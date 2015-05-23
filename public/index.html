@@ -1,0 +1,106 @@
+<!doctype html>
+<html>
+  <head>
+        <title>My TODOs</title>
+		<link href="css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="css/styles.css" />
+    </head>
+    <body>
+		<section id="app">
+			<header id="header">
+				<div id="user"></div><div id="databases"></div>
+			</header>
+			<section id="content">				
+
+				<div class="panel-group" id="tables-accord" role="tablist">
+				</div>
+
+			</section>
+		</section>
+
+		<div class="modal fade" id="modalEditTable" tabindex="-1" role="dialog">
+		  <div class="modal-dialog">
+			<div class="modal-content">
+			  <div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+				<h4 class="modal-title" id="modalTableTitle">Edit Table</h4>
+			  </div>
+<ul class="nav nav-tabs">
+  <li role="presentation" class="active"><a href="#tab-table-edit-general" data-toggle="tab">General</a></li>
+  <li role="presentation"><a href="#tab-table-edit-fields" data-toggle="tab">Fields</a></li>
+</ul>
+			  <div class="tab-content modal-body">
+				<div class="tab-pane active" id="tab-table-edit-general">
+				<form>
+				  <div class="form-group">
+					<label for="recipient-name" class="control-label">Name:</label>
+					<input type="text" class="form-control" id="modalInputTableName">
+				  </div>
+				  <div class="form-group">
+					<label for="message-text" class="control-label">Message:</label>
+					<textarea class="form-control" id="message-text"></textarea>
+				  </div>
+				</form>
+				</div>
+				<div class="tab-pane" id="tab-table-edit-fields">
+DADA
+				</div>
+			  </div>
+			  <div class="modal-footer">
+				<button id="modalTableRemove" type="button" class="btn btn-danger" data-dismiss="modal">Delete</button>
+				<button id="modalTableUpdate" type="button" data-dismiss="modal" class="btn btn-primary">Update</button>
+			  </div>
+			</div>
+		  </div>
+		</div>
+
+		<script type="text/template" id="table-template">
+		    <div class="panel-heading" role="tab" id="heading<%= name %>">
+		      <div class="panel-title">
+				<button data-table="<%= name %>" class="edit-table"><span class="glyphicon-pencil"></span></button>
+		        <a data-toggle="collapse" data-parent="#tables-accord" href="#collapse<%= name %>">
+		          <%- name %>
+		        </a>
+		      </div>
+		    </div>
+		    <div id="collapse<%= name %>" class="panel-collapse collapse" role="tabpanel">
+				TODO TABLE Header
+				<h3>Fields</h3>
+				<table style="max-width: 400px" id="fields<%= name %>" class="table">
+				</table>
+			</div>
+		</script>
+
+		<script type="text/template" id="field-template">
+			<td><%= name %></td><td><%= type %></td><td><%= length%></td>
+			<td>
+				<button data-field="<%= name %>" class="edit-field"><span class="glyphicon-pencil"></span></button>
+			</td>
+		</script>
+
+		<script type="text/template" id="table-edit-template">
+		</script>
+
+  		<script src="js/lib/jquery.min.js" type="text/javascript"></script>
+  		<script src="js/lib/bootstrap.min.js" type="text/javascript"></script>
+  		<script src="js/lib/underscore-min.js" type="text/javascript"></script>
+  		<script src="js/lib/backbone-min.js" type="text/javascript"></script>
+
+		<script src="js/models/Schema.js" type="text/javascript"></script>
+		<script src="js/models/Table.js" type="text/javascript"></script>
+		<script src="js/models/Field.js" type="text/javascript"></script>
+
+		<script src="js/collections/Tables.js" type="text/javascript"></script>
+		<script src="js/collections/Fields.js" type="text/javascript"></script>
+
+		<script src="js/views/SchemaView.js" type="text/javascript"></script>
+		<script src="js/views/TableView.js" type="text/javascript"></script>
+		<script src="js/views/TableEditView.js" type="text/javascript"></script>
+		<script src="js/views/FieldView.js" type="text/javascript"></script>
+
+		<script src="js/app.js" type="text/javascript"></script>
+    </body>
+</html>
+
+
+
