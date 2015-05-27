@@ -12,6 +12,28 @@ var app = app || {};
 				return new app.Field(field);
 			});
 			this.set('fields', new app.Fields(fields));
+
+			var relations = [];
+			_.each(table.parents, function(p) {
+				var fk = _.find(table.fields, function(f) {
+					return f.fk_table == p;
+				});
+				var r = {
+					table: table.name,
+					related: p,
+					field: fk.name
+				}; 
+				relations.push(r);
+			});
+			if (table.supertype) {
+				var r = {
+					table: table.name,
+					related: table.supertype,
+					field: table.fields['id'].name
+				}; 
+				relations.push(r);
+			}
+			this.set('relations', new app.Relations(relations));
 		},
 
 	});

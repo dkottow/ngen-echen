@@ -8,8 +8,8 @@ var app = app || {};
 		el:  '#modalEditTable',
 
 		events: {
-			'click #modalTableUpdate': 'updateTableClick',
-			'click #modalTableRemove': 'removeTableClick'
+			'click #modalTableUpdate': 'updateClick',
+			'click #modalTableRemove': 'removeClick'
 		},
 
 		initialize: function() {
@@ -23,12 +23,13 @@ var app = app || {};
 			return this;
 		},
 
-		updateTableClick: function() {
+		updateClick: function() {
 			var newName = $('#modalInputTableName').val();
 			this.model.set('name', newName);
+			$('#collapse-' + newName).collapse('show');
 		},
 
-		removeTableClick: function() {	
+		removeClick: function() {	
 			this.model.collection.remove(this.model);
 		}
 

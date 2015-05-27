@@ -57,7 +57,7 @@ var app = app || {};
 			//console.log('SchemaView.setTables');
 			var html = [
 	'<div class="panel-heading" role="tab" id="add-table-heading">',
-	'	<button id="add-table"><span class="glyphicon-plus"></span></button>',
+	'	<button id="add-table">Add table</button>',
 	'</div>'];
 
 			$('#tables-accord').html(html.join('\n'));

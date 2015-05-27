@@ -8,6 +8,10 @@ var app = app || {};
 
 		tagName: 'tr',
 
+		events: {
+			'click .edit-field': 'editFieldClick',
+		},
+
 		initialize: function () {
 			//console.log("TableView.init " + this.model.get('name'));
 			this.listenTo(this.model, 'change', this.render);
@@ -20,6 +24,12 @@ var app = app || {};
 			this.$el.html(this.template(this.model.toJSON()));
 			return this;
 		},
+
+		editFieldClick: function(ev) {				
+			app.fieldEditView.model = this.model;
+			app.fieldEditView.render();
+		},
+
 
 	});
 

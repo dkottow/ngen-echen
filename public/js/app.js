@@ -6,10 +6,13 @@ $(function () {
 	
 	// kick things off..
 	app.schema = new app.Schema({user: "stores", name: "custorder"});
-	app.schema.fetch();
 	app.schemaView = new app.SchemaView({
 		model: app.schema
 	});
 	app.tableEditView = new app.TableEditView();
+	app.fieldEditView = new app.FieldEditView();
+	app.relationEditView = new app.RelationEditView();
+
+	app.schema.fetch();
 });
 

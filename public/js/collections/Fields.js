@@ -11,6 +11,12 @@ var app = app || {};
 		// Reference to this collection's model.
 		model: app.Field,
 		
+		addNew: function() {
+			var field = app.Field.create('field' + this.length);
+			this.add(field);
+			return field;
+		}
+
 	});
 
 })();
