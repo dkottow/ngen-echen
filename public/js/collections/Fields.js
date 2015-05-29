@@ -15,8 +15,11 @@ var app = app || {};
 			var field = app.Field.create('field' + this.length);
 			this.add(field);
 			return field;
-		}
+		},
 
+		getByName: function(name) {
+			return this.find(function(f) { return f.get('name') == name; });
+		}
 	});
 
 })();

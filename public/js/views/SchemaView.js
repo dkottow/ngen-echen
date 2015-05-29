@@ -16,12 +16,12 @@ var app = app || {};
 			console.log("SchemaView.init");
 
 			this.listenTo(this.model, 'change', this.render);
-			this.listenTo(this.model, 'change:tables', this.setTableListeners);
+			this.listenTo(this.model, 'change:tables', this.setAttributeListeners);
 
 			this.tableViews = {};
 		},
 
-		setTableListeners: function() {
+		setAttributeListeners: function() {
 			console.log('SchemaView.setTableListeners');			
 			this.listenTo(this.model.get('tables'), 'reset', this.setTables);
 			this.listenTo(this.model.get('tables'), 'add', this.addTable);

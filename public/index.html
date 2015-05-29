@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-        <title>My TODOs</title>
+        <title>DonkeyLift Schema</title>
 		<link href="css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="css/styles.css" />
     </head>
@@ -23,17 +23,12 @@
 			<div class="modal-content">
 			  <div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-				<h4 class="modal-title" id="modalTableTitle">Edit Table</h4>
+				<h4 class="modal-title">Edit Table</h4>
 			  </div>
-<ul class="nav nav-tabs">
-  <li role="presentation" class="active"><a href="#tab-table-edit-general" data-toggle="tab">General</a></li>
-  <li role="presentation"><a href="#tab-table-edit-fields" data-toggle="tab">Fields</a></li>
-</ul>
-			  <div class="tab-content modal-body">
-				<div class="tab-pane active" id="tab-table-edit-general">
+			  <div class="modal-body">
 				<form>
 				  <div class="form-group">
-					<label for="recipient-name" class="control-label">Name:</label>
+					<label for="modalInputTableName" class="control-label">Name:</label>
 					<input type="text" class="form-control" id="modalInputTableName">
 				  </div>
 				  <div class="form-group">
@@ -41,10 +36,6 @@
 					<textarea class="form-control" id="message-text"></textarea>
 				  </div>
 				</form>
-				</div>
-				<div class="tab-pane" id="tab-table-edit-fields">
-DADA
-				</div>
 			  </div>
 			  <div class="modal-footer">
 				<button id="modalTableRemove" type="button" class="btn btn-danger" data-dismiss="modal">Delete</button>
@@ -54,31 +45,152 @@ DADA
 		  </div>
 		</div>
 
+		<div class="modal fade" id="modalEditField" tabindex="-1" role="dialog">
+		  <div class="modal-dialog">
+			<div class="modal-content">
+			  <div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+				<h4 class="modal-title">Edit Field</h4>
+			  </div>
+			  <div class="modal-body">
+				<form>
+				  <div class="form-group">
+					<label for="modalInputFieldName" class="control-label">Name:</label>
+					<input type="text" class="form-control" id="modalInputFieldName">
+				  </div>
+				  <div class="form-group">
+					<label for="modalInputFieldType" class="control-label">Type:</label>
+					<select class="form-control" id="modalInputFieldType">
+						<option value="Integer">Integer</option>
+						<option value="Decimal">Decimal</option>
+						<option value="Text">Text</option>
+						<option value="Date">Date</option>
+						<option value="Timestamp">Timestamp</option>
+					</select>
+				  </div>
+				  <div class="form-group">
+					<label for="modalInputFieldLength" class="control-label">Length:</label>
+					<input type="text" class="form-control" id="modalInputFieldLength">
+				  </div>
+				</form>
+			  </div>
+			  <div class="modal-footer">
+				<button id="modalFieldRemove" type="button" class="btn btn-danger" data-dismiss="modal">Delete</button>
+				<button id="modalFieldUpdate" type="button" data-dismiss="modal" class="btn btn-primary">Update</button>
+			  </div>
+			</div>
+		  </div>
+		</div>
+
+		<div class="modal fade" id="modalEditRelation" tabindex="-1" role="dialog">
+		  <div class="modal-dialog">
+			<div class="modal-content">
+			  <div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+				<h4 class="modal-title">Edit Relationship</h4>
+			  </div>
+			  <div class="modal-body">
+				<form>
+				  <div class="form-group">
+					<label for="modalInputRelationTable" class="control-label">Referenced Table:</label>
+					<select class="form-control" id="modalInputRelationTable">
+						<option value="Date">Date</option>
+						<option value="Timestamp">Timestamp</option>
+					</select>
+				  </div>
+				  <div class="form-group">
+					<label for="modalInputRelationType" class="control-label">Type:</label>
+					<select class="form-control" id="modalInputRelationType">
+						<option value="many-to-one">many-to-one</option>
+						<option value="one-to-one">one-to-one</option>
+					</select>
+				  </div>
+				  <div class="form-group">
+					<label for="modalInputRelationField" class="control-label">Foreign Key:</label>
+					<select class="form-control" id="modalInputRelationField">
+					</select>
+				  </div>
+				</form>
+			  </div>
+			  <div class="modal-footer">
+				<button id="modalRelationRemove" type="button" class="btn btn-danger" data-dismiss="modal">Delete</button>
+				<button id="modalRelationUpdate" type="button" data-dismiss="modal" class="btn btn-primary">Update</button>
+			  </div>
+			</div>
+		  </div>
+		</div>
+
 		<script type="text/template" id="table-template">
-		    <div class="panel-heading" role="tab" id="heading<%= name %>">
+		    <div class="panel-heading" role="tab" id="heading-<%= name %>">
 		      <div class="panel-title">
-				<button data-table="<%= name %>" class="edit-table"><span class="glyphicon-pencil"></span></button>
-		        <a data-toggle="collapse" data-parent="#tables-accord" href="#collapse<%= name %>">
-		          <%- name %>
+				<button class="edit-table"><span class="glyphicon-pencil"></span></button>
+		        <a data-toggle="collapse" data-parent="#tables-accord" href="#collapse-<%= name %>">
+		          <%= name %>
 		        </a>
 		      </div>
 		    </div>
-		    <div id="collapse<%= name %>" class="panel-collapse collapse" role="tabpanel">
-				TODO TABLE Header
-				<h3>Fields</h3>
-				<table style="max-width: 400px" id="fields<%= name %>" class="table">
-				</table>
+		    <div id="collapse-<%= name %>" class="panel-collapse collapse" role="tabpanel">				
+
+				<div id="fields-<%= name %>" class="panel panel-primary">
+					<div class="panel-heading">
+						<h3 class="panel-title">Fields</h3>
+					</div>
+					<div class="panel-body">
+						<table class="table field-table">
+							<thead>
+							<tr><th>Name</th>
+								<th>Type</th>
+								<th>Length</th>
+								<th></th>
+							</tr>
+							</thead>
+							<tbody></tbody>
+						</table>
+					</div>
+					<div class="panel-footer" id="add-field-heading">
+						<button id="add-field">Add field</button>
+					</div>
+				</div>
+
+				<div id="relations-<%= name %>" class="panel panel-primary">
+					<div class="panel-heading">
+						<h3 class="panel-title">Relationships</h3>
+					</div>
+					<div class="panel-body">
+						<table class="table relation-table">
+							<thead>
+							<tr><th>Referenced Table</th>
+								<th>Type</th>
+								<th>Foreign Key</th>
+								<th></th>
+							</tr>
+							</thead>
+							<tbody></tbody>
+						</table>
+					</div>
+					<div class="panel-footer">
+						<button id="add-relation">Add relationship</button>
+					</div>
+				</div>
+
 			</div>
 		</script>
 
 		<script type="text/template" id="field-template">
-			<td><%= name %></td><td><%= type %></td><td><%= length%></td>
+			<td><%= name %></td><td><%= type %></td><td><%= length %></td>
 			<td>
-				<button data-field="<%= name %>" class="edit-field"><span class="glyphicon-pencil"></span></button>
+				<button class="edit-field"><span class="glyphicon-pencil"></span></button>
 			</td>
 		</script>
 
-		<script type="text/template" id="table-edit-template">
+		<script type="text/template" id="relation-template">
+			<td><% if (related) print(related.attributes.name) %></td>
+			<td><%= type %></td>
+			<td><% if (field) print(field.attributes.name) %></td>
+
+			<td>
+				<button class="edit-relation"><span class="glyphicon-pencil"></span></button>
+			</td>
 		</script>
 
   		<script src="js/lib/jquery.min.js" type="text/javascript"></script>
@@ -89,14 +201,19 @@ DADA
 		<script src="js/models/Schema.js" type="text/javascript"></script>
 		<script src="js/models/Table.js" type="text/javascript"></script>
 		<script src="js/models/Field.js" type="text/javascript"></script>
+		<script src="js/models/Relation.js" type="text/javascript"></script>
 
 		<script src="js/collections/Tables.js" type="text/javascript"></script>
 		<script src="js/collections/Fields.js" type="text/javascript"></script>
+		<script src="js/collections/Relations.js" type="text/javascript"></script>
 
 		<script src="js/views/SchemaView.js" type="text/javascript"></script>
 		<script src="js/views/TableView.js" type="text/javascript"></script>
 		<script src="js/views/TableEditView.js" type="text/javascript"></script>
 		<script src="js/views/FieldView.js" type="text/javascript"></script>
+		<script src="js/views/FieldEditView.js" type="text/javascript"></script>
+		<script src="js/views/RelationView.js" type="text/javascript"></script>
+		<script src="js/views/RelationEditView.js" type="text/javascript"></script>
 
 		<script src="js/app.js" type="text/javascript"></script>
     </body>

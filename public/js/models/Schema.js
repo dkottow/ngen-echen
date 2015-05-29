@@ -24,12 +24,6 @@ var app = app || {};
 				'joins': response.joins,
 				'tables': new app.Tables(tables)
 			});
-/*
-			this.get('tables').reset(tables);
-			this.get('tables').each( function(t) {
-				t.get('fields').trigger('reset');
-			});
-*/
 		}
 
 	});

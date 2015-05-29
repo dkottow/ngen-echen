@@ -15,13 +15,19 @@ var app = app || {};
 		initialize: function () {
 			//console.log("RelationView.init " + this.model.get('table'));
 			this.listenTo(this.model, 'change', this.render);
+			this.listenTo(this.model, 'change:field', this.setAttributeListeners);
+			this.listenTo(this.model, 'change:related', this.setAttributeListeners);
+		},
+
+		setAttributeListeners: function () {
+			this.listenTo(this.model.get('field'), 'change:name', this.render);
+			this.listenTo(this.model.get('related'), 'change:name', this.render);
 		},
 
 		template: _.template($('#relation-template').html()),
 
 		render: function() {
-			console.log("RelationView.render " + this.model);
-			console.log("RelationView.render " + this.model.attributes);
+			console.log("RelationView.render ");
 			this.$el.html(this.template(this.model.toJSON()));
 			return this;
 		},

@@ -70,7 +70,7 @@ var app = app || {};
 
 		newRelationClick: function() {
 			console.log('TableView.newRelationClick');
-			var relation = this.model.get('relations').addNew(this.model.get('name'));
+			var relation = this.model.get('relations').addNew(this.model);
 			app.relationEditView.model = relation;
 			app.relationEditView.render();
 		},

@@ -7,12 +7,12 @@ var app = app || {};
 	app.Table = Backbone.Model.extend({ 
 		
 		initialize: function(table) {
-			this.id = table.name;
 			var fields = _.map(table.fields, function(field) {
 				return new app.Field(field);
 			});
 			this.set('fields', new app.Fields(fields));
 
+/*
 			var relations = [];
 			_.each(table.parents, function(p) {
 				var fk = _.find(table.fields, function(f) {
@@ -34,6 +34,7 @@ var app = app || {};
 				relations.push(r);
 			}
 			this.set('relations', new app.Relations(relations));
+*/
 		},
 
 	});
@@ -41,7 +42,8 @@ var app = app || {};
 	app.Table.create = function(name) {
 		var fields = {
 			id: { name: 'id', type: 'INTEGER' },
-			modified_by: { name : 'modified_by', type: 'VARCHAR' }
+			modified_by: { name : 'modified_by', type: 'VARCHAR' },
+			modified_at: { name : 'modified_at', type: 'DATETIME' }
 		};
 		return new app.Table({
 			name: name,
