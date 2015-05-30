@@ -28,6 +28,7 @@ var app = app || {};
 					.text(table.get('name')));
 			});
 			
+			el.val('');
 			if (this.model.get('related'))
 				el.val(this.model.get('related').get('name'));
 
@@ -41,6 +42,7 @@ var app = app || {};
 				}
 			});
 
+			el.val('');
 			if (this.model.get('field'))
 				el.val(this.model.get('field').get('name'));
 
@@ -55,16 +57,16 @@ var app = app || {};
 			var newType = $('#modalInputRelationType').val();
 			var newField = $('#modalInputRelationField').val();
 			if (newType == 'one-to-one') newField = 'id';
-			this.model.set('type', newType);	
 
-			var fields = this.model.get('table').get('fields');
-			var tables = app.schema.get('tables');
+			newField = this.model.get('table').get('fields').getByName(newField);
+			newTable = app.schema.get('tables').getByName(newTable);
 			//console.log('new field ' + fields.getByName(newField).get('name'));
 			//console.log('new related table ' + tables.getByName(newTable).get('name'));
 			
 			this.model.set({
-				'field': fields.getByName(newField),
-				'related': tables.getByName(newTable)
+				'type': newType,
+				'field': newField,
+				'related': newTable
 			});	
 		},
 
@@ -76,7 +78,7 @@ var app = app || {};
 		typeChange: function() {
 			var el = $('#modalInputRelationField');	
 			if ($('#modalInputRelationType').val() == 'one-to-one') {
-				el.val('');
+				el.val('id'); //doesnt work
 				el.prop('disabled', true);
 			} else {
 				el.prop('disabled', false);

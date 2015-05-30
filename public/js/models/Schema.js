@@ -24,7 +24,17 @@ var app = app || {};
 				'joins': response.joins,
 				'tables': new app.Tables(tables)
 			});
-		}
+		},
+
+		toServerJSON : function() {
+			var tables = this.get('tables').map(function(table) {
+				return table.toServerJSON();	
+			});
+			return {
+				name: this.get('name'),
+				tables: tables
+			};
+		}	
 
 	});
 

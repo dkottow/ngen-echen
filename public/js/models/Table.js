@@ -14,6 +14,23 @@ var app = app || {};
 			this.set('relations', new app.Relations());
 		},
 
+		toServerJSON: function() {
+			var fields = this.get('fields').map(function(field) {
+				return field.toServerJSON();
+			}); 
+			fields = _.object(_.pluck(fields, 'name'), fields);
+
+			this.get('relations').each(function(relation) {
+				var field = fields[relation.get('field').get('name')];
+				field.fk_table = relation.get('related').get('name');
+			});
+
+			return {
+				name: this.get('name'),
+				fields: fields
+			};
+		}
+
 	});
 
 	app.Table.create = function(name) {

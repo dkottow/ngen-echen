@@ -12,6 +12,7 @@ var app = app || {};
 		model: app.Relation,
 		
 		addNew: function(table) {
+			console.log('Relations addNew ' + table.get('name'));
 			var relation = new app.Relation.create(table);
 			this.add(relation);
 			return relation;

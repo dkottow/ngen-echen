@@ -1,9 +1,17 @@
+#content {
+	margin: 1em;
+}
+
 .edit-table {
 	margin-right: 1em;
 }
 
 .panel-collapse {
-	padding-left: 3em;
+	padding: 1em 1em 1em 3em;
+}
+
+.field-panel {
+	margin-bottom: 1em;
 }
 
 .panel-title {
@@ -14,3 +22,4 @@
 	max-width: 400px;
 	margin-bottom: 0;
 }
+

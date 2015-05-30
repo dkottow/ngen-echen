@@ -14,6 +14,19 @@ var app = app || {};
 			this.set('length', spec);
 		},
 
+		toServerJSON: function() {
+			var type = app.Field.ALIAS[this.get('type')];
+			if (this.get('length')) {
+				type += '(' + this.get('length') + ')';
+			}
+
+			return {
+				name: this.get('name'),
+				type: type,
+				order: this.get('order')
+			};
+		}
+
 	});
 
 	app.Field.create = function(name) {
@@ -31,6 +44,8 @@ var app = app || {};
 		'DATE': 'Date',
 		'DATETIME': 'Timestamp'
 	}
+
+	app.Field.ALIAS = _.invert(app.Field.TYPES);
 
 	app.Field.TypeAlias = function(type) {
 		return app.Field.TYPES[type]; 		

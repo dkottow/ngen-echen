@@ -17,11 +17,14 @@ var app = app || {};
 			this.listenTo(this.model, 'change', this.render);
 			this.listenTo(this.model, 'change:field', this.setAttributeListeners);
 			this.listenTo(this.model, 'change:related', this.setAttributeListeners);
+			this.setAttributeListeners();
 		},
 
 		setAttributeListeners: function () {
-			this.listenTo(this.model.get('field'), 'change:name', this.render);
-			this.listenTo(this.model.get('related'), 'change:name', this.render);
+			if (this.model.get('field')) {
+				this.listenTo(this.model.get('field'), 'change:name', this.render);
+				this.listenTo(this.model.get('related'), 'change:name', this.render);
+			}
 		},
 
 		template: _.template($('#relation-template').html()),

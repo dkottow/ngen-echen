@@ -92,16 +92,18 @@ var app = app || {};
 		evNewRelationClick: function() {
 			console.log('TableView.evNewRelationClick');
 			var relation = this.model.get('relations').addNew(this.model);
+			//console.log(relation.attributes);
 			app.relationEditView.model = relation;
 			app.relationEditView.render();
 		},
 
 		removeRelation: function(relation) {
-			console.log('SchemaView.removeRelation ' + relation.id);
+			console.log('SchemaView.removeRelation ' + relation.cid);
 			this.relationViews[relation.cid].remove();
 		},
 
 		addRelation: function(relation) {
+			console.log('SchemaView.addRelation ' + relation.cid);
 			var view = new app.RelationView({model: relation});
 			this.elRelations().append(view.render().el);
 			this.relationViews[relation.cid] = view;

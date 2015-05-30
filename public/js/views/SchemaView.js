@@ -9,7 +9,8 @@ var app = app || {};
 
 		events: {
 			//'keypress #new-todo': 'createOnEnter',
-			'click #add-table': 'newTableClick'
+			'click #add-table': 'evNewTable',
+			'click #save-schema': 'evSaveSchema'
 		},
 
 		initialize: function() {
@@ -34,8 +35,12 @@ var app = app || {};
 			return this;
 		},
 
-		newTableClick: function() {
-			console.log('SchemaView.newTableClick');
+		evSaveSchema: function() {
+			console.log(JSON.stringify(this.model.toServerJSON()));
+		},
+
+		evNewTable: function() {
+			console.log('SchemaView.evNewTable');
 			var table = this.model.get('tables').addNew();
 			app.tableEditView.model = table;
 			app.tableEditView.render();
@@ -49,18 +54,13 @@ var app = app || {};
 		addTable: function(table) {
 			console.log('SchemaView.addTable ' + table.get("name"));
 			var view = new app.TableView({model: table});
-			$('#add-table-heading').before(view.render().el);
+			$('#tables-accord').append(view.render().el);
 			this.tableViews[table.cid] = view;
 		},
 
 		setTables: function() {
 			//console.log('SchemaView.setTables');
-			var html = [
-	'<div class="panel-heading" role="tab" id="add-table-heading">',
-	'	<button id="add-table">Add table</button>',
-	'</div>'];
-
-			$('#tables-accord').html(html.join('\n'));
+			$('#tables-accord').html('');
 			this.model.get('tables').each(this.addTable, this);
 		}
 

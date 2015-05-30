@@ -15,6 +15,12 @@
 
 				<div class="panel-group" id="tables-accord" role="tablist">
 				</div>
+				<div>
+					<button class="btn btn-primary" id="add-table">Add table</button>
+				</div>
+				<div>
+					<button class="btn btn-danger" id="save-schema">Save Schema</button>
+				</div>
 
 			</section>
 		</section>
@@ -124,7 +130,7 @@
 		<script type="text/template" id="table-template">
 		    <div class="panel-heading" role="tab" id="heading-<%= name %>">
 		      <div class="panel-title">
-				<button class="edit-table"><span class="glyphicon-pencil"></span></button>
+				<button class="edit-table btn btn-default"><span class="glyphicon-pencil"></span></button>
 		        <a data-toggle="collapse" data-parent="#tables-accord" href="#collapse-<%= name %>">
 		          <%= name %>
 		        </a>
@@ -151,10 +157,10 @@
 						</table>
 					</div>
 					<div class="panel-footer" id="add-field-heading">
-						<button id="add-field">Add field</button>
+						<button id="add-field" class="btn btn-primary">Add field</button>
 					</div>
 				</div>
-
+				<br/>
 				<div id="relations-<%= name %>" class="panel panel-primary">
 					<div class="panel-heading">
 						<h3 class="panel-title">Relationships</h3>
@@ -172,7 +178,7 @@
 						</table>
 					</div>
 					<div class="panel-footer">
-						<button id="add-relation">Add relationship</button>
+						<button id="add-relation" class="btn btn-primary">Add relationship</button>
 					</div>
 				</div>
 
@@ -187,7 +193,7 @@
 			<td><%= type %></td>
 			<td><%= length %></td>
 			<td>
-				<button class="edit-field">
+				<button class="edit-field btn btn-default">
 					<span class="glyphicon-pencil"></span>
 				</button>
 			</td>
