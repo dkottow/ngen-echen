@@ -10,9 +10,9 @@ var app = app || {};
 		className: 'panel panel-default',	
 
 		events: {
-			'click .edit-table': 'editTableClick',
-			'click #add-field': 'newFieldClick',
-			'click #add-relation': 'newRelationClick'
+			'click .edit-table': 'evEditTableClick',
+			'click #add-field': 'evNewFieldClick',
+			'click #add-relation': 'evNewRelationClick'
 		},
 
 		initialize: function () {
@@ -25,6 +25,7 @@ var app = app || {};
 			this.listenTo(this.model.get('relations'), 'remove', this.removeRelation);
 			this.fieldViews = {};
 			this.relationViews = {};
+
 		},
 
 		template: _.template($('#table-template').html()),
@@ -32,18 +33,39 @@ var app = app || {};
 		render: function() {
 			console.log("TableView.render " + this.model.get("name"));
 			this.$el.html(this.template(this.model.toJSON()));
+
+			var me = this;
+			this.elFields().sortable({
+				stop: function() {
+					$('tr', me.elFields()).each(function(index) {
+						var name = $('td:eq(1)', this).text();
+						//console.log(name + ' = ' + (index + 1));
+						var field = me.model.get('fields').getByName(name);
+						field.set('order', index + 1);
+					});
+				}
+			});
+
 			this.setFields();
 			this.setRelations();
 			return this;
 		},
 
-		editTableClick: function(ev) {				
+		elFields: function() {
+			return this.$('#fields-' + this.model.get('name') + ' tbody');
+		},
+
+		elRelations: function() {
+			return this.$('#relations-' + this.model.get('name') + ' tbody');
+		},
+
+		evEditTableClick: function(ev) {				
 			app.tableEditView.model = this.model;
 			app.tableEditView.render();
 		},
 
-		newFieldClick: function() {
-			console.log('TableView.newFieldClick');
+		evNewFieldClick: function() {
+			console.log('TableView.evNewFieldClick');
 			var field = this.model.get('fields').addNew();
 			app.fieldEditView.model = field;
 			app.fieldEditView.render();
@@ -57,19 +79,18 @@ var app = app || {};
 		addField: function(field) {
 			//console.log('TableView.addField ' + field.get("name"));
 			var view = new app.FieldView({model: field});
-			this.$('#fields-' + this.model.get('name') + ' tbody')
-				.append(view.render().el);
+			this.elFields().append(view.render().el);
 			this.fieldViews[field.cid] = view;
 		},
 
 		setFields: function() {
 			console.log('TableView.setFields ' + this.model.get('name'));
-			this.$('#fields-' + this.model.get('name') + ' tbody').html('');
+			this.elFields().html('');
 			this.model.get('fields').each(this.addField, this);
 		},
 
-		newRelationClick: function() {
-			console.log('TableView.newRelationClick');
+		evNewRelationClick: function() {
+			console.log('TableView.evNewRelationClick');
 			var relation = this.model.get('relations').addNew(this.model);
 			app.relationEditView.model = relation;
 			app.relationEditView.render();
@@ -82,13 +103,12 @@ var app = app || {};
 
 		addRelation: function(relation) {
 			var view = new app.RelationView({model: relation});
-			this.$('#relations-' + this.model.get('name') + ' tbody')
-				.append(view.render().el);
+			this.elRelations().append(view.render().el);
 			this.relationViews[relation.cid] = view;
 		},
 
 		setRelations: function() {
-			this.$('#relations-' + this.model.get('name') + ' tbody').html('');
+			this.elRelations().html('');
 			this.model.get('relations').each(this.addRelation, this);
 		}
 	});

@@ -1,0 +1,6 @@
+field ordering
+validate no references exist when deleting field / table (due to relations)
+no edits of fields: id, modified_by, modified_on
+validate length attribute of field
+send schema to server!
+enum fields

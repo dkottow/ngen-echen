@@ -13,6 +13,7 @@ var app = app || {};
 		
 		addNew: function() {
 			var field = app.Field.create('field' + this.length);
+			field.set('order', this.length);
 			this.add(field);
 			return field;
 		},

@@ -3,7 +3,7 @@ var app = app || {};
 
 $(function () {
 	'use strict';
-	
+
 	// kick things off..
 	app.schema = new app.Schema({user: "stores", name: "custorder"});
 	app.schemaView = new app.SchemaView({

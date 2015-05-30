@@ -59,8 +59,8 @@ var app = app || {};
 
 			var fields = this.model.get('table').get('fields');
 			var tables = app.schema.get('tables');
-			console.log('new field ' + fields.getByName(newField).get('name'));
-			console.log('new related table ' + tables.getByName(newTable).get('name'));
+			//console.log('new field ' + fields.getByName(newField).get('name'));
+			//console.log('new related table ' + tables.getByName(newTable).get('name'));
 			
 			this.model.set({
 				'field': fields.getByName(newField),
