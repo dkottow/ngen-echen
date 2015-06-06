@@ -7,6 +7,7 @@ var app = app || {};
 	app.Table = Backbone.Model.extend({ 
 		
 		initialize: function(table) {
+			console.log("Table.initialize " + table.name);
 			var fields = _.map(table.fields, function(field) {
 				return new app.Field(field);
 			});

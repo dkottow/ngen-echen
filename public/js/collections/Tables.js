@@ -35,6 +35,7 @@ var app = app || {};
 		},
 
 		addNew: function() {
+			console.log("Tables.addNew");
 			var table = app.Table.create('table' + this.length);
 			this.add(table);
 			return table;

@@ -6,8 +6,7 @@ var app = app || {};
 
 	app.TableView = Backbone.View.extend({
 
-		tagName: 'div',
-		className: 'panel panel-default',	
+		//el:  '#content',
 
 		events: {
 			'click .edit-table': 'evEditTableClick',
@@ -52,11 +51,11 @@ var app = app || {};
 		},
 
 		elFields: function() {
-			return this.$('#fields-' + this.model.get('name') + ' tbody');
+			return this.$('#fields tbody');
 		},
 
 		elRelations: function() {
-			return this.$('#relations-' + this.model.get('name') + ' tbody');
+			return this.$('#relations tbody');
 		},
 
 		evEditTableClick: function(ev) {				
@@ -77,7 +76,7 @@ var app = app || {};
 		},
 
 		addField: function(field) {
-			//console.log('TableView.addField ' + field.get("name"));
+			console.log('TableView.addField ' + field.get("name"));
 			var view = new app.FieldView({model: field});
 			this.elFields().append(view.render().el);
 			this.fieldViews[field.cid] = view;
@@ -85,6 +84,9 @@ var app = app || {};
 
 		setFields: function() {
 			console.log('TableView.setFields ' + this.model.get('name'));
+			_.each(this.fieldViews, function(view) {
+				view.remove();
+			});
 			this.elFields().html('');
 			this.model.get('fields').each(this.addField, this);
 		},
