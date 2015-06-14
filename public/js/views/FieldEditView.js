@@ -29,11 +29,17 @@ var app = app || {};
 			this.model.set('name', $('#modalInputFieldName').val());
 			this.model.set('type', $('#modalInputFieldType').val());
 			this.model.set('length', $('#modalInputFieldLength').val());
+			if ( ! app.table.get('fields').contains(this.model)) {
+				this.model.set('order', app.table.get('fields').length + 1);
+				app.table.get('fields').add(this.model);
+			}
 		},
 
 		removeClick: function() {	
 			console.log("FieldEditView.removeClick " + this.model.collection);
-			this.model.collection.remove(this.model);
+			if (this.model.collection) {
+				this.model.collection.remove(this.model);
+			}
 		}
 
 	});

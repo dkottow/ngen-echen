@@ -24,14 +24,14 @@ var app = app || {};
 			this.listenTo(this.model.get('relations'), 'remove', this.removeRelation);
 			this.fieldViews = {};
 			this.relationViews = {};
-
+			
 		},
 
 		template: _.template($('#table-template').html()),
 
 		render: function() {
 			console.log("TableView.render " + this.model.get("name"));
-			this.$el.html(this.template(this.model.toJSON()));
+			this.$el.html(this.template(this.model.attrJSON()));
 
 			var me = this;
 			this.elFields().sortable({
@@ -65,7 +65,8 @@ var app = app || {};
 
 		evNewFieldClick: function() {
 			console.log('TableView.evNewFieldClick');
-			var field = this.model.get('fields').addNew();
+			var field = app.Field.create();
+			//var field = this.model.get('fields').addNew();
 			app.fieldEditView.model = field;
 			app.fieldEditView.render();
 		},
@@ -93,7 +94,8 @@ var app = app || {};
 
 		evNewRelationClick: function() {
 			console.log('TableView.evNewRelationClick');
-			var relation = this.model.get('relations').addNew(this.model);
+			var relation = app.Relation.create(this.model);
+			//var relation = this.model.get('relations').addNew(this.model);
 			//console.log(relation.attributes);
 			app.relationEditView.model = relation;
 			app.relationEditView.render();

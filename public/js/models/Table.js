@@ -15,9 +15,13 @@ var app = app || {};
 			this.set('relations', new app.Relations());
 		},
 
-		toServerJSON: function() {
+		attrJSON: function() {
+			return _.clone(this.attributes);
+		},		
+
+		toJSON: function() {
 			var fields = this.get('fields').map(function(field) {
-				return field.toServerJSON();
+				return field.toJSON();
 			}); 
 			fields = _.object(_.pluck(fields, 'name'), fields);
 
@@ -38,7 +42,7 @@ var app = app || {};
 		var fields = [ 
 			{ name: 'id', type: 'INTEGER', order: 1 },
 			{ name : 'modified_by', type: 'VARCHAR', order: 2 },
-			{ name : 'modified_at', type: 'DATETIME', order: 3 }
+			{ name : 'modified_on', type: 'DATETIME', order: 3 }
 		];
 		return new app.Table({
 			name: name,

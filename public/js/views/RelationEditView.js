@@ -68,11 +68,16 @@ var app = app || {};
 				'field': newField,
 				'related': newTable
 			});	
+			if ( ! app.table.get('relations').contains(this.model)) {
+				app.table.get('relations').add(this.model);
+			}
 		},
 
 		removeClick: function() {	
 			console.log("RelationEditView.removeClick " + this.model.collection);
-			this.model.collection.remove(this.model);
+			if (this.model.collection) {
+				this.model.collection.remove(this.model);
+			}
 		},
 
 		typeChange: function() {

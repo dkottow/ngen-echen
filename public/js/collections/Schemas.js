@@ -6,13 +6,14 @@ var app = app || {};
 	app.Schemas = Backbone.Collection.extend({
 
 		initialize: function(models, options) {
+			console.log("Schemas.initialize");
 			this.user = options.user;
 		},
 
 		model: app.Schema,
 
 		url	: function() { 
-			return REST_ROOT + "/" + this.user; 
+			return REST_ROOT + this.user; 
 		},
 
 		parse : function(response) {

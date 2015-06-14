@@ -13,8 +13,12 @@ var app = app || {};
 			if (match[2]) spec = match[2].substr(1, match[2].length - 2);
 			this.set('length', spec);
 		},
+		
+		attrJSON: function() {
+			return _.clone(this.attributes);
+		},		
 
-		toServerJSON: function() {
+		toJSON: function() {
 			var type = app.Field.ALIAS[this.get('type')];
 			if (this.get('length')) {
 				type += '(' + this.get('length') + ')';

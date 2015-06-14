@@ -21,7 +21,7 @@ var app = app || {};
 
 		render: function() {
 			//console.log("FieldView.render " + this.model.get("name"));
-			this.$el.html(this.template(this.model.toJSON()));
+			this.$el.html(this.template(this.model.attrJSON()));
 			return this;
 		},
 

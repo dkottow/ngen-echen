@@ -16,7 +16,7 @@ var app = app || {};
 
 		initialize: function() {
 			console.log("SchemaListView.init");
-			this.listenTo(this.collection, 'update', this.render);
+			this.listenTo(this.collection, 'reset', this.render);
 		},
 
 		template: _.template($('#schema-select-template').html()),
@@ -24,6 +24,7 @@ var app = app || {};
 		render: function() {
 			console.log('SchemaListView.render ');			
 			//var el = this.$('ul');
+			this.$el.empty();	
 			this.collection.each(function(schema) {
 				this.$el.append(this.template({name: schema.get('name')}));
 			}, this);			
@@ -36,16 +37,8 @@ var app = app || {};
 			var schema = this.collection.find(function(c) { 
 				return c.get('name') == name; 
 			});
-//TODO			
-			app.schema = schema;
-			this.$('a:first span').html(' Schema ' + app.schema.get('name') + ' ');
-
-			if (app.tableListView) app.tableListView.remove();
-			app.tableListView = new app.TableListView({
-				collection: app.schema.get('tables')
-			});
-			$('#table-list').append(app.tableListView.render().el);
-
+			
+			app.setSchema(schema);
 		}
 
 	});

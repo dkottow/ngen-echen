@@ -26,11 +26,17 @@ var app = app || {};
 		updateClick: function() {
 			var newName = $('#modalInputTableName').val();
 			this.model.set('name', newName);
-			$('#collapse-' + newName).collapse('show');
+			if ( ! app.schema.get('tables').contains(this.model)) {
+				app.schema.get('tables').add(this.model);
+				app.tableListView.setTable(this.model);
+			}
 		},
 
 		removeClick: function() {	
-			this.model.collection.remove(this.model);
+			if (this.model.collection) {
+				this.model.collection.remove(this.model);
+				app.tableView.remove();
+			}
 		}
 
 	});
