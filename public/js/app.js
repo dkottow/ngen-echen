@@ -22,8 +22,8 @@ $(function () {
 	app.menuView.render();
 
 	app.user = "stores";
-	app.schemas = new app.Schemas();
 
+	app.schemas = new app.Schemas();
 	app.schemas.fetch({success: function() {
 		app.schemaListView = new app.SchemaListView({collection: app.schemas});
 		$('#schema-list').append(app.schemaListView.render().el);

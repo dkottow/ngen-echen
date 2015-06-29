@@ -9,7 +9,8 @@ var app = app || {};
 			console.log("Schemas.initialize");
 		},
 
-		model: app.Schema,
+		//Schemas is just a list of schema names
+		//model: app.Schema,
 
 		url	: function() { 
 			return REST_ROOT + "/" + app.user; 
