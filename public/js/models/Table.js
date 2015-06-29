@@ -8,9 +8,10 @@ var app = app || {};
 		
 		initialize: function(table) {
 			console.log("Table.initialize " + table.name);
-			var fields = _.map(table.fields, function(field) {
+			var fields = _.map( _.sortBy(table.fields, 'order'), 
+						function(field) {
 				return new app.Field(field);
-			});
+			});			
 			this.set('fields', new app.Fields(fields));
 			this.set('relations', new app.Relations());
 		},

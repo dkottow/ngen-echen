@@ -45,10 +45,13 @@ var app = app || {};
 
 		evNewSchemaClick: function() {
 			
+			app.newSchema();
+/*
 			var newSchema = app.Schema.create();
 			app.schemas.remove('');
 			app.schemas.add(newSchema);
 			app.setSchema(newSchema);
+*/
 		}
 
 	});

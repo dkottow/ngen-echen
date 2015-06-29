@@ -18,6 +18,7 @@ var app = app || {};
 
 		render: function() {
 			console.log("SchemaEditView.render");
+			$('#modalSchemaAction > button').prop('disabled', false);
 			$('#modalInputSchemaName').val(this.model.get('name'));
 			$('#modalSchemaActionResult').hide();
 			$('#modalSchemaAction').show();
@@ -27,7 +28,6 @@ var app = app || {};
 	
 		renderResult: function(err) {
 			$('#modalSchemaAction').hide();
-			$('#modalSchemaAction > button').prop('disabled', false);
 			if (err) {
 				$('#modalSchemaResultMessage').html(
 						err.status + " " + err.responseText
@@ -58,8 +58,8 @@ var app = app || {};
 						reset: true,
 						success: function() {
 							me.renderResult();
-							var model = app.schemas.get(me.model.get('name'));
-							app.setSchema(model);
+							app.schema = app.schemas.get(me.model.get('name'));
+							//app.setSchema();
 						},
 						error: function(model, response) {
 							me.renderResult(response);
@@ -74,6 +74,7 @@ var app = app || {};
 		},
 
 		evRemoveClick: function() {	
+			$('#modalSchemaAction > button').prop('disabled', true);
 			var me = this;
 			this.model.destroy({
 				success: function() {			
@@ -90,6 +91,7 @@ var app = app || {};
 				},
 				error: function(model, response) {
 					me.renderResult(response);
+					app.schemas.add(me.model);
 					console.dir(response);
 				}
 			});

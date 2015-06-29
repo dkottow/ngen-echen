@@ -6,14 +6,11 @@ var app = app || {};
 	console.log("Schema class def");
 	app.Schema = Backbone.Model.extend({
 
-		initialize: function(schema) {
-			console.log("Schema.initialize " + schema.name);
-			var tables = _.map(schema.tables, function(table) {
-				return new app.Table(table);
-			});
-			this.set('tables', new app.Tables(tables));
+		initialize: function(attrs) {
+			console.log("Schema.initialize " + attrs.name);
+
 			this.orgJSON = this.toJSON();
-			this.set('id', schema.name); //unset me when new
+			this.set('id', attrs.name); //unset me when new
 		},
 
 		isDirty: function() {
@@ -32,7 +29,21 @@ var app = app || {};
 				name: this.get('name'),
 				tables: tables
 			};
-		}	
+		},	
+
+
+		url	: function() { 
+			return REST_ROOT + "/" + app.user + "/" + this.get('name'); 
+		},
+
+		parse : function(response) {
+			console.log("Schema.parse " + response);
+			var tables = _.map(response.tables, function(table) {
+				return new app.Table(table);
+			});
+			response.tables = new app.Tables(tables);
+			return response;
+		}
 
 	});
 
@@ -40,7 +51,7 @@ var app = app || {};
 		if ( ! name) name = '';
 		return new app.Schema({
 			name: name,
-			tables: {}	
+			tables: new app.Tables()	
 		});
 	}
 

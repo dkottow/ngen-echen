@@ -34,11 +34,13 @@ var app = app || {};
 		evSchemaClick: function(ev) {
 			var name = $(ev.target).attr('data-target');
 			console.log('SchemaListView.evSchemaClick ' + name);
+			app.loadSchema(name);
+/*
 			var schema = this.collection.find(function(c) { 
 				return c.get('name') == name; 
 			});
-			
 			app.setSchema(schema);
+*/			
 		}
 
 	});
