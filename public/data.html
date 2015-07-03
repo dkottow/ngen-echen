@@ -1,0 +1,149 @@
+<!doctype html>
+<html>
+  <head>
+        <title>DonkeyLift Data</title>
+		<link href="3rdparty/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<link href="3rdparty/jquery-ui/jquery-ui.min.css" rel="stylesheet">
+		<link href="3rdparty/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+		<link href="3rdparty/DataTables/media/css/jquery.dataTables.min.css" rel="stylesheet">
+		<link href="css/sb-admin.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="css/styles.css" />
+		<style>
+			body {
+				background-color: white;
+			}
+			.side-nav {
+				top: 50px;
+			}
+			#content {
+				margin-top: 55px;
+			}
+		</style>
+    </head>
+    <body>
+	<div id="wrapper">	
+
+        <!-- Navigation -->
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+
+            <!-- Brand and toggle get grouped for better mobile display -->
+
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+
+
+            <!-- Top Menu Items -->
+            <ul class="nav navbar-left top-nav">
+                <li id="goto-data">
+					<a class="navbar-brand" href="/public/data.html">Data</a>
+                </li>
+				<li id="goto-schema">
+					<a class="navbar-brand" href="/public/schema.html">Schema</a>
+				</li>
+			</ul>
+            <ul class="nav navbar-right top-nav">
+                <li id="schema-list" class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-database"></i><span> Change Schema </span><b class="caret"></b></a>
+                    <ul class="dropdown-menu alert-dropdown">
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> John Smith <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="#"><i class="fa fa-fw fa-user"></i> Profile</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#"><i class="fa fa-fw fa-power-off"></i> Log Out</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
+            <div id="table-list" class="collapse navbar-collapse navbar-ex1-collapse">
+            </div>
+            <!-- /.navbar-collapse -->
+        </nav>
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+			<section id="content">				
+			</section>
+		</div>		
+	</div>
+<!-- END FIXED PAGE ELEMENTS --> 
+
+	  <div id="ajax-progress-spinner">
+		<img src="img/progress-spinner.gif"></img>
+	  </div>	
+
+		<script type="text/template" id="schema-menu-template">
+			<ul class="nav navbar-nav"><li><a>Tables</a></li></ul>
+			<ul style="margin-left: 145px" class="nav navbar-nav">
+
+			</ul>
+			<ul class="nav navbar-nav navbar-right">
+			</ul>
+		</script>
+
+		<script type="text/template" id="schema-select-template">
+			<li><a data-target="<%= name %>" class="schema-option" href="#"> <%= name %> </a></li>
+		</script>
+
+		<script type="text/template" id="table-list-template">
+			<li><a data-target="<%= name %>" class="table-item" href="#"> <%= name %> </a></li>
+		</script>
+
+		<script type="text/template" id="grid-table-template">
+			<table id="grid" class="display" width="100%" cellspacing="0">
+				<thead>
+					<tr>
+					</tr>
+				</thead>
+				<tfoot>
+					<tr>
+					</tr>
+				</tfoot>
+			</table>
+		</script>
+
+		<script type="text/template" id="grid-column-template">
+			<th><%= name %></th>
+		</script>
+		
+  		<script src="3rdparty/jquery/jquery.min.js" type="text/javascript"></script>
+  		<script src="3rdparty/jquery-ui/jquery-ui.min.js" type="text/javascript"></script>
+  		<script src="3rdparty/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+  		<script src="3rdparty/underscore/underscore.js" type="text/javascript"></script>
+  		<script src="3rdparty/backbone/backbone.js" type="text/javascript"></script>
+  		<script src="3rdparty/DataTables/media/js/jquery.dataTables.js" type="text/javascript"></script>
+
+		<script src="js/models/Schema.js" type="text/javascript"></script>
+		<script src="js/models/Table.js" type="text/javascript"></script>
+		<script src="js/models/Field.js" type="text/javascript"></script>
+		<script src="js/models/Relation.js" type="text/javascript"></script>
+
+		<script src="js/collections/Schemas.js" type="text/javascript"></script>
+		<script src="js/collections/Tables.js" type="text/javascript"></script>
+		<script src="js/collections/Fields.js" type="text/javascript"></script>
+		<script src="js/collections/Relations.js" type="text/javascript"></script>
+
+		<script src="js/views/MenuView.js" type="text/javascript"></script>
+		<script src="js/views/SchemaListView.js" type="text/javascript"></script>
+		<script src="js/views/TableListView.js" type="text/javascript"></script>
+		<script src="js/views/GridView.js" type="text/javascript"></script>
+
+		<script src="js/data-app.js" type="text/javascript"></script>
+    </body>
+</html>
+
+
+

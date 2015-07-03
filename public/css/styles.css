@@ -2,10 +2,6 @@
 	margin-top: 110px;
 }
 
-
-#table-list {
-}
-
 #ajax-progress-spinner {
 	display: none;
 	position: absolute;
@@ -20,6 +16,9 @@
   padding: 0 15px 0 15px;
 }
 
+#grid-panel {
+	padding: 1em;
+}
 
 #table-list  {
 	border-color: ;

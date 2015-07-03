@@ -43,23 +43,16 @@ var app = app || {};
 		},
 
 		evSaveClick: function() {
-			$('#modalSchemaAction > button').prop('disabled', true);
-			var newName = $('#modalInputSchemaName').val();
-			if (newName != this.model.get('name')) {
-				//add schema, not replace
-				console.log('SchemaEditView unset id');
-				this.model.unset('id');
-			}
-			this.model.set('name', newName);
-			var me = this;
-			this.model.save(null, {
+
+			var saveOptions = {
 				success: function() {	
+					//set id, just in case we saved under a new name
+					app.schema.set('id', app.schema.get('name'));
 					app.schemas.fetch({
 						reset: true,
 						success: function() {
 							me.renderResult();
-							app.schema = app.schemas.get(me.model.get('name'));
-							//app.setSchema();
+							app.menuView.render();
 						},
 						error: function(model, response) {
 							me.renderResult(response);
@@ -70,7 +63,19 @@ var app = app || {};
 					me.renderResult(response);
 					console.dir(response);
 				}
-			});
+			};
+	
+			$('#modalSchemaAction > button').prop('disabled', true);
+			var newName = $('#modalInputSchemaName').val();
+			if (newName != this.model.get('name')) {
+				//add schema, not replace
+				console.log('SchemaEditView unset id');
+				this.model.unset('id');
+				saveOptions.url = app.schemaListUrl();
+			}
+			this.model.set('name', newName);
+			var me = this;
+			this.model.save(null, saveOptions);
 		},
 
 		evRemoveClick: function() {	
@@ -78,11 +83,12 @@ var app = app || {};
 			var me = this;
 			this.model.destroy({
 				success: function() {			
+					app.unsetSchema();
 					app.schemas.fetch({
 						reset: true,
 						success: function() {
 							me.renderResult();
-							app.setSchema(null);
+							app.menuView.render();
 						},
 						error: function(model, response) {
 							me.renderResult(response);
@@ -91,7 +97,6 @@ var app = app || {};
 				},
 				error: function(model, response) {
 					me.renderResult(response);
-					app.schemas.add(me.model);
 					console.dir(response);
 				}
 			});

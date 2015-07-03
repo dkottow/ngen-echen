@@ -28,6 +28,16 @@ var app = app || {};
 			}));
 			this.$('#add-table').prop('disabled', app.schema == null);
 			this.$('#save-schema').prop('disabled', app.schema == null);
+
+			//render current schema label
+			var current = ' Change Schema ';
+			if (app.schema && app.schema.get('name') == '')	{
+				current = ' New Schema ';
+			} else if (app.schema) {
+				current = ' Schema ' + app.schema.get('name');
+			} 
+			$('#schema-list > a:first span').html(current);
+
 			return this;
 		},
 

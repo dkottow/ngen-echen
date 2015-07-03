@@ -27,7 +27,8 @@ var app = app || {};
 			this.$el.empty();	
 			this.collection.each(function(schema) {
 				this.$el.append(this.template({name: schema.get('name')}));
-			}, this);			
+			}, this);
+
 			return this;
 		},
 	

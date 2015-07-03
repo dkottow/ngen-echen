@@ -1,6 +1,23 @@
-field ordering
+UI
+
 validate no references exist when deleting field / table (due to relations)
-no edits of fields: id, modified_by, modified_on
+prohibit edits of fields: id, modified_by, modified_on
 validate length attribute of field
-send schema to server!
 enum fields
+null/not null fields
+labels for fields and tables
+filter interface
+search/filter integration
+sort out table select menu
+edit/delete single row dialog - includes edit fields for each col type (date picker)
+
+SERVER
+
+make query return record totals (filtered /unfiltered)
+full row text search
+multiple order by
+user/prefs table
+access control with 2 roles admin, user. tables are admin, user too. all access is rw except user on admin tables which is ro. no individual permissions
+store created_by, created_on on db creation
+
+
