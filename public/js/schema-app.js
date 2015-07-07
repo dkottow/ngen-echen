@@ -6,6 +6,7 @@ $(function () {
 
 	// kick things off..
 	app.name = 'schema';
+	app.user = 'demo';
 
 	$(document).ajaxStart(function() {
 		$('#ajax-progress-spinner').show();
@@ -22,7 +23,6 @@ $(function () {
 	app.menuView = new app.MenuView();
 	app.menuView.render();
 
-	app.user = "stores";
 	app.schemaListUrl = function() { return REST_ROOT + "/" + app.user; }
 
 	app.schemas = new app.Schemas();

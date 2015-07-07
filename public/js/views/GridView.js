@@ -22,6 +22,7 @@ var app = app || {};
 		ajaxCreateFn: function() {
 			var me = this;
 			return function(data, callback, setttings) {
+				console.log('request to REST');
 				console.dir(data);
 				var orderField = me.model.get('fields')
 								.at(data.order[0].column).get('name');
@@ -38,9 +39,15 @@ var app = app || {};
 						+ "&" + topParam;
 				$.ajax(url, {
 					cache: false
-				}).done(function(data) {
-					data.recordsTotal = 1000;
-					data.recordsFiltered = 234;
+				}).done(function(response) {
+					//console.log('response from REST');
+					//console.dir(response);
+
+					var data = {
+						data: response.rows,
+						recordsTotal: response.totalCount,
+						recordsFiltered: response.count,
+					};
 					callback(data);
 				});
 			}
@@ -56,11 +63,13 @@ var app = app || {};
 				}));	
 			}, this);			
 			var columns = this.model.get('fields').map(function(field) {
-				return { 'data': field.get('name') }
+				return (field.get('fk') == 1) ?
+					  { 'data': field.get('fk_table') + '_'}
+					: { 'data': field.get('name') };
 			});
 			this.$('#grid').dataTable({
 				'serverSide': true,
-				'processing': true,
+				//'processing': true,
 				'columns': columns,
 				'ajax': this.ajaxCreateFn()
 			});
