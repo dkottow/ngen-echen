@@ -30,13 +30,6 @@ var app = app || {};
 			return this;
 		},
 
-		setGrid: function(grid) {
-			app.grid = grid;
-			if (app.gridView) app.gridView.remove();
-			app.gridView = new app.GridView({model: app.grid});
-			$('#content').append(app.gridView.render().el);			
-		},
-
 		setTable: function(table) {
 			app.table = table;
 			if (app.tableView) app.tableView.remove();
@@ -49,11 +42,8 @@ var app = app || {};
 			var table = this.collection.find(function(c) { 
 				return c.get('name') == name; 
 			});
-			//dispatch according to app - schema or data
-			if (app.name == 'schema')
-				this.setTable(table);
-			else if (app.name == 'data')
-				this.setGrid(table);
+
+			app.setTable(table);
 		}
 
 	});

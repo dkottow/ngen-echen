@@ -64,6 +64,13 @@ $(function () {
 		}});
 	}
 
+	app.setTable = function(table) {
+		app.table = table;
+		if (app.tableView) app.tableView.remove();
+		app.tableView = new app.TableView({model: app.table});
+		$('#content').append(app.tableView.render().el);			
+	}
+
 	app.toggleSidebar = function() {
 		var destValue = 225 - parseInt($('.side-nav').css('width'));
 console.log(destValue);

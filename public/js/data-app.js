@@ -27,19 +27,29 @@ $(function () {
 	}});
 
 	app.loadSchema = function(name) {
-		app.schema = null;
+		console.log('app.loadSchema ' + name);
+		app.database = null;
 		if (app.gridView) app.gridView.remove();
 		if (app.tableListView) app.tableListView.remove();
 
-		app.schema = new app.Schema.create(name);
-		app.schema.fetch({success: function() {
+		app.database = new app.Database.create(name);
+		app.database.fetch({success: function() {
 			app.tableListView = new app.TableListView({
-				collection: app.schema.get('tables')
+				collection: app.database.get('tables')
 			});
 			$('#table-list').append(app.tableListView.render().el);
 			app.menuView.render();			
 		}});
 	}
+
+	app.setTable = function(table) {
+		console.log('app.setTable');
+		app.table = table;
+		if (app.tableView) app.tableView.remove();
+		app.tableView = new app.DataTableView({model: app.table});
+		$('#content').append(app.tableView.render().el);			
+	}
+
 
 	app.toggleSidebar = function() {
 		var destValue = 225 - $('#wrapper').css('width');
