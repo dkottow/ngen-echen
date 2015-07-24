@@ -30,12 +30,14 @@ var app = app || {};
 			this.$('#save-schema').prop('disabled', app.schema == null);
 
 			//render current schema label
-			var current = ' Change Schema ';
+			var current = $('#schema-list > a:first span').html();
 			if (app.schema && app.schema.get('name') == '')	{
 				current = ' New Schema ';
 			} else if (app.schema) {
 				current = ' Schema ' + app.schema.get('name');
-			} 
+			} else if (app.database) {
+				current = ' Database ' + app.database.get('name');
+			}
 			$('#schema-list > a:first span').html(current);
 
 			return this;

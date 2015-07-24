@@ -26,6 +26,8 @@ $(function () {
 		$('#schema-list').append(app.schemaListView.render().el);
 	}});
 
+	app.filters = new app.Filters();
+
 	app.loadSchema = function(name) {
 		console.log('app.loadSchema ' + name);
 		app.database = null;
@@ -52,10 +54,16 @@ $(function () {
 
 
 	app.toggleSidebar = function() {
-		var destValue = 225 - $('#wrapper').css('width');
-		$('#wrapper').animate({'padding-left': destValue}, 1000);
-		$('.side-nav').animate({'width': destValue}, 1000);
+		var destValue = 225 - parseInt($('.side-nav').css('width'));
+		$('.side-nav').animate({'width': destValue}, 200);
+		$('#wrapper').animate({'padding-left': destValue}, 200);
 	}
+
+	$('#toggle-sidebar > a').click(function() {
+		app.toggleSidebar();
+	}); 
+
+
 
 });
 

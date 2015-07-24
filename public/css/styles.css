@@ -70,3 +70,9 @@
 	margin-bottom: 1em;
 }
 
+.dataTable th {
+	white-space: nowrap; 
+}
+
+.dataTable td {
+}

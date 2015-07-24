@@ -14,6 +14,12 @@ var app = app || {};
 			this.set('length', spec);
 		},
 		
+		vname: function() {
+			return (this.get('fk') == 1) ?
+				this.get('fk_table') + '_ref'
+			  : this.get('name');
+		},
+
 		attrJSON: function() {
 			return _.clone(this.attributes);
 		},		

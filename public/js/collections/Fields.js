@@ -19,7 +19,7 @@ var app = app || {};
 		},
 
 		getByName: function(name) {
-			return this.find(function(f) { return f.get('name') == name; });
+			return this.find(function(f) { return f.vname() == name; });
 		}
 	});
 

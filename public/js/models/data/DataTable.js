@@ -9,9 +9,7 @@ var app = app || {};
 		getColumns: function() {
 
 			return this.get('fields').map(function(field) {
-				return (field.get('fk') == 1) ?
-					  { 'data': field.get('fk_table') + '_ref'}
-					: { 'data': field.get('name') };
+				return { data : field.vname() };
 			});
 		},
 
@@ -19,43 +17,40 @@ var app = app || {};
 			var me = this;
 			return function(data, callback, setttings) {
 				console.log('request to REST');
-				console.dir(data);
+				//console.dir(data);
 				var orderField = me.get('fields')
 								.at(data.order[0].column);
 
-				var orderFieldName = orderField.get('fk') == 1 ?
-									orderField.get('fk_table') + '_ref' :
-									orderField.get('name');
-
-				var orderParam = '$orderby=' + orderFieldName 
+				var orderParam = '$orderby=' + orderField.vname() 
 								+ ' ' + data.order[0].dir;
 				
 				var skipParam = '$skip=' + data.start;
 				var topParam = '$top=' + data.length;
 
-				var searchParam = '';
 				if (data.search.value.length > 0) {
-					app.filter = new app.DataFilter({
+					var filter = new app.Filter({
 						table: me.get('name'),
 						field: me.get('name'),
 						op: 'search',
 						value: data.search.value + '*'
 					});
-/*
-					searchParam = '$filter=' + me.get('name') 
-								+ '.' + me.get('name')
-								+ ' search ' + data.search.value + '*';
-*/
-				}
-				if (app.filter) {
-					searchParam = '$filter=' + app.filter.toParam();
+					app.filters.setSearch(filter);
 				}
 
+				var searchParam = app.filters.toParam();
+/*
+				if (app.filters.size() > 0) {
+					searchParam = '$filter=' + app.filter.toParam();
+				}
+*/
 				var url = REST_ROOT + me.get('url') + '?'
 						+ orderParam
 						+ "&" + skipParam 
 						+ "&" + topParam
 						+ "&" + searchParam;
+
+				console.log(url);
+
 				$.ajax(url, {
 					cache: false
 				}).done(function(response) {

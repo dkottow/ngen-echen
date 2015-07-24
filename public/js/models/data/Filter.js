@@ -3,10 +3,10 @@ var app = app || {};
 
 (function () {
 	'use strict';
-	app.DataFilter = Backbone.Model.extend({
+	app.Filter = Backbone.Model.extend({
 
 		initialize: function(attrs) {
-			console.log("DataFilter.initialize ");
+			console.log("Filter.initialize ");
 		},
 
 		toParam: function() {			
