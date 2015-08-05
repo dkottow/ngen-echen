@@ -34,12 +34,20 @@ var app = app || {};
 
 			}, this);
 
+			var filter = app.filters.getSearch(this.model);			
+			var initSearch = {};
+			if (filter) initSearch.search = filter.get('value');
+
 			this.$('#grid').dataTable({
 				'serverSide': true,
-				//'processing': true,
-				'columns': columns,				
-				'ajax': this.model.ajaxGetRowsFn()
+				'columns': this.model.getColumns(),				
+				'ajax': this.model.ajaxGetRowsFn(),
+				'search': initSearch
 			});
+
+			if (filter) {
+				this.$('#grid_filter input').val(filter.get('value'));
+			}
 
 			this.$('.field-filter').click(function(ev) {
 				ev.stopPropagation();
@@ -53,15 +61,14 @@ var app = app || {};
 
 				var colName = $(this).data('column');
 				var field = me.model.get('fields').getByName(colName);
+				var el = me.$('#col-' + colName + ' div.dropdown-menu');
 
-				var filterEl = me.$('#col-' + colName + ' div.dropdown-menu');
-
-				app.filterView = new app.FilterView({
-					model: field,
-					el: filterEl
+				var filter = new app.Filter({
+					table: me.model,
+					field: field
 				});
-				app.filterView.render();
 
+				app.setFilterView(filter, el);
 			});
 
 /*

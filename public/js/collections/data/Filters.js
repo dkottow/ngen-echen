@@ -19,14 +19,20 @@ var app = app || {};
 			return '$filter=' + params;
 		},
 
-		setSearch: function(filter) {
-
-			var current = this.find(function(f) { 
-				return f.get('op') == 'search'; 
-			});
+		setFilter: function(attrs) {
+			var filter = new app.Filter(attrs);		
+			var current = this.get(filter.id);
 			if (current) this.remove(current);
-			this.add(filter);	
+			if (attrs.value.length > 0) {
+				this.add(filter);
+			}
+		},
+
+		getSearch: function(table) {
+			if (_.isObject(table)) table = table.get('name');
+			return this.get(table + '.' + table);
 		}
+
 	});
 
 })();

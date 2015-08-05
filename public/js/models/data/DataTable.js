@@ -1,6 +1,9 @@
 /*global Backbone */
 var app = app || {};
 
+var ROWS_EXT = '.rows';
+var STATS_EXT = '.stats';
+
 (function () {
 	'use strict';
 	//console.log("Table class def");
@@ -15,9 +18,8 @@ var app = app || {};
 
 		ajaxGetRowsFn: function() {
 			var me = this;
-			return function(data, callback, setttings) {
+			return function(data, callback, settings) {
 				console.log('request to REST');
-				//console.dir(data);
 				var orderField = me.get('fields')
 								.at(data.order[0].column);
 
@@ -27,27 +29,19 @@ var app = app || {};
 				var skipParam = '$skip=' + data.start;
 				var topParam = '$top=' + data.length;
 
-				if (data.search.value.length > 0) {
-					var filter = new app.Filter({
-						table: me.get('name'),
-						field: me.get('name'),
-						op: 'search',
-						value: data.search.value + '*'
-					});
-					app.filters.setSearch(filter);
-				}
+				//if (data.search.value.length > 0) {
+				app.filters.setFilter({
+					table: me,
+					op: app.Filter.OPS.SEARCH,
+					value: data.search.value
+				});
+				//}
 
-				var searchParam = app.filters.toParam();
-/*
-				if (app.filters.size() > 0) {
-					searchParam = '$filter=' + app.filter.toParam();
-				}
-*/
-				var url = REST_ROOT + me.get('url') + '?'
+				var url = REST_ROOT + me.get('url') + ROWS_EXT + '?'
 						+ orderParam
-						+ "&" + skipParam 
-						+ "&" + topParam
-						+ "&" + searchParam;
+						+ '&' + skipParam 
+						+ '&' + topParam
+						+ '&' + app.filters.toParam();
 
 				console.log(url);
 
@@ -67,8 +61,59 @@ var app = app || {};
 			}
 		},
 
+		dataCache: {},
+		stats : function(field, callback) {
+			var fieldParam = '$fields='+field;
+			
+			var me = this;
+			var url = REST_ROOT + this.get('url') + STATS_EXT + '?'
+					+ fieldParam
+					+ '&' + app.filters.toParam();
 
+			console.log('stats ' + me.get('name') + '.' + field + ' ' + url);
 
+			if (this.dataCache[url]) {
+				callback(this.dataCache[url][field]);
+
+			} else {
+				$.ajax(url, {
+				}).done(function(response) {
+					//console.dir(response);
+					me.dataCache[url] = response;
+					callback(response[field]);
+				});
+			}
+		},
+		
+		options: function(field, callback) {
+			var topParam = '$top=200';
+			var distinctParam = '$distinct=1';
+			var fieldParam = '$fields='+field;
+			var orderParam = '$orderby='+field;
+
+			var me = this;
+			var url = REST_ROOT + this.get('url') + ROWS_EXT + '?'
+					+ '&' + fieldParam
+					+ '&' + orderParam
+					+ '&' + distinctParam
+					+ '&' + topParam
+					+ '&' + app.filters.toParam();
+
+			console.log('options ' + me.get('name') + '.' + field + ' ' + url);
+
+			if (this.dataCache[url]) {
+	console.log(this.dataCache[url]);
+				callback(this.dataCache[url]['rows']);
+
+			} else {
+				$.ajax(url, {
+				}).done(function(response) {
+					//console.dir(response.rows);
+					me.dataCache[url] = response;
+					callback(response.rows);
+				});
+			}
+		}
 
 	});		
 

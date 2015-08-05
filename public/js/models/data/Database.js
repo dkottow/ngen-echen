@@ -13,7 +13,8 @@ var app = app || {};
 			});
 			response.tables = new app.Tables(tables);
 			return response;
-		}
+		},
+
 	});		
 
 	app.Database.create = function(name) {

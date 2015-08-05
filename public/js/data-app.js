@@ -35,28 +35,36 @@ $(function () {
 		if (app.tableListView) app.tableListView.remove();
 
 		app.database = new app.Database.create(name);
-		app.database.fetch({success: function() {
-			app.tableListView = new app.TableListView({
-				collection: app.database.get('tables')
-			});
-			$('#table-list').append(app.tableListView.render().el);
-			app.menuView.render();			
-		}});
+		app.database.fetch({
+			success: function() {
+				app.tableListView = new app.TableListView({
+					collection: app.database.get('tables')
+				});
+				$('#table-list').append(app.tableListView.render().el);
+				app.menuView.render();			
+			}	
+		});
 	}
 
 	app.setTable = function(table) {
 		console.log('app.setTable');
 		app.table = table;
 		if (app.tableView) app.tableView.remove();
-		app.tableView = new app.DataTableView({model: app.table});
+		app.tableView = new app.DataTableView({ model: app.table });
 		$('#content').append(app.tableView.render().el);			
 	}
 
+	app.setFilterView = function(filter, $parentElem) {
+		if (app.filterView) app.filterView.remove();
+		app.filterView = new app.FilterView({ model: filter });
+		$parentElem.append(app.filterView.el);
+		app.filterView.show();
+	}
 
 	app.toggleSidebar = function() {
 		var destValue = 225 - parseInt($('.side-nav').css('width'));
-		$('.side-nav').animate({'width': destValue}, 200);
-		$('#wrapper').animate({'padding-left': destValue}, 200);
+		$('.side-nav').animate({ 'width': destValue }, 200);
+		$('#wrapper').animate({ 'padding-left': destValue }, 200);
 	}
 
 	$('#toggle-sidebar > a').click(function() {
