@@ -28,11 +28,23 @@ var app = app || {};
 			}
 		},
 
-		getSearch: function(table) {
-			if (_.isObject(table)) table = table.get('name');
-			return this.get(table + '.' + table);
-		}
+		getFilter: function(table, field) {
+			return this.get(app.Filter.Key(table, field));
+		},
+
+		clearFilter: function(table, field) {
+			var current = this.getFilter(table, field);
+			if (current) this.remove(current);
+		},
 
 	});
+
+	app.Filters.toParam = function(filters) {
+		var params = _.reduce(filters, function(memo, f) {
+			return memo.length == 0 ? f.toParam() 
+				: memo + ' and ' + f.toParam();
+		}, '');
+		return '$filter=' + params;
+	}
 
 })();

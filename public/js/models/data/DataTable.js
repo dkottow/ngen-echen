@@ -29,13 +29,15 @@ var STATS_EXT = '.stats';
 				var skipParam = '$skip=' + data.start;
 				var topParam = '$top=' + data.length;
 
-				//if (data.search.value.length > 0) {
-				app.filters.setFilter({
-					table: me,
-					op: app.Filter.OPS.SEARCH,
-					value: data.search.value
-				});
-				//}
+				if (data.search.value.length > 0) {
+					app.filters.setFilter({
+						table: me,
+						op: app.Filter.OPS.SEARCH,
+						value: data.search.value
+					});
+				} else {
+					app.filters.clearFilter(me);
+				}
 
 				var url = REST_ROOT + me.get('url') + ROWS_EXT + '?'
 						+ orderParam
@@ -61,48 +63,63 @@ var STATS_EXT = '.stats';
 			}
 		},
 
+		reload: function() {
+			$('#grid').DataTable().ajax.reload();
+		},
+
 		dataCache: {},
-		stats : function(field, callback) {
-			var fieldParam = '$fields='+field;
+
+		filterParams: function(exField) {
+			var exKey = app.Filter.Key(this, exField);
+			var filters = app.filters.filter(function(f) {
+				return  f.id != exKey;
+			});
 			
+			return app.Filters.toParam(filters);
+		},
+
+		stats : function(fieldName, callback) {
 			var me = this;
+
+			var fieldParam = '$fields='+fieldName;
 			var url = REST_ROOT + this.get('url') + STATS_EXT + '?'
 					+ fieldParam
-					+ '&' + app.filters.toParam();
+					+ '&' + this.filterParams(fieldName);
 
-			console.log('stats ' + me.get('name') + '.' + field + ' ' + url);
+			console.log('stats ' + me.get('name') + '.' + fieldName + ' ' + url);
 
 			if (this.dataCache[url]) {
-				callback(this.dataCache[url][field]);
+				callback(this.dataCache[url][fieldName]);
 
 			} else {
 				$.ajax(url, {
 				}).done(function(response) {
 					//console.dir(response);
 					me.dataCache[url] = response;
-					callback(response[field]);
+					callback(response[fieldName]);
 				});
 			}
 		},
 		
-		options: function(field, callback) {
-			var topParam = '$top=200';
-			var distinctParam = '$distinct=1';
-			var fieldParam = '$fields='+field;
-			var orderParam = '$orderby='+field;
-
+		options: function(fieldName, callback) {
 			var me = this;
+
+			var topParam = '$top=20';
+			var distinctParam = '$distinct=1';
+			var fieldParam = '$fields='+fieldName;
+			var orderParam = '$orderby='+fieldName;
+
 			var url = REST_ROOT + this.get('url') + ROWS_EXT + '?'
 					+ '&' + fieldParam
 					+ '&' + orderParam
 					+ '&' + distinctParam
 					+ '&' + topParam
-					+ '&' + app.filters.toParam();
+					+ '&' + this.filterParams(fieldName);
 
-			console.log('options ' + me.get('name') + '.' + field + ' ' + url);
+			console.log('options ' + me.get('name') + '.' + fieldName + ' ' + url);
 
 			if (this.dataCache[url]) {
-	console.log(this.dataCache[url]);
+	//console.log(this.dataCache[url]);
 				callback(this.dataCache[url]['rows']);
 
 			} else {

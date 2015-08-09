@@ -34,7 +34,7 @@ var app = app || {};
 
 			}, this);
 
-			var filter = app.filters.getSearch(this.model);			
+			var filter = app.filters.getFilter(this.model);			
 			var initSearch = {};
 			if (filter) initSearch.search = filter.get('value');
 

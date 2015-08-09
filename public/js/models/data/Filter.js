@@ -19,20 +19,19 @@ var app = app || {};
 					this.get('table').get('fields').getByName(attrs.field));
 			}
 
-			if (attrs.op == app.Filter.OPS.SEARCH) {
-				this.set('id', this.get('table').get('name') + '.' 
-							+ this.get('table').get('name'));
-			} else {
-				this.set('id', this.get('table').get('name') + '.' 
-							+ this.get('field').get('name'));
-			}
-			//console.dir(this);
+			this.set('id', app.Filter.Key(attrs.table, attrs.field));
+
 		},
 
 		toParam: function() {
-			var val = this.get('value');
-			if (this.get('op') == app.Filter.OPS.SEARCH) val = val + '*';
-			return 	this.id + ' ' + this.get('op') + ' ' + val;
+			var param;
+			if (this.get('op') == app.Filter.OPS.SEARCH) {
+				param = this.id + ' search ' + this.get('value') + '*';
+			} else if (this.get('op') == app.Filter.OPS.BETWEEN) {
+				param = this.id + ' ge ' + this.get('value')[0]
+					+ ' and ' + this.id + ' le ' + this.get('value')[1];
+			}
+			return param;
 		},
 
 		loadRange: function(cbAfter) {
@@ -54,8 +53,16 @@ var app = app || {};
 
 	});
 
+	app.Filter.Key = function(table, field) {		
+		if (_.isObject(table)) table = table.get('name');
+		if ( ! field) field = table;
+		else if (_.isObject(field)) field = field.get('name');
+		return table + '.' + field;
+	}
+
 	app.Filter.OPS = {
-		'SEARCH': 'search'
+		'SEARCH': 'search',
+		'BETWEEN': ['le', 'ge']
 	}
 
 })();
