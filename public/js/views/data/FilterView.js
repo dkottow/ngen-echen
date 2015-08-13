@@ -121,7 +121,8 @@ var app = app || {};
 			var maxVal =  this.$("#inputFilterMax").val();
 			var stats = this.model.get('field').get('stats');
 
-			if (minVal > stats.min + 1E-6 || maxVal < stats.max + 1E-6) {
+//console.log(minVal + " - " + maxVal + " R " + stats);
+			if (minVal > stats.min + 1E-6 || maxVal < stats.max - 1E-6) {
 				//apply filter
 				console.log("apply filter " + minVal + " - " + maxVal);
 				app.filters.setFilter({
@@ -140,7 +141,7 @@ var app = app || {};
 		},
 
 		evFilterInputChange: function(ev) {
-			var val = ev.target.value;
+			var val = this.model.get('field').parse(ev.target.value);
 			var stats = this.model.get('field').get('stats');
 			var idx, minVal, maxVal;
 

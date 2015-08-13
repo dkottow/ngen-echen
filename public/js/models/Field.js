@@ -35,6 +35,20 @@ var app = app || {};
 				type: type,
 				order: this.get('order')
 			};
+		},
+
+		parse: function(val) {
+			var t = this.get('type');
+			if (t == app.Field.TYPES.INTEGER) {
+				return parseInt(val);
+			} else if(t == app.Field.TYPES.NUMERIC) {
+				return parseFloat(val);
+			} else if(t == app.Field.TYPES.DATE
+					|| t == app.Field.TYPES.DATETIME) {
+				return new Date(val);
+			} else {
+				return val;
+			}
 		}
 
 	});

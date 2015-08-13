@@ -56,7 +56,7 @@ var app = app || {};
 	app.Filter.Key = function(table, field) {		
 		if (_.isObject(table)) table = table.get('name');
 		if ( ! field) field = table;
-		else if (_.isObject(field)) field = field.get('name');
+		else if (_.isObject(field)) field = field.get('name'); //not vname
 		return table + '.' + field;
 	}
 
