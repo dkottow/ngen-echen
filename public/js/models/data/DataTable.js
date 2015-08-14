@@ -81,7 +81,7 @@ var STATS_EXT = '.stats';
 		stats : function(fieldName, callback) {
 			var me = this;
 
-			var fieldParam = '$fields='+fieldName;
+			var fieldParam = '$select='+fieldName;
 			var url = REST_ROOT + this.get('url') + STATS_EXT + '?'
 					+ fieldParam
 					+ '&' + this.filterParams(fieldName);
@@ -105,8 +105,8 @@ var STATS_EXT = '.stats';
 			var me = this;
 
 			var topParam = '$top=20';
-			var distinctParam = '$distinct=1';
-			var fieldParam = '$fields='+fieldName;
+			var distinctParam = '$distinct=true';
+			var fieldParam = '$select='+fieldName;
 			var orderParam = '$orderby='+fieldName;
 
 			var url = REST_ROOT + this.get('url') + ROWS_EXT + '?'

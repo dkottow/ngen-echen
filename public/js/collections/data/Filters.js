@@ -12,11 +12,7 @@ var app = app || {};
 		model: app.Filter,
 		
 		toParam: function() {
-			var params = this.reduce(function(memo, f) {
-				return memo.length == 0 ? f.toParam() 
-					: memo + ' and ' + f.toParam();
-			}, '');
-			return '$filter=' + params;
+			return app.Filters.toParam(this.models);	
 		},
 
 		setFilter: function(attrs) {
@@ -40,11 +36,15 @@ var app = app || {};
 	});
 
 	app.Filters.toParam = function(filters) {
-		var params = _.reduce(filters, function(memo, f) {
-			return memo.length == 0 ? f.toParam() 
-				: memo + ' and ' + f.toParam();
-		}, '');
-		return '$filter=' + params;
+		var result = '';
+		if (filters.length > 0) {
+			var params = _.reduce(filters, function(memo, f) {
+				return memo.length == 0 ? f.toParam() 
+					: memo + ' and ' + f.toParam();
+			}, '');				
+			result = '$filter=' + params;
+		}
+		return result;
 	}
 
 })();

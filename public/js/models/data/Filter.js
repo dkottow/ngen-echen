@@ -26,10 +26,10 @@ var app = app || {};
 		toParam: function() {
 			var param;
 			if (this.get('op') == app.Filter.OPS.SEARCH) {
-				param = this.id + ' search ' + this.get('value') + '*';
+				param = this.id + " search '" + this.get('value') + "*'";
 			} else if (this.get('op') == app.Filter.OPS.BETWEEN) {
-				param = this.id + ' ge ' + this.get('value')[0]
-					+ ' and ' + this.id + ' le ' + this.get('value')[1];
+				param = this.id + " ge '" + this.get('value')[0] + "'"
+					+ ' and ' + this.id + " le '" + this.get('value')[1] + "'";
 			}
 			return param;
 		},
