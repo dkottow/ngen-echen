@@ -9,9 +9,14 @@ var app = app || {};
 		events: {
 			'click .filter-column': 'evFilterColumnClick',
 			'click .nav-tabs a': 'evFilterTabClick',
+			//range filter evs
 			'click #rangeReset': 'evFilterRangeResetClick',
 			'change #inputFilterMin': 'evFilterInputChange',
-			'change #inputFilterMax': 'evFilterInputChange'
+			'change #inputFilterMax': 'evFilterInputChange',
+			//select filter evs
+			'click #selectReset': 'evFilterSelectResetClick',
+			'click .filter-option': 'evFilterOptionClick',
+			'click .filter-selected': 'evFilterSelectedClick'
 		},
 
 		initialize: function () {
@@ -41,6 +46,7 @@ var app = app || {};
 
 		template: _.template($('#filter-template').html()),
 		optionTemplate: _.template($('#filter-option-template').html()),
+		selectedTemplate: _.template($('#filter-selected-template').html()),
 
 		render: function() {
 			var field = this.model.get('field');
@@ -111,7 +117,7 @@ var app = app || {};
 //console.log(opts);
 			_.each(opts, function(opt) {
 				this.$('#filterOptions').append(this.optionTemplate({
-					name: opt[fn]
+					value: opt[fn]
 				}));
 			}, this);
 		},
@@ -191,7 +197,26 @@ var app = app || {};
 									this.model.get('field'));
 			this.renderRange();
 			this.applyRangeFilter();
-		}
+		},
+
+		evFilterOptionClick: function(ev) {
+			console.log(ev.target);
+			var opt = $(ev.target).attr('data-target');
+			var attr = 'a[data-target="' + opt + '"]';
+			if (this.$('#filterSelection').has(attr).length == 0) {
+				var item = this.selectedTemplate({value: opt});
+				this.$('#filterSelection').append(item);
+			}
+		},
+
+		evFilterSelectedClick: function(ev) {
+			console.log(ev.target);
+			$(ev.target).remove();
+		},
+
+		evFilterSelectResetClick: function() {
+			this.$('#filterSelection').empty();
+		},
 
 	});
 

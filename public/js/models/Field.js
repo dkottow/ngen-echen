@@ -43,9 +43,10 @@ var app = app || {};
 				return parseInt(val);
 			} else if(t == app.Field.TYPES.NUMERIC) {
 				return parseFloat(val);
-			} else if(t == app.Field.TYPES.DATE
-					|| t == app.Field.TYPES.DATETIME) {
-				return new Date(val);
+			} else if(t == app.Field.TYPES.DATE) {
+				return new Date(val).toISOString().substr(0,10);
+			} else if (t == app.Field.TYPES.DATETIME) {
+				return new Date(val).toISOString();
 			} else {
 				return val;
 			}
