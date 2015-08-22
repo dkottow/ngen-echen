@@ -58,7 +58,7 @@ $(function () {
 		if (app.filterView) app.filterView.remove();
 		app.filterView = new app.FilterView({ model: filter });
 		$parentElem.append(app.filterView.el);
-		app.filterView.show();
+		app.filterView.render();
 	}
 
 	app.toggleSidebar = function() {
