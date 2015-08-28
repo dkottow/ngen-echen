@@ -23,13 +23,33 @@ var app = app || {};
 
 		},
 
+		values: function() {
+			var me = this;
+			var val = _.isArray(this.get('value')) ? 
+						this.get('value') : [ this.get('value') ];
+
+			return val.map(function(val) {
+				if (me.get('field').get('fk') == 1 
+					&& me.get('op') == app.Filter.OPS.IN) {
+					var m = val.match(/^(.*)\(([0-9]+)\)$/);
+					//console.log(val + " matches " + m);
+					return m[2];
+				} else {
+					return me.get('field').toQS(val);
+				}
+			});
+		},
+
 		toParam: function() {
 			var param;
+			var values = this.values();
 			if (this.get('op') == app.Filter.OPS.SEARCH) {
 				param = this.id + " search '" + this.get('value') + "*'";
 			} else if (this.get('op') == app.Filter.OPS.BETWEEN) {
-				param = this.id + " ge '" + this.get('value')[0] + "'"
-					+ ' and ' + this.id + " le '" + this.get('value')[1] + "'";
+				param = this.id + " ge " + values[0] + ' and ' 
+						+ this.id + " le " + values[1];
+			} else if (this.get('op') == app.Filter.OPS.IN) {
+				param = this.id + " in " + values.join(",");
 			}
 			return param;
 		},
@@ -42,9 +62,9 @@ var app = app || {};
 			});
 		},
 
-		loadSelect: function(cbAfter) {
+		loadSelect: function(searchTerm, cbAfter) {
 			var field = this.get('field');
-			this.get('table').options(field.vname(), function(opts) {
+			this.get('table').options(field.vname(), searchTerm, function(opts) {
 				field.set('options', opts);
 				cbAfter();
 			});
@@ -62,7 +82,10 @@ var app = app || {};
 
 	app.Filter.OPS = {
 		'SEARCH': 'search',
-		'BETWEEN': ['le', 'ge']
+		'BETWEEN': ['le', 'ge'],
+		'IN': 'in'
 	}
+
+	app.Filter.CONJUNCTION = ' and ';
 
 })();

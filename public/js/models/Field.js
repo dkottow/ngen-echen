@@ -50,6 +50,15 @@ var app = app || {};
 			} else {
 				return val;
 			}
+		},
+
+		toQS: function(val) {
+			var t = this.get('type');
+			if (t == app.Field.TYPES.INTEGER || t == app.Field.TYPES.NUMERIC) {
+				return val;
+			} else {
+				return "'" + val + "'";
+			}
 		}
 
 	});

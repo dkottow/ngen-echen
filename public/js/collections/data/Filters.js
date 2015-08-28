@@ -40,7 +40,7 @@ var app = app || {};
 		if (filters.length > 0) {
 			var params = _.reduce(filters, function(memo, f) {
 				return memo.length == 0 ? f.toParam() 
-					: memo + ' and ' + f.toParam();
+					: memo + app.Filter.CONJUNCTION + f.toParam();
 			}, '');				
 			result = '$filter=' + params;
 		}

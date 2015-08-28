@@ -69,11 +69,27 @@ var STATS_EXT = '.stats';
 
 		dataCache: {},
 
-		filterParams: function(exField) {
-			var exKey = app.Filter.Key(this, exField);
+		filterParams: function(excludeFieldName, searchTerm) {
+			var me = this;
+			var excludeKey = app.Filter.Key(this, excludeFieldName);
 			var filters = app.filters.filter(function(f) {
-				return  f.id != exKey;
+				return  f.id != excludeKey;
 			});
+			filters = filters.filter(function(f) {
+				//exclude evtl search on same table
+				return ! (f.get('op') == app.Filter.OPS.SEARCH 
+						&& f.get('table') == me);
+			});
+			
+			if (searchTerm && searchTerm.length > 0) {
+				var searchFilter = new app.Filter({
+						table: this,
+						field: excludeFieldName,
+						op: app.Filter.OPS.SEARCH,
+						value: searchTerm
+				});
+				filters.push(searchFilter);
+			}
 			
 			return app.Filters.toParam(filters);
 		},
@@ -82,8 +98,8 @@ var STATS_EXT = '.stats';
 			var me = this;
 
 			var fieldParam = '$select='+fieldName;
-			var url = REST_ROOT + this.get('url') + STATS_EXT + '?'
-					+ fieldParam
+			var url = REST_ROOT + this.get('url') + STATS_EXT 
+					+ '?' + fieldParam
 					+ '&' + this.filterParams(fieldName);
 
 			console.log('stats ' + me.get('name') + '.' + fieldName + ' ' + url);
@@ -101,7 +117,7 @@ var STATS_EXT = '.stats';
 			}
 		},
 		
-		options: function(fieldName, callback) {
+		options: function(fieldName, searchTerm, callback) {
 			var me = this;
 
 			var topParam = '$top=20';
@@ -109,13 +125,12 @@ var STATS_EXT = '.stats';
 			var fieldParam = '$select='+fieldName;
 			var orderParam = '$orderby='+fieldName;
 
-			var url = REST_ROOT + this.get('url') + ROWS_EXT + '?'
-					+ '&' + fieldParam
+			var url = REST_ROOT + this.get('url') + ROWS_EXT 
+					+ '?' + fieldParam
 					+ '&' + orderParam
 					+ '&' + distinctParam
 					+ '&' + topParam
-					+ '&' + this.filterParams(fieldName);
-
+					+ '&' + this.filterParams(fieldName, searchTerm);					
 			console.log('options ' + me.get('name') + '.' + fieldName + ' ' + url);
 
 			if (this.dataCache[url]) {

@@ -23,6 +23,13 @@ var app = app || {};
 					_.contains(['Integer', 'Decimal'], field.get('type'));
 		},
 
+		loadRender: function() {
+			var me = this;
+			this.model.loadRange(function() {
+				me.render();
+			});
+		},
+
 		render: function() {
 			this.$('a[href=#filterRange]').tab('show');
 
@@ -32,7 +39,7 @@ var app = app || {};
 							this.model.get('table'),
 							this.model.get('field'));
 
-			if (current) {
+			if (current && current.get('op') == app.Filter.OPS.BETWEEN) {
 				this.$("#inputFilterMin").val(current.get('value')[0]);
 				this.$("#inputFilterMax").val(current.get('value')[1]);
 			} else {

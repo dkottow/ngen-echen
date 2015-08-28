@@ -26,9 +26,7 @@ var app = app || {};
 		template: _.template($('#filter-template').html()),
 
 		render: function() {
-			var me = this;
 			var field = this.model.get('field');
-
 			console.log("FilterView.render " + field.get('name'));
 
 			this.$el.html(this.template({
@@ -37,13 +35,9 @@ var app = app || {};
 
 			if (field.get('type') == app.Field.TYPES.VARCHAR
 			 || field.get('fk') == 1) {
-				this.model.loadSelect(function() {
-					me.itemsView.render();
-				});
+				this.itemsView.loadRender();
 			} else {
-				this.model.loadRange(function() {
-					me.rangeView.render();
-				});
+				this.rangeView.loadRender();
 			}
 
 			return this;
@@ -57,15 +51,10 @@ var app = app || {};
 			ev.preventDefault();
 
 	//console.log('evFilterTab ' + ev.target);
-			var me = this;
 			if (ev.target.href.endsWith('filterSelect')) {
-				this.model.loadSelect(function() {
-					me.itemsView.render();
-				});
+				this.itemsView.loadRender();
 			} else if (ev.target.href.endsWith('filterRange')) {
-				this.model.loadRange(function() {
-					me.rangeView.render();
-				});
+				this.rangeView.loadRender();
 			}
 		}
 	});
