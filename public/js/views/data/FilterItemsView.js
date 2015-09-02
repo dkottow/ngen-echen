@@ -32,6 +32,22 @@ var app = app || {};
 		render: function() {
 			this.$('a[href=#filterSelect]').tab('show');
 
+			this.$('#filterSelection').empty();
+			var current = app.filters.getFilter(
+							this.model.get('table'),
+							this.model.get('field'));
+
+			if (current && current.get('op') == app.Filter.OPS.IN) {
+				//get values from filter
+				var selected = current.get('value');		
+console.log(selected);
+				_.each(selected, function(val) {
+					this.$('#filterSelection').append(this.selectedTemplate({
+						value: val
+					}));
+				}, this);
+			}
+
 			this.$('#filterOptions').empty();
 			var fn = this.model.get('field').vname();
 			var opts = this.model.get('field').get('options');		

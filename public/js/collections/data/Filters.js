@@ -15,6 +15,36 @@ var app = app || {};
 			return app.Filters.toParam(this.models);	
 		},
 
+		apply: function(filter, searchTerm) {
+
+			var filters = this.filter(function(f) {
+
+				//exclude callee
+				if (f.id == filter.id) return false;
+
+				//exclude existing search on same table
+				if (f.get('op') == app.Filter.OPS.SEARCH 
+				 && f.get('table') == filter.get('table')) {
+					return false;
+				}
+
+				return true;
+			});
+			
+			//add search term
+			if (searchTerm && searchTerm.length > 0) {
+				var searchFilter = new app.Filter({
+						table: filter.get('table'),
+						field: filter.get('field'),
+						op: app.Filter.OPS.SEARCH,
+						value: searchTerm
+				});
+				filters.push(searchFilter);
+			}
+			
+			return filters;
+		},
+
 		setFilter: function(attrs) {
 			var filter = new app.Filter(attrs);		
 			var current = this.get(filter.id);

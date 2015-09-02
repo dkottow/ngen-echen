@@ -69,40 +69,24 @@ var STATS_EXT = '.stats';
 
 		dataCache: {},
 
-		filterParams: function(excludeFieldName, searchTerm) {
+		stats : function(filter, callback) {
 			var me = this;
-			var excludeKey = app.Filter.Key(this, excludeFieldName);
-			var filters = app.filters.filter(function(f) {
-				return  f.id != excludeKey;
-			});
-			filters = filters.filter(function(f) {
-				//exclude evtl search on same table
-				return ! (f.get('op') == app.Filter.OPS.SEARCH 
-						&& f.get('table') == me);
-			});
 			
-			if (searchTerm && searchTerm.length > 0) {
-				var searchFilter = new app.Filter({
-						table: this,
-						field: excludeFieldName,
-						op: app.Filter.OPS.SEARCH,
-						value: searchTerm
-				});
-				filters.push(searchFilter);
-			}
-			
-			return app.Filters.toParam(filters);
-		},
+			var fieldName = filter.get('field').vname();
 
-		stats : function(fieldName, callback) {
-			var me = this;
+			var params = { '$select' : fieldName };
 
-			var fieldParam = '$select='+fieldName;
+			var q = _.map(params, function(v,k) { return k + "=" + v; })
+					.join('&');
+
+			var filters = app.filters.apply(filter);
+			q = q + '&' + app.Filters.toParam(filters);
+
 			var url = REST_ROOT + this.get('url') + STATS_EXT 
-					+ '?' + fieldParam
-					+ '&' + this.filterParams(fieldName);
+					+ '?' + q;
 
-			console.log('stats ' + me.get('name') + '.' + fieldName + ' ' + url);
+			console.log('stats ' + me.get('name') + '.' + fieldName 
+						+ ' ' + url);
 
 			if (this.dataCache[url]) {
 				callback(this.dataCache[url][fieldName]);
@@ -117,21 +101,29 @@ var STATS_EXT = '.stats';
 			}
 		},
 		
-		options: function(fieldName, searchTerm, callback) {
+		options: function(filter, searchTerm, callback) {
 			var me = this;
 
-			var topParam = '$top=20';
-			var distinctParam = '$distinct=true';
-			var fieldParam = '$select='+fieldName;
-			var orderParam = '$orderby='+fieldName;
+			var fieldName = filter.get('field').vname();
+
+			var params = { 
+				'$top': 20,
+				'$distinct': true,
+				'$select': fieldName,				
+				'$orderby': fieldName
+			};
+
+			var q = _.map(params, function(v,k) { return k + "=" + v; })
+					.join('&');
+
+			var filters = app.filters.apply(filter, searchTerm);
+			q = q + '&' + app.Filters.toParam(filters);
 
 			var url = REST_ROOT + this.get('url') + ROWS_EXT 
-					+ '?' + fieldParam
-					+ '&' + orderParam
-					+ '&' + distinctParam
-					+ '&' + topParam
-					+ '&' + this.filterParams(fieldName, searchTerm);					
-			console.log('options ' + me.get('name') + '.' + fieldName + ' ' + url);
+					+ '?' + q;
+
+			console.log('options ' + me.get('name') + '.' + fieldName 
+						+ ' ' + url);
 
 			if (this.dataCache[url]) {
 	//console.log(this.dataCache[url]);
@@ -145,7 +137,7 @@ var STATS_EXT = '.stats';
 					callback(response.rows);
 				});
 			}
-		}
+		},
 
 	});		
 

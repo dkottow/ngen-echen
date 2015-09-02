@@ -31,6 +31,7 @@ var app = app || {};
 			return val.map(function(val) {
 				if (me.get('field').get('fk') == 1 
 					&& me.get('op') == app.Filter.OPS.IN) {
+					//extract fk from ref such as 'Book (12)'
 					var m = val.match(/^(.*)\(([0-9]+)\)$/);
 					//console.log(val + " matches " + m);
 					return m[2];
@@ -56,7 +57,7 @@ var app = app || {};
 
 		loadRange: function(cbAfter) {
 			var field = this.get('field');
-			this.get('table').stats(field.vname(), function(stats) {
+			this.get('table').stats(this, function(stats) {
 				field.set('stats', stats);
 				cbAfter();
 			});
@@ -64,12 +65,11 @@ var app = app || {};
 
 		loadSelect: function(searchTerm, cbAfter) {
 			var field = this.get('field');
-			this.get('table').options(field.vname(), searchTerm, function(opts) {
+			this.get('table').options(this, searchTerm, function(opts) {
 				field.set('options', opts);
 				cbAfter();
 			});
 		}
-
 
 	});
 
