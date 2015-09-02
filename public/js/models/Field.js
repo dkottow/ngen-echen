@@ -38,6 +38,9 @@ var app = app || {};
 		},
 
 		parse: function(val) {
+			if (this.get('fk') == 1 && _.isString(val)) {
+				return val;
+			}
 			var t = this.get('type');
 			if (t == app.Field.TYPES.INTEGER) {
 				return parseInt(val);
@@ -53,6 +56,9 @@ var app = app || {};
 		},
 
 		toQS: function(val) {
+			if (this.get('fk') == 1 && _.isString(val)) {
+				return "'" + val + "'";
+			}
 			var t = this.get('type');
 			if (t == app.Field.TYPES.INTEGER || t == app.Field.TYPES.NUMERIC) {
 				return val;

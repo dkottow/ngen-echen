@@ -25,6 +25,7 @@ var app = app || {};
 
 		values: function() {
 			var me = this;
+
 			var val = _.isArray(this.get('value')) ? 
 						this.get('value') : [ this.get('value') ];
 
@@ -42,16 +43,25 @@ var app = app || {};
 		},
 
 		toParam: function() {
+			var f = this.get('field') ? this.get('field').vname() : null;
+			var key = app.Filter.Key(this.get('table'), f);
 			var param;
-			var values = this.values();
+
 			if (this.get('op') == app.Filter.OPS.SEARCH) {
-				param = this.id + " search '" + this.get('value') + "*'";
-			} else if (this.get('op') == app.Filter.OPS.BETWEEN) {
-				param = this.id + " ge " + values[0] + ' and ' 
-						+ this.id + " le " + values[1];
-			} else if (this.get('op') == app.Filter.OPS.IN) {
-				param = this.id + " in " + values.join(",");
+				param = key + " search '" + this.get('value') + "*'";
+
+			} else {
+				var values = this.values();
+				if (this.get('op') == app.Filter.OPS.BETWEEN) {
+					param = key + " ge " + values[0] + ' and ' 
+						  + key + " le " + values[1];
+
+				} else if (this.get('op') == app.Filter.OPS.IN) {
+					key = app.Filter.Key(this.get('table'), this.get('field'));
+					param = key + " in " + values.join(",");
+				}
 			}
+
 			return param;
 		},
 
