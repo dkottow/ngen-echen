@@ -5,5 +5,10 @@
   "private": true,
   "dependencies": {
     "express": "4.x"
+  },
+  "devDependencies": {
+    "gulp": "~3.9.0",
+    "gulp-concat": "*",
+    "gulp-inject": "~1.5.0"
   }
 }

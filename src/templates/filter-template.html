@@ -1,0 +1,58 @@
+<script type="text/template" id="filter-template">
+	<div class="filter-column">
+
+	  <!-- Nav tabs -->
+	  <ul class="nav nav-tabs">
+		<li class="active">
+			<a href="#filterRange" data-toggle="tab">Range</a>
+		</li>
+		<li>
+			<a href="#filterSelect" data-toggle="tab">Select</a>
+		</li>
+	  </ul>
+
+	  <!-- Tab panes -->
+	  <div class="tab-content">
+		<div class="tab-pane active" id="filterRange">
+			<form class="form-inline filter-form">				
+				<div class="form-group">
+					<label for="inputFilterMin" class="control-label">From</label>
+					<input type="text" size="16" class="form-control input-sm" id="inputFilterMin">
+				</div>
+				<div class="form-group">
+					<label for="inputFilterMax" class="control-label">To</label>
+					<input type="text" size="16" class="form-control input-sm" id="inputFilterMax">
+				</div>
+				<div id="sliderRange"></div>
+				<div class="filter-reset">
+					<button id="rangeReset" type="button" class="btn btn-primary">Reset</button>
+				</div>
+			</form>
+		</div>
+		<div class="tab-pane" id="filterSelect">
+			<form class="form-inline filter-form">				
+			<div class="pull-left" style="width: 45%">
+				<div class="form-group">
+					<label for="inputFilterItemsSearch" class="control-label">Search </label>						
+					<input type="text" size="14" class="form-control input-sm" id="inputFilterItemsSearch">
+				</div>
+				<div id="filterOptions" class="list-group scrollable-menu">
+				</div>						
+			</div>
+			<div class="pull-right" style="width: 45%">
+				<div class="form-group">
+					<label class="control-label">Selected </label>
+					<input style="visibility: hidden;"><!-- force equal heights -->
+				</div>
+				<div id="filterSelection" class="list-group scrollable-menu">
+				</div>
+			</div>
+			<div style="clear: both" class="filter-reset">
+				<button id="selectReset" type="button" class="btn btn-primary">Reset</button>
+			</div>
+			</form>
+		</div>
+	  </div>
+	</div>
+</script>		
+
