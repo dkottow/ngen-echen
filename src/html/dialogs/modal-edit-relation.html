@@ -1,0 +1,38 @@
+<div class="modal fade" id="modalEditRelation" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+	<div class="modal-content">
+	  <div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+		<h4 class="modal-title">Edit Relationship</h4>
+	  </div>
+	  <div class="modal-body">
+		<form>
+		  <div class="form-group">
+			<label for="modalInputRelationTable" class="control-label">Referenced Table:</label>
+			<select class="form-control" id="modalInputRelationTable">
+				<option value="Date">Date</option>
+				<option value="Timestamp">Timestamp</option>
+			</select>
+		  </div>
+		  <div class="form-group">
+			<label for="modalInputRelationType" class="control-label">Type:</label>
+			<select class="form-control" id="modalInputRelationType">
+				<option value="many-to-one">many-to-one</option>
+				<option value="one-to-one">one-to-one</option>
+			</select>
+		  </div>
+		  <div class="form-group">
+			<label for="modalInputRelationField" class="control-label">Foreign Key:</label>
+			<select class="form-control" id="modalInputRelationField">
+			</select>
+		  </div>
+		</form>
+	  </div>
+	  <div class="modal-footer">
+		<button id="modalRelationRemove" type="button" class="btn btn-danger" data-dismiss="modal">Delete</button>
+		<button id="modalRelationUpdate" type="button" data-dismiss="modal" class="btn btn-primary">Update</button>
+	  </div>
+	</div>
+  </div>
+</div>
+

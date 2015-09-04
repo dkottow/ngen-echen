@@ -28,7 +28,7 @@ var app = app || {};
 			this.model.set('name', newName);
 			if ( ! app.schema.get('tables').contains(this.model)) {
 				app.schema.get('tables').add(this.model);
-				app.tableListView.setTable(this.model);
+				app.setTable(this.model);
 			}
 		},
 

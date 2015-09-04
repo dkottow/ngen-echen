@@ -22,21 +22,10 @@ var app = app || {};
 
 		render: function() {
 			console.log('MenuSchemaView.render ');			
-			this.$el.html(this.template({
-				table: app.table, 
-				schema: app.schema
-			}));
+			this.$el.show();
+			this.$el.html(this.template());
 			this.$('#add-table').prop('disabled', app.schema == null);
 			this.$('#save-schema').prop('disabled', app.schema == null);
-
-			//render current schema label
-			var current = $('#schema-list > a:first span').html();
-			if (app.schema && app.schema.get('name') == '')	{
-				current = ' New Database ';
-			} else if (app.schema) {
-				current = ' Database ' + app.schema.get('name');
-			}
-			$('#schema-list > a:first span').html(current);
 
 			return this;
 		},
@@ -60,5 +49,4 @@ var app = app || {};
 	});
 
 })(jQuery);
-
 

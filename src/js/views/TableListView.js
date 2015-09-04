@@ -32,19 +32,16 @@ var app = app || {};
 			return this;
 		},
 
-		setTable: function(table) {
-			app.table = table;
-			if (app.tableView) app.tableView.remove();
-			app.tableView = new app.TableView({model: app.table});
-			$('#content').append(app.tableView.render().el);			
-		},
-	
-		evTableClick: function(ev) {
+		evTableClick: function(ev) {			
 			var name = $(ev.target).attr('data-target');
+
+			this.$('a').removeClass('active');
+			$(ev.target).addClass('active');
+
 			var table = this.collection.find(function(c) { 
 				return c.get('name') == name; 
 			});
-
+			
 			app.setTable(table);
 		}
 

@@ -4,7 +4,7 @@ var app = app || {};
 (function ($) {
 	'use strict';
 
-	app.TableView = Backbone.View.extend({
+	app.SchemaTableView = Backbone.View.extend({
 
 		//el:  '#content',
 

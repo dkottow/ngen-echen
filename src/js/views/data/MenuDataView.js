@@ -15,11 +15,12 @@ var app = app || {};
 			//this.listenTo(app.schema, 'change', this.render);
 		},
 
-		template: null,
+		template: _.template($('#data-menu-template').html()),
 
 		render: function() {
 			console.log('MenuDataView.render ');			
-			this.$el.html('');
+			this.$el.toggle(app.table);
+			this.$el.html(this.template());
 			return this;
 		},
 

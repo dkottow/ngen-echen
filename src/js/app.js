@@ -5,7 +5,6 @@ $(function () {
 	'use strict';
 
 	// kick things off..
-	app.name = 'data';
 	app.user = 'demo';
 
 	$(document).ajaxStart(function() {
@@ -26,11 +25,14 @@ $(function () {
 		app.toggleSidebar();
 	}); 
 
-	app.gotoModule = function(name, el) {
+	$('#toggle-sidebar').hide();
+
+	app.gotoModule = function(name) {
 		console.log('switching to module ' + name);
 
 		$('#goto-options li').removeClass('active');
-		$(el).parent().addClass('active');
+		$('#goto-options a[data-target="' + name + '"]')
+			.parent().addClass('active');
 
 		if (name == 'schema') {
 			app.menuView = new app.MenuSchemaView();
@@ -38,14 +40,24 @@ $(function () {
 			app.menuView = new app.MenuDataView();
 		}
 		app.menuView.render();
+
+		//refresh table view
+		if (app.table) app.setTable(app.table);
+	}
+
+	app.module = function() {
+		var m = undefined
+		if (app.menuView instanceof app.MenuSchemaView) m = 'schema';
+		else if (app.menuView instanceof app.MenuDataView) m = 'data';
+		//console.log('module ' + m);
+		return m;		
 	}
 
 	$('#goto-options a').click(function(ev) {
-		app.gotoModule($(ev.target).attr('data-target'), ev.target);
+		app.gotoModule($(ev.target).attr('data-target'));
 	}); 
 
-	app.menuView = new app.MenuDataView();
-	app.menuView.render();
+	app.gotoModule('data');
 
 	app.schemaListUrl = function() { return REST_ROOT + "/" + app.user; }
 
@@ -60,8 +72,10 @@ $(function () {
 		if (app.gridView) app.gridView.remove();
 		if (app.tableView) app.tableView.remove();
 		if (app.tableListView) app.tableListView.remove();
+		
+		$('#schema-list > a:first span').html(' New DB ');
 
-		app.menuView.render();
+		//app.menuView.render();
 	}
 
 	app.loadSchema = function(name) {
@@ -74,17 +88,27 @@ $(function () {
 					collection: app.schema.get('tables')
 				});
 				$('#sidebar').append(app.tableListView.render().el);
+				$('#toggle-sidebar').show();
+
+				//render current schema label
+				$('#schema-list > a:first span').html(' DB ' + name);
+
 				app.menuView.render();			
 			}
 		});
 	}
 
 	app.setTable = function(table) {
-		console.log('app.setTable');
+		//console.log('app.setTable');
 		app.table = table;
 		if (app.tableView) app.tableView.remove();
-//TODO ask if data or schema then instantiate
-		app.tableView = table.createView({model: table});
+
+		if (app.module() == 'data') {
+			app.tableView = new app.DataTableView({model: table});
+		} else if (app.module() == 'schema') {
+			app.tableView = new app.SchemaTableView({model: table});
+		}
+
 		$('#content').append(app.tableView.render().el);			
 	}
 
@@ -102,8 +126,7 @@ $(function () {
 		app.tableListView = new app.TableListView({
 			collection: app.schema.get('tables')
 		});
-		$('#table-list').append(app.tableListView.render().el);
-
+		$('#sidebar').append(app.tableListView.render().el);
 		app.menuView.render();
 	}
 

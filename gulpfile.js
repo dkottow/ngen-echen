@@ -6,7 +6,8 @@ var allTasks = ['build-3rdparty-js',
 				'build-app-js', 
 				'build-3rdparty-css', 
 				'build-app-css',
-				'build-html'
+				'build-html',
+				'watch'
 ];
 
 gulp.task('default', allTasks, function() {
@@ -64,7 +65,6 @@ gulp.task('build-app-js', function() {
 
 
 gulp.task('build-html', function() {
-  // place code for your default task here
 	return gulp.src(['./src/index.html'])
 
 		.pipe(inject(gulp.src('./src/html/nav.html'), {
@@ -90,3 +90,12 @@ gulp.task('build-html', function() {
 		
 		.pipe(gulp.dest('./public/'));
 });
+
+// Watch Files For Changes
+gulp.task('watch', function() {
+    gulp.watch('./src/js/**/*.js', ['build-app-js']);
+    gulp.watch('./src/html/**/*.html', ['build-html']);
+    gulp.watch('./src/index.html', ['build-html']);
+    gulp.watch('./src/css/*.css', ['build-app-css']);
+});
+
