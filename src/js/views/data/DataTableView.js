@@ -6,8 +6,8 @@ var app = app || {};
 
 	app.DataTableView = Backbone.View.extend({
 
-		className: 'panel',
 		id: 'grid-panel',
+		className: 'panel',
 
 		initialize: function() {
 			console.log("DataTableView.init " + this.model);			

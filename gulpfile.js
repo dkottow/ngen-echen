@@ -2,11 +2,14 @@ var gulp = require('gulp');
 var concat = require('gulp-concat');
 var inject = require('gulp-inject');
 
-gulp.task('default', ['build-3rdparty-js', 
-					'build-app-js', 
-					'build-3rdparty-css', 
-					'build-app-css',
-					'build-html'], function() {
+var allTasks = ['build-3rdparty-js', 
+				'build-app-js', 
+				'build-3rdparty-css', 
+				'build-app-css',
+				'build-html'
+];
+
+gulp.task('default', allTasks, function() {
 });
 
 //TODO
@@ -41,6 +44,9 @@ gulp.task('build-3rdparty-js', function() {
 });
 
 gulp.task('build-app-css', function() {
+	return gulp.src('./src/css/*.css')
+		.pipe(concat('app.css'))
+		.pipe(gulp.dest('./public/css/'));
 });
 
 gulp.task('build-app-js', function() {
@@ -61,14 +67,21 @@ gulp.task('build-html', function() {
   // place code for your default task here
 	return gulp.src(['./src/index.html'])
 
-		.pipe(inject(gulp.src('./src/nav.html'), {
+		.pipe(inject(gulp.src('./src/html/nav.html'), {
 		    starttag: '<!-- inject:nav:{{ext}} -->',
 		    transform: function (filePath, file) {
 		      return file.contents.toString('utf8')
     		}
   		}))
 
-		.pipe(inject(gulp.src(['./src/templates/*.html']), {
+		.pipe(inject(gulp.src(['./src/html/dialogs/*.html']), {
+		    starttag: '<!-- inject:dialogs:{{ext}} -->',
+		    transform: function (filePath, file) {
+		      return file.contents.toString('utf8')
+    		}
+  		}))
+		
+		.pipe(inject(gulp.src(['./src/html/templates/*.html']), {
 		    starttag: '<!-- inject:templates:{{ext}} -->',
 		    transform: function (filePath, file) {
 		      return file.contents.toString('utf8')

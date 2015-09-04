@@ -16,16 +16,35 @@ $(function () {
 	});
 
 	app.toggleSidebar = function() {
-		var destValue = 225 - parseInt($('.side-nav').css('width'));
-		$('.side-nav').animate({ 'width': destValue }, 200);
-		$('#wrapper').animate({ 'padding-left': destValue }, 200);
+        $('#table-list').toggle('slide', function() {
+		   	$('#module').toggleClass('col-sm-16 col-sm-13');             
+		   	$('#sidebar').toggleClass('col-sm-3 col-sm-0');
+		});
 	}
-
-	$('#toggle-sidebar > a').click(function() {
+	
+	$('#toggle-sidebar').click(function() {
 		app.toggleSidebar();
 	}); 
 
-	app.menuView = new app.MenuView();
+	app.gotoModule = function(name, el) {
+		console.log('switching to module ' + name);
+
+		$('#goto-options li').removeClass('active');
+		$(el).parent().addClass('active');
+
+		if (name == 'schema') {
+			app.menuView = new app.MenuSchemaView();
+		} else if (name == 'data') {
+			app.menuView = new app.MenuDataView();
+		}
+		app.menuView.render();
+	}
+
+	$('#goto-options a').click(function(ev) {
+		app.gotoModule($(ev.target).attr('data-target'), ev.target);
+	}); 
+
+	app.menuView = new app.MenuDataView();
 	app.menuView.render();
 
 	app.schemaListUrl = function() { return REST_ROOT + "/" + app.user; }
@@ -54,7 +73,7 @@ $(function () {
 				app.tableListView = new app.TableListView({
 					collection: app.schema.get('tables')
 				});
-				$('#table-list').append(app.tableListView.render().el);
+				$('#sidebar').append(app.tableListView.render().el);
 				app.menuView.render();			
 			}
 		});
@@ -64,6 +83,7 @@ $(function () {
 		console.log('app.setTable');
 		app.table = table;
 		if (app.tableView) app.tableView.remove();
+//TODO ask if data or schema then instantiate
 		app.tableView = table.createView({model: table});
 		$('#content').append(app.tableView.render().el);			
 	}

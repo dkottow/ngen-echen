@@ -4,13 +4,13 @@ var app = app || {};
 (function ($) {
 	'use strict';
 
-	app.MenuView = Backbone.View.extend({
-		el:  '#schema-menu',
+	app.MenuSchemaView = Backbone.View.extend({
+		el:  '#menu',
 
 		events: {
 			'click #add-table': 'evAddTableClick',
 			'click #new-schema': 'evNewSchemaClick',
-			'click #save-schema': 'evSaveSchemaClick'
+			'click #save-schema': 'evSaveSchemaClick',
 		},
 
 		initialize: function() {
@@ -21,7 +21,7 @@ var app = app || {};
 		template: _.template($('#schema-menu-template').html()),
 
 		render: function() {
-			console.log('MenuView.render ');			
+			console.log('MenuSchemaView.render ');			
 			this.$el.html(this.template({
 				table: app.table, 
 				schema: app.schema
@@ -32,11 +32,9 @@ var app = app || {};
 			//render current schema label
 			var current = $('#schema-list > a:first span').html();
 			if (app.schema && app.schema.get('name') == '')	{
-				current = ' New Schema ';
+				current = ' New Database ';
 			} else if (app.schema) {
-				current = ' Schema ' + app.schema.get('name');
-			} else if (app.database) {
-				current = ' Database ' + app.database.get('name');
+				current = ' Database ' + app.schema.get('name');
 			}
 			$('#schema-list > a:first span').html(current);
 
@@ -56,15 +54,8 @@ var app = app || {};
 		},
 
 		evNewSchemaClick: function() {
-			
 			app.newSchema();
-/*
-			var newSchema = app.Schema.create();
-			app.schemas.remove('');
-			app.schemas.add(newSchema);
-			app.setSchema(newSchema);
-*/
-		}
+		},
 
 	});
 

@@ -1,69 +1,41 @@
 <!doctype html>
 <html>
   <head>
-        <title>DonkeyLift Data</title>
-		<link href="css/3rdparty.css" rel="stylesheet">
-		<link href="css/sb-admin.css" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href="css/styles.css" />
-		<style>
-			body {
-				background-color: white;
-			}
-			.side-nav {
-				top: 50px;
-			}
-			#content {
-				margin-top: 55px;
-			}
-			.filter-column {
-				width: 32em;
-			}
-			.filter-form {
-				padding: 10px;
-			}
-			#sliderRange {
-				margin: 10px;
-			}
-			#inputFilterMin {
-				margin-right: 4.5em;
-			}
-			#filterOptions, #filterSelection {
-				margin-top: 1em;
-			}
-			#filterOptions a, #filterSelection a {
-				padding: 3px 5px;
-			}
-			.filter-reset {
-		 		text-align: right; margin-top: 1em	
-			}
+        <title>DonkeyLift</title>
+		<link href="css/3rdparty.css" rel="stylesheet" type="text/css" />
+        <link href="css/app.css" rel="stylesheet" type="text/css" />
+		<style></style>
+  </head>
 
-			.scrollable-menu {
-			    height: auto;
-			    max-height: 21em;
-			    overflow-x: hidden;
-			}
-
-		</style>
-    </head>
-    <body>
-	<div id="wrapper">	
+  <body>
+<div id="wrapper" class="container-fluid">	
 
 <!-- inject:nav:html -->
 <!-- endinject -->
 
- <!-- Dynamic Content -->
-        <div id="page-content-wrapper">
-			<section id="content">				
-			</section>
-		</div>		
- <!-- end Dynamic Content -->
+	<div id="main" class="row">
 
-	</div><!-- id wrapper -->
+<!-- Sidebar -->
+		<div id="sidebar" class="col-sm-3 sidebar"></div>        
+
+ <!-- Dynamic Content -->
+		<div id="module" class="col-sm-13">
+			<div id="menu"></div>
+			<section id="content"></section>
+		</div>		
+
+	</div><!-- main -->
+
+</div><!-- id wrapper -->
+
 <!-- end FIXED PAGE ELEMENTS --> 
 
-	  <div id="ajax-progress-spinner">
+	<div id="ajax-progress-spinner">
 		<img src="img/progress-spinner.gif"></img>
-	  </div>	
+	</div>	
+
+<!-- inject:dialogs:html -->
+<!-- endinject -->
 
 <!-- inject:templates:html -->
 <!-- endinject -->

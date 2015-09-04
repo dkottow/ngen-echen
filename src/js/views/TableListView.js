@@ -6,8 +6,9 @@ var app = app || {};
 
 	app.TableListView = Backbone.View.extend({
 
-		tagName: 'ul',
-		className: 'nav navbar-nav side-nav',
+		
+		id: "table-list",
+		className: "list-group",
 
 		events: {
 			'click .table-item': 'evTableClick'
@@ -20,12 +21,13 @@ var app = app || {};
 		},
 
 		template: _.template($('#table-list-template').html()),
+		itemTemplate: _.template($('#table-item-template').html()),
 
 		render: function() {
 			console.log('TableListView.render ');			
-			this.$el.empty();
+			this.$el.html(this.template());
 			this.collection.each(function(table) {
-				this.$el.append(this.template({name: table.get('name')}));
+				this.$el.append(this.itemTemplate({name: table.get('name')}));
 			}, this);			
 			return this;
 		},
