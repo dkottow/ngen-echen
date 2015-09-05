@@ -1,20 +1,29 @@
-UI
+UI schema 
 
+generate default fk when adding new relationship
+edit reference ui (on Others field tab)
 validate no references exist when deleting field / table (due to relations)
 prohibit edits of fields: id, modified_by, modified_on
 validate length attribute of field
 enum fields
 null/not null fields
 labels for fields and tables
-filter interface
-search/filter integration
-sort out table select menu
+
+UI data 
+
+datepick on filter slider for date fields
+visual filter state on controls using bg-color
+view filter list / reset filters
 edit/delete single row dialog - includes edit fields for each col type (date picker)
+
+
+EXCEL
+
+recover
+integrate odata as arg to spreadsheet download
 
 SERVER
 
-make query return record totals (filtered /unfiltered)
-full row text search
 multiple order by
 user/prefs table
 access control with 2 roles admin, user. tables are admin, user too. all access is rw except user on admin tables which is ro. no individual permissions

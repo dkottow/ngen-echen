@@ -15,9 +15,13 @@ var STATS_EXT = '.stats';
 
 		getColumns: function() {
 
-			return this.get('fields').map(function(field) {
-				return { data : field.vname() };
-			});
+			return this.get('fields')
+				.sortBy(function(field) {
+					return field.get('order');
+				})
+				.map(function(field) {
+					return { data : field.vname() };
+				});
 		},
 
 		ajaxGetRowsFn: function() {

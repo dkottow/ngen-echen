@@ -57,6 +57,13 @@ var app = app || {};
 			var newType = $('#modalInputRelationType').val();
 			var newField = $('#modalInputRelationField').val();
 			if (newType == 'one-to-one') newField = 'id';
+			else if (_.isEmpty(newField)) {
+				//create field as <newTable>_id
+				newField = newTable + "_id";
+				var f = this.model.get('table').get('fields').addNew();
+				f.set('name', newField);
+				f.set('type', app.Field.TYPES.INTEGER);
+			}
 
 			newField = this.model.get('table').get('fields').getByName(newField);
 			newTable = app.schema.get('tables').getByName(newTable);

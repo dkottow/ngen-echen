@@ -2,16 +2,16 @@
 	<div>
 		<div class="panel panel-heading">
 			<h3 class="panel-title">
-				Table <%= name%> &nbsp;
+				<span>Table</span> <%= name%> &nbsp;
 				<button class="edit-table btn btn-default">
-					<span class="glyphicon-pencil"></span>
+					<i class="fa fa-pencil"></i>
 				</button>
 			</h3>
 			<br/>
 			<ul class="nav nav-tabs">
 				<li role="presentation" class="active"><a href="#fields" data-toggle="tab">Fields</a></li>
 				<li role="presentation"><a href="#relations" data-toggle="tab">Relationships</a></li>
-				<li role="presentation"><a href="#general" data-toggle="tab">Other</a></li>
+				<li role="presentation"><a href="#alias" data-toggle="tab">Alias</a></li>
 			</ul>
 		</div>
 		<div class="tab-content">
@@ -43,7 +43,7 @@
 				</table>
 				<button id="add-relation" class="btn btn-default">Add relationship</button>
 			</div>
-			<div role="tabpanel" class="panel tab-pane" id="general">
+			<div role="tabpanel" class="panel tab-pane" id="alias">
 			</div>
 		</div><!-- tabcontent -->
 

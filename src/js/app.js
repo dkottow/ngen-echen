@@ -15,10 +15,16 @@ $(function () {
 	});
 
 	app.toggleSidebar = function() {
-        $('#table-list').toggle('slide', function() {
-		   	$('#module').toggleClass('col-sm-16 col-sm-13');             
-		   	$('#sidebar').toggleClass('col-sm-3 col-sm-0');
-		});
+		if ($('#table-list').is(':visible')) {
+	        $('#table-list').toggle('slide', function() {
+			   	$('#module').toggleClass('col-sm-16 col-sm-13');             
+			   	$('#sidebar').toggleClass('col-sm-3 col-sm-0');
+			});
+		} else {
+			$('#module').toggleClass('col-sm-16 col-sm-13');             
+			$('#sidebar').toggleClass('col-sm-3 col-sm-0');
+        	$('#table-list').toggle('slide');
+		}
 	}
 	
 	$('#toggle-sidebar').click(function() {

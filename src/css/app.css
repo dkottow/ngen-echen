@@ -87,11 +87,18 @@ body {
 	font-size: large;
 }
 
+.panel-title span {
+	color: grey;
+}
+
 .field-table, .relation-table {
 	float: left;
 	max-width: 400px;
 	margin-bottom: 1em;
 	margin-right: 2em;
+}
+.field-table>tbody>tr>td, .relation-table>tbody>tr>td {
+	vertical-align: middle;
 }
 
 .dataTable th {
