@@ -97,6 +97,7 @@ body {
 	margin-bottom: 1em;
 	margin-right: 2em;
 }
+
 .field-table>tbody>tr>td, .relation-table>tbody>tr>td {
 	vertical-align: middle;
 }

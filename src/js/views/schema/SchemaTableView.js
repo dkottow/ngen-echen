@@ -89,7 +89,10 @@ var app = app || {};
 				view.remove();
 			});
 			this.elFields().html('');
-			this.model.get('fields').each(this.addField, this);
+
+			_.each(this.model.get('fields').sortBy(function(field) {
+					return field.get('order');
+				}), this.addField, this);
 		},
 
 		evNewRelationClick: function() {
