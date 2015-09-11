@@ -14,6 +14,15 @@ var app = app || {};
 			});			
 			this.set('fields', new app.Fields(fields));
 			this.set('relations', new app.Relations());
+			this.set('row_alias', _.map(table.row_alias, function(f) {
+				return f.indexOf('.') < 0 ? table.name + '.' + f : f;
+			}));
+		},
+
+		getFieldQN: function(field) {
+			return _.isString(field) 
+				? this.get('name') + '.' + field
+				: this.get('name') + '.' + field.get('name');
 		},
 
 		createView: function(options) {
@@ -35,8 +44,15 @@ var app = app || {};
 				field.fk_table = relation.get('related').get('name');
 			});
 
+			var row_alias = _.map(this.get('row_alias'), function(fieldQName) {
+				var parts = fieldQName.split('.');
+				if (parts[0] == this.get('name')) return parts[1];
+				else return fieldQName;
+			}, this);
+
 			return {
 				name: this.get('name'),
+				row_alias: row_alias,
 				fields: fields
 			};
 		}

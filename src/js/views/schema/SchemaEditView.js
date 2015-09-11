@@ -40,66 +40,28 @@ var app = app || {};
 				$('#modalSchemaResultButton').removeClass('btn-danger');
 			}
 			$('#modalSchemaActionResult').show();
+			app.schemaCurrentView.render();
 		},
 
 		evSaveClick: function() {
+			var me = this;
+			console.log("SchemaEditView.evSaveClick");
 
-			var saveOptions = {
-				success: function() {	
-					//set id, just in case we saved under a new name
-					app.schema.set('id', app.schema.get('name'));
-					app.schemas.fetch({
-						reset: true,
-						success: function() {
-							me.renderResult();
-							app.menuView.render();
-						},
-						error: function(model, response) {
-							me.renderResult(response);
-						}
-					});
-				},
-				error: function(model, response) {
-					me.renderResult(response);
-					console.dir(response);
-				}
-			};
-	
 			$('#modalSchemaAction > button').prop('disabled', true);
 			var newName = $('#modalInputSchemaName').val();
 			if (newName != this.model.get('name')) {
+				console.log('SchemaEditView Save as new');
+				this.model.set('name', newName);
 				//add schema, not replace
-				console.log('SchemaEditView unset id');
 				this.model.unset('id');
-				saveOptions.url = app.schemaListUrl();
 			}
-			this.model.set('name', newName);
-			var me = this;
-			this.model.save(null, saveOptions);
+			this.model.save(function(err) { return me.renderResult(err); });
 		},
 
 		evRemoveClick: function() {	
 			$('#modalSchemaAction > button').prop('disabled', true);
 			var me = this;
-			this.model.destroy({
-				success: function() {			
-					app.unsetSchema();
-					app.schemas.fetch({
-						reset: true,
-						success: function() {
-							me.renderResult();
-							app.menuView.render();
-						},
-						error: function(model, response) {
-							me.renderResult(response);
-						}
-					});
-				},
-				error: function(model, response) {
-					me.renderResult(response);
-					console.dir(response);
-				}
-			});
+			this.model.destroy(function(err) { return me.renderResult(err); });
 		}
 
 	});

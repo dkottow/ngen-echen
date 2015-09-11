@@ -28,10 +28,10 @@ var app = app || {};
 			this.collection.each(function(schema) {
 				this.$el.append(this.template({name: schema.get('name')}));
 			}, this);
-
+			
 			return this;
 		},
-	
+
 		evSchemaClick: function(ev) {
 			var name = $(ev.target).attr('data-target');
 			console.log('SchemaListView.evSchemaClick ' + name);

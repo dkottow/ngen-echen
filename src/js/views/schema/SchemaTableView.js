@@ -11,7 +11,8 @@ var app = app || {};
 		events: {
 			'click .edit-table': 'evEditTableClick',
 			'click #add-field': 'evNewFieldClick',
-			'click #add-relation': 'evNewRelationClick'
+			'click #add-relation': 'evNewRelationClick',
+			'click #add-alias': 'evNewAliasClick'
 		},
 
 		initialize: function () {
@@ -24,7 +25,6 @@ var app = app || {};
 			this.listenTo(this.model.get('relations'), 'remove', this.removeRelation);
 			this.fieldViews = {};
 			this.relationViews = {};
-			
 		},
 
 		template: _.template($('#table-template').html()),
@@ -47,6 +47,13 @@ var app = app || {};
 
 			this.setFields();
 			this.setRelations();
+
+			this.aliasView = new app.AliasView({
+				el: this.$('#alias'),
+				model: this.model,
+			});
+			this.aliasView.render();
+
 			return this;
 		},
 
@@ -98,7 +105,6 @@ var app = app || {};
 		evNewRelationClick: function() {
 			console.log('TableView.evNewRelationClick');
 			var relation = app.Relation.create(this.model);
-			//var relation = this.model.get('relations').addNew(this.model);
 			//console.log(relation.attributes);
 			app.relationEditView.model = relation;
 			app.relationEditView.render();
@@ -119,7 +125,16 @@ var app = app || {};
 		setRelations: function() {
 			this.elRelations().html('');
 			this.model.get('relations').each(this.addRelation, this);
+		},
+
+
+		evNewAliasClick: function() {
+			console.log('TableView.evNewAliasClick');
+			app.aliasEditView.setModel(this.model, '');
+			app.aliasEditView.render();
 		}
+
+
 	});
 
 })(jQuery);

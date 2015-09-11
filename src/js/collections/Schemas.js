@@ -17,6 +17,7 @@ var app = app || {};
 		},
 
 		parse : function(response) {
+			console.log("Schemas.parse ");
 			return _.values(response);
 		},
 

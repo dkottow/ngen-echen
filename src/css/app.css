@@ -3,12 +3,18 @@ body {
 	background-color: white;
 }
 
+.navbar-nav > li > a, .navbar-brand {
+    padding-top:10px !important; padding-bottom:0 !important;
+    height: 40px;
+}
+.navbar {min-height:30px !important;}
+
 .side-nav {
 	top: 50px;
 }
 
 #main {
-	margin-top: 50px;
+	margin-top: 40px;
 }
 
 #ajax-progress-spinner {
@@ -91,9 +97,9 @@ body {
 	color: grey;
 }
 
-.field-table, .relation-table {
+.field-table, .relation-table, .alias-table {
 	float: left;
-	max-width: 400px;
+	max-width: 60%;
 	margin-bottom: 1em;
 	margin-right: 2em;
 }

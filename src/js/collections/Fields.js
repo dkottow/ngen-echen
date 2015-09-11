@@ -19,7 +19,9 @@ var app = app || {};
 		},
 
 		getByName: function(name) {
-			return this.find(function(f) { return f.vname() == name; });
+			return this.find(function(f) { 
+				return f.vname() == name || f.get('name') == name; 
+			});
 		}
 	});
 
