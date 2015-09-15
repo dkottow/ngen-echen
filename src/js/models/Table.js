@@ -14,9 +14,60 @@ var app = app || {};
 			});			
 			this.set('fields', new app.Fields(fields));
 			this.set('relations', new app.Relations());
-			this.set('row_alias', _.map(table.row_alias, function(f) {
-				return f.indexOf('.') < 0 ? table.name + '.' + f : f;
-			}));
+			// row_alias will be fixed in initAlias
+		},
+
+		initRelations : function(tables) {
+			var relations = [];
+			_.each(this.get('parents'), function(parent_name) {
+				//construct Relations
+				var pt = _.find(tables, function(t) { 
+					return t.get('name') == parent_name;
+				});
+				var fk = _.find(this.get('fields').models, 
+					function(field) {
+						return field.get('fk_table') == parent_name;
+				});
+				var relation = new app.Relation({
+					table: this,
+					related: pt,
+					field: fk
+				});
+				relations.push(relation);
+			}, this);
+			this.set('relations', new app.Relations(relations));
+		},
+
+		initAlias : function(tables) {
+
+			//console.log('table: ' + this.get('name'));
+			//console.log('row_alias: ' + this.get('row_alias'));
+			var row_alias = [];
+			_.each(this.get('row_alias'), function(a) {
+				//console.log('alias_part: ' + a);
+				var alias = a.split('.');
+				var alias_table;
+				var field_name;
+				if (alias.length == 2) {
+					var alias_table = _.find(tables, function(t) {
+							return t.get('name') == alias[0];
+					});
+					field_name = alias[1];
+				} else {
+					alias_table = this;
+					field_name = alias;
+				}
+				var alias_field = _.find(alias_table.get('fields').models, 
+					function(f) {
+						return f.get('name') == field_name;
+				});
+				row_alias.push(new app.Alias({
+							table : alias_table,
+							field : alias_field
+				}));
+
+			}, this);
+			this.set('row_alias', row_alias);
 		},
 
 		getFieldQN: function(field) {
@@ -44,10 +95,15 @@ var app = app || {};
 				field.fk_table = relation.get('related').get('name');
 			});
 
-			var row_alias = _.map(this.get('row_alias'), function(fieldQName) {
+			var row_alias = _.map(this.get('row_alias'), function(a) {
+console.log(a);
+				if (a.get('table') == this) return a.get('field').get('name');
+				else return a.toString();	
+/*
 				var parts = fieldQName.split('.');
 				if (parts[0] == this.get('name')) return parts[1];
 				else return fieldQName;
+*/
 			}, this);
 
 			return {

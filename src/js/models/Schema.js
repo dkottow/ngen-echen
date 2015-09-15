@@ -9,8 +9,10 @@ var app = app || {};
 		initialize: function(attrs) {
 			console.log("Schema.initialize " + attrs.name);
 
-			this.orgJSON = this.toJSON();
-			this.set('id', attrs.name); //unset me when new
+			if ( ! attrs.table) this.set('tables', new app.Tables());
+
+			//this.set('id', attrs.name); //unset me when new
+			//this.orgJSON = this.toJSON();
 		},
 
 		isDirty: function() {
@@ -31,11 +33,6 @@ var app = app || {};
 			};
 		},	
 
-
-		url	: function() { 
-			return REST_ROOT + "/" + app.user + "/" + this.get('name'); 
-		},
-
 		parse : function(response) {
 			console.log("Schema.parse " + response);
 			var tables = _.map(response.tables, function(table) {
@@ -45,10 +42,36 @@ var app = app || {};
 			return response;
 		},
 
+		url : function() {
+			return app.schemas.url() + '/' + this.get('name');
+		},
+
+		fetch : function(cbAfter) {
+			var me = this;
+			console.log("Schema.fetch...");
+			Backbone.Model.prototype.fetch.call(this, {
+				success: function() {
+					me.orgJSON = me.toJSON();
+					console.log("Schema.fetch OK");
+					cbAfter();
+				}
+			});
+		},
+
+		update : function() {
+			var me = this;
+			this.save(function(err) {
+				if (err) {
+					//TODO
+					alert('ERROR on update ' + me.get('name'));
+				}
+			});
+		},
+
+
 		save : function(cbResult) {
 			console.log("Schema.save...");
 			var saveOptions = {
-				parse: false,
 				error: function(model, response) {
 					console.log("Schema.save ERROR");
 					console.dir(response);
@@ -56,18 +79,28 @@ var app = app || {};
 				},
 			};
 
-			if (this.get('id')) {
+			//save existing database
+			if (this.get('id') == this.get('name')) {
+				saveOptions.parse = false;
 				saveOptions.url = this.url();
+				console.log("Schema.save " + saveOptions.url);
 				saveOptions.success = function(model) {	
 					console.log("Schema.save OK");
 					cbResult();
 				}
+
+			//save new database
 			} else {
-				saveOptions.url = REST_ROOT + '/' + app.user;
+				this.unset('id'); 
+				saveOptions.parse = false;
+				saveOptions.url = app.schemas.url();
+				console.log("Schema.save " + saveOptions.url);
 				saveOptions.success = function(model) {
 					console.log("Schema.save new OK");
 					//set id to (new) name
 					model.set('id', model.get('name'));
+					app.schema = model;
+
 					//reload schema list
 					app.schemas.fetch({
 						reset: true,
@@ -116,13 +149,5 @@ var app = app || {};
 		}
 
 	});
-
-	app.Schema.create = function(name) {
-		if ( ! name) name = '';
-		return new app.Schema({
-			name: name,
-			tables: new app.Tables()	
-		});
-	}
 
 })();

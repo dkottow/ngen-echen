@@ -30,12 +30,14 @@ var app = app || {};
 				app.schema.get('tables').add(this.model);
 				app.setTable(this.model);
 			}
+			app.schema.update();
 		},
 
 		removeClick: function() {	
 			if (this.model.collection) {
 				this.model.collection.remove(this.model);
 				app.tableView.remove();
+				app.schema.update();
 			}
 		}
 

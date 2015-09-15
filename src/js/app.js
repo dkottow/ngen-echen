@@ -4,8 +4,35 @@ var app = app || {};
 $(function () {
 	'use strict';
 
-	// kick things off..
-	app.user = 'demo';
+	/**** init app - called at the end ***/
+	app.init = function() {
+
+		//fixed user named demo
+		app.user = 'demo';
+
+		app.schemas = new app.Schemas(null, {url: REST_ROOT + '/' + app.user});
+
+		app.filters = new app.Filters();
+
+		app.schemaCurrentView = new app.SchemaCurrentView();
+
+		app.schemaEditView = new app.SchemaEditView();
+		app.tableEditView = new app.TableEditView();
+		app.fieldEditView = new app.FieldEditView();
+		app.relationEditView = new app.RelationEditView();
+		app.aliasEditView = new app.AliasEditView();
+
+
+		app.schemas.fetch({success: function() {
+			app.schemaListView = new app.SchemaListView({collection: app.schemas});
+			$('#schema-list').append(app.schemaListView.render().el);
+		}});
+
+		app.gotoModule('data');
+
+		$('#toggle-sidebar').hide();
+	}
+
 
 	$(document).ajaxStart(function() {
 		$('#ajax-progress-spinner').show();
@@ -33,8 +60,6 @@ $(function () {
 		app.toggleSidebar();
 	}); 
 
-	$('#toggle-sidebar').hide();
-
 	app.gotoModule = function(name) {
 		console.log('switching to module ' + name);
 
@@ -54,7 +79,7 @@ $(function () {
 	}
 
 	app.module = function() {
-		var m = undefined
+		var m;
 		if (app.menuView instanceof app.MenuSchemaView) m = 'schema';
 		else if (app.menuView instanceof app.MenuDataView) m = 'data';
 		//console.log('module ' + m);
@@ -64,45 +89,6 @@ $(function () {
 	$('#goto-options a').click(function(ev) {
 		app.gotoModule($(ev.target).attr('data-target'));
 	}); 
-
-	app.gotoModule('data');
-
-	app.schemaListUrl = function() { return REST_ROOT + "/" + app.user; }
-
-	app.schemas = new app.Schemas();
-	app.schemas.fetch({success: function() {
-		app.schemaListView = new app.SchemaListView({collection: app.schemas});
-		$('#schema-list').append(app.schemaListView.render().el);
-	}});
-
-	app.schemaCurrentView = new app.SchemaCurrentView();
-
-	app.unsetSchema = function() {
-		app.schema = null;
-		if (app.gridView) app.gridView.remove();
-		if (app.tableView) app.tableView.remove();
-		if (app.tableListView) app.tableListView.remove();
-		
-		app.schemaCurrentView.render();
-	}
-
-	app.loadSchema = function(name) {
-		app.unsetSchema();
-		app.schema = new app.Database.create(name);
-		app.schema.fetch({
-			success: function() {
-				app.schema.orgJSON = app.schema.toJSON();
-				app.tableListView = new app.TableListView({
-					collection: app.schema.get('tables')
-				});
-				$('#sidebar').append(app.tableListView.render().el);
-				$('#toggle-sidebar').show();
-
-				//render current schema label
-				app.schemaCurrentView.render();
-			}
-		});
-	}
 
 	app.setTable = function(table) {
 		//console.log('app.setTable');
@@ -119,28 +105,47 @@ $(function () {
 		app.menuView.render();			
 	}
 
+	app.unsetSchema = function() {
+		app.schema = null;
+		if (app.gridView) app.gridView.remove();
+		if (app.tableView) app.tableView.remove();
+		if (app.tableListView) app.tableListView.remove();
+		
+		app.schemaCurrentView.render();
+	}
+
+	app.loadSchema = function(name) {
+		app.unsetSchema();
+		app.schema = new app.Database({name : name, id : name});
+		app.schema.fetch(function() {
+			app.tableListView = new app.TableListView({
+				collection: app.schema.get('tables')
+			});
+			$('#sidebar').append(app.tableListView.render().el);
+			$('#toggle-sidebar').show();
+
+			//render current schema label
+			app.schemaCurrentView.render();
+		});
+	}
+
 	/**** schema only stuff ****/
 
-	app.schemaEditView = new app.SchemaEditView();
-	app.tableEditView = new app.TableEditView();
-	app.fieldEditView = new app.FieldEditView();
-	app.relationEditView = new app.RelationEditView();
-	app.aliasEditView = new app.AliasEditView();
-
-	app.newSchema = function() {
+	app.newSchema = function(name) {
 		app.unsetSchema();
-		app.schema = new app.Schema.create();
+		app.schema = new app.Database({name : name});
+		app.schema.save(function() {
+			app.tableListView = new app.TableListView({
+				collection: app.schema.get('tables')
+			});
+			$('#sidebar').append(app.tableListView.render().el);
 
-		app.tableListView = new app.TableListView({
-			collection: app.schema.get('tables')
+			//render current schema label
+			app.schemaCurrentView.render();
 		});
-		$('#sidebar').append(app.tableListView.render().el);
-		//app.menuView.render();
 	}
 
 	/**** data only stuff ****/
-
-	app.filters = new app.Filters();
 
 	app.setFilterView = function(filter, $parentElem) {
 		if (app.filterView) app.filterView.remove();
@@ -149,7 +154,8 @@ $(function () {
 		app.filterView.render();
 	}
 
-
+	//start
+	app.init();
 
 });
 

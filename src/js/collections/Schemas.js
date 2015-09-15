@@ -6,14 +6,16 @@ var app = app || {};
 	app.Schemas = Backbone.Collection.extend({
 
 		initialize: function(models, options) {
-			console.log("Schemas.initialize");
+			console.log("Schemas.initialize " + options);
+			this._url = options.url;
 		},
 
 		//Schemas is just a list of schema names
 		//model: app.Schema,
 
 		url	: function() { 
-			return REST_ROOT + "/" + app.user; 
+			return this._url;
+			//return REST_ROOT + "/" + app.user; 
 		},
 
 		parse : function(response) {

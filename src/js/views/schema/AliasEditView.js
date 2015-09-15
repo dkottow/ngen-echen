@@ -16,9 +16,9 @@ var app = app || {};
 			console.log("AliasEditView.init");
 		},
 
-		setModel: function(model, fieldQName) {
+		setModel: function(model, alias) {
 			this.model = model;
-			this.fieldQName = fieldQName;
+			this.alias = alias;
 		},
 
 		
@@ -44,27 +44,38 @@ var app = app || {};
 				el.append('</optgroup>');
 			});
 			
-			el.val(this.fieldQName);
+			if (this.alias) {
+				el.val(this.alias.toString());
+			}
 
 			$('#modalEditAlias').modal();
 			return this;
 		},
 
 		evUpdateClick: function() {
+//TODO
 			var newFieldQName = $('#modalInputAliasField').val();
 //console.log(this.model.get('row_alias'));
-			var i = this.model.get('row_alias').indexOf(this.fieldQName);
+			var alias = app.Alias.parse(
+							newFieldQName.split('.')[0],
+							newFieldQName.split('.')[1]
+			);	
+
+			var i = this.model.get('row_alias').indexOf(this.alias);
+console.log(i);
 			if (i >= 0) {
-				this.model.get('row_alias').splice(i, 1, newFieldQName);
+				this.model.get('row_alias').splice(i, 1, alias);
 			} else {
-				this.model.get('row_alias').push(newFieldQName);
+				this.model.get('row_alias').push(alias);
 			}
+
 			this.model.trigger('change:row_alias'); //trigger change
 //console.log(this.model.get('row_alias'));
 		},
 
 		evRemoveClick: function() {	
-			var i = this.model.get('row_alias').indexOf(this.fieldQName);
+//TODO
+			var i = this.model.get('row_alias').indexOf(this.alias);
 			if (i >= 0) {
 				this.model.get('row_alias').splice(i, 1);
 				this.model.trigger('change:row_alias'); //trigger change

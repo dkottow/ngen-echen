@@ -18,8 +18,9 @@ var app = app || {};
 
 		render: function() {
 			console.log("SchemaEditView.render");
+			var name = this.model.get('name') || '';
 			$('#modalSchemaAction > button').prop('disabled', false);
-			$('#modalInputSchemaName').val(this.model.get('name'));
+			$('#modalInputSchemaName').val(name);
 			$('#modalSchemaActionResult').hide();
 			$('#modalSchemaAction').show();
 			$('#modalEditSchema').modal();
@@ -52,15 +53,13 @@ var app = app || {};
 			if (newName != this.model.get('name')) {
 				console.log('SchemaEditView Save as new');
 				this.model.set('name', newName);
-				//add schema, not replace
-				this.model.unset('id');
 			}
 			this.model.save(function(err) { return me.renderResult(err); });
 		},
 
 		evRemoveClick: function() {	
-			$('#modalSchemaAction > button').prop('disabled', true);
 			var me = this;
+			$('#modalSchemaAction > button').prop('disabled', true);
 			this.model.destroy(function(err) { return me.renderResult(err); });
 		}
 

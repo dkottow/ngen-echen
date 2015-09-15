@@ -37,13 +37,16 @@ var app = app || {};
 			
 		},
 
+
 		evSaveSchemaClick: function() {
 			app.schemaEditView.model = app.schema;
 			app.schemaEditView.render();
 		},
 
+
 		evNewSchemaClick: function() {
-			app.newSchema();
+			app.schemaEditView.model = new app.Database({});
+			app.schemaEditView.render();
 		},
 
 	});

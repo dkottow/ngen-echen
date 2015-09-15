@@ -130,7 +130,7 @@ var app = app || {};
 
 		evNewAliasClick: function() {
 			console.log('TableView.evNewAliasClick');
-			app.aliasEditView.setModel(this.model, '');
+			app.aliasEditView.setModel(this.model, null);
 			app.aliasEditView.render();
 		}
 
