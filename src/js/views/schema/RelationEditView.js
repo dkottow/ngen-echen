@@ -78,12 +78,14 @@ var app = app || {};
 			if ( ! app.table.get('relations').contains(this.model)) {
 				app.table.get('relations').add(this.model);
 			}
+			app.schema.update();
 		},
 
 		removeClick: function() {	
 			console.log("RelationEditView.removeClick " + this.model.collection);
 			if (this.model.collection) {
 				this.model.collection.remove(this.model);
+				app.schema.update();
 			}
 		},
 

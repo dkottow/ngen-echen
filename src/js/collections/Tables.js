@@ -28,11 +28,12 @@ var app = app || {};
 			while(tables.length > 0) {
 				var it = tables.shift();
 				var parents = it.get('parents');
-				if (it.get('supertype')) parents.push(it.get('supertype'));
 				_.each(parents, function(tn) {
 					var pt = this.getByName(tn);
-					result.push(pt);
-					tables.push(pt);
+					if (pt != it) {
+						result.push(pt);
+						tables.push(pt);
+					}
 				}, this);
 			}
 			return result;

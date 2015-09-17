@@ -32,6 +32,14 @@ $(function () {
 
 		$('#toggle-sidebar').hide();
 	}
+	
+	$('#toggle-sidebar').click(function() {
+		app.toggleSidebar();
+	}); 
+
+	$('#goto-options a').click(function(ev) {
+		app.gotoModule($(ev.target).attr('data-target'));
+	}); 
 
 
 	$(document).ajaxStart(function() {
@@ -55,10 +63,6 @@ $(function () {
 	        $('#menu').show('slide');
 		}
 	}
-	
-	$('#toggle-sidebar').click(function() {
-		app.toggleSidebar();
-	}); 
 
 	app.gotoModule = function(name) {
 		console.log('switching to module ' + name);
@@ -86,10 +90,6 @@ $(function () {
 		return m;		
 	}
 
-	$('#goto-options a').click(function(ev) {
-		app.gotoModule($(ev.target).attr('data-target'));
-	}); 
-
 	app.setTable = function(table) {
 		//console.log('app.setTable');
 		app.table = table;
@@ -104,6 +104,8 @@ $(function () {
 		$('#content').append(app.tableView.render().el);			
 		app.menuView.render();			
 	}
+
+	/**** schema stuff ****/
 
 	app.unsetSchema = function() {
 		app.schema = null;
@@ -129,8 +131,6 @@ $(function () {
 		});
 	}
 
-	/**** schema only stuff ****/
-
 	app.newSchema = function(name) {
 		app.unsetSchema();
 		app.schema = new app.Database({name : name});
@@ -145,7 +145,7 @@ $(function () {
 		});
 	}
 
-	/**** data only stuff ****/
+	/**** data stuff ****/
 
 	app.setFilterView = function(filter, $parentElem) {
 		if (app.filterView) app.filterView.remove();

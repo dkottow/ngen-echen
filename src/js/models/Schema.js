@@ -63,7 +63,9 @@ var app = app || {};
 			this.save(function(err) {
 				if (err) {
 					//TODO
-					alert('ERROR on update ' + me.get('name'));
+					console.log(err);
+					alert('ERROR on update ' + me.get('name') + '. ' 
+						+ err.status + " " + err.responseText);
 				}
 			});
 		},

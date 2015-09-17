@@ -33,12 +33,14 @@ var app = app || {};
 				this.model.set('order', app.table.get('fields').length + 1);
 				app.table.get('fields').add(this.model);
 			}
+			app.schema.update();
 		},
 
 		removeClick: function() {	
 			console.log("FieldEditView.removeClick " + this.model.collection);
 			if (this.model.collection) {
 				this.model.collection.remove(this.model);
+				app.schema.update();
 			}
 		}
 
