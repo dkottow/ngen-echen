@@ -1,0 +1,159 @@
+
+body {
+	background-color: white;
+}
+
+.navbar-nav > li > a, .navbar-brand {
+    padding-top:10px !important; padding-bottom:0 !important;
+    height: 40px;
+}
+.navbar {min-height:30px !important;}
+
+.side-nav {
+	top: 50px;
+}
+
+#main {
+	margin-top: 40px;
+}
+
+#ajax-progress-spinner {
+	display: none;
+	position: absolute;
+	z-index: 999;
+	right: 30px;
+	bottom: 30px;
+}
+
+#grid-panel {
+	padding: 1em;
+}
+
+#sidebar {
+  padding-top: 10px;
+} 
+
+#menu {
+  margin-top: 10px;	
+  margin-left: 1em;	
+}
+
+#schema-list span {
+	color: black;
+	font-weight: bold;
+}
+
+#table-list span {
+	color: grey;
+	font-weight: bold;
+}
+
+#table-list a.active {
+	background-color: #eee;
+	color: black;
+	font-weight: bold;
+	border: 0;
+}
+
+#modalSchemaResultMessage {
+	margin-right: 1em;
+}
+
+.navbar-top-btn  {
+	margin-top: 8px;
+	margin-right: 15px;
+}
+
+#toggle-sidebar {
+	margin-left: -20px;
+	margin-right: 20px;
+}
+
+.tab-pane {
+	padding: 1em;
+}
+
+.edit-table {
+	margin-right: 1em;
+}
+
+.panel {
+	margin: 0.5em;
+}
+
+.panel-collapse {
+	padding: 1em 1em 1em 3em;
+}
+
+.field-panel {
+	margin-bottom: 1em;
+}
+
+.panel-title {
+	font-size: large;
+}
+
+.panel-title span {
+	color: grey;
+}
+
+.field-table, .relation-table, .alias-table {
+	float: left;
+	max-width: 60%;
+	margin-bottom: 1em;
+	margin-right: 2em;
+}
+
+.field-table>tbody>tr>td, .relation-table>tbody>tr>td {
+	vertical-align: middle;
+}
+
+.dataTable th {
+	white-space: nowrap; 
+}
+
+.dataTable td {
+}
+
+#grid_length label, #grid_filter label {
+	font-weight: normal;
+}
+
+.filter-column {
+	width: 32em;
+}
+.filter-form {
+	padding: 10px;
+}
+#sliderRange {
+	margin: 10px;
+}
+#inputFilterMin {
+	margin-right: 4.5em;
+}
+#filterOptions, #filterSelection {
+	margin-top: 1em;
+}
+#filterOptions a, #filterSelection a {
+	padding: 3px 5px;
+}
+.filter-reset {
+	text-align: right; margin-top: 1em	
+}
+
+.scrollable-menu {
+	height: auto;
+	max-height: 21em;
+	overflow-x: hidden;
+}
+
+.col-sm-0 {
+    width: 0px;
+    float: left;
+    overflow: hidden;
+    margin: 0px;
+    padding: 0px;
+    min-height: 1px;
+}
+
+
