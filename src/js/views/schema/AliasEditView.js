@@ -53,7 +53,6 @@ var app = app || {};
 		},
 
 		evUpdateClick: function() {
-//TODO
 			var newFieldQName = $('#modalInputAliasField').val();
 //console.log(this.model.get('row_alias'));
 			var alias = app.Alias.parse(
@@ -74,7 +73,6 @@ console.log(i);
 		},
 
 		evRemoveClick: function() {	
-//TODO
 			var i = this.model.get('row_alias').indexOf(this.alias);
 			if (i >= 0) {
 				this.model.get('row_alias').splice(i, 1);

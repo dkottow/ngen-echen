@@ -11,6 +11,10 @@ var app = app || {};
 		// Reference to this collection's model.
 		model: app.Field,
 		
+		initialize: function(attrs) {
+			//this.on('change', function(ev) { console.log('Fields.ev ' + ev); });
+		},
+
 		addNew: function() {
 			var field = app.Field.create('field' + this.length);
 			field.set('order', this.length);

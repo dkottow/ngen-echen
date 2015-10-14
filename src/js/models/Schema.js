@@ -15,10 +15,6 @@ var app = app || {};
 			//this.orgJSON = this.toJSON();
 		},
 
-		isDirty: function() {
-			return ! _.isEqual(this.orgJSON, this.toJSON());
-		},
-
 		attrJSON: function() {
 			return _.clone(this.attributes);
 		},		
@@ -51,7 +47,6 @@ var app = app || {};
 			console.log("Schema.fetch...");
 			Backbone.Model.prototype.fetch.call(this, {
 				success: function() {
-					me.orgJSON = me.toJSON();
 					console.log("Schema.fetch OK");
 					cbAfter();
 				}
@@ -59,7 +54,8 @@ var app = app || {};
 		},
 
 		update : function() {
-			var me = this;
+return;
+			var me = this;			
 			this.save(function(err) {
 				if (err) {
 					//TODO

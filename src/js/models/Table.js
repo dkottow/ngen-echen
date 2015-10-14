@@ -6,15 +6,24 @@ var app = app || {};
 	//console.log("Table class def");
 	app.Table = Backbone.Model.extend({ 
 		
-		initialize: function(table) {
-			console.log("Table.initialize " + table.name);
-			var fields = _.map( _.sortBy(table.fields, 'order'), 
+		initialize: function(attrs) {
+			console.log("Table.initialize " + attrs.name);
+			var fields = _.map( _.sortBy(attrs.fields, 'order'), 
 						function(field) {
 				return new app.Field(field);
 			});			
 			this.set('fields', new app.Fields(fields));
-			this.set('relations', new app.Relations());
-			// row_alias will be fixed in initAlias
+			//relations and row_alias are set in initRefs
+		},
+
+		initRefs: function(tables) {
+			this.initRelations(tables);
+			this.initAlias(tables);
+			this.initJSON = this.toJSON();
+		},
+
+		isDirty: function() {
+			return ! _.isEqual(this.initJSON, this.toJSON());
 		},
 
 		initRelations : function(tables) {
@@ -35,7 +44,7 @@ var app = app || {};
 				});
 				relations.push(relation);
 			}, this);
-			this.set('relations', new app.Relations(relations));
+			this.set('relations', new app.Relations(relations), {silent: true});
 		},
 
 		initAlias : function(tables) {
@@ -67,9 +76,9 @@ var app = app || {};
 				}));
 
 			}, this);
-			this.set('row_alias', row_alias);
+			this.set('row_alias', row_alias, {silent: true});
 		},
-
+		
 		getFieldQN: function(field) {
 			return _.isString(field) 
 				? this.get('name') + '.' + field
@@ -96,7 +105,6 @@ var app = app || {};
 			});
 
 			var row_alias = _.map(this.get('row_alias'), function(a) {
-console.log(a);
 				if (a.get('table') == this) return a.get('field').get('name');
 				else return a.toString();	
 /*

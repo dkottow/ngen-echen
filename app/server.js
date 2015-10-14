@@ -10,6 +10,14 @@ var config = {
 	'port'	: 3001 
 }
 
+if (process.env.OPENSHIFT_DATA_DIR) {
+	config.ip = process.env.OPENSHIFT_NODEJS_IP;
+	config.port = process.env.OPENSHIFT_NODEJS_PORT;
+} else if (process.env.C9_USER) {
+	config.ip = process.env.IP;
+	config.port = process.env.PORT;
+}
+
 app.use('/public', express.static('./public')); 
 
 app.use(function(err, req, res, next) {

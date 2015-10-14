@@ -13,8 +13,7 @@ var app = app || {};
 
 		initialize : function(tables) {
 			_.each(tables, function(table) {				
-				table.initRelations(tables);
-				table.initAlias(tables);
+				table.initRefs(tables);
 			});
 		},
 

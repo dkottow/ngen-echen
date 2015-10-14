@@ -23,7 +23,7 @@ var app = app || {};
 			console.log("AliasView.render");
 
 			this.$el.find('tbody').empty();
-console.log(this.model.get('row_alias'));
+//console.log(this.model.get('row_alias'));
 			_.each(this.model.get('row_alias'), function(a) {
 				this.$el.find('tbody').append(this.template({
 					table: a.get('table').get('name'),
