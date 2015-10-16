@@ -51,9 +51,9 @@ var app = app || {};
 			ev.preventDefault();
 
 	//console.log('evFilterTab ' + ev.target);
-			if (ev.target.href.endsWith('filterSelect')) {
+			if (/filterSelect$/.test(ev.target.href)) {
 				this.itemsView.loadRender();
-			} else if (ev.target.href.endsWith('filterRange')) {
+			} else if (/filterRange$/.test(ev.target.href)) {
 				this.rangeView.loadRender();
 			}
 		}

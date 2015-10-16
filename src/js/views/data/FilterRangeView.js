@@ -79,7 +79,7 @@ var app = app || {};
 
 		sanitizeInputFilterValue: function(el, bounds) {
 
-			if (el.id.endsWith('Min')) {
+			if (/Min$/.test(el.id)) {
 				bounds = [bounds[0], this.$("#inputFilterMax").val()];
 			} else {
 				bounds = [this.$("#inputFilterMin").val(), bounds[1]];
@@ -91,7 +91,7 @@ var app = app || {};
 			$(el).val(val);
 
 			if (this.canSlide()) {
-				var idx = el.id.endsWith('Min') ? 0 : 1;	
+				var idx = /Min$/.test(el.id) ? 0 : 1;	
 				this.$("#sliderRange").slider("values", idx, val);
 			}
 		},
