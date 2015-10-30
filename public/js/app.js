@@ -827,7 +827,8 @@ var app = app || {};
 
 		parse : function(response) {
 			console.log("Schemas.parse ");
-			return _.values(response);
+			return response.databases;
+			//return _.values(response);
 		},
 
 	});
@@ -1377,7 +1378,7 @@ var app = app || {};
 
 		sanitizeInputFilterValue: function(el, bounds) {
 
-			if (el.id.endsWith('Min')) {
+			if (/Min$/.test(el.id)) {
 				bounds = [bounds[0], this.$("#inputFilterMax").val()];
 			} else {
 				bounds = [this.$("#inputFilterMin").val(), bounds[1]];
@@ -1389,7 +1390,7 @@ var app = app || {};
 			$(el).val(val);
 
 			if (this.canSlide()) {
-				var idx = el.id.endsWith('Min') ? 0 : 1;	
+				var idx = /Min$/.test(el.id) ? 0 : 1;	
 				this.$("#sliderRange").slider("values", idx, val);
 			}
 		},
@@ -1481,9 +1482,9 @@ var app = app || {};
 			ev.preventDefault();
 
 	//console.log('evFilterTab ' + ev.target);
-			if (ev.target.href.endsWith('filterSelect')) {
+			if (/filterSelect$/.test(ev.target.href)) {
 				this.itemsView.loadRender();
-			} else if (ev.target.href.endsWith('filterRange')) {
+			} else if (/filterRange$/.test(ev.target.href)) {
 				this.rangeView.loadRender();
 			}
 		}
