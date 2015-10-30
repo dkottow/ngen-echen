@@ -20,7 +20,7 @@ var app = app || {};
 
 		parse : function(response) {
 			console.log("Schemas.parse ");
-			return response.databases;
+			return _.values(response.databases);
 			//return _.values(response);
 		},
 
