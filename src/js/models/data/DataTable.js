@@ -20,7 +20,18 @@ var STATS_EXT = '.stats';
 					return field.get('order');
 				})
 				.map(function(field) {
-					return { data : field.vname() };
+					return { 
+			data : field.vname(),
+		    render: function ( data, type, full, meta ) {
+				      	return type == 'display' && data && data.length > 40 
+							?  '<span title="'
+								+ data + '">'
+								+ data.substr( 0, 38) 
+								+ '...</span>' 
+							: data;
+    					},
+						field: field 
+					};
 				});
 		},
 
@@ -115,7 +126,7 @@ var STATS_EXT = '.stats';
 			var fieldName = filter.get('field').vname();
 
 			var params = { 
-				'$top': 20,
+				'$top': 10,
 				'$distinct': true,
 				'$select': fieldName,				
 				'$orderby': fieldName

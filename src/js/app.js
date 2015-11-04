@@ -22,6 +22,7 @@ $(function () {
 		app.relationEditView = new app.RelationEditView();
 		app.aliasEditView = new app.AliasEditView();
 
+		app.filterShowView = new app.FilterShowView();
 
 		app.schemas.fetch({success: function() {
 			app.schemaListView = new app.SchemaListView({collection: app.schemas});
@@ -78,8 +79,7 @@ $(function () {
 		}
 		app.menuView.render();
 
-		//refresh table view
-		if (app.table) app.setTable(app.table);
+		app.refreshTableView();
 	}
 
 	app.module = function() {
@@ -103,6 +103,10 @@ $(function () {
 
 		$('#content').append(app.tableView.render().el);			
 		app.menuView.render();			
+	}
+
+	app.refreshTableView = function() {
+		if (app.table) app.setTable(app.table);
 	}
 
 	/**** schema stuff ****/
@@ -146,6 +150,11 @@ $(function () {
 	}
 
 	/**** data stuff ****/
+
+	app.clearAllFilters = function() {
+		app.filters = new app.Filters();
+		app.refreshTableView();
+	}
 
 	app.setFilterView = function(filter, $parentElem) {
 		if (app.filterView) app.filterView.remove();

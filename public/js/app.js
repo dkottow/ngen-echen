@@ -461,7 +461,18 @@ var STATS_EXT = '.stats';
 					return field.get('order');
 				})
 				.map(function(field) {
-					return { data : field.vname() };
+					return { 
+			data : field.vname(),
+		    render: function ( data, type, full, meta ) {
+				      	return type == 'display' && data && data.length > 40 
+							?  '<span title="'
+								+ data + '">'
+								+ data.substr( 0, 38) 
+								+ '...</span>' 
+							: data;
+    					},
+						field: field 
+					};
 				});
 		},
 
@@ -556,7 +567,7 @@ var STATS_EXT = '.stats';
 			var fieldName = filter.get('field').vname();
 
 			var params = { 
-				'$top': 20,
+				'$top': 10,
 				'$distinct': true,
 				'$select': fieldName,				
 				'$orderby': fieldName
@@ -1107,10 +1118,27 @@ var app = app || {};
 
 		initialize: function() {
 			console.log("DataTableView.init " + this.model);			
+			this.listenTo(app.filters, 'update', this.renderFilterButtons);
 		},
 
 		tableTemplate: _.template($('#grid-table-template').html()),
 		columnTemplate: _.template($('#grid-column-template').html()),
+
+		renderFilterButtons: function() {
+			var columns = this.model.getColumns();
+			_.each(columns, function(c, idx) {
+				
+				var filter = app.filters.getFilter(
+						this.model, 
+						c.field.get('name')
+					);
+				
+				var active = filter ? true : false;
+				var $el = this.$('#col-' + c.data + ' button').first();
+				$el.toggleClass('filter-btn-active', active); 
+
+			}, this);
+		},
 
 		render: function() {
 			console.log('DataTableView.render ');			
@@ -1129,6 +1157,8 @@ var app = app || {};
 				}));					
 
 			}, this);
+
+			this.renderFilterButtons();
 
 			var filter = app.filters.getFilter(this.model);			
 			var initSearch = {};
@@ -1435,6 +1465,34 @@ var app = app || {};
 (function ($) {
 	'use strict';
 
+	app.FilterShowView = Backbone.View.extend({
+		el:  '#modalShowFilters',
+
+		events: {
+		},
+
+		initialize: function() {
+			console.log("FilterShowView.init");
+		},
+
+		render: function() {
+			$('#modalShowFilters').modal();
+			return this;
+		},
+
+
+	});
+
+})(jQuery);
+
+
+
+/*global Backbone, jQuery, _ */
+var app = app || {};
+
+(function ($) {
+	'use strict';
+
 	app.FilterView = Backbone.View.extend({
 
 		events: {
@@ -1504,6 +1562,8 @@ var app = app || {};
 		el:  '#menu',
 
 		events: {
+			'click #show-filters': 'evShowFilters',
+			'click #reset-all-filters': 'evResetAllFilters'
 		},
 
 		initialize: function() {
@@ -1519,6 +1579,14 @@ var app = app || {};
 			else this.$el.html(this.template());
 			return this;
 		},
+
+		evResetAllFilters: function() {
+			app.clearAllFilters();
+		},
+
+		evShowFilters: function() {
+			app.filterShowView.render();
+		}
 
 	});
 
@@ -2261,6 +2329,7 @@ $(function () {
 		app.relationEditView = new app.RelationEditView();
 		app.aliasEditView = new app.AliasEditView();
 
+		app.filterShowView = new app.FilterShowView();
 
 		app.schemas.fetch({success: function() {
 			app.schemaListView = new app.SchemaListView({collection: app.schemas});
@@ -2317,8 +2386,7 @@ $(function () {
 		}
 		app.menuView.render();
 
-		//refresh table view
-		if (app.table) app.setTable(app.table);
+		app.refreshTableView();
 	}
 
 	app.module = function() {
@@ -2342,6 +2410,10 @@ $(function () {
 
 		$('#content').append(app.tableView.render().el);			
 		app.menuView.render();			
+	}
+
+	app.refreshTableView = function() {
+		if (app.table) app.setTable(app.table);
 	}
 
 	/**** schema stuff ****/
@@ -2385,6 +2457,11 @@ $(function () {
 	}
 
 	/**** data stuff ****/
+
+	app.clearAllFilters = function() {
+		app.filters = new app.Filters();
+		app.refreshTableView();
+	}
 
 	app.setFilterView = function(filter, $parentElem) {
 		if (app.filterView) app.filterView.remove();

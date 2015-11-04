@@ -8,6 +8,8 @@ var app = app || {};
 		el:  '#menu',
 
 		events: {
+			'click #show-filters': 'evShowFilters',
+			'click #reset-all-filters': 'evResetAllFilters'
 		},
 
 		initialize: function() {
@@ -23,6 +25,14 @@ var app = app || {};
 			else this.$el.html(this.template());
 			return this;
 		},
+
+		evResetAllFilters: function() {
+			app.clearAllFilters();
+		},
+
+		evShowFilters: function() {
+			app.filterShowView.render();
+		}
 
 	});
 

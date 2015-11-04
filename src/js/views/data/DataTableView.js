@@ -11,10 +11,27 @@ var app = app || {};
 
 		initialize: function() {
 			console.log("DataTableView.init " + this.model);			
+			this.listenTo(app.filters, 'update', this.renderFilterButtons);
 		},
 
 		tableTemplate: _.template($('#grid-table-template').html()),
 		columnTemplate: _.template($('#grid-column-template').html()),
+
+		renderFilterButtons: function() {
+			var columns = this.model.getColumns();
+			_.each(columns, function(c, idx) {
+				
+				var filter = app.filters.getFilter(
+						this.model, 
+						c.field.get('name')
+					);
+				
+				var active = filter ? true : false;
+				var $el = this.$('#col-' + c.data + ' button').first();
+				$el.toggleClass('filter-btn-active', active); 
+
+			}, this);
+		},
 
 		render: function() {
 			console.log('DataTableView.render ');			
@@ -33,6 +50,8 @@ var app = app || {};
 				}));					
 
 			}, this);
+
+			this.renderFilterButtons();
 
 			var filter = app.filters.getFilter(this.model);			
 			var initSearch = {};

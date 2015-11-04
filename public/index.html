@@ -178,7 +178,7 @@
 			<label for="modalInputRelationType" class="control-label">Type:</label>
 			<select class="form-control" id="modalInputRelationType">
 				<option value="many-to-one">many-to-one</option>
-				<option value="one-to-one">one-to-one</option>
+				<!-- <option value="one-to-one">one-to-one</option> -->
 			</select>
 		  </div>
 		  <div class="form-group">
@@ -254,6 +254,24 @@
 </div>
 
 
+<div class="modal fade" id="modalShowFilters" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+	<div class="modal-content">
+	  <div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+		<h4 class="modal-title">Active Filters</h4>
+	  </div>
+	  <div class="modal-body">
+		TODO
+	  </div>
+	  <div class="modal-footer">
+		<button id="modalFieldClose" type="button" data-dismiss="modal" class="btn btn-primary">Close</button>
+	  </div>
+	</div>
+  </div>
+</div>
+
+
 <!-- endinject -->
 
 <!-- inject:templates:html -->
@@ -272,8 +290,8 @@
 
 <script type="text/template" id="data-menu-template">
 	<div class="btn-group" role="group">
-			<button id="show-filter" type="button" class="btn btn-default navbar-btn">Filters</button>
-			<button id="reset-filter" type="button" class="btn btn-default navbar-btn">Reset</button>
+			<button id="show-filters" type="button" class="btn btn-default navbar-btn">Filters</button>
+			<button id="reset-all-filters" type="button" class="btn btn-default navbar-btn">Reset All</button>
 	</div>
 </script>
 
