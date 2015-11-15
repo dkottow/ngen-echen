@@ -10,7 +10,8 @@
     "gulp": "~3.9.0",
     "gulp-concat": "*",
     "gulp-inject": "~1.5.0",
-    "gulp-replace": "*"
+    "gulp-replace": "*",
+    "gulp-if": "*"
   }
   , "main": "server.js"
 }
