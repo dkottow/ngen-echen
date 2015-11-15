@@ -1,6 +1,7 @@
 var gulp = require('gulp');
 var concat = require('gulp-concat');
 var inject = require('gulp-inject');
+var replace = require('gulp-replace');
 
 var allTasks = ['build-3rdparty-js', 
 				'build-app-js', 
@@ -10,7 +11,10 @@ var allTasks = ['build-3rdparty-js',
 				'watch'
 ];
 
+
 gulp.task('default', allTasks, function() {
+
+	
 });
 
 //TODO
@@ -54,9 +58,10 @@ gulp.task('build-app-js', function() {
 	return gulp.src(["./src/js/models/**/*.js",
 					 "./src/js/collections/**/*.js",
 					 "./src/js/views/**/*.js",
-					 "./src/js/*.js",
 			])
-
+		.pipe(gulp.src('./src/js/app.js')
+			.pipe(replace("$DONKEYLIFT_API", process.env.DONKEYLIFT_API))
+		) 
 		.pipe(concat('app.js'))
 		.pipe(gulp.dest('./public/js/'));
 			

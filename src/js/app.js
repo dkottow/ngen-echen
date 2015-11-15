@@ -1,5 +1,5 @@
-var REST_ROOT = "http://localhost:3000";
-var REST_ROOT = "http://api.donkeylift.com";
+var REST_ROOT = "$DONKEYLIFT_API";
+//var REST_ROOT = "http://api.donkeylift.com";
 var app = app || {};
 
 $(function () {
