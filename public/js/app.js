@@ -707,7 +707,7 @@ var app = app || {};
 			var param;
 
 			if (this.get('op') == app.Filter.OPS.SEARCH) {
-				param = key + " search '" + this.get('value') + "*'";
+				param = key + " search '" + '"' + this.get('value') + '*"' + "'";
 
 			} else {
 				var values = this.values();
