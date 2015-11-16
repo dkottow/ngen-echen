@@ -23,7 +23,14 @@ var app = app || {};
 			this.collection.each(function(filter) {
 				el.append(this.template(filter.toStrings()));
 			}, this);			
+
+			$('#modalInputDataUrl').val(app.table.getFullUrl());
+			$('#modalShowFilters').on('shown.bs.modal', function() {
+				$('#modalInputDataUrl').select();
+			});
+
 			$('#modalShowFilters').modal();
+
 			return this;
 		},
 

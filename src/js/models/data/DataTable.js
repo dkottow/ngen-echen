@@ -35,6 +35,10 @@ var STATS_EXT = '.stats';
 				});
 		},
 
+		getFullUrl: function() {
+			return this.lastAjaxUrl;
+		},
+
 		ajaxGetRowsFn: function() {
 			var me = this;
 			return function(data, callback, settings) {
@@ -65,6 +69,8 @@ var STATS_EXT = '.stats';
 						+ '&' + app.filters.toParam();
 
 				console.log(url);
+
+				me.lastAjaxUrl = url;
 
 				$.ajax(url, {
 					cache: false

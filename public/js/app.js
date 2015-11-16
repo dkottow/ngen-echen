@@ -485,6 +485,10 @@ var STATS_EXT = '.stats';
 				});
 		},
 
+		getFullUrl: function() {
+			return this.lastAjaxUrl;
+		},
+
 		ajaxGetRowsFn: function() {
 			var me = this;
 			return function(data, callback, settings) {
@@ -515,6 +519,8 @@ var STATS_EXT = '.stats';
 						+ '&' + app.filters.toParam();
 
 				console.log(url);
+
+				me.lastAjaxUrl = url;
 
 				$.ajax(url, {
 					cache: false
@@ -1531,7 +1537,14 @@ var app = app || {};
 			this.collection.each(function(filter) {
 				el.append(this.template(filter.toStrings()));
 			}, this);			
+
+			$('#modalInputDataUrl').val(app.table.getFullUrl());
+			$('#modalShowFilters').on('shown.bs.modal', function() {
+				$('#modalInputDataUrl').select();
+			});
+
 			$('#modalShowFilters').modal();
+
 			return this;
 		},
 
@@ -1642,7 +1655,7 @@ var app = app || {};
 		evShowFilters: function() {
 			app.filterShowView.collection = app.filters;
 			app.filterShowView.render();
-		}
+		},
 
 	});
 
