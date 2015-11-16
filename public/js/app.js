@@ -75,8 +75,10 @@ var app = app || {};
 			} else if(t == app.Field.TYPES.NUMERIC) {
 				return parseFloat(val);
 			} else if(t == app.Field.TYPES.DATE) {
+				//return new Date(val); 
 				return new Date(val).toISOString().substr(0,10);
 			} else if (t == app.Field.TYPES.DATETIME) {
+				//return new Date(val);
 				return new Date(val).toISOString();
 			} else {
 				return val;
@@ -119,6 +121,13 @@ var app = app || {};
 	app.Field.TypeAlias = function(type) {
 		return app.Field.TYPES[type]; 		
 	}
+
+	app.Field.toDate = function(dateISOString) {
+		return new Date(dateISOString.split('-')[0], 
+						dateISOString.split('-')[1] - 1,
+						dateISOString.split('-')[2]);
+	}
+
 
 })();
 
@@ -707,7 +716,8 @@ var app = app || {};
 			var param;
 
 			if (this.get('op') == app.Filter.OPS.SEARCH) {
-				param = key + " search '" + '"' + this.get('value') + '*"' + "'";
+				param = key + " search '" 
+						+ '"' + this.get('value') + '*"' + "'";
 
 			} else {
 				var values = this.values();
@@ -738,6 +748,24 @@ var app = app || {};
 				field.set('options', opts);
 				cbAfter();
 			});
+		},
+
+		toStrings: function() {
+			var result = { table: this.get('table').get('name'), field: '' };
+			if (this.get('op') == app.Filter.OPS.SEARCH) {
+				result.op = 'search';
+				result.value = this.get('value');
+			} else if (this.get('op') == app.Filter.OPS.BETWEEN) {
+				result.op = 'between';
+				result.field = this.get('field').get('name');
+				result.value = this.get('value')[0] 
+							+ ' and ' + this.get('value')[1];
+			} else if (this.get('op') == app.Filter.OPS.IN) {
+				result.op = 'in';
+				result.field = this.get('field').get('name');
+				result.value = this.get('value').join(', '); 
+			}
+			return result;
 		}
 
 	});
@@ -1348,8 +1376,10 @@ var app = app || {};
 
 		canSlide: function() {
 			var field = this.model.get('field');
-			return ( ! field.get('fk')) && 
-					_.contains(['Integer', 'Decimal'], field.get('type'));
+			var slideTypes = [app.Field.TYPES.INTEGER,
+								app.Field.TYPES.NUMERIC];
+			return ( ! field.get('fk')) &&
+					_.contains(slideTypes, field.get('type'));
 		},
 
 		loadRender: function() {
@@ -1401,6 +1431,23 @@ var app = app || {};
 							$("#inputFilterMax").change();
 						}
 					}
+				});
+			}
+			if (this.model.get('field').get('type') 
+				== app.Field.TYPES['DATE']) {
+
+				var opts = { minDate: app.Field.toDate(stats.min), 
+							 maxDate: app.Field.toDate(stats.max),
+							dateFormat: 'yy-mm-dd' };
+				var minVal = app.Field.toDate($("#inputFilterMin").val());
+				var maxVal = app.Field.toDate($("#inputFilterMax").val());
+				$("#inputFilterMin").datepicker(opts);
+				$("#inputFilterMin").datepicker("setDate", minVal);
+				$("#inputFilterMax").datepicker(opts);
+				$("#inputFilterMax").datepicker("setDate", maxVal);
+
+				$('#ui-datepicker-div').click(function(e) {
+					e.stopPropagation();
 				});
 			}
 
@@ -1471,11 +1518,19 @@ var app = app || {};
 		events: {
 		},
 
+		template: _.template($('#show-filter-item-template').html()),
+
 		initialize: function() {
 			console.log("FilterShowView.init");
 		},
 
 		render: function() {
+			var el = this.$('#modalTableFilters > tbody');
+			el.empty();
+			//el.children('tr:not(:first)').remove();	
+			this.collection.each(function(filter) {
+				el.append(this.template(filter.toStrings()));
+			}, this);			
 			$('#modalShowFilters').modal();
 			return this;
 		},
@@ -1585,6 +1640,7 @@ var app = app || {};
 		},
 
 		evShowFilters: function() {
+			app.filterShowView.collection = app.filters;
 			app.filterShowView.render();
 		}
 
@@ -1622,7 +1678,7 @@ var app = app || {};
 		render: function() {
 			console.log("AliasEditView.render ");
 
-			var el = $('#modalInputAliasField')
+			var el = this.$('#modalInputAliasField');
 
 			el.html('');
 
@@ -2305,7 +2361,7 @@ var app = app || {};
 
 
 
-var REST_ROOT = "http://api.donkeylift.com";
+var REST_ROOT = "http://localhost:3000";
 //var REST_ROOT = "http://api.donkeylift.com";
 var app = app || {};
 

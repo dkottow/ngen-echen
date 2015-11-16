@@ -10,11 +10,19 @@ var app = app || {};
 		events: {
 		},
 
+		template: _.template($('#show-filter-item-template').html()),
+
 		initialize: function() {
 			console.log("FilterShowView.init");
 		},
 
 		render: function() {
+			var el = this.$('#modalTableFilters > tbody');
+			el.empty();
+			//el.children('tr:not(:first)').remove();	
+			this.collection.each(function(filter) {
+				el.append(this.template(filter.toStrings()));
+			}, this);			
 			$('#modalShowFilters').modal();
 			return this;
 		},

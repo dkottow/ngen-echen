@@ -26,7 +26,7 @@ var app = app || {};
 		render: function() {
 			console.log("AliasEditView.render ");
 
-			var el = $('#modalInputAliasField')
+			var el = this.$('#modalInputAliasField');
 
 			el.html('');
 

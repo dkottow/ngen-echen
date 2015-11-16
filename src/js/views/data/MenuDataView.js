@@ -31,6 +31,7 @@ var app = app || {};
 		},
 
 		evShowFilters: function() {
+			app.filterShowView.collection = app.filters;
 			app.filterShowView.render();
 		}
 

@@ -48,8 +48,10 @@ var app = app || {};
 			} else if(t == app.Field.TYPES.NUMERIC) {
 				return parseFloat(val);
 			} else if(t == app.Field.TYPES.DATE) {
+				//return new Date(val); 
 				return new Date(val).toISOString().substr(0,10);
 			} else if (t == app.Field.TYPES.DATETIME) {
+				//return new Date(val);
 				return new Date(val).toISOString();
 			} else {
 				return val;
@@ -92,5 +94,12 @@ var app = app || {};
 	app.Field.TypeAlias = function(type) {
 		return app.Field.TYPES[type]; 		
 	}
+
+	app.Field.toDate = function(dateISOString) {
+		return new Date(dateISOString.split('-')[0], 
+						dateISOString.split('-')[1] - 1,
+						dateISOString.split('-')[2]);
+	}
+
 
 })();
