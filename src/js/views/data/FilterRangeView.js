@@ -19,8 +19,10 @@ var app = app || {};
 
 		canSlide: function() {
 			var field = this.model.get('field');
-			return ( ! field.get('fk')) && 
-					_.contains(['Integer', 'Decimal'], field.get('type'));
+			var slideTypes = [app.Field.TYPES.INTEGER,
+								app.Field.TYPES.NUMERIC];
+			return ( ! field.get('fk')) &&
+					_.contains(slideTypes, field.get('type'));
 		},
 
 		loadRender: function() {
@@ -72,6 +74,23 @@ var app = app || {};
 							$("#inputFilterMax").change();
 						}
 					}
+				});
+			}
+			if (this.model.get('field').get('type') 
+				== app.Field.TYPES['DATE']) {
+
+				var opts = { minDate: app.Field.toDate(stats.min), 
+							 maxDate: app.Field.toDate(stats.max),
+							dateFormat: 'yy-mm-dd' };
+				var minVal = app.Field.toDate($("#inputFilterMin").val());
+				var maxVal = app.Field.toDate($("#inputFilterMax").val());
+				$("#inputFilterMin").datepicker(opts);
+				$("#inputFilterMin").datepicker("setDate", minVal);
+				$("#inputFilterMax").datepicker(opts);
+				$("#inputFilterMax").datepicker("setDate", maxVal);
+
+				$('#ui-datepicker-div').click(function(e) {
+					e.stopPropagation();
 				});
 			}
 

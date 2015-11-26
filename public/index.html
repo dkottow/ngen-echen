@@ -262,7 +262,19 @@
 		<h4 class="modal-title">Active Filters</h4>
 	  </div>
 	  <div class="modal-body">
-		TODO
+		<table class="table" id="modalTableFilters">
+			<thead><tr>
+				<th>Table</th>
+				<th>Field</th>
+				<th>Action</th>
+				<th>Value</th>
+			</tr></thead>
+			<tbody></tbody>
+		</table>
+	    <div class="form-group">
+			<label for="modalInputDataUrl" class="control-label">Data URL:</label>
+			<input type="text" class="form-control" id="modalInputDataUrl">
+		</div>
 	  </div>
 	  <div class="modal-footer">
 		<button id="modalFieldClose" type="button" data-dismiss="modal" class="btn btn-primary">Close</button>
@@ -429,6 +441,11 @@
 			<%= name %> 
 		</a>
 	</li>
+</script>
+
+
+<script type="text/template" id="show-filter-item-template">
+	<tr><td><%= table %></td><td><%= field %></td><td><%= op %></td><td><%= value %></td></tr>
 </script>
 
 

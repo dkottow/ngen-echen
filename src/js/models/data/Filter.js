@@ -49,7 +49,8 @@ var app = app || {};
 
 			if (this.get('op') == app.Filter.OPS.SEARCH) {
 				//add asterisk and enclose in double quotes (prefix last + phrase query)
-				param = key + " search '" + '"' + this.get('value') + '*"' + "'";
+				param = key + " search '" 
+						+ '"' + this.get('value') + '*"' + "'";
 
 			} else {
 				var values = this.values();
@@ -80,6 +81,24 @@ var app = app || {};
 				field.set('options', opts);
 				cbAfter();
 			});
+		},
+
+		toStrings: function() {
+			var result = { table: this.get('table').get('name'), field: '' };
+			if (this.get('op') == app.Filter.OPS.SEARCH) {
+				result.op = 'search';
+				result.value = this.get('value');
+			} else if (this.get('op') == app.Filter.OPS.BETWEEN) {
+				result.op = 'between';
+				result.field = this.get('field').get('name');
+				result.value = this.get('value')[0] 
+							+ ' and ' + this.get('value')[1];
+			} else if (this.get('op') == app.Filter.OPS.IN) {
+				result.op = 'in';
+				result.field = this.get('field').get('name');
+				result.value = this.get('value').join(', '); 
+			}
+			return result;
 		}
 
 	});
