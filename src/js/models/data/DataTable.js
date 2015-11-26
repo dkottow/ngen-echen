@@ -77,6 +77,11 @@ var STATS_EXT = '.stats';
 				}).done(function(response) {
 					//console.log('response from REST');
 					//console.dir(response);
+					app.router.navigate(app.module() 
+								+ "/" + app.schema.get('name')
+								+ "/" + app.table.get('name'), 
+							{replace: true}
+					);
 
 					var data = {
 						data: response.rows,

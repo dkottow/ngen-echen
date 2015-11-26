@@ -33,8 +33,7 @@ $(function () {
 		app.router = new app.Router();
 		Backbone.history.start();
 
-		app.router.navigate("data");
-		//app.gotoModule('data');
+		app.gotoModule('data');
 
 		$('#toggle-sidebar').hide();
 	}
@@ -92,6 +91,10 @@ $(function () {
 
 	app.setTable = function(table) {
 		//console.log('app.setTable');
+		$('#table-list a').removeClass('active');
+		var $a = $("#table-list a[data-target='" + table.get('name') + "']");
+		$a.addClass('active');
+
 		app.table = table;
 		if (app.tableView) app.tableView.remove();
 
@@ -112,6 +115,7 @@ $(function () {
 	/**** schema stuff ****/
 
 	app.unsetSchema = function() {
+		app.table = null;
 		app.schema = null;
 		if (app.gridView) app.gridView.remove();
 		if (app.tableView) app.tableView.remove();
@@ -120,7 +124,7 @@ $(function () {
 		app.schemaCurrentView.render();
 	}
 
-	app.loadSchema = function(name) {
+	app.loadSchema = function(name, cbAfter) {
 		app.unsetSchema();
 		app.schema = new app.Database({name : name, id : name});
 		app.schema.fetch(function() {
@@ -132,6 +136,7 @@ $(function () {
 
 			//render current schema label
 			app.schemaCurrentView.render();
+			if (cbAfter) cbAfter();
 		});
 	}
 

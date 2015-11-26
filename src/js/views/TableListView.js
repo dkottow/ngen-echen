@@ -11,7 +11,7 @@ var app = app || {};
 		className: "list-group",
 
 		events: {
-			'click .table-item': 'evTableClick'
+			//'click .table-item': 'evTableClick'
 		},
 
 		initialize: function() {
@@ -27,11 +27,18 @@ var app = app || {};
 			console.log('TableListView.render ');			
 			this.$el.html(this.template());
 			this.collection.each(function(table) {
-				this.$el.append(this.itemTemplate({name: table.get('name')}));
+				var href = "#nav" 
+						+ "/" + app.schema.get('name')
+						+ "/" + table.get('name');
+				this.$el.append(this.itemTemplate({
+					name: table.get('name'),
+					href: href
+				}));
 			}, this);			
 			return this;
 		},
 
+/*
 		evTableClick: function(ev) {			
 			var name = $(ev.target).attr('data-target');
 
@@ -44,7 +51,7 @@ var app = app || {};
 			
 			app.setTable(table);
 		}
-
+*/
 	});
 
 })(jQuery);

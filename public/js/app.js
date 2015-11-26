@@ -527,6 +527,11 @@ var STATS_EXT = '.stats';
 				}).done(function(response) {
 					//console.log('response from REST');
 					//console.dir(response);
+					app.router.navigate(app.module() 
+								+ "/" + app.schema.get('name')
+								+ "/" + app.table.get('name'), 
+							{replace: true}
+					);
 
 					var data = {
 						data: response.rows,
@@ -1100,7 +1105,7 @@ var app = app || {};
 		className: "list-group",
 
 		events: {
-			'click .table-item': 'evTableClick'
+			//'click .table-item': 'evTableClick'
 		},
 
 		initialize: function() {
@@ -1116,11 +1121,18 @@ var app = app || {};
 			console.log('TableListView.render ');			
 			this.$el.html(this.template());
 			this.collection.each(function(table) {
-				this.$el.append(this.itemTemplate({name: table.get('name')}));
+				var href = "#nav" 
+						+ "/" + app.schema.get('name')
+						+ "/" + table.get('name');
+				this.$el.append(this.itemTemplate({
+					name: table.get('name'),
+					href: href
+				}));
 			}, this);			
 			return this;
 		},
 
+/*
 		evTableClick: function(ev) {			
 			var name = $(ev.target).attr('data-target');
 
@@ -1133,531 +1145,7 @@ var app = app || {};
 			
 			app.setTable(table);
 		}
-
-	});
-
-})(jQuery);
-
-
-
-/*global Backbone, jQuery, _ */
-var app = app || {};
-
-(function ($) {
-	'use strict';
-
-	app.DataTableView = Backbone.View.extend({
-
-		id: 'grid-panel',
-		className: 'panel',
-
-		initialize: function() {
-			console.log("DataTableView.init " + this.model);			
-			this.listenTo(app.filters, 'update', this.renderFilterButtons);
-		},
-
-		tableTemplate: _.template($('#grid-table-template').html()),
-		columnTemplate: _.template($('#grid-column-template').html()),
-
-		renderFilterButtons: function() {
-			var columns = this.model.getColumns();
-			_.each(columns, function(c, idx) {
-				
-				var filter = app.filters.getFilter(
-						this.model, 
-						c.field.get('name')
-					);
-				
-				var active = filter ? true : false;
-				var $el = this.$('#col-' + c.data + ' button').first();
-				$el.toggleClass('filter-btn-active', active); 
-
-			}, this);
-		},
-
-		render: function() {
-			console.log('DataTableView.render ');			
-			var me = this;
-			this.$el.html(this.tableTemplate());
-
-			var columns = this.model.getColumns();
-
-			_.each(columns, function(c, idx) {
-				var align = idx < columns.length / 2 ? 
-					'dropdown-menu-left' : 'dropdown-menu-right';
-				
-				this.$('thead > tr').append(this.columnTemplate({
-					name: c.data,
-					dropalign: align	
-				}));					
-
-			}, this);
-
-			this.renderFilterButtons();
-
-			var filter = app.filters.getFilter(this.model);			
-			var initSearch = {};
-			if (filter) initSearch.search = filter.get('value');
-
-			this.$('#grid').dataTable({
-				'serverSide': true,
-				'columns': this.model.getColumns(),				
-				'ajax': this.model.ajaxGetRowsFn(),
-				'search': initSearch
-			});
-
-			if (filter) {
-				this.$('#grid_filter input').val(filter.get('value'));
-			}
-
-			this.$('.field-filter').click(function(ev) {
-				ev.stopPropagation();
-
-				if ( ! $(this).data('bs.dropdown')) {
-					//workaround for first click to show dropdown
-					$(this).dropdown('toggle');
-				} else {
-					$(this).dropdown();
-				}
-
-				var colName = $(this).data('column');
-				var field = me.model.get('fields').getByName(colName);
-				var el = me.$('#col-' + colName + ' div.dropdown-menu');
-
-				var filter = new app.Filter({
-					table: me.model,
-					field: field
-				});
-
-				app.setFilterView(filter, el);
-			});
-
-/*
-			this.$('#grid').on( 'init.dt', function () {
-			    console.log('grid ev init');
-			});
 */
-			return this;
-		},
-
-	});
-
-})(jQuery);
-
-
-
-/*global Backbone, jQuery, _ */
-var app = app || {};
-
-(function ($) {
-	'use strict';
-
-	app.FilterItemsView = Backbone.View.extend({
-
-		events: {
-			'click #selectReset': 'evFilterItemsReset',
-			'click .filter-option': 'evFilterOptionClick',
-			'click .filter-selected': 'evFilterSelectedClick',
-			'input #inputFilterItemsSearch': 'evInputFilterSearchChange',
-		},
-
-		initialize: function () {
-			console.log("FilterItemsView.init " + this.model.get('table'));
-		},
-
-		template: _.template($('#filter-option-template').html()),
-
-		loadRender: function() {
-			var me = this;
-			var s = this.$('#inputFilterItemsSearch').val();
-			this.model.loadSelect(s, function() {
-				me.render();
-			});
-		},
-
-		render: function() {
-			this.$('a[href=#filterSelect]').tab('show');
-
-			this.$('#filterSelection').empty();
-			var current = app.filters.getFilter(
-							this.model.get('table'),
-							this.model.get('field'));
-
-			if (current && current.get('op') == app.Filter.OPS.IN) {
-				//get values from filter
-				var selected = current.get('value');		
-//console.log(selected);
-				_.each(selected, function(val) {
-					this.$('#filterSelection').append(this.template({
-						name: 'filter-selected',
-						value: val
-					}));
-				}, this);
-			}
-
-			this.$('#filterOptions').empty();
-			var fn = this.model.get('field').vname();
-			var opts = this.model.get('field').get('options');		
-//console.log(opts);
-			_.each(opts, function(opt) {
-				this.$('#filterOptions').append(this.template({
-					name: 'filter-option',
-					value: opt[fn]
-				}));
-			}, this);
-		},
-
-		setFilter: function() {
-			var filterValues = this.$('#filterSelection').children()
-				.map(function() {
-					return $(this).attr('data-target');
-			}).get();
-
-			app.filters.setFilter({
-				table: this.model.get('table'),
-				field: this.model.get('field'),
-				op: app.Filter.OPS.IN,
-				value: filterValues
-			});
-			app.table.reload();
-		},
-
-		evFilterOptionClick: function(ev) {
-			//console.log(ev.target);
-			var opt = $(ev.target).attr('data-target');
-			var attr = 'a[data-target="' + opt + '"]';
-
-			//avoid duplicate items in filterSelection
-			if (this.$('#filterSelection').has(attr).length == 0) {
-				var item = this.template({
-					name: 'filter-selected',
-					value: opt
-				});
-				this.$('#filterSelection').append(item);
-				this.setFilter();
-			}
-		},
-
-		evFilterSelectedClick: function(ev) {
-			//console.log(ev.target);
-			$(ev.target).remove();
-			this.setFilter();
-		},
-
-		evInputFilterSearchChange: function(ev) {
-			this.loadRender();
-		},
-
-
-		evFilterItemsReset: function() {
-			this.$('#filterSelection').empty();
-			this.setFilter(); //actually clears filter
-			this.$('#inputFilterItemsSearch').val('');
-			this.loadRender();
-		},
-
-	});
-
-})(jQuery);
-
-
-
-/*global Backbone, jQuery, _ */
-var app = app || {};
-
-(function ($) {
-	'use strict';
-
-	app.FilterRangeView = Backbone.View.extend({
-
-		events: {
-			//range filter evs
-			'click #rangeReset': 'evFilterRangeResetClick',
-			'change #inputFilterMin': 'evInputFilterChange',
-			'change #inputFilterMax': 'evInputFilterChange',
-		},
-
-		initialize: function () {
-			console.log("FilterRangeView.init " + this.model.get('table'));
-		},
-
-		canSlide: function() {
-			var field = this.model.get('field');
-			var slideTypes = [app.Field.TYPES.INTEGER,
-								app.Field.TYPES.NUMERIC];
-			return ( ! field.get('fk')) &&
-					_.contains(slideTypes, field.get('type'));
-		},
-
-		loadRender: function() {
-			var me = this;
-			this.model.loadRange(function() {
-				me.render();
-			});
-		},
-
-		render: function() {
-			this.$('a[href=#filterRange]').tab('show');
-
-			var stats = this.model.get('field').get('stats');
-
-			var current = app.filters.getFilter(
-							this.model.get('table'),
-							this.model.get('field'));
-
-			if (current && current.get('op') == app.Filter.OPS.BETWEEN) {
-				this.$("#inputFilterMin").val(current.get('value')[0]);
-				this.$("#inputFilterMax").val(current.get('value')[1]);
-			} else {
-				this.$("#inputFilterMin").val(stats.min);
-				this.$("#inputFilterMax").val(stats.max);
-			}
-
-			//console.log('el ' + this.$el.html());
-
-			if (this.canSlide()) {
-				this.$("#sliderRange").slider({
-					range: true,
-					min: stats.min,
-					max: stats.max,
-					values: [
-						this.$("#inputFilterMin").val(),
-						this.$("#inputFilterMax").val()
-					],	
-					slide: function(ev, ui) {
-						if ($(ui.handle).index() == 1) {
-							$("#inputFilterMin").val(ui.values[0]);
-						} else {
-							$("#inputFilterMax").val(ui.values[1]);
-						}
-				  	},
-					stop: function(ev, ui) {
-						if ($(ui.handle).index() == 1) {
-							$("#inputFilterMin").change();
-						} else {
-							$("#inputFilterMax").change();
-						}
-					}
-				});
-			}
-			if (this.model.get('field').get('type') 
-				== app.Field.TYPES['DATE']) {
-
-				var opts = { minDate: app.Field.toDate(stats.min), 
-							 maxDate: app.Field.toDate(stats.max),
-							dateFormat: 'yy-mm-dd' };
-				var minVal = app.Field.toDate($("#inputFilterMin").val());
-				var maxVal = app.Field.toDate($("#inputFilterMax").val());
-				$("#inputFilterMin").datepicker(opts);
-				$("#inputFilterMin").datepicker("setDate", minVal);
-				$("#inputFilterMax").datepicker(opts);
-				$("#inputFilterMax").datepicker("setDate", maxVal);
-
-				$('#ui-datepicker-div').click(function(e) {
-					e.stopPropagation();
-				});
-			}
-
-		},
-
-		sanitizeInputFilterValue: function(el, bounds) {
-
-			if (/Min$/.test(el.id)) {
-				bounds = [bounds[0], this.$("#inputFilterMax").val()];
-			} else {
-				bounds = [this.$("#inputFilterMin").val(), bounds[1]];
-			}
-
-			var val = this.model.get('field').parse(el.value);
-			if (val < bounds[0]) val = bounds[0];
-			if (val > bounds[1]) val = bounds[1];
-			$(el).val(val);
-
-			if (this.canSlide()) {
-				var idx = /Min$/.test(el.id) ? 0 : 1;	
-				this.$("#sliderRange").slider("values", idx, val);
-			}
-		},
-
-		evInputFilterChange: function(ev) {
-			var stats = this.model.get('field').get('stats');
-
-			this.sanitizeInputFilterValue(ev.target, [stats.min, stats.max]);
-
-			var filterValues = [this.$("#inputFilterMin").val(),
-								this.$("#inputFilterMax").val()];
-
-			if (filterValues[0] != stats.min || filterValues[1] != stats.max) {
-				app.filters.setFilter({
-					table: this.model.get('table'),
-					field: this.model.get('field'),
-					op: app.Filter.OPS.BETWEEN,
-					value: filterValues
-				});
-			} else {
-				app.filters.clearFilter(this.model.get('table'), 
-										this.model.get('field'));
-			}
-			app.table.reload();
-		},
-
-		evFilterRangeResetClick: function() {
-			app.filters.clearFilter(this.model.get('table'), 
-									this.model.get('field'));
-			app.table.reload();
-			this.render();
-		},
-	});
-
-})(jQuery);
-
-
-
-/*global Backbone, jQuery, _ */
-var app = app || {};
-
-(function ($) {
-	'use strict';
-
-	app.FilterShowView = Backbone.View.extend({
-		el:  '#modalShowFilters',
-
-		events: {
-		},
-
-		template: _.template($('#show-filter-item-template').html()),
-
-		initialize: function() {
-			console.log("FilterShowView.init");
-		},
-
-		render: function() {
-			var el = this.$('#modalTableFilters > tbody');
-			el.empty();
-			//el.children('tr:not(:first)').remove();	
-			this.collection.each(function(filter) {
-				el.append(this.template(filter.toStrings()));
-			}, this);			
-
-			$('#modalInputDataUrl').val(app.table.getFullUrl());
-			$('#modalShowFilters').on('shown.bs.modal', function() {
-				$('#modalInputDataUrl').select();
-			});
-
-			$('#modalShowFilters').modal();
-
-			return this;
-		},
-
-
-	});
-
-})(jQuery);
-
-
-
-/*global Backbone, jQuery, _ */
-var app = app || {};
-
-(function ($) {
-	'use strict';
-
-	app.FilterView = Backbone.View.extend({
-
-		events: {
-			'click .filter-column': 'evFilterColumnClick',
-			'click .nav-tabs a': 'evFilterTabClick'
-		},
-
-		initialize: function () {
-			console.log("FilterView.init " + this.model.get('table'));
-			this.rangeView = new app.FilterRangeView({
-										model: this.model,
-										el: this.el
-			});
-			this.itemsView = new app.FilterItemsView({
-										model: this.model,
-										el: this.el
-			});
-		},
-
-		template: _.template($('#filter-template').html()),
-
-		render: function() {
-			var field = this.model.get('field');
-			console.log("FilterView.render " + field.get('name'));
-
-			this.$el.html(this.template({
-				name: field.get('name'),
-			}));
-
-			if (field.get('type') == app.Field.TYPES.VARCHAR
-			 || field.get('fk') == 1) {
-				this.itemsView.loadRender();
-			} else {
-				this.rangeView.loadRender();
-			}
-
-			return this;
-		},
-
-		evFilterColumnClick: function(ev) {
-			ev.stopPropagation();
-		},
-
-		evFilterTabClick: function(ev) {
-			ev.preventDefault();
-
-	//console.log('evFilterTab ' + ev.target);
-			if (/filterSelect$/.test(ev.target.href)) {
-				this.itemsView.loadRender();
-			} else if (/filterRange$/.test(ev.target.href)) {
-				this.rangeView.loadRender();
-			}
-		}
-	});
-
-})(jQuery);
-
-
-
-/*global Backbone, jQuery, _ */
-var app = app || {};
-
-(function ($) {
-	'use strict';
-
-	app.MenuDataView = Backbone.View.extend({
-		el:  '#menu',
-
-		events: {
-			'click #show-filters': 'evShowFilters',
-			'click #reset-all-filters': 'evResetAllFilters'
-		},
-
-		initialize: function() {
-			console.log("MenuView.init");
-			//this.listenTo(app.table, 'change', this.render);
-		},
-
-		template: _.template($('#data-menu-template').html()),
-
-		render: function() {
-			console.log('MenuDataView.render ');			
-			if (! app.table) this.$el.empty();
-			else this.$el.html(this.template());
-			return this;
-		},
-
-		evResetAllFilters: function() {
-			app.clearAllFilters();
-		},
-
-		evShowFilters: function() {
-			app.filterShowView.collection = app.filters;
-			app.filterShowView.render();
-		},
-
 	});
 
 })(jQuery);
@@ -2375,8 +1863,595 @@ var app = app || {};
 
 
 
-var REST_ROOT = "http://api.donkeylift.com";
-//var REST_ROOT = "http://api.donkeylift.com";
+/*global Backbone, jQuery, _ */
+var app = app || {};
+
+(function ($) {
+	'use strict';
+
+	app.DataTableView = Backbone.View.extend({
+
+		id: 'grid-panel',
+		className: 'panel',
+
+		initialize: function() {
+			console.log("DataTableView.init " + this.model);			
+			this.listenTo(app.filters, 'update', this.renderFilterButtons);
+		},
+
+		tableTemplate: _.template($('#grid-table-template').html()),
+		columnTemplate: _.template($('#grid-column-template').html()),
+
+		renderFilterButtons: function() {
+			var columns = this.model.getColumns();
+			_.each(columns, function(c, idx) {
+				
+				var filter = app.filters.getFilter(
+						this.model, 
+						c.field.get('name')
+					);
+				
+				var active = filter ? true : false;
+				var $el = this.$('#col-' + c.data + ' button').first();
+				$el.toggleClass('filter-btn-active', active); 
+
+			}, this);
+		},
+
+		render: function() {
+			console.log('DataTableView.render ');			
+			var me = this;
+			this.$el.html(this.tableTemplate());
+
+			var columns = this.model.getColumns();
+
+			_.each(columns, function(c, idx) {
+				var align = idx < columns.length / 2 ? 
+					'dropdown-menu-left' : 'dropdown-menu-right';
+				
+				this.$('thead > tr').append(this.columnTemplate({
+					name: c.data,
+					dropalign: align	
+				}));					
+
+			}, this);
+
+			this.renderFilterButtons();
+
+			var filter = app.filters.getFilter(this.model);			
+			var initSearch = {};
+			if (filter) initSearch.search = filter.get('value');
+
+			this.$('#grid').dataTable({
+				'serverSide': true,
+				'columns': this.model.getColumns(),				
+				'ajax': this.model.ajaxGetRowsFn(),
+				'search': initSearch
+			});
+
+			if (filter) {
+				this.$('#grid_filter input').val(filter.get('value'));
+			}
+
+			this.$('.field-filter').click(function(ev) {
+				ev.stopPropagation();
+
+				if ( ! $(this).data('bs.dropdown')) {
+					//workaround for first click to show dropdown
+					$(this).dropdown('toggle');
+				} else {
+					$(this).dropdown();
+				}
+
+				var colName = $(this).data('column');
+				var field = me.model.get('fields').getByName(colName);
+				var el = me.$('#col-' + colName + ' div.dropdown-menu');
+
+				var filter = new app.Filter({
+					table: me.model,
+					field: field
+				});
+
+				app.setFilterView(filter, el);
+			});
+
+/*
+			this.$('#grid').on( 'init.dt', function () {
+			    console.log('grid ev init');
+			});
+*/
+			return this;
+		},
+
+	});
+
+})(jQuery);
+
+
+
+/*global Backbone, jQuery, _ */
+var app = app || {};
+
+(function ($) {
+	'use strict';
+
+	app.FilterItemsView = Backbone.View.extend({
+
+		events: {
+			'click #selectReset': 'evFilterItemsReset',
+			'click .filter-option': 'evFilterOptionClick',
+			'click .filter-selected': 'evFilterSelectedClick',
+			'input #inputFilterItemsSearch': 'evInputFilterSearchChange',
+		},
+
+		initialize: function () {
+			console.log("FilterItemsView.init " + this.model.get('table'));
+		},
+
+		template: _.template($('#filter-option-template').html()),
+
+		loadRender: function() {
+			var me = this;
+			var s = this.$('#inputFilterItemsSearch').val();
+			this.model.loadSelect(s, function() {
+				me.render();
+			});
+		},
+
+		render: function() {
+			this.$('a[href=#filterSelect]').tab('show');
+
+			this.$('#filterSelection').empty();
+			var current = app.filters.getFilter(
+							this.model.get('table'),
+							this.model.get('field'));
+
+			if (current && current.get('op') == app.Filter.OPS.IN) {
+				//get values from filter
+				var selected = current.get('value');		
+//console.log(selected);
+				_.each(selected, function(val) {
+					this.$('#filterSelection').append(this.template({
+						name: 'filter-selected',
+						value: val
+					}));
+				}, this);
+			}
+
+			this.$('#filterOptions').empty();
+			var fn = this.model.get('field').vname();
+			var opts = this.model.get('field').get('options');		
+//console.log(opts);
+			_.each(opts, function(opt) {
+				this.$('#filterOptions').append(this.template({
+					name: 'filter-option',
+					value: opt[fn]
+				}));
+			}, this);
+		},
+
+		setFilter: function() {
+			var filterValues = this.$('#filterSelection').children()
+				.map(function() {
+					return $(this).attr('data-target');
+			}).get();
+
+			app.filters.setFilter({
+				table: this.model.get('table'),
+				field: this.model.get('field'),
+				op: app.Filter.OPS.IN,
+				value: filterValues
+			});
+			app.table.reload();
+		},
+
+		evFilterOptionClick: function(ev) {
+			//console.log(ev.target);
+			var opt = $(ev.target).attr('data-target');
+			var attr = 'a[data-target="' + opt + '"]';
+
+			//avoid duplicate items in filterSelection
+			if (this.$('#filterSelection').has(attr).length == 0) {
+				var item = this.template({
+					name: 'filter-selected',
+					value: opt
+				});
+				this.$('#filterSelection').append(item);
+				this.setFilter();
+			}
+		},
+
+		evFilterSelectedClick: function(ev) {
+			//console.log(ev.target);
+			$(ev.target).remove();
+			this.setFilter();
+		},
+
+		evInputFilterSearchChange: function(ev) {
+			this.loadRender();
+		},
+
+
+		evFilterItemsReset: function() {
+			this.$('#filterSelection').empty();
+			this.setFilter(); //actually clears filter
+			this.$('#inputFilterItemsSearch').val('');
+			this.loadRender();
+		},
+
+	});
+
+})(jQuery);
+
+
+
+/*global Backbone, jQuery, _ */
+var app = app || {};
+
+(function ($) {
+	'use strict';
+
+	app.FilterRangeView = Backbone.View.extend({
+
+		events: {
+			//range filter evs
+			'click #rangeReset': 'evFilterRangeResetClick',
+			'change #inputFilterMin': 'evInputFilterChange',
+			'change #inputFilterMax': 'evInputFilterChange',
+		},
+
+		initialize: function () {
+			console.log("FilterRangeView.init " + this.model.get('table'));
+		},
+
+		canSlide: function() {
+			var field = this.model.get('field');
+			var slideTypes = [app.Field.TYPES.INTEGER,
+								app.Field.TYPES.NUMERIC];
+			return ( ! field.get('fk')) &&
+					_.contains(slideTypes, field.get('type'));
+		},
+
+		loadRender: function() {
+			var me = this;
+			this.model.loadRange(function() {
+				me.render();
+			});
+		},
+
+		render: function() {
+			this.$('a[href=#filterRange]').tab('show');
+
+			var stats = this.model.get('field').get('stats');
+
+			var current = app.filters.getFilter(
+							this.model.get('table'),
+							this.model.get('field'));
+
+			if (current && current.get('op') == app.Filter.OPS.BETWEEN) {
+				this.$("#inputFilterMin").val(current.get('value')[0]);
+				this.$("#inputFilterMax").val(current.get('value')[1]);
+			} else {
+				this.$("#inputFilterMin").val(stats.min);
+				this.$("#inputFilterMax").val(stats.max);
+			}
+
+			//console.log('el ' + this.$el.html());
+
+			if (this.canSlide()) {
+				this.$("#sliderRange").slider({
+					range: true,
+					min: stats.min,
+					max: stats.max,
+					values: [
+						this.$("#inputFilterMin").val(),
+						this.$("#inputFilterMax").val()
+					],	
+					slide: function(ev, ui) {
+						if ($(ui.handle).index() == 1) {
+							$("#inputFilterMin").val(ui.values[0]);
+						} else {
+							$("#inputFilterMax").val(ui.values[1]);
+						}
+				  	},
+					stop: function(ev, ui) {
+						if ($(ui.handle).index() == 1) {
+							$("#inputFilterMin").change();
+						} else {
+							$("#inputFilterMax").change();
+						}
+					}
+				});
+			}
+			if (this.model.get('field').get('type') 
+				== app.Field.TYPES['DATE']) {
+
+				var opts = { minDate: app.Field.toDate(stats.min), 
+							 maxDate: app.Field.toDate(stats.max),
+							dateFormat: 'yy-mm-dd' };
+				var minVal = app.Field.toDate($("#inputFilterMin").val());
+				var maxVal = app.Field.toDate($("#inputFilterMax").val());
+				$("#inputFilterMin").datepicker(opts);
+				$("#inputFilterMin").datepicker("setDate", minVal);
+				$("#inputFilterMax").datepicker(opts);
+				$("#inputFilterMax").datepicker("setDate", maxVal);
+
+				$('#ui-datepicker-div').click(function(e) {
+					e.stopPropagation();
+				});
+			}
+
+		},
+
+		sanitizeInputFilterValue: function(el, bounds) {
+
+			if (/Min$/.test(el.id)) {
+				bounds = [bounds[0], this.$("#inputFilterMax").val()];
+			} else {
+				bounds = [this.$("#inputFilterMin").val(), bounds[1]];
+			}
+
+			var val = this.model.get('field').parse(el.value);
+			if (val < bounds[0]) val = bounds[0];
+			if (val > bounds[1]) val = bounds[1];
+			$(el).val(val);
+
+			if (this.canSlide()) {
+				var idx = /Min$/.test(el.id) ? 0 : 1;	
+				this.$("#sliderRange").slider("values", idx, val);
+			}
+		},
+
+		evInputFilterChange: function(ev) {
+			var stats = this.model.get('field').get('stats');
+
+			this.sanitizeInputFilterValue(ev.target, [stats.min, stats.max]);
+
+			var filterValues = [this.$("#inputFilterMin").val(),
+								this.$("#inputFilterMax").val()];
+
+			if (filterValues[0] != stats.min || filterValues[1] != stats.max) {
+				app.filters.setFilter({
+					table: this.model.get('table'),
+					field: this.model.get('field'),
+					op: app.Filter.OPS.BETWEEN,
+					value: filterValues
+				});
+			} else {
+				app.filters.clearFilter(this.model.get('table'), 
+										this.model.get('field'));
+			}
+			app.table.reload();
+		},
+
+		evFilterRangeResetClick: function() {
+			app.filters.clearFilter(this.model.get('table'), 
+									this.model.get('field'));
+			app.table.reload();
+			this.render();
+		},
+	});
+
+})(jQuery);
+
+
+
+/*global Backbone, jQuery, _ */
+var app = app || {};
+
+(function ($) {
+	'use strict';
+
+	app.FilterShowView = Backbone.View.extend({
+		el:  '#modalShowFilters',
+
+		events: {
+		},
+
+		template: _.template($('#show-filter-item-template').html()),
+
+		initialize: function() {
+			console.log("FilterShowView.init");
+		},
+
+		render: function() {
+			var el = this.$('#modalTableFilters > tbody');
+			el.empty();
+			//el.children('tr:not(:first)').remove();	
+			this.collection.each(function(filter) {
+				el.append(this.template(filter.toStrings()));
+			}, this);			
+
+			$('#modalInputDataUrl').val(app.table.getFullUrl());
+			$('#modalShowFilters').on('shown.bs.modal', function() {
+				$('#modalInputDataUrl').select();
+			});
+
+			$('#modalShowFilters').modal();
+
+			return this;
+		},
+
+
+	});
+
+})(jQuery);
+
+
+
+/*global Backbone, jQuery, _ */
+var app = app || {};
+
+(function ($) {
+	'use strict';
+
+	app.FilterView = Backbone.View.extend({
+
+		events: {
+			'click .filter-column': 'evFilterColumnClick',
+			'click .nav-tabs a': 'evFilterTabClick'
+		},
+
+		initialize: function () {
+			console.log("FilterView.init " + this.model.get('table'));
+			this.rangeView = new app.FilterRangeView({
+										model: this.model,
+										el: this.el
+			});
+			this.itemsView = new app.FilterItemsView({
+										model: this.model,
+										el: this.el
+			});
+		},
+
+		template: _.template($('#filter-template').html()),
+
+		render: function() {
+			var field = this.model.get('field');
+			console.log("FilterView.render " + field.get('name'));
+
+			this.$el.html(this.template({
+				name: field.get('name'),
+			}));
+
+			if (field.get('type') == app.Field.TYPES.VARCHAR
+			 || field.get('fk') == 1) {
+				this.itemsView.loadRender();
+			} else {
+				this.rangeView.loadRender();
+			}
+
+			return this;
+		},
+
+		evFilterColumnClick: function(ev) {
+			ev.stopPropagation();
+		},
+
+		evFilterTabClick: function(ev) {
+			ev.preventDefault();
+
+	//console.log('evFilterTab ' + ev.target);
+			if (/filterSelect$/.test(ev.target.href)) {
+				this.itemsView.loadRender();
+			} else if (/filterRange$/.test(ev.target.href)) {
+				this.rangeView.loadRender();
+			}
+		}
+	});
+
+})(jQuery);
+
+
+
+/*global Backbone, jQuery, _ */
+var app = app || {};
+
+(function ($) {
+	'use strict';
+
+	app.MenuDataView = Backbone.View.extend({
+		el:  '#menu',
+
+		events: {
+			'click #show-filters': 'evShowFilters',
+			'click #reset-all-filters': 'evResetAllFilters'
+		},
+
+		initialize: function() {
+			console.log("MenuView.init");
+			//this.listenTo(app.table, 'change', this.render);
+		},
+
+		template: _.template($('#data-menu-template').html()),
+
+		render: function() {
+			console.log('MenuDataView.render ');			
+			if (! app.table) this.$el.empty();
+			else this.$el.html(this.template());
+			return this;
+		},
+
+		evResetAllFilters: function() {
+			app.clearAllFilters();
+		},
+
+		evShowFilters: function() {
+			app.filterShowView.collection = app.filters;
+			app.filterShowView.render();
+		},
+
+	});
+
+})(jQuery);
+
+
+
+/*global Backbone */
+var app = app || {};
+
+(function () {
+	'use strict';
+
+	app.Router = Backbone.Router.extend({
+        routes: {
+            "data": "data",
+            "schema": "schema",
+			"nav/:schema/:table": "navTable",
+			"data/:schema/:table": "navTableData",
+			"schema/:schema/:table": "navTableSchema"
+        },
+        
+        data: function() {
+            app.gotoModule("data");
+        },
+
+        schema: function() {
+            app.gotoModule("schema");
+        },
+
+		navTableData: function(schemaName, tableName) {
+			this._navTable('data', schemaName, tableName);
+		},
+
+		navTableSchema: function(schemaName, tableName) {
+			this._navTable('schema', schemaName, tableName);
+		},
+
+		navTable: function(schemaName, tableName) {
+			this._navTable(app.module(), schemaName, tableName);
+		},
+
+		_navTable: function(moduleName, schemaName, tableName) {
+
+			if (app.module() != moduleName) {
+				app.gotoModule(moduleName);
+			}
+
+			var setTable = function() {
+				var table = app.schema.get('tables').find(function(t) { 
+					return t.get('name') == tableName; 
+				});			
+				app.setTable(table);
+			}
+
+			if (!app.schema || app.schema.get('name') != schemaName) {
+				app.loadSchema(schemaName, setTable);
+			} else {
+				setTable();
+			}
+
+
+		}
+
+        
+	});
+
+
+})();
+
+/*global Backbone */
+var REST_ROOT = "http://127.0.0.1:3000";  //set by gulp according to env var. e.g. "http://api.donkeylift.com";
 var app = app || {};
 
 $(function () {
@@ -2407,6 +2482,9 @@ $(function () {
 			$('#schema-list').append(app.schemaListView.render().el);
 		}});
 
+		app.router = new app.Router();
+		Backbone.history.start();
+
 		app.gotoModule('data');
 
 		$('#toggle-sidebar').hide();
@@ -2415,11 +2493,6 @@ $(function () {
 	$('#toggle-sidebar').click(function() {
 		app.toggleSidebar();
 	}); 
-
-	$('#goto-options a').click(function(ev) {
-		app.gotoModule($(ev.target).attr('data-target'));
-	}); 
-
 
 	$(document).ajaxStart(function() {
 		$('#ajax-progress-spinner').show();
@@ -2470,6 +2543,10 @@ $(function () {
 
 	app.setTable = function(table) {
 		//console.log('app.setTable');
+		$('#table-list a').removeClass('active');
+		var $a = $("#table-list a[data-target='" + table.get('name') + "']");
+		$a.addClass('active');
+
 		app.table = table;
 		if (app.tableView) app.tableView.remove();
 
@@ -2490,6 +2567,7 @@ $(function () {
 	/**** schema stuff ****/
 
 	app.unsetSchema = function() {
+		app.table = null;
 		app.schema = null;
 		if (app.gridView) app.gridView.remove();
 		if (app.tableView) app.tableView.remove();
@@ -2498,7 +2576,7 @@ $(function () {
 		app.schemaCurrentView.render();
 	}
 
-	app.loadSchema = function(name) {
+	app.loadSchema = function(name, cbAfter) {
 		app.unsetSchema();
 		app.schema = new app.Database({name : name, id : name});
 		app.schema.fetch(function() {
@@ -2510,6 +2588,7 @@ $(function () {
 
 			//render current schema label
 			app.schemaCurrentView.render();
+			if (cbAfter) cbAfter();
 		});
 	}
 

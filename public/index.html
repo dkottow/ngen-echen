@@ -41,10 +41,10 @@
 		  </ul>	
           <ul id="goto-options" class="nav navbar-nav">
 		    <li class="active">
-			  <a data-target="data" class="" href="#">Data</a>
+			  <a data-target="data" class="" href="#data">Data</a>
 			</li>
 			<li>
-		      <a data-target="schema" class="" href="#">Schema</a>
+		      <a data-target="schema" class="" href="#schema">Schema</a>
 			</li>
           </ul>
 
@@ -450,7 +450,7 @@
 
 
 <script type="text/template" id="table-item-template">
-	<a data-target="<%= name %>" class="list-group-item table-item" href="#"> 
+	<a data-target="<%= name %>" class="list-group-item table-item" href="<%= href %>"> 
 		<%= name %> 
 	</a>
 </script>
