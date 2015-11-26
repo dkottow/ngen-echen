@@ -59,6 +59,7 @@ gulp.task('build-app-js', function() {
 	return gulp.src(["./src/js/models/**/*.js",
 					 "./src/js/collections/**/*.js",
 					 "./src/js/views/**/*.js",
+					 "./src/js/Router.js",
 					 "./src/js/app.js"
 			])
 		.pipe(replace("$DONKEYLIFT_API", process.env.DONKEYLIFT_API))

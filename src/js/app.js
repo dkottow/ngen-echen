@@ -1,5 +1,5 @@
-var REST_ROOT = "$DONKEYLIFT_API";
-//var REST_ROOT = "http://api.donkeylift.com";
+/*global Backbone */
+var REST_ROOT = "$DONKEYLIFT_API";  //set by gulp according to env var. e.g. "http://api.donkeylift.com";
 var app = app || {};
 
 $(function () {
@@ -30,7 +30,11 @@ $(function () {
 			$('#schema-list').append(app.schemaListView.render().el);
 		}});
 
-		app.gotoModule('data');
+		app.router = new app.Router();
+		Backbone.history.start();
+
+		app.router.navigate("data");
+		//app.gotoModule('data');
 
 		$('#toggle-sidebar').hide();
 	}
@@ -38,11 +42,6 @@ $(function () {
 	$('#toggle-sidebar').click(function() {
 		app.toggleSidebar();
 	}); 
-
-	$('#goto-options a').click(function(ev) {
-		app.gotoModule($(ev.target).attr('data-target'));
-	}); 
-
 
 	$(document).ajaxStart(function() {
 		$('#ajax-progress-spinner').show();
