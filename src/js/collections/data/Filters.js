@@ -15,16 +15,18 @@ var app = app || {};
 			return app.Filters.toParam(this.models);	
 		},
 
-		apply: function(filter, searchTerm) {
+		//used by Datable.stats & Datatable.options to get context:
+		//min/max, opts
+		apply: function(exFilter, searchTerm) {
 
 			var filters = this.filter(function(f) {
 
 				//exclude callee
-				if (f.id == filter.id) return false;
+				if (f.id == exFilter.id) return false;
 
 				//exclude existing search on same table
 				if (f.get('op') == app.Filter.OPS.SEARCH 
-				 && f.get('table') == filter.get('table')) {
+				 && f.get('table') == exFilter.get('table')) {
 					return false;
 				}
 
@@ -34,8 +36,8 @@ var app = app || {};
 			//add search term
 			if (searchTerm && searchTerm.length > 0) {
 				var searchFilter = new app.Filter({
-						table: filter.get('table'),
-						field: filter.get('field'),
+						table: exFilter.get('table'),
+						field: exFilter.get('field'),
 						op: app.Filter.OPS.SEARCH,
 						value: searchTerm
 				});

@@ -27,7 +27,7 @@ var app = app || {};
 			console.log('TableListView.render ');			
 			this.$el.html(this.template());
 			this.collection.each(function(table) {
-				var href = "#nav" 
+				var href = "#click" 
 						+ "/" + app.schema.get('name')
 						+ "/" + table.get('name');
 				this.$el.append(this.itemTemplate({

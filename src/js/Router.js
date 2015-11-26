@@ -8,9 +8,9 @@ var app = app || {};
         routes: {
             "data": "data",
             "schema": "schema",
-			"nav/:schema/:table": "navTable",
-			"data/:schema/:table": "navTableData",
-			"schema/:schema/:table": "navTableSchema"
+			"click/:schema/:table": "clickTable",
+			"data/:schema/:table": "urlTableData",
+			"schema/:schema/:table": "urlTableSchema"
         },
         
         data: function() {
@@ -21,19 +21,19 @@ var app = app || {};
             app.gotoModule("schema");
         },
 
-		navTableData: function(schemaName, tableName) {
-			this._navTable('data', schemaName, tableName);
+		urlTableData: function(schemaName, tableName) {
+			this.navTable('data', schemaName, tableName);
 		},
 
-		navTableSchema: function(schemaName, tableName) {
-			this._navTable('schema', schemaName, tableName);
+		urlTableSchema: function(schemaName, tableName) {
+			this.navTable('schema', schemaName, tableName);
 		},
 
-		navTable: function(schemaName, tableName) {
-			this._navTable(app.module(), schemaName, tableName);
+		clickTable: function(schemaName, tableName) {
+			this.navTable(app.module(), schemaName, tableName);
 		},
 
-		_navTable: function(moduleName, schemaName, tableName) {
+		navTable: function(moduleName, schemaName, tableName) {
 
 			if (app.module() != moduleName) {
 				app.gotoModule(moduleName);
