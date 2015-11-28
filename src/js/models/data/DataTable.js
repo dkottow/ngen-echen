@@ -83,8 +83,8 @@ var STATS_EXT = '.stats';
 								+ '/' + app.schema.get('name')
 								+ '/' + app.table.get('name') 
 								+ '/' + q.replace(' ', '+'));
-console.log(fragment);
-					app.router.navigate(fragment, {replace: false});
+					//console.log(fragment);
+					app.router.navigate(fragment, {replace: true});
 
 					var data = {
 						data: response.rows,
