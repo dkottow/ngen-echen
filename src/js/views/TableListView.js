@@ -27,8 +27,7 @@ var app = app || {};
 			console.log('TableListView.render ');			
 			this.$el.html(this.template());
 			this.collection.each(function(table) {
-				var href = "#click" 
-						+ "/" + app.schema.get('name')
+				var href = "#table" 
 						+ "/" + table.get('name');
 				this.$el.append(this.itemTemplate({
 					name: table.get('name'),
@@ -37,21 +36,6 @@ var app = app || {};
 			}, this);			
 			return this;
 		},
-
-/*
-		evTableClick: function(ev) {			
-			var name = $(ev.target).attr('data-target');
-
-			this.$('a').removeClass('active');
-			$(ev.target).addClass('active');
-
-			var table = this.collection.find(function(c) { 
-				return c.get('name') == name; 
-			});
-			
-			app.setTable(table);
-		}
-*/
 	});
 
 })(jQuery);

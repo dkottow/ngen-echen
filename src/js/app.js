@@ -90,9 +90,9 @@ $(function () {
 	}
 
 	app.setTable = function(table) {
-		//console.log('app.setTable');
-		$('#table-list a').removeClass('active');
+		console.log('app.setTable');
 		var $a = $("#table-list a[data-target='" + table.get('name') + "']");
+		$('#table-list a').removeClass('active');
 		$a.addClass('active');
 
 		app.table = table;

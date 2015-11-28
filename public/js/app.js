@@ -512,11 +512,11 @@ var STATS_EXT = '.stats';
 					app.filters.clearFilter(me);
 				}
 
-				var url = REST_ROOT + me.get('url') + ROWS_EXT + '?'
-						+ orderParam
-						+ '&' + skipParam 
-						+ '&' + topParam
-						+ '&' + app.filters.toParam();
+				var q = orderParam
+					+ '&' + skipParam 
+					+ '&' + topParam
+					+ '&' + app.filters.toParam();
+				var url = REST_ROOT + me.get('url') + ROWS_EXT + '?' + q;
 
 				console.log(url);
 
@@ -527,11 +527,14 @@ var STATS_EXT = '.stats';
 				}).done(function(response) {
 					//console.log('response from REST');
 					//console.dir(response);
-					app.router.navigate(app.module() 
-								+ "/" + app.schema.get('name')
-								+ "/" + app.table.get('name'), 
-							{replace: true}
-					);
+
+					var fragment = encodeURI(
+								app.module() 
+								+ '/' + app.schema.get('name')
+								+ '/' + app.table.get('name') 
+								+ '/' + q.replace(' ', '+'));
+console.log(fragment);
+					app.router.navigate(fragment, {replace: false});
 
 					var data = {
 						data: response.rows,
@@ -545,6 +548,10 @@ var STATS_EXT = '.stats';
 
 		reload: function() {
 			$('#grid').DataTable().ajax.reload();
+		},
+
+		load: function(url) {
+			$('#grid').DataTable().ajax.url(url).load();
 		},
 
 		dataCache: {},
@@ -1123,8 +1130,7 @@ var app = app || {};
 			console.log('TableListView.render ');			
 			this.$el.html(this.template());
 			this.collection.each(function(table) {
-				var href = "#click" 
-						+ "/" + app.schema.get('name')
+				var href = "#table" 
 						+ "/" + table.get('name');
 				this.$el.append(this.itemTemplate({
 					name: table.get('name'),
@@ -1133,21 +1139,6 @@ var app = app || {};
 			}, this);			
 			return this;
 		},
-
-/*
-		evTableClick: function(ev) {			
-			var name = $(ev.target).attr('data-target');
-
-			this.$('a').removeClass('active');
-			$(ev.target).addClass('active');
-
-			var table = this.collection.find(function(c) { 
-				return c.get('name') == name; 
-			});
-			
-			app.setTable(table);
-		}
-*/
 	});
 
 })(jQuery);
@@ -2399,8 +2390,8 @@ var app = app || {};
         routes: {
             "data": "data",
             "schema": "schema",
-			"click/:schema/:table": "clickTable",
-			"data/:schema/:table": "urlTableData",
+			"table/:table": "clickTable",
+			"data/:schema/:table(/*params)": "urlTableData",
 			"schema/:schema/:table": "urlTableSchema"
         },
         
@@ -2412,7 +2403,11 @@ var app = app || {};
             app.gotoModule("schema");
         },
 
-		urlTableData: function(schemaName, tableName) {
+		urlTableData: function(schemaName, tableName, params) {
+/*
+			console.log("urlTableData " 
+						+ schemaName + " " + tableName + " " + params);
+*/
 			this.navTable('data', schemaName, tableName);
 		},
 
@@ -2420,8 +2415,9 @@ var app = app || {};
 			this.navTable('schema', schemaName, tableName);
 		},
 
-		clickTable: function(schemaName, tableName) {
-			this.navTable(app.module(), schemaName, tableName);
+		clickTable: function(tableName) {
+			//console.log("clickTable " + tableName);
+			this.navTable(app.module(), app.schema.get('name'), tableName);
 		},
 
 		navTable: function(moduleName, schemaName, tableName) {
@@ -2544,9 +2540,9 @@ $(function () {
 	}
 
 	app.setTable = function(table) {
-		//console.log('app.setTable');
-		$('#table-list a').removeClass('active');
+		console.log('app.setTable');
 		var $a = $("#table-list a[data-target='" + table.get('name') + "']");
+		$('#table-list a').removeClass('active');
 		$a.addClass('active');
 
 		app.table = table;

@@ -62,11 +62,11 @@ var STATS_EXT = '.stats';
 					app.filters.clearFilter(me);
 				}
 
-				var url = REST_ROOT + me.get('url') + ROWS_EXT + '?'
-						+ orderParam
-						+ '&' + skipParam 
-						+ '&' + topParam
-						+ '&' + app.filters.toParam();
+				var q = orderParam
+					+ '&' + skipParam 
+					+ '&' + topParam
+					+ '&' + app.filters.toParam();
+				var url = REST_ROOT + me.get('url') + ROWS_EXT + '?' + q;
 
 				console.log(url);
 
@@ -77,11 +77,14 @@ var STATS_EXT = '.stats';
 				}).done(function(response) {
 					//console.log('response from REST');
 					//console.dir(response);
-					app.router.navigate(app.module() 
-								+ "/" + app.schema.get('name')
-								+ "/" + app.table.get('name'), 
-							{replace: true}
-					);
+
+					var fragment = encodeURI(
+								app.module() 
+								+ '/' + app.schema.get('name')
+								+ '/' + app.table.get('name') 
+								+ '/' + q.replace(' ', '+'));
+console.log(fragment);
+					app.router.navigate(fragment, {replace: false});
 
 					var data = {
 						data: response.rows,
@@ -95,6 +98,10 @@ var STATS_EXT = '.stats';
 
 		reload: function() {
 			$('#grid').DataTable().ajax.reload();
+		},
+
+		load: function(url) {
+			$('#grid').DataTable().ajax.url(url).load();
 		},
 
 		dataCache: {},

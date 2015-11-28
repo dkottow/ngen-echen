@@ -8,8 +8,8 @@ var app = app || {};
         routes: {
             "data": "data",
             "schema": "schema",
-			"click/:schema/:table": "clickTable",
-			"data/:schema/:table": "urlTableData",
+			"table/:table": "clickTable",
+			"data/:schema/:table(/*params)": "urlTableData",
 			"schema/:schema/:table": "urlTableSchema"
         },
         
@@ -21,7 +21,11 @@ var app = app || {};
             app.gotoModule("schema");
         },
 
-		urlTableData: function(schemaName, tableName) {
+		urlTableData: function(schemaName, tableName, params) {
+/*
+			console.log("urlTableData " 
+						+ schemaName + " " + tableName + " " + params);
+*/
 			this.navTable('data', schemaName, tableName);
 		},
 
@@ -29,8 +33,9 @@ var app = app || {};
 			this.navTable('schema', schemaName, tableName);
 		},
 
-		clickTable: function(schemaName, tableName) {
-			this.navTable(app.module(), schemaName, tableName);
+		clickTable: function(tableName) {
+			//console.log("clickTable " + tableName);
+			this.navTable(app.module(), app.schema.get('name'), tableName);
 		},
 
 		navTable: function(moduleName, schemaName, tableName) {
