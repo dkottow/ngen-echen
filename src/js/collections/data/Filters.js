@@ -79,4 +79,10 @@ var app = app || {};
 		return result;
 	}
 
+	app.Filters.parse = function(urlSegment) {
+		//TODO use QueryParser from REST api
+		var filterDefs = /\$filter=([^&]*)&?/.exec(urlSegment).split(" and ");
+		
+	}
+
 })();

@@ -1018,6 +1018,12 @@ var app = app || {};
 		return result;
 	}
 
+	app.Filters.parse = function(urlSegment) {
+		//TODO use QueryParser from REST api
+		var filterDefs = /\$filter=([^&]*)&?/.exec(urlSegment).split(" and ");
+		
+	}
+
 })();
 
 /*global Backbone, jQuery, _ */
@@ -2449,7 +2455,7 @@ var app = app || {};
 })();
 
 /*global Backbone */
-var REST_ROOT = "http://127.0.0.1:3000";  //set by gulp according to env var. e.g. "http://api.donkeylift.com";
+var REST_ROOT = "http://api.donkeylift.com";  //set by gulp according to env var. e.g. "http://api.donkeylift.com";
 var app = app || {};
 
 $(function () {
