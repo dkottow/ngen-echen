@@ -78,7 +78,6 @@ $(function () {
 		}
 		app.menuView.render();
 
-		app.refreshTableView();
 	}
 
 	app.module = function() {
@@ -108,7 +107,7 @@ $(function () {
 		app.menuView.render();			
 	}
 
-	app.refreshTableView = function() {
+	app.resetTable = function() {
 		if (app.table) app.setTable(app.table);
 	}
 
@@ -124,20 +123,26 @@ $(function () {
 		app.schemaCurrentView.render();
 	}
 
-	app.loadSchema = function(name, cbAfter) {
-		app.unsetSchema();
-		app.schema = new app.Database({name : name, id : name});
-		app.schema.fetch(function() {
-			app.tableListView = new app.TableListView({
-				collection: app.schema.get('tables')
-			});
-			$('#sidebar').append(app.tableListView.render().el);
-			$('#toggle-sidebar').show();
+	app.setSchema = function(name, cbAfter) {
+		var loadRequired = ! app.schema || app.schema.get('name') != name;
 
-			//render current schema label
-			app.schemaCurrentView.render();
+		if (loadRequired) {
+			app.unsetSchema();
+			app.schema = new app.Database({name : name, id : name});
+			app.schema.fetch(function() {
+				app.tableListView = new app.TableListView({
+					collection: app.schema.get('tables')
+				});
+				$('#sidebar').append(app.tableListView.render().el);
+				$('#toggle-sidebar').show();
+
+				//render current schema label
+				app.schemaCurrentView.render();
+				if (cbAfter) cbAfter();
+			});
+		} else {
 			if (cbAfter) cbAfter();
-		});
+		}
 	}
 
 	app.newSchema = function(name) {
@@ -156,9 +161,12 @@ $(function () {
 
 	/**** data stuff ****/
 
-	app.clearAllFilters = function() {
+	app.setFilters = function(filters) {
+		app.filters = new app.Filters(filters);
+	}
+
+	app.unsetFilters = function() {
 		app.filters = new app.Filters();
-		app.refreshTableView();
 	}
 
 	app.setFilterView = function(filter, $parentElem) {

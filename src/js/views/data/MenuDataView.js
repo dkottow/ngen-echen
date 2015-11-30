@@ -9,7 +9,7 @@ var app = app || {};
 
 		events: {
 			'click #show-filters': 'evShowFilters',
-			'click #reset-all-filters': 'evResetAllFilters'
+			//'click #reset-all-filters': 'evResetAllFilters'
 		},
 
 		initialize: function() {
@@ -27,7 +27,8 @@ var app = app || {};
 		},
 
 		evResetAllFilters: function() {
-			app.clearAllFilters();
+			app.unsetFilters();
+			app.resetTable();
 		},
 
 		evShowFilters: function() {

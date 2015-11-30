@@ -134,13 +134,14 @@ var app = app || {};
 				app.filters.clearFilter(this.model.get('table'), 
 										this.model.get('field'));
 			}
-			app.table.reload();
+			window.location.hash = "#reload-table";
 		},
 
 		evFilterRangeResetClick: function() {
 			app.filters.clearFilter(this.model.get('table'), 
 									this.model.get('field'));
-			app.table.reload();
+
+			window.location.hash = "#reload-table";
 			this.render();
 		},
 	});
