@@ -71,7 +71,9 @@ var app = app || {};
 				op: app.Filter.OPS.IN,
 				value: filterValues
 			});
-			app.table.reload();
+			
+			app.router.navigate("reload-table", {trigger: true});			
+			//window.location.hash = "#reload-table";
 		},
 
 		evFilterOptionClick: function(ev) {
@@ -102,7 +104,7 @@ var app = app || {};
 
 
 		evFilterItemsReset: function() {
-			this.$('#filterSelection').empty();
+			this.$('#filterSelection').empty();			
 			this.setFilter(); //actually clears filter
 			this.$('#inputFilterItemsSearch').val('');
 			this.loadRender();

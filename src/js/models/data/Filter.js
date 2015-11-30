@@ -11,7 +11,7 @@ var app = app || {};
 			
 			if (_.isString(attrs.table)) {
 				this.set('table', 
-					app.database.get('tables').getByName(attrs.table));
+					app.schema.get('tables').getByName(attrs.table));
 			}
 
 			if (attrs.field && _.isString(attrs.field)) {
@@ -29,15 +29,17 @@ var app = app || {};
 			var val = _.isArray(this.get('value')) ? 
 						this.get('value') : [ this.get('value') ];
 
-			return val.map(function(val) {
+			return val.map(function(v) {
 				if (me.get('field').get('fk') == 1 
 					&& me.get('op') == app.Filter.OPS.IN) {
+
+					if (_.isNumber(v)) return v;
 					//extract fk from ref such as 'Book (12)'
-					var m = val.match(/^(.*)\(([0-9]+)\)$/);
+					var m = v.match(/^(.*)\(([0-9]+)\)$/);
 					//console.log(val + " matches " + m);
 					return m[2];
 				} else {
-					return me.get('field').toQS(val);
+					return me.get('field').toQS(v);
 				}
 			});
 		},
@@ -55,8 +57,7 @@ var app = app || {};
 			} else {
 				var values = this.values();
 				if (this.get('op') == app.Filter.OPS.BETWEEN) {
-					param = key + " ge " + values[0] + ' and ' 
-						  + key + " le " + values[1];
+					param = key + " btwn " + values[0] + ',' + values[1];
 
 				} else if (this.get('op') == app.Filter.OPS.IN) {
 					key = app.Filter.Key(this.get('table'), this.get('field'));
@@ -88,11 +89,13 @@ var app = app || {};
 			if (this.get('op') == app.Filter.OPS.SEARCH) {
 				result.op = 'search';
 				result.value = this.get('value');
+
 			} else if (this.get('op') == app.Filter.OPS.BETWEEN) {
 				result.op = 'between';
 				result.field = this.get('field').get('name');
 				result.value = this.get('value')[0] 
 							+ ' and ' + this.get('value')[1];
+
 			} else if (this.get('op') == app.Filter.OPS.IN) {
 				result.op = 'in';
 				result.field = this.get('field').get('name');
@@ -112,7 +115,7 @@ var app = app || {};
 
 	app.Filter.OPS = {
 		'SEARCH': 'search',
-		'BETWEEN': ['le', 'ge'],
+		'BETWEEN': 'btwn',
 		'IN': 'in'
 	}
 

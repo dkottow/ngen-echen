@@ -36,7 +36,7 @@ var STATS_EXT = '.stats';
 		},
 
 		getFullUrl: function() {
-			return this.lastAjaxUrl;
+			return decodeURI(this.lastAjaxUrl);
 		},
 
 		ajaxGetRowsFn: function() {
@@ -46,8 +46,9 @@ var STATS_EXT = '.stats';
 				var orderField = me.get('fields')
 								.at(data.order[0].column);
 
-				var orderParam = '$orderby=' + orderField.vname() 
-								+ ' ' + data.order[0].dir;
+				var orderParam = '$orderby=' 
+								+ encodeURIComponent(orderField.vname() 
+								+ ' ' + data.order[0].dir);
 				
 				var skipParam = '$skip=' + data.start;
 				var topParam = '$top=' + data.length;
@@ -78,11 +79,21 @@ var STATS_EXT = '.stats';
 					//console.log('response from REST');
 					//console.dir(response);
 
-					var fragment = encodeURI(
+					var fragment = 
 								app.module() 
 								+ '/' + app.schema.get('name')
 								+ '/' + app.table.get('name') 
-								+ '/' + q.replace(' ', '+'));
+								+ '/' + q; 
+
+/*
+						//seems to avoid reload on FF but ugly
+					var fragment = 
+								app.module() 
+								+ '/' + app.schema.get('name')
+								+ '/' + app.table.get('name') 
+								+ '/' + encodeURIComponent(q); 
+*/
+
 					//console.log(fragment);
 					app.router.navigate(fragment, {replace: true});
 

@@ -74,15 +74,9 @@ var app = app || {};
 				return memo.length == 0 ? f.toParam() 
 					: memo + app.Filter.CONJUNCTION + f.toParam();
 			}, '');				
-			result = '$filter=' + params;
+			result = '$filter=' + encodeURIComponent(params);
 		}
 		return result;
-	}
-
-	app.Filters.parse = function(urlSegment) {
-		//TODO use QueryParser from REST api
-		var filterDefs = /\$filter=([^&]*)&?/.exec(urlSegment).split(" and ");
-		
 	}
 
 })();
