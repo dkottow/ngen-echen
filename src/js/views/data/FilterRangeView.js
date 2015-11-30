@@ -134,14 +134,17 @@ var app = app || {};
 				app.filters.clearFilter(this.model.get('table'), 
 										this.model.get('field'));
 			}
-			window.location.hash = "#reload-table";
+
+			app.router.navigate("reload-table", {trigger: true});			
+			//window.location.hash = "#reload-table";
 		},
 
 		evFilterRangeResetClick: function() {
 			app.filters.clearFilter(this.model.get('table'), 
 									this.model.get('field'));
 
-			window.location.hash = "#reload-table";
+			app.router.navigate("reload-table", {trigger: true});			
+			//window.location.hash = "#reload-table";
 			this.render();
 		},
 	});

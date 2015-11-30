@@ -72,7 +72,8 @@ var app = app || {};
 				value: filterValues
 			});
 			
-			window.location.hash = "#reload-table";
+			app.router.navigate("reload-table", {trigger: true});			
+			//window.location.hash = "#reload-table";
 		},
 
 		evFilterOptionClick: function(ev) {

@@ -535,14 +535,14 @@ var STATS_EXT = '.stats';
 								+ '/' + app.table.get('name') 
 								+ '/' + q; 
 
-					if (navigator.userAgent.indexOf("Mozilla") == 0) {
-						//avoids reload
-						fragment = 
+/*
+						//seems to avoid reload on FF but ugly
+					var fragment = 
 								app.module() 
 								+ '/' + app.schema.get('name')
 								+ '/' + app.table.get('name') 
 								+ '/' + encodeURIComponent(q); 
-					}
+*/
 
 					//console.log(fragment);
 					app.router.navigate(fragment, {replace: true});
@@ -1337,7 +1337,8 @@ var app = app || {};
 				value: filterValues
 			});
 			
-			window.location.hash = "#reload-table";
+			app.router.navigate("reload-table", {trigger: true});			
+			//window.location.hash = "#reload-table";
 		},
 
 		evFilterOptionClick: function(ev) {
@@ -1516,14 +1517,17 @@ var app = app || {};
 				app.filters.clearFilter(this.model.get('table'), 
 										this.model.get('field'));
 			}
-			window.location.hash = "#reload-table";
+
+			app.router.navigate("reload-table", {trigger: true});			
+			//window.location.hash = "#reload-table";
 		},
 
 		evFilterRangeResetClick: function() {
 			app.filters.clearFilter(this.model.get('table'), 
 									this.model.get('field'));
 
-			window.location.hash = "#reload-table";
+			app.router.navigate("reload-table", {trigger: true});			
+			//window.location.hash = "#reload-table";
 			this.render();
 		},
 	});

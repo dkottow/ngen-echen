@@ -85,14 +85,14 @@ var STATS_EXT = '.stats';
 								+ '/' + app.table.get('name') 
 								+ '/' + q; 
 
-					if (navigator.userAgent.indexOf("Mozilla") == 0) {
-						//avoids reload
-						fragment = 
+/*
+						//seems to avoid reload on FF but ugly
+					var fragment = 
 								app.module() 
 								+ '/' + app.schema.get('name')
 								+ '/' + app.table.get('name') 
 								+ '/' + encodeURIComponent(q); 
-					}
+*/
 
 					//console.log(fragment);
 					app.router.navigate(fragment, {replace: true});
