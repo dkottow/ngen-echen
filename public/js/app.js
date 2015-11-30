@@ -533,7 +533,17 @@ var STATS_EXT = '.stats';
 								app.module() 
 								+ '/' + app.schema.get('name')
 								+ '/' + app.table.get('name') 
-								+ '/' + q; //encodeURI(q); //reload in FF?
+								+ '/' + q; 
+
+					if (navigator.userAgent.indexOf("Mozilla") == 0) {
+						//avoids reload
+						fragment = 
+								app.module() 
+								+ '/' + app.schema.get('name')
+								+ '/' + app.table.get('name') 
+								+ '/' + encodeURIComponent(q); 
+					}
+
 					//console.log(fragment);
 					app.router.navigate(fragment, {replace: true});
 
@@ -4256,7 +4266,6 @@ var pegParser = module.exports;
 			console.log("urlTableData " 
 						+ schemaName + " " + tableName + " " + paramStr);
 
-
 			this.gotoTable(tableName, { 
 				module: 'data', 
 				schema: schemaName,
@@ -4327,7 +4336,7 @@ var pegParser = module.exports;
 })();
 
 /*global Backbone */
-var REST_ROOT = "http://api.donkeylift.com";  //set by gulp according to env var. e.g. "http://api.donkeylift.com";
+var REST_ROOT = "http://127.0.0.1:3000";  //set by gulp according to env var. e.g. "http://api.donkeylift.com";
 var app = app || {};
 
 $(function () {

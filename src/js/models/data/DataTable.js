@@ -83,7 +83,17 @@ var STATS_EXT = '.stats';
 								app.module() 
 								+ '/' + app.schema.get('name')
 								+ '/' + app.table.get('name') 
-								+ '/' + q; //encodeURI(q); //reload in FF?
+								+ '/' + q; 
+
+					if (navigator.userAgent.indexOf("Mozilla") == 0) {
+						//avoids reload
+						fragment = 
+								app.module() 
+								+ '/' + app.schema.get('name')
+								+ '/' + app.table.get('name') 
+								+ '/' + encodeURIComponent(q); 
+					}
+
 					//console.log(fragment);
 					app.router.navigate(fragment, {replace: true});
 

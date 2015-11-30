@@ -47,7 +47,6 @@ var pegParser = module.exports;
 			console.log("urlTableData " 
 						+ schemaName + " " + tableName + " " + paramStr);
 
-
 			this.gotoTable(tableName, { 
 				module: 'data', 
 				schema: schemaName,
