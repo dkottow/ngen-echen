@@ -4336,7 +4336,7 @@ var pegParser = module.exports;
 })();
 
 /*global Backbone */
-var REST_ROOT = "http://127.0.0.1:3000";  //set by gulp according to env var. e.g. "http://api.donkeylift.com";
+var REST_ROOT = "http://api.donkeylift.com";  //set by gulp according to env var. e.g. "http://api.donkeylift.com";
 var app = app || {};
 
 $(function () {
