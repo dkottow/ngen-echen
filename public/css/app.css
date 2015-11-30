@@ -128,9 +128,19 @@ body {
 #sliderRange {
 	margin: 10px;
 }
-#inputFilterMin {
-	margin-right: 4.5em;
+
+#inputFilterMax, #inputFilterMin {
+	width: 12em;
 }
+
+#inputFilterMin {
+	margin-right: 4em;
+}
+
+#inputFilterItemsSearch {
+	width: 10.5em;
+}
+
 #filterOptions, #filterSelection {
 	margin-top: 1em;
 }

@@ -907,7 +907,7 @@ var app = app || {};
 
 })();
 
-/*global Backbone */
+/*global Backbone, _ */
 var app = app || {};
 
 (function () {
