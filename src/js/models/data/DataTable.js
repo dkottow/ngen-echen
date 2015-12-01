@@ -95,6 +95,7 @@ var STATS_EXT = '.stats';
 */
 
 					//console.log(fragment);
+					app.router.blockGotoUrl(100); //FF needs this
 					app.router.navigate(fragment, {replace: true});
 
 					var data = {
