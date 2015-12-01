@@ -4232,21 +4232,21 @@ var pegParser = module.exports;
 
 	app.Router = Backbone.Router.extend({
         routes: {
-            "data": "data",
-            "schema": "schema",
-			"table/:table": "navTable",
-			"reset-filter": "unsetFilters",
-			"reload-table": "reloadTable",
-			"data/:schema/:table(/*params)": "urlTableData",
-			"schema/:schema/:table": "urlTableSchema"
+            "data": "routeData",
+            "schema": "routeSchema",
+			"table/:table": "routeGotoTable",
+			"reset-filter": "routeResetFilter",
+			"reload-table": "routeReloadTable",
+			"data/:schema/:table(/*params)": "routeUrlTableData",
+			"schema/:schema/:table": "routeUrlTableSchema"
         },
         
-        data: function() {
+        routeData: function() {
             app.gotoModule("data");
 			app.resetTable();
         },
 
-        schema: function() {
+        routeSchema: function() {
             app.gotoModule("schema");
 			app.resetTable();
         },
@@ -4268,9 +4268,17 @@ var pegParser = module.exports;
 			return params;
 		},
 
-		urlTableData: function(schemaName, tableName, paramStr) {
-			console.log("urlTableData " 
+		routeUrlTableData: function(schemaName, tableName, paramStr) {
+			console.log("routeTableData " 
 						+ schemaName + " " + tableName + " " + paramStr);
+
+			/* 
+			 * hack to block executing router handlers twice in FF
+			 * if user interactively hits a route, 
+			 * block execution of "url" routes 
+			 * will be reset after 1s
+			*/
+			if (this.isBlockedGotoUrl) return;
 
 			this.gotoTable(tableName, { 
 				module: 'data', 
@@ -4279,24 +4287,35 @@ var pegParser = module.exports;
 			});
 		},
 
-		urlTableSchema: function(schemaName, tableName) {
+		blockGotoUrl: function(ms) {
+			var me = this;
+			this.isBlockedGotoUrl = true;
+			window.setTimeout(function() {
+				me.isBlockedGotoUrl = false;
+			}, ms);
+		},
+
+		routeUrlTableSchema: function(schemaName, tableName) {
 			this.gotoTable(tableName, {
 				module: 'schema', 
 				schema: schemaName
 			});
 		},
 
-		navTable: function(tableName) {
+		routeGotoTable: function(tableName) {
+			this.blockGotoUrl(1000);
 			//console.log("clickTable " + tableName);
 			this.gotoTable(tableName);
 		},
 
-		unsetFilters: function() {
+		routeResetFilter: function() {
+			this.blockGotoUrl(1000);
 			app.unsetFilters();
 			app.resetTable();
 		},
 
-		reloadTable: function() {
+		routeReloadTable: function() {
+			this.blockGotoUrl(1000);
 			app.table.reload();
 		},
 
