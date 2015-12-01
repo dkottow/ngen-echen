@@ -4224,7 +4224,7 @@ module.exports = (function() {
   };
 })();
 
-/*global Backbone */
+/*global Backbone, _ */
 var app = app || {};
 var pegParser = module.exports;
 
@@ -4305,19 +4305,16 @@ var pegParser = module.exports;
 		},
 
 		routeGotoTable: function(tableName) {
-			this.blockGotoUrl(1000);
 			//console.log("clickTable " + tableName);
 			this.gotoTable(tableName);
 		},
 
 		routeResetFilter: function() {
-			this.blockGotoUrl(1000);
 			app.unsetFilters();
 			app.resetTable();
 		},
 
 		routeReloadTable: function() {
-			this.blockGotoUrl(1000);
 			app.table.reload();
 		},
 

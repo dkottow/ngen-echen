@@ -144,7 +144,7 @@ body {
 #filterOptions, #filterSelection {
 	margin-top: 1em;
 }
-#filterOptions a, #filterSelection a {
+#filterOptions button, #filterSelection button {
 	padding: 3px 5px;
 }
 .filter-reset {
