@@ -95,6 +95,7 @@ var STATS_EXT = '.stats';
 */
 
 					//console.log(fragment);
+					this.blockGotoUrl(100);
 					app.router.navigate(fragment, {replace: true});
 
 					var data = {

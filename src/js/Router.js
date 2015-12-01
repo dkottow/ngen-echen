@@ -63,6 +63,7 @@ var pegParser = module.exports;
 		},
 
 		blockGotoUrl: function(ms) {
+			ms = ms || 1000;
 			var me = this;
 			this.isBlockedGotoUrl = true;
 			window.setTimeout(function() {
