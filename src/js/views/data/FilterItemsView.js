@@ -79,7 +79,7 @@ var app = app || {};
 		evFilterOptionClick: function(ev) {
 			//console.log(ev.target);
 			var opt = $(ev.target).attr('data-target');
-			var attr = 'a[data-target="' + opt + '"]';
+			var attr = '[data-target="' + opt + '"]';
 
 			//avoid duplicate items in filterSelection
 			if (this.$('#filterSelection').has(attr).length == 0) {
