@@ -545,6 +545,7 @@ var STATS_EXT = '.stats';
 */
 
 					//console.log(fragment);
+					this.blockGotoUrl(100);
 					app.router.navigate(fragment, {replace: true});
 
 					var data = {
@@ -4288,6 +4289,7 @@ var pegParser = module.exports;
 		},
 
 		blockGotoUrl: function(ms) {
+			ms = ms || 1000;
 			var me = this;
 			this.isBlockedGotoUrl = true;
 			window.setTimeout(function() {
