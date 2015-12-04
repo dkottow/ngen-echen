@@ -10,6 +10,7 @@ var pegParser = module.exports;
             "data": "routeData",
             "schema": "routeSchema",
 			"table/:table": "routeGotoTable",
+			"table/:table/:id": "routeGotoRow",
 			"reset-filter": "routeResetFilter",
 			"reload-table": "routeReloadTable",
 			"data/:schema/:table(/*params)": "routeUrlTableData",
@@ -79,19 +80,28 @@ var pegParser = module.exports;
 		},
 
 		routeGotoTable: function(tableName) {
-			this.blockGotoUrl(1000);
-			//console.log("clickTable " + tableName);
+			//console.log("routeGotoTable " + tableName);
+			this.gotoTable(tableName);
+		},
+
+		routeGotoRow: function(tableName, id) {
+			console.log("routeGotoRow " + tableName + " " + id);
+			app.filters.setFilter({
+				table: tableName,
+				field: 'id',
+				op: app.Filter.OPS.EQUAL,
+				value: id
+			});
+			
 			this.gotoTable(tableName);
 		},
 
 		routeResetFilter: function() {
-			this.blockGotoUrl(1000);
 			app.unsetFilters();
 			app.resetTable();
 		},
 
 		routeReloadTable: function() {
-			this.blockGotoUrl(1000);
 			app.table.reload();
 		},
 

@@ -20,16 +20,43 @@ var STATS_EXT = '.stats';
 					return field.get('order');
 				})
 				.map(function(field) {
-					return { 
-			data : field.vname(),
-		    render: function ( data, type, full, meta ) {
-				      	return type == 'display' && data && data.length > 40 
+
+		    		var renderFn = function ( data, type, full, meta ) {
+				   		return type == 'display' 
+							&& data && data.length > 40 
 							?  '<span title="'
 								+ data + '">'
 								+ data.substr( 0, 38) 
 								+ '...</span>' 
 							: data;
-    					},
+    				};
+					if (field.get('name') == 'id') {
+						; //TODO
+
+					} else if (field.get('fk') == 1) {
+						var renderFn = function(data, type, full, meta) {
+							if (type == 'display' && data) {
+								var content = data.length > 40 
+									?  '<span title="'
+										+ data + '">'
+										+ data.substr( 0, 38) 
+										+ '...</span>' 
+									: data;
+								var href = '#table/' 
+									+ field.get('fk_table')
+									+ '/' + app.Field.getIdFromRef(data)
+								return '<a href="' + href + '">'
+									+ content 
+									+ '</a>';
+							} else {
+								return data;
+							}
+						}
+					}
+
+					return { 
+						data : field.vname(),
+		    			render: renderFn,
 						field: field 
 					};
 				});
@@ -85,17 +112,8 @@ var STATS_EXT = '.stats';
 								+ '/' + app.table.get('name') 
 								+ '/' + q; 
 
-/*
-						//seems to avoid reload on FF but ugly
-					var fragment = 
-								app.module() 
-								+ '/' + app.schema.get('name')
-								+ '/' + app.table.get('name') 
-								+ '/' + encodeURIComponent(q); 
-*/
-
 					//console.log(fragment);
-					this.blockGotoUrl(100);
+					app.router.blockGotoUrl(100); //avoid immediate reolad FF
 					app.router.navigate(fragment, {replace: true});
 
 					var data = {
