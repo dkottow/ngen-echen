@@ -33,11 +33,8 @@ var app = app || {};
 				if (me.get('field').get('fk') == 1 
 					&& me.get('op') == app.Filter.OPS.IN) {
 
-					if (_.isNumber(v)) return v;
-					//extract fk from ref such as 'Book (12)'
-					var m = v.match(/^(.*)\(([0-9]+)\)$/);
-					//console.log(val + " matches " + m);
-					return m[2];
+					return Field.getIdFromRef(v);
+
 				} else {
 					return me.get('field').toQS(v);
 				}
@@ -53,6 +50,10 @@ var app = app || {};
 				//add asterisk and enclose in double quotes (prefix last + phrase query)
 				param = key + " search '" 
 						+ '"' + this.get('value') + '*"' + "'";
+
+			} else if (this.get('op') == app.Filter.OPS.EQUAL) {
+				param = key + " eq " 
+						+ this.get('field').toQS(this.get('value'));
 
 			} else {
 				var values = this.values();
@@ -100,6 +101,11 @@ var app = app || {};
 				result.op = 'in';
 				result.field = this.get('field').get('name');
 				result.value = this.get('value').join(', '); 
+
+			} else if (this.get('op') == app.Filter.OPS.EQUAL) {
+				result.op = 'equal';
+				result.field = this.get('field').get('name');
+				result.value = this.get('value'); 
 			}
 			return result;
 		}
@@ -116,7 +122,8 @@ var app = app || {};
 	app.Filter.OPS = {
 		'SEARCH': 'search',
 		'BETWEEN': 'btwn',
-		'IN': 'in'
+		'IN': 'in',
+		'EQUAL': 'eq'
 	}
 
 	app.Filter.CONJUNCTION = ' and ';

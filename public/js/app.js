@@ -128,6 +128,14 @@ var app = app || {};
 						dateISOString.split('-')[2]);
 	}
 
+	app.Field.getIdFromRef = function(val) {
+		if (_.isNumber(val)) return val;
+		//extract fk from ref such as 'Book (12)'
+		var m = val.match(/^(.*)\(([0-9]+)\)$/);
+		//console.log(val + " matches " + m);
+		return m[2];
+	}
+
 
 })();
 
@@ -470,16 +478,43 @@ var STATS_EXT = '.stats';
 					return field.get('order');
 				})
 				.map(function(field) {
-					return { 
-			data : field.vname(),
-		    render: function ( data, type, full, meta ) {
-				      	return type == 'display' && data && data.length > 40 
+
+		    		var renderFn = function ( data, type, full, meta ) {
+				   		return type == 'display' 
+							&& data && data.length > 40 
 							?  '<span title="'
 								+ data + '">'
 								+ data.substr( 0, 38) 
 								+ '...</span>' 
 							: data;
-    					},
+    				};
+					if (field.get('name') == 'id') {
+						; //TODO
+
+					} else if (field.get('fk') == 1) {
+						var renderFn = function(data, type, full, meta) {
+							if (type == 'display' && data) {
+								var content = data.length > 40 
+									?  '<span title="'
+										+ data + '">'
+										+ data.substr( 0, 38) 
+										+ '...</span>' 
+									: data;
+								var href = '#table/' 
+									+ field.get('fk_table')
+									+ '/' + app.Field.getIdFromRef(data)
+								return '<a href="' + href + '">'
+									+ content 
+									+ '</a>';
+							} else {
+								return data;
+							}
+						}
+					}
+
+					return { 
+						data : field.vname(),
+		    			render: renderFn,
 						field: field 
 					};
 				});
@@ -535,17 +570,8 @@ var STATS_EXT = '.stats';
 								+ '/' + app.table.get('name') 
 								+ '/' + q; 
 
-/*
-						//seems to avoid reload on FF but ugly
-					var fragment = 
-								app.module() 
-								+ '/' + app.schema.get('name')
-								+ '/' + app.table.get('name') 
-								+ '/' + encodeURIComponent(q); 
-*/
-
 					//console.log(fragment);
-					app.router.blockGotoUrl(100); //FF needs this
+					app.router.blockGotoUrl(100); //avoid immediate reolad FF
 					app.router.navigate(fragment, {replace: true});
 
 					var data = {
@@ -731,11 +757,8 @@ var app = app || {};
 				if (me.get('field').get('fk') == 1 
 					&& me.get('op') == app.Filter.OPS.IN) {
 
-					if (_.isNumber(v)) return v;
-					//extract fk from ref such as 'Book (12)'
-					var m = v.match(/^(.*)\(([0-9]+)\)$/);
-					//console.log(val + " matches " + m);
-					return m[2];
+					return Field.getIdFromRef(v);
+
 				} else {
 					return me.get('field').toQS(v);
 				}
@@ -751,6 +774,10 @@ var app = app || {};
 				//add asterisk and enclose in double quotes (prefix last + phrase query)
 				param = key + " search '" 
 						+ '"' + this.get('value') + '*"' + "'";
+
+			} else if (this.get('op') == app.Filter.OPS.EQUAL) {
+				param = key + " eq " 
+						+ this.get('field').toQS(this.get('value'));
 
 			} else {
 				var values = this.values();
@@ -798,6 +825,11 @@ var app = app || {};
 				result.op = 'in';
 				result.field = this.get('field').get('name');
 				result.value = this.get('value').join(', '); 
+
+			} else if (this.get('op') == app.Filter.OPS.EQUAL) {
+				result.op = 'equal';
+				result.field = this.get('field').get('name');
+				result.value = this.get('value'); 
 			}
 			return result;
 		}
@@ -814,7 +846,8 @@ var app = app || {};
 	app.Filter.OPS = {
 		'SEARCH': 'search',
 		'BETWEEN': 'btwn',
-		'IN': 'in'
+		'IN': 'in',
+		'EQUAL': 'eq'
 	}
 
 	app.Filter.CONJUNCTION = ' and ';
@@ -4236,6 +4269,7 @@ var pegParser = module.exports;
             "data": "routeData",
             "schema": "routeSchema",
 			"table/:table": "routeGotoTable",
+			"table/:table/:id": "routeGotoRow",
 			"reset-filter": "routeResetFilter",
 			"reload-table": "routeReloadTable",
 			"data/:schema/:table(/*params)": "routeUrlTableData",
@@ -4305,7 +4339,19 @@ var pegParser = module.exports;
 		},
 
 		routeGotoTable: function(tableName) {
-			//console.log("clickTable " + tableName);
+			//console.log("routeGotoTable " + tableName);
+			this.gotoTable(tableName);
+		},
+
+		routeGotoRow: function(tableName, id) {
+			console.log("routeGotoRow " + tableName + " " + id);
+			app.filters.setFilter({
+				table: tableName,
+				field: 'id',
+				op: app.Filter.OPS.EQUAL,
+				value: id
+			});
+			
 			this.gotoTable(tableName);
 		},
 

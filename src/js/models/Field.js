@@ -101,5 +101,13 @@ var app = app || {};
 						dateISOString.split('-')[2]);
 	}
 
+	app.Field.getIdFromRef = function(val) {
+		if (_.isNumber(val)) return val;
+		//extract fk from ref such as 'Book (12)'
+		var m = val.match(/^(.*)\(([0-9]+)\)$/);
+		//console.log(val + " matches " + m);
+		return m[2];
+	}
+
 
 })();
