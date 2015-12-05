@@ -23,7 +23,7 @@ var STATS_EXT = '.stats';
 				.map(function(field) {
 
 					var abbrFn = function (data) {
-				   		return data && data.length > 40 
+				   		return data.length > 40 
 							?  '<span title="'
 								+ data + '">'
 								+ data.substr( 0, 38) 
@@ -31,9 +31,9 @@ var STATS_EXT = '.stats';
 							: data;
 					}
 
-		    		var anchor = undefined;
+		    		var anchorFn = undefined;
 					if (field.get('name') == 'id' && me.get('children')) {
-						anchor = function(id) {
+						anchorFn = function(id) {
 							var href = '#table' 
 								+ '/' + me.get('children')[0]
 								+ '/' + me.get('name') + '.id=' + id;
@@ -42,7 +42,7 @@ var STATS_EXT = '.stats';
 						}
 						
 					} else if (field.get('fk') == 1) {
-						anchor = function(ref) {
+						anchorFn = function(ref) {
 							var href = '#table' 
 								+ '/' + field.get('fk_table')
 								+ '/id=' + app.Field.getIdFromRef(ref)
@@ -53,8 +53,10 @@ var STATS_EXT = '.stats';
 
 					var renderFn = function (data, type, full, meta ) {
 					
-						if (type == 'display') {
-							return anchor ? anchor(data) : abbrFn(data);
+						if (type == 'display' && data) {
+							return anchorFn ? anchorFn(data) : abbrFn(data);
+						} else {
+							return data;
 						}
 					}
 				
