@@ -47,9 +47,7 @@ var app = app || {};
 			var param;
 
 			if (this.get('op') == app.Filter.OPS.SEARCH) {
-				//add asterisk and enclose in double quotes (prefix last + phrase query)
-				param = key + " search '" 
-						+ '"' + this.get('value') + '*"' + "'";
+				param = key + " search '" + this.get('value') + "'";
 
 			} else if (this.get('op') == app.Filter.OPS.EQUAL) {
 				param = key + " eq " 

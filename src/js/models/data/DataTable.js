@@ -86,20 +86,20 @@ var STATS_EXT = '.stats';
 				var skipParam = '$skip=' + data.start;
 				var topParam = '$top=' + data.length;
 
+				var filters = app.filters.clone();
+				
 				if (data.search.value.length > 0) {
-					app.filters.setFilter({
+					filters.setFilter({
 						table: me,
 						op: app.Filter.OPS.SEARCH,
 						value: data.search.value
 					});
-				} else {
-					app.filters.clearFilter(me);
 				}
 
 				var q = orderParam
 					+ '&' + skipParam 
 					+ '&' + topParam
-					+ '&' + app.filters.toParam();
+					+ '&' + filters.toParam();
 				var url = REST_ROOT + me.get('url') + ROWS_EXT + '?' + q;
 
 				console.log(url);

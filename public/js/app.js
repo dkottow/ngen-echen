@@ -544,20 +544,20 @@ var STATS_EXT = '.stats';
 				var skipParam = '$skip=' + data.start;
 				var topParam = '$top=' + data.length;
 
+				var filters = app.filters.clone();
+				
 				if (data.search.value.length > 0) {
-					app.filters.setFilter({
+					filters.setFilter({
 						table: me,
 						op: app.Filter.OPS.SEARCH,
 						value: data.search.value
 					});
-				} else {
-					app.filters.clearFilter(me);
 				}
 
 				var q = orderParam
 					+ '&' + skipParam 
 					+ '&' + topParam
-					+ '&' + app.filters.toParam();
+					+ '&' + filters.toParam();
 				var url = REST_ROOT + me.get('url') + ROWS_EXT + '?' + q;
 
 				console.log(url);
@@ -674,7 +674,7 @@ var STATS_EXT = '.stats';
 
 })();
 
-/*global Backbone */
+/*global Backbone, _ */
 var app = app || {};
 
 (function () {
@@ -777,9 +777,7 @@ var app = app || {};
 			var param;
 
 			if (this.get('op') == app.Filter.OPS.SEARCH) {
-				//add asterisk and enclose in double quotes (prefix last + phrase query)
-				param = key + " search '" 
-						+ '"' + this.get('value') + '*"' + "'";
+				param = key + " search '" + this.get('value') + "'";
 
 			} else if (this.get('op') == app.Filter.OPS.EQUAL) {
 				param = key + " eq " 
