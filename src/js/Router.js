@@ -10,7 +10,7 @@ var pegParser = module.exports;
             "data": "routeData",
             "schema": "routeSchema",
 			"table/:table": "routeGotoTable",
-			"table/:table/:id": "routeGotoRow",
+			"table/:table/:filter": "routeGotoRows",
 			"reset-filter": "routeResetFilter",
 			"reload-table": "routeReloadTable",
 			"data/:schema/:table(/*params)": "routeUrlTableData",
@@ -51,8 +51,8 @@ var pegParser = module.exports;
 			/* 
 			 * hack to block executing router handlers twice in FF
 			 * if user interactively hits a route, 
-			 * block execution of "url" routes 
-			 * will be reset after 1s
+			 * block execution of this route. 
+			 * isBlocked.. will be timeout reset after a short time (100ms). 
 			*/
 			if (this.isBlockedGotoUrl) return;
 
@@ -84,13 +84,21 @@ var pegParser = module.exports;
 			this.gotoTable(tableName);
 		},
 
-		routeGotoRow: function(tableName, id) {
-			console.log("routeGotoRow " + tableName + " " + id);
+		routeGotoRows: function(tableName, filter) {
+			var kv = filter.split('=');
+			var filterTable;
+			if (kv[0].indexOf('.') > 0) {
+				filterTable = kv[0].substr(0, kv[0].indexOf('.'));
+			} else {
+				filterTable = tableName;
+			}
+
+			console.log("routeGotoRow " + tableName + " " + filter);
 			app.filters.setFilter({
-				table: tableName,
+				table: filterTable,
 				field: 'id',
 				op: app.Filter.OPS.EQUAL,
-				value: id
+				value: kv[1]
 			});
 			
 			this.gotoTable(tableName);

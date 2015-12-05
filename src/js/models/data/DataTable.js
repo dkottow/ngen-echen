@@ -14,6 +14,7 @@ var STATS_EXT = '.stats';
 		},
 
 		getColumns: function() {
+			var me = this;
 
 			return this.get('fields')
 				.sortBy(function(field) {
@@ -21,39 +22,42 @@ var STATS_EXT = '.stats';
 				})
 				.map(function(field) {
 
-		    		var renderFn = function ( data, type, full, meta ) {
-				   		return type == 'display' 
-							&& data && data.length > 40 
+					var abbrFn = function (data) {
+				   		return data && data.length > 40 
 							?  '<span title="'
 								+ data + '">'
 								+ data.substr( 0, 38) 
 								+ '...</span>' 
 							: data;
-    				};
-					if (field.get('name') == 'id') {
-						; //TODO
+					}
 
+		    		var anchor = undefined;
+					if (field.get('name') == 'id' && me.get('children')) {
+						anchor = function(id) {
+							var href = '#table' 
+								+ '/' + me.get('children')[0]
+								+ '/' + me.get('name') + '.id=' + id;
+							
+							return '<a href="' + href + '">' + id + '</a>';
+						}
+						
 					} else if (field.get('fk') == 1) {
-						var renderFn = function(data, type, full, meta) {
-							if (type == 'display' && data) {
-								var content = data.length > 40 
-									?  '<span title="'
-										+ data + '">'
-										+ data.substr( 0, 38) 
-										+ '...</span>' 
-									: data;
-								var href = '#table/' 
-									+ field.get('fk_table')
-									+ '/' + app.Field.getIdFromRef(data)
-								return '<a href="' + href + '">'
-									+ content 
-									+ '</a>';
-							} else {
-								return data;
-							}
+						anchor = function(ref) {
+							var href = '#table' 
+								+ '/' + field.get('fk_table')
+								+ '/id=' + app.Field.getIdFromRef(ref)
+
+							return '<a href="' + href + '">' + abbrFn(ref) + '</a>';
 						}
 					}
 
+					var renderFn = function (data, type, full, meta ) {
+					
+						if (type == 'display') {
+							return anchor ? anchor(data) : abbrFn(data);
+						}
+					}
+				
 					return { 
 						data : field.vname(),
 		    			render: renderFn,

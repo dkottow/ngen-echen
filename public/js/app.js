@@ -317,7 +317,7 @@ return;
 
 })();
 
-/*global Backbone */
+/*global Backbone, _ */
 var app = app || {};
 
 (function () {
@@ -472,6 +472,7 @@ var STATS_EXT = '.stats';
 		},
 
 		getColumns: function() {
+			var me = this;
 
 			return this.get('fields')
 				.sortBy(function(field) {
@@ -479,39 +480,42 @@ var STATS_EXT = '.stats';
 				})
 				.map(function(field) {
 
-		    		var renderFn = function ( data, type, full, meta ) {
-				   		return type == 'display' 
-							&& data && data.length > 40 
+					var abbrFn = function (data) {
+				   		return data && data.length > 40 
 							?  '<span title="'
 								+ data + '">'
 								+ data.substr( 0, 38) 
 								+ '...</span>' 
 							: data;
-    				};
-					if (field.get('name') == 'id') {
-						; //TODO
+					}
 
+		    		var anchor = undefined;
+					if (field.get('name') == 'id' && me.get('children')) {
+						anchor = function(id) {
+							var href = '#table' 
+								+ '/' + me.get('children')[0]
+								+ '/' + me.get('name') + '.id=' + id;
+							
+							return '<a href="' + href + '">' + id + '</a>';
+						}
+						
 					} else if (field.get('fk') == 1) {
-						var renderFn = function(data, type, full, meta) {
-							if (type == 'display' && data) {
-								var content = data.length > 40 
-									?  '<span title="'
-										+ data + '">'
-										+ data.substr( 0, 38) 
-										+ '...</span>' 
-									: data;
-								var href = '#table/' 
-									+ field.get('fk_table')
-									+ '/' + app.Field.getIdFromRef(data)
-								return '<a href="' + href + '">'
-									+ content 
-									+ '</a>';
-							} else {
-								return data;
-							}
+						anchor = function(ref) {
+							var href = '#table' 
+								+ '/' + field.get('fk_table')
+								+ '/id=' + app.Field.getIdFromRef(ref)
+
+							return '<a href="' + href + '">' + abbrFn(ref) + '</a>';
 						}
 					}
 
+					var renderFn = function (data, type, full, meta ) {
+					
+						if (type == 'display') {
+							return anchor ? anchor(data) : abbrFn(data);
+						}
+					}
+				
 					return { 
 						data : field.vname(),
 		    			render: renderFn,
@@ -4269,7 +4273,7 @@ var pegParser = module.exports;
             "data": "routeData",
             "schema": "routeSchema",
 			"table/:table": "routeGotoTable",
-			"table/:table/:id": "routeGotoRow",
+			"table/:table/:filter": "routeGotoRows",
 			"reset-filter": "routeResetFilter",
 			"reload-table": "routeReloadTable",
 			"data/:schema/:table(/*params)": "routeUrlTableData",
@@ -4310,8 +4314,8 @@ var pegParser = module.exports;
 			/* 
 			 * hack to block executing router handlers twice in FF
 			 * if user interactively hits a route, 
-			 * block execution of "url" routes 
-			 * will be reset after 1s
+			 * block execution of this route. 
+			 * isBlocked.. will be timeout reset after a short time (100ms). 
 			*/
 			if (this.isBlockedGotoUrl) return;
 
@@ -4343,13 +4347,21 @@ var pegParser = module.exports;
 			this.gotoTable(tableName);
 		},
 
-		routeGotoRow: function(tableName, id) {
-			console.log("routeGotoRow " + tableName + " " + id);
+		routeGotoRows: function(tableName, filter) {
+			var kv = filter.split('=');
+			var filterTable;
+			if (kv[0].indexOf('.') > 0) {
+				filterTable = kv[0].substr(0, kv[0].indexOf('.'));
+			} else {
+				filterTable = tableName;
+			}
+
+			console.log("routeGotoRow " + tableName + " " + filter);
 			app.filters.setFilter({
-				table: tableName,
+				table: filterTable,
 				field: 'id',
 				op: app.Filter.OPS.EQUAL,
-				value: id
+				value: kv[1]
 			});
 			
 			this.gotoTable(tableName);
@@ -4406,7 +4418,7 @@ var pegParser = module.exports;
 })();
 
 /*global Backbone */
-var REST_ROOT = "http://api.donkeylift.com";  //set by gulp according to env var. e.g. "http://api.donkeylift.com";
+var REST_ROOT = "https://api.donkeylift.com";  //set by gulp according to env var. e.g. "http://api.donkeylift.com";
 var app = app || {};
 
 $(function () {
