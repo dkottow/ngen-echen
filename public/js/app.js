@@ -770,7 +770,7 @@ var app = app || {};
 				if (me.get('field').get('fk') == 1 
 					&& me.get('op') == app.Filter.OPS.IN) {
 
-					return Field.getIdFromRef(v);
+					return app.Field.getIdFromRef(v);
 
 				} else {
 					return me.get('field').toQS(v);
