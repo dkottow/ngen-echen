@@ -88,8 +88,8 @@ $(function () {
 		return m;		
 	}
 
-	app.setTable = function(table) {
-		console.log('app.setTable');
+	app.setTable = function(table, params) {
+		console.log('app.setTable ' + params);
 		var $a = $("#table-list a[data-target='" + table.get('name') + "']");
 		$('#table-list a').removeClass('active');
 		$a.addClass('active');
@@ -98,7 +98,11 @@ $(function () {
 		if (app.tableView) app.tableView.remove();
 
 		if (app.module() == 'data') {
-			app.tableView = new app.DataTableView({model: table});
+			app.tableView = new app.DataTableView({
+				model: table, 
+				attributes: { params: params }
+						
+			});
 		} else if (app.module() == 'schema') {
 			app.tableView = new app.SchemaTableView({model: table});
 		}

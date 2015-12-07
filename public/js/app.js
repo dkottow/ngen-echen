@@ -544,6 +544,11 @@ var STATS_EXT = '.stats';
 				var skipParam = '$skip=' + data.start;
 				var topParam = '$top=' + data.length;
 
+				if (data.search.value.length == 0) {
+					//sometimes necessary after back/fwd
+					app.filters.clearFilter(me);
+				}
+
 				var filters = app.filters.clone();
 				
 				if (data.search.value.length > 0) {
@@ -577,8 +582,10 @@ var STATS_EXT = '.stats';
 								+ '/' + q; 
 
 					//console.log(fragment);
-					app.router.blockGotoUrl(100); //avoid immediate reolad FF
-					app.router.navigate(fragment, {replace: true});
+					app.router.updateNavigation(fragment, { 
+						block: 100,  
+						replace: true
+					}); 
 
 					var data = {
 						data: response.rows,
@@ -1232,6 +1239,29 @@ var app = app || {};
 			}, this);
 		},
 
+		getOptions: function(params, columns) {
+			params = params || {};
+			var dtOptions = {};
+			
+			dtOptions.displayStart = params.$skip || 0;
+			dtOptions.pageLength = params.$top || 10;
+
+			dtOptions.order = [0, 'asc'];
+			if (params.$orderby) {
+				var order = _.pairs(params.$orderby[0]) [0];
+				for(var i = 0; i < columns.length; ++i) {
+					if (columns[i].data == order[0]) {
+						dtOptions.order[0] = i;
+						dtOptions.order[1] = order[1];
+						break;
+					}
+					
+				}
+			}
+
+			return dtOptions;
+		},
+
 		render: function() {
 			console.log('DataTableView.render ');			
 			var me = this;
@@ -1256,11 +1286,17 @@ var app = app || {};
 			var initSearch = {};
 			if (filter) initSearch.search = filter.get('value');
 
+			var dtOptions = this.getOptions(this.attributes.params, columns);
+			console.log(dtOptions);
+
 			this.$('#grid').dataTable({
-				'serverSide': true,
-				'columns': this.model.getColumns(),				
-				'ajax': this.model.ajaxGetRowsFn(),
-				'search': initSearch
+				serverSide: true,
+				columns: this.model.getColumns(),				
+				ajax: this.model.ajaxGetRowsFn(),
+				search: initSearch,
+				displayStart: dtOptions.displayStart, 
+				pageLength: dtOptions.pageLength, 
+				order: dtOptions.order
 			});
 
 			if (filter) {
@@ -1289,11 +1325,29 @@ var app = app || {};
 				app.setFilterView(filter, el);
 			});
 
-/*
-			this.$('#grid').on( 'init.dt', function () {
-			    console.log('grid ev init');
+
+			this.$('#grid').on( 'page.dt', function () {
+				console.log("page.dt");
+				app.router.navigate("reload-table", {trigger: false});			
 			});
-*/
+
+			//using order.dt event won't work because its fired otherwise, too
+			this.$('th.sorting').click(function () {
+				console.log("order.dt");
+				app.router.navigate("reload-table", {trigger: false});			
+			});
+
+			//using search.dt event won't work because its fired otherwise, too
+			this.$('input[type="search"]').blur(function () {
+				console.log("search.dt");
+				app.router.navigate("reload-table", {trigger: false});			
+			});
+			this.$('input[type="search"]').focus(function () {
+				console.log("search.dt");
+				app.router.navigate("reload-table", {trigger: false});			
+			});
+
+
 			return this;
 		},
 
@@ -4269,6 +4323,7 @@ var pegParser = module.exports;
 	'use strict';
 
 	app.Router = Backbone.Router.extend({
+
         routes: {
             "data": "routeData",
             "schema": "routeSchema",
@@ -4279,7 +4334,7 @@ var pegParser = module.exports;
 			"data/:schema/:table(/*params)": "routeUrlTableData",
 			"schema/:schema/:table": "routeUrlTableSchema"
         },
-        
+
         routeData: function() {
             app.gotoModule("data");
 			app.resetTable();
@@ -4290,27 +4345,9 @@ var pegParser = module.exports;
 			app.resetTable();
         },
 
-		parseParams: function(paramStr) {
-			var params = {};
-			_.each(paramStr.split('&'), function(p) {
-				var ps = p.split('=');
-				var k = decodeURIComponent(ps[0]);
-				var v = ps.length > 1 
-						? decodeURIComponent(ps[1])
-						:  decodeURIComponent(ps[0]);
-				if (k[0] == '$') {
-					var param = pegParser.parse(k + "=" + v);
-					params[param.name] = param.value;
-				}
-			});
-			//console.dir(params);
-			return params;
-		},
-
 		routeUrlTableData: function(schemaName, tableName, paramStr) {
-			console.log("routeTableData " 
+			console.log("routeUrlTableData " 
 						+ schemaName + " " + tableName + " " + paramStr);
-
 			/* 
 			 * hack to block executing router handlers twice in FF
 			 * if user interactively hits a route, 
@@ -4324,15 +4361,6 @@ var pegParser = module.exports;
 				schema: schemaName,
 				params: this.parseParams(paramStr)
 			});
-		},
-
-		blockGotoUrl: function(ms) {
-			ms = ms || 1000;
-			var me = this;
-			this.isBlockedGotoUrl = true;
-			window.setTimeout(function() {
-				me.isBlockedGotoUrl = false;
-			}, ms);
 		},
 
 		routeUrlTableSchema: function(schemaName, tableName) {
@@ -4376,6 +4404,41 @@ var pegParser = module.exports;
 			app.table.reload();
 		},
 
+		parseParams: function(paramStr) {
+			var params = {};
+			_.each(paramStr.split('&'), function(p) {
+				var ps = p.split('=');
+				var k = decodeURIComponent(ps[0]);
+				var v = ps.length > 1 
+						? decodeURIComponent(ps[1])
+						:  decodeURIComponent(ps[0]);
+				if (k[0] == '$') {
+					var param = pegParser.parse(k + "=" + v);
+					params[param.name] = param.value;
+				}
+			});
+			//console.dir(params);
+			return params;
+		},
+
+		blockGotoUrl: function(ms) {
+			ms = ms || 1000;
+			var me = this;
+			this.isBlockedGotoUrl = true;
+			window.setTimeout(function() {
+				me.isBlockedGotoUrl = false;
+			}, ms);
+		},
+
+		updateNavigation: function(fragment, options) {
+			console.log('update nav ' + fragment + ' ' + options); 
+			options = options || {};
+			if (options.block > 0) {
+				this.blockGotoUrl(options.block); //avoid inmediate reolad FF
+			}
+			this.navigate(fragment, {replace: options.replace});
+		},	
+
 		gotoTable: function(tableName, options) {
 			options = options || {};
 
@@ -4385,8 +4448,8 @@ var pegParser = module.exports;
 					return t.get('name') == tableName; 
 				});			
 
-				//set filters
 				if (options.params) {
+					//set filters
 					var filters = _.map(options.params.$filter, function(f) {
 						return new app.Filter(f);
 					});
@@ -4394,7 +4457,7 @@ var pegParser = module.exports;
 				}
 				
 				//load data			
-				app.setTable(table);
+				app.setTable(table, options.params);
 			}
 
 			if (options.module) {
@@ -4507,8 +4570,8 @@ $(function () {
 		return m;		
 	}
 
-	app.setTable = function(table) {
-		console.log('app.setTable');
+	app.setTable = function(table, params) {
+		console.log('app.setTable ' + params);
 		var $a = $("#table-list a[data-target='" + table.get('name') + "']");
 		$('#table-list a').removeClass('active');
 		$a.addClass('active');
@@ -4517,7 +4580,11 @@ $(function () {
 		if (app.tableView) app.tableView.remove();
 
 		if (app.module() == 'data') {
-			app.tableView = new app.DataTableView({model: table});
+			app.tableView = new app.DataTableView({
+				model: table, 
+				attributes: { params: params }
+						
+			});
 		} else if (app.module() == 'schema') {
 			app.tableView = new app.SchemaTableView({model: table});
 		}

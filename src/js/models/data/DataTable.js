@@ -86,6 +86,11 @@ var STATS_EXT = '.stats';
 				var skipParam = '$skip=' + data.start;
 				var topParam = '$top=' + data.length;
 
+				if (data.search.value.length == 0) {
+					//sometimes necessary after back/fwd
+					app.filters.clearFilter(me);
+				}
+
 				var filters = app.filters.clone();
 				
 				if (data.search.value.length > 0) {
@@ -119,8 +124,10 @@ var STATS_EXT = '.stats';
 								+ '/' + q; 
 
 					//console.log(fragment);
-					app.router.blockGotoUrl(100); //avoid immediate reolad FF
-					app.router.navigate(fragment, {replace: true});
+					app.router.updateNavigation(fragment, { 
+						block: 100,  
+						replace: true
+					}); 
 
 					var data = {
 						data: response.rows,

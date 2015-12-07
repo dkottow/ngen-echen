@@ -6,6 +6,7 @@ var pegParser = module.exports;
 	'use strict';
 
 	app.Router = Backbone.Router.extend({
+
         routes: {
             "data": "routeData",
             "schema": "routeSchema",
@@ -16,7 +17,7 @@ var pegParser = module.exports;
 			"data/:schema/:table(/*params)": "routeUrlTableData",
 			"schema/:schema/:table": "routeUrlTableSchema"
         },
-        
+
         routeData: function() {
             app.gotoModule("data");
 			app.resetTable();
@@ -27,27 +28,9 @@ var pegParser = module.exports;
 			app.resetTable();
         },
 
-		parseParams: function(paramStr) {
-			var params = {};
-			_.each(paramStr.split('&'), function(p) {
-				var ps = p.split('=');
-				var k = decodeURIComponent(ps[0]);
-				var v = ps.length > 1 
-						? decodeURIComponent(ps[1])
-						:  decodeURIComponent(ps[0]);
-				if (k[0] == '$') {
-					var param = pegParser.parse(k + "=" + v);
-					params[param.name] = param.value;
-				}
-			});
-			//console.dir(params);
-			return params;
-		},
-
 		routeUrlTableData: function(schemaName, tableName, paramStr) {
-			console.log("routeTableData " 
+			console.log("routeUrlTableData " 
 						+ schemaName + " " + tableName + " " + paramStr);
-
 			/* 
 			 * hack to block executing router handlers twice in FF
 			 * if user interactively hits a route, 
@@ -61,15 +44,6 @@ var pegParser = module.exports;
 				schema: schemaName,
 				params: this.parseParams(paramStr)
 			});
-		},
-
-		blockGotoUrl: function(ms) {
-			ms = ms || 1000;
-			var me = this;
-			this.isBlockedGotoUrl = true;
-			window.setTimeout(function() {
-				me.isBlockedGotoUrl = false;
-			}, ms);
 		},
 
 		routeUrlTableSchema: function(schemaName, tableName) {
@@ -113,6 +87,41 @@ var pegParser = module.exports;
 			app.table.reload();
 		},
 
+		parseParams: function(paramStr) {
+			var params = {};
+			_.each(paramStr.split('&'), function(p) {
+				var ps = p.split('=');
+				var k = decodeURIComponent(ps[0]);
+				var v = ps.length > 1 
+						? decodeURIComponent(ps[1])
+						:  decodeURIComponent(ps[0]);
+				if (k[0] == '$') {
+					var param = pegParser.parse(k + "=" + v);
+					params[param.name] = param.value;
+				}
+			});
+			//console.dir(params);
+			return params;
+		},
+
+		blockGotoUrl: function(ms) {
+			ms = ms || 1000;
+			var me = this;
+			this.isBlockedGotoUrl = true;
+			window.setTimeout(function() {
+				me.isBlockedGotoUrl = false;
+			}, ms);
+		},
+
+		updateNavigation: function(fragment, options) {
+			console.log('update nav ' + fragment + ' ' + options); 
+			options = options || {};
+			if (options.block > 0) {
+				this.blockGotoUrl(options.block); //avoid inmediate reolad FF
+			}
+			this.navigate(fragment, {replace: options.replace});
+		},	
+
 		gotoTable: function(tableName, options) {
 			options = options || {};
 
@@ -122,8 +131,8 @@ var pegParser = module.exports;
 					return t.get('name') == tableName; 
 				});			
 
-				//set filters
 				if (options.params) {
+					//set filters
 					var filters = _.map(options.params.$filter, function(f) {
 						return new app.Filter(f);
 					});
@@ -131,7 +140,7 @@ var pegParser = module.exports;
 				}
 				
 				//load data			
-				app.setTable(table);
+				app.setTable(table, options.params);
 			}
 
 			if (options.module) {
