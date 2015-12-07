@@ -21,7 +21,7 @@ if (process.env.OPENSHIFT_DATA_DIR) {
 app.use('/public', express.static('./public')); 
 
 app.use(function(err, req, res, next) {
-	log.error(err);
+	console.log(err);
 	res.send(500, err.stack);
 });
 
