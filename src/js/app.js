@@ -138,9 +138,11 @@ $(function () {
 	}
 
 	app.setSchema = function(name, cbAfter) {
+		console.log('app.setSchema ' + name);
 		var loadRequired = ! app.schema || app.schema.get('name') != name;
 
 		if (loadRequired) {
+			console.log('app.setSchema loadRequired');
 			app.unsetSchema();
 			app.schema = new app.Database({name : name, id : name});
 			app.schema.fetch(function() {
@@ -159,6 +161,7 @@ $(function () {
 		}
 	}
 
+/*
 	app.newSchema = function(name) {
 		app.unsetSchema();
 		app.schema = new app.Database({name : name});
@@ -172,6 +175,7 @@ $(function () {
 			app.schemaCurrentView.render();
 		});
 	}
+*/
 
 	/**** data stuff ****/
 

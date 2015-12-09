@@ -448,10 +448,12 @@ var app = app || {};
 			{ name : 'modified_by', type: 'VARCHAR', order: 2 },
 			{ name : 'modified_on', type: 'DATETIME', order: 3 }
 		];
-		return new app.Table({
+		var table = new app.Table({
 			name: name,
 			fields: fields
 		});
+		table.initRefs();
+		return table;
 	}
 
 })();
@@ -2318,7 +2320,10 @@ var app = app || {};
 				console.log('SchemaEditView Save as new');
 				this.model.set('name', newName);
 			}
-			this.model.save(function(err) { return me.renderResult(err); });
+			this.model.save(function(err) { 
+				app.setSchema(me.model.get('name'));
+				return me.renderResult(err); 
+			});
 		},
 
 		evRemoveClick: function() {	
@@ -4658,9 +4663,11 @@ $(function () {
 	}
 
 	app.setSchema = function(name, cbAfter) {
+		console.log('app.setSchema ' + name);
 		var loadRequired = ! app.schema || app.schema.get('name') != name;
 
 		if (loadRequired) {
+			console.log('app.setSchema loadRequired');
 			app.unsetSchema();
 			app.schema = new app.Database({name : name, id : name});
 			app.schema.fetch(function() {
@@ -4679,6 +4686,7 @@ $(function () {
 		}
 	}
 
+/*
 	app.newSchema = function(name) {
 		app.unsetSchema();
 		app.schema = new app.Database({name : name});
@@ -4692,6 +4700,7 @@ $(function () {
 			app.schemaCurrentView.render();
 		});
 	}
+*/
 
 	/**** data stuff ****/
 

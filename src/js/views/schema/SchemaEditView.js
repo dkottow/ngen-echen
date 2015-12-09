@@ -54,7 +54,10 @@ var app = app || {};
 				console.log('SchemaEditView Save as new');
 				this.model.set('name', newName);
 			}
-			this.model.save(function(err) { return me.renderResult(err); });
+			this.model.save(function(err) { 
+				app.setSchema(me.model.get('name'));
+				return me.renderResult(err); 
+			});
 		},
 
 		evRemoveClick: function() {	
