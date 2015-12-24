@@ -1087,38 +1087,6 @@ var app = app || {};
 (function ($) {
 	'use strict';
 
-	app.DownloadsView = Backbone.View.extend({
-		el:  '#content',
-
-		events: {
-			//'click #reset-all-filters': 'evResetAllFilters'
-		},
-
-		initialize: function() {
-			console.log("MenuView.init");
-			//this.listenTo(app.table, 'change', this.render);
-		},
-
-		template: _.template($('#downloads-template').html()),
-
-		render: function() {
-			console.log('DownloadsView.render ');			
-			this.$el.html(this.template());
-			return this;
-		},
-
-	});
-
-})(jQuery);
-
-
-
-/*global Backbone, jQuery, _ */
-var app = app || {};
-
-(function ($) {
-	'use strict';
-
 	app.SchemaCurrentView = Backbone.View.extend({
 		el:  '#schema-list',
 
