@@ -448,10 +448,12 @@ var app = app || {};
 			{ name : 'modified_by', type: 'VARCHAR', order: 2 },
 			{ name : 'modified_on', type: 'DATETIME', order: 3 }
 		];
-		return new app.Table({
+		var table = new app.Table({
 			name: name,
 			fields: fields
 		});
+		table.initRefs();
+		return table;
 	}
 
 })();
@@ -1085,6 +1087,38 @@ var app = app || {};
 (function ($) {
 	'use strict';
 
+	app.DownloadsView = Backbone.View.extend({
+		el:  '#content',
+
+		events: {
+			//'click #reset-all-filters': 'evResetAllFilters'
+		},
+
+		initialize: function() {
+			console.log("MenuView.init");
+			//this.listenTo(app.table, 'change', this.render);
+		},
+
+		template: _.template($('#downloads-template').html()),
+
+		render: function() {
+			console.log('DownloadsView.render ');			
+			this.$el.html(this.template());
+			return this;
+		},
+
+	});
+
+})(jQuery);
+
+
+
+/*global Backbone, jQuery, _ */
+var app = app || {};
+
+(function ($) {
+	'use strict';
+
 	app.SchemaCurrentView = Backbone.View.extend({
 		el:  '#schema-list',
 
@@ -1436,6 +1470,7 @@ var app = app || {};
 		},
 
 		evFilterOptionClick: function(ev) {
+			ev.stopPropagation();
 			//console.log(ev.target);
 			var opt = $(ev.target).attr('data-target');
 			var attr = '[data-target="' + opt + '"]';
@@ -1452,6 +1487,7 @@ var app = app || {};
 		},
 
 		evFilterSelectedClick: function(ev) {
+			ev.stopPropagation();
 			//console.log(ev.target);
 			$(ev.target).remove();
 			this.setFilter();
@@ -1723,7 +1759,7 @@ var app = app || {};
 		},
 
 		evFilterTabClick: function(ev) {
-			ev.preventDefault();
+			//ev.preventDefault();
 
 	//console.log('evFilterTab ' + ev.target);
 			if (/filterSelect$/.test(ev.target.href)) {
@@ -2286,7 +2322,10 @@ var app = app || {};
 				console.log('SchemaEditView Save as new');
 				this.model.set('name', newName);
 			}
-			this.model.save(function(err) { return me.renderResult(err); });
+			this.model.save(function(err) { 
+				app.setSchema(me.model.get('name'));
+				return me.renderResult(err); 
+			});
 		},
 
 		evRemoveClick: function() {	
@@ -4327,12 +4366,18 @@ var pegParser = module.exports;
         routes: {
             "data": "routeData",
             "schema": "routeSchema",
+            "downloads": "routeDownloads",
 			"table/:table": "routeGotoTable",
 			"table/:table/:filter": "routeGotoRows",
 			"reset-filter": "routeResetFilter",
 			"reload-table": "routeReloadTable",
 			"data/:schema/:table(/*params)": "routeUrlTableData",
 			"schema/:schema/:table": "routeUrlTableSchema"
+        },
+
+        routeDownloads: function() {
+			app.unsetSchema();
+            app.gotoModule("downloads");
         },
 
         routeData: function() {
@@ -4553,10 +4598,15 @@ $(function () {
 		$('#goto-options a[data-target="' + name + '"]')
 			.parent().addClass('active');
 
+		$("#menu").empty();
+		$("#content").empty();
+
 		if (name == 'schema') {
 			app.menuView = new app.MenuSchemaView();
 		} else if (name == 'data') {
 			app.menuView = new app.MenuDataView();
+		} else if (name == 'downloads') {
+			app.menuView = new app.DownloadsView();
 		}
 		app.menuView.render();
 
@@ -4566,6 +4616,7 @@ $(function () {
 		var m;
 		if (app.menuView instanceof app.MenuSchemaView) m = 'schema';
 		else if (app.menuView instanceof app.MenuDataView) m = 'data';
+		else if (app.menuView instanceof app.DownloadsView) m = 'downloads';
 		//console.log('module ' + m);
 		return m;		
 	}
@@ -4589,7 +4640,7 @@ $(function () {
 			app.tableView = new app.SchemaTableView({model: table});
 		}
 
-		$('#content').append(app.tableView.render().el);			
+		$('#content').html(app.tableView.render().el);			
 		app.menuView.render();			
 	}
 
@@ -4597,12 +4648,16 @@ $(function () {
 		if (app.table) app.setTable(app.table);
 	}
 
+	app.unsetTable = function() {
+		app.table = null;
+		if (app.tableView) app.tableView.remove();
+	}
+
 	/**** schema stuff ****/
 
 	app.unsetSchema = function() {
 		app.table = null;
 		app.schema = null;
-		if (app.gridView) app.gridView.remove();
 		if (app.tableView) app.tableView.remove();
 		if (app.tableListView) app.tableListView.remove();
 		
@@ -4610,9 +4665,11 @@ $(function () {
 	}
 
 	app.setSchema = function(name, cbAfter) {
+		console.log('app.setSchema ' + name);
 		var loadRequired = ! app.schema || app.schema.get('name') != name;
 
 		if (loadRequired) {
+			console.log('app.setSchema loadRequired');
 			app.unsetSchema();
 			app.schema = new app.Database({name : name, id : name});
 			app.schema.fetch(function() {
@@ -4631,6 +4688,7 @@ $(function () {
 		}
 	}
 
+/*
 	app.newSchema = function(name) {
 		app.unsetSchema();
 		app.schema = new app.Database({name : name});
@@ -4644,6 +4702,7 @@ $(function () {
 			app.schemaCurrentView.render();
 		});
 	}
+*/
 
 	/**** data stuff ****/
 

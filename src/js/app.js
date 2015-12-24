@@ -71,10 +71,15 @@ $(function () {
 		$('#goto-options a[data-target="' + name + '"]')
 			.parent().addClass('active');
 
+		$("#menu").empty();
+		$("#content").empty();
+
 		if (name == 'schema') {
 			app.menuView = new app.MenuSchemaView();
 		} else if (name == 'data') {
 			app.menuView = new app.MenuDataView();
+		} else if (name == 'downloads') {
+			app.menuView = new app.DownloadsView();
 		}
 		app.menuView.render();
 
@@ -84,6 +89,7 @@ $(function () {
 		var m;
 		if (app.menuView instanceof app.MenuSchemaView) m = 'schema';
 		else if (app.menuView instanceof app.MenuDataView) m = 'data';
+		else if (app.menuView instanceof app.DownloadsView) m = 'downloads';
 		//console.log('module ' + m);
 		return m;		
 	}
@@ -107,7 +113,7 @@ $(function () {
 			app.tableView = new app.SchemaTableView({model: table});
 		}
 
-		$('#content').append(app.tableView.render().el);			
+		$('#content').html(app.tableView.render().el);			
 		app.menuView.render();			
 	}
 
@@ -115,12 +121,16 @@ $(function () {
 		if (app.table) app.setTable(app.table);
 	}
 
+	app.unsetTable = function() {
+		app.table = null;
+		if (app.tableView) app.tableView.remove();
+	}
+
 	/**** schema stuff ****/
 
 	app.unsetSchema = function() {
 		app.table = null;
 		app.schema = null;
-		if (app.gridView) app.gridView.remove();
 		if (app.tableView) app.tableView.remove();
 		if (app.tableListView) app.tableListView.remove();
 		
@@ -128,9 +138,11 @@ $(function () {
 	}
 
 	app.setSchema = function(name, cbAfter) {
+		console.log('app.setSchema ' + name);
 		var loadRequired = ! app.schema || app.schema.get('name') != name;
 
 		if (loadRequired) {
+			console.log('app.setSchema loadRequired');
 			app.unsetSchema();
 			app.schema = new app.Database({name : name, id : name});
 			app.schema.fetch(function() {
@@ -149,6 +161,7 @@ $(function () {
 		}
 	}
 
+/*
 	app.newSchema = function(name) {
 		app.unsetSchema();
 		app.schema = new app.Database({name : name});
@@ -162,6 +175,7 @@ $(function () {
 			app.schemaCurrentView.render();
 		});
 	}
+*/
 
 	/**** data stuff ****/
 

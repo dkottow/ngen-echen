@@ -129,10 +129,12 @@ var app = app || {};
 			{ name : 'modified_by', type: 'VARCHAR', order: 2 },
 			{ name : 'modified_on', type: 'DATETIME', order: 3 }
 		];
-		return new app.Table({
+		var table = new app.Table({
 			name: name,
 			fields: fields
 		});
+		table.initRefs();
+		return table;
 	}
 
 })();

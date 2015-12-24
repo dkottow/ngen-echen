@@ -77,6 +77,7 @@ var app = app || {};
 		},
 
 		evFilterOptionClick: function(ev) {
+			ev.stopPropagation();
 			//console.log(ev.target);
 			var opt = $(ev.target).attr('data-target');
 			var attr = '[data-target="' + opt + '"]';
@@ -93,6 +94,7 @@ var app = app || {};
 		},
 
 		evFilterSelectedClick: function(ev) {
+			ev.stopPropagation();
 			//console.log(ev.target);
 			$(ev.target).remove();
 			this.setFilter();

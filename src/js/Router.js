@@ -10,12 +10,18 @@ var pegParser = module.exports;
         routes: {
             "data": "routeData",
             "schema": "routeSchema",
+            "downloads": "routeDownloads",
 			"table/:table": "routeGotoTable",
 			"table/:table/:filter": "routeGotoRows",
 			"reset-filter": "routeResetFilter",
 			"reload-table": "routeReloadTable",
 			"data/:schema/:table(/*params)": "routeUrlTableData",
 			"schema/:schema/:table": "routeUrlTableSchema"
+        },
+
+        routeDownloads: function() {
+			app.unsetSchema();
+            app.gotoModule("downloads");
         },
 
         routeData: function() {
