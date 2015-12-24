@@ -48,7 +48,7 @@ var app = app || {};
 		},
 
 		evFilterTabClick: function(ev) {
-			ev.preventDefault();
+			//ev.preventDefault();
 
 	//console.log('evFilterTab ' + ev.target);
 			if (/filterSelect$/.test(ev.target.href)) {
