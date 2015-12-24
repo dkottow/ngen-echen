@@ -7,6 +7,7 @@ validate length attribute of field
 enum fields
 null/not null fields
 labels for fields and tables
+add table ordering so that nav to children can be determined by 1st
 
 UI data 
 
