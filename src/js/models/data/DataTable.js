@@ -68,8 +68,8 @@ var STATS_EXT = '.stats';
 				});
 		},
 
-		getFullUrl: function() {
-			return decodeURI(this.lastAjaxUrl);
+		getAllRowsUrl: function() {
+			return decodeURI(this.lastFilterUrl);
 		},
 
 		ajaxGetRowsFn: function() {
@@ -109,7 +109,9 @@ var STATS_EXT = '.stats';
 
 				console.log(url);
 
-				me.lastAjaxUrl = url;
+				me.lastFilterUrl = REST_ROOT
+								 + me.get('url') + ROWS_EXT + '?'
+								 + filters.toParam();
 
 				$.ajax(url, {
 					cache: false

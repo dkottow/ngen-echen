@@ -24,7 +24,7 @@ var app = app || {};
 				el.append(this.template(filter.toStrings()));
 			}, this);			
 
-			$('#modalInputDataUrl').val(app.table.getFullUrl());
+			$('#modalInputDataUrl').val(app.table.getAllRowsUrl());
 			$('#modalShowFilters').on('shown.bs.modal', function() {
 				$('#modalInputDataUrl').select();
 			});

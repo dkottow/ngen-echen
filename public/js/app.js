@@ -528,8 +528,8 @@ var STATS_EXT = '.stats';
 				});
 		},
 
-		getFullUrl: function() {
-			return decodeURI(this.lastAjaxUrl);
+		getAllRowsUrl: function() {
+			return decodeURI(this.lastFilterUrl);
 		},
 
 		ajaxGetRowsFn: function() {
@@ -569,7 +569,9 @@ var STATS_EXT = '.stats';
 
 				console.log(url);
 
-				me.lastAjaxUrl = url;
+				me.lastFilterUrl = REST_ROOT
+								 + me.get('url') + ROWS_EXT + '?'
+								 + filters.toParam();
 
 				$.ajax(url, {
 					cache: false
@@ -1080,6 +1082,38 @@ var app = app || {};
 	}
 
 })();
+
+/*global Backbone, jQuery, _ */
+var app = app || {};
+
+(function ($) {
+	'use strict';
+
+	app.DownloadsView = Backbone.View.extend({
+		el:  '#content',
+
+		events: {
+			//'click #reset-all-filters': 'evResetAllFilters'
+		},
+
+		initialize: function() {
+			console.log("MenuView.init");
+			//this.listenTo(app.table, 'change', this.render);
+		},
+
+		template: _.template($('#downloads-template').html()),
+
+		render: function() {
+			console.log('DownloadsView.render ');			
+			this.$el.html(this.template());
+			return this;
+		},
+
+	});
+
+})(jQuery);
+
+
 
 /*global Backbone, jQuery, _ */
 var app = app || {};
@@ -1660,7 +1694,7 @@ var app = app || {};
 				el.append(this.template(filter.toStrings()));
 			}, this);			
 
-			$('#modalInputDataUrl').val(app.table.getFullUrl());
+			$('#modalInputDataUrl').val(app.table.getAllRowsUrl());
 			$('#modalShowFilters').on('shown.bs.modal', function() {
 				$('#modalInputDataUrl').select();
 			});
@@ -4494,7 +4528,7 @@ var pegParser = module.exports;
 })();
 
 /*global Backbone */
-var REST_ROOT = "http://api.donkeylift.com";  //set by gulp according to env var. e.g. "http://api.donkeylift.com";
+var REST_ROOT = "http://api.donkeylift.com";  //set by gulp according to env var DONKEYLIFT_API. e.g. "http://api.donkeylift.com";
 var app = app || {};
 
 $(function () {

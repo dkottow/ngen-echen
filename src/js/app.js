@@ -1,5 +1,5 @@
 /*global Backbone */
-var REST_ROOT = "$DONKEYLIFT_API";  //set by gulp according to env var. e.g. "http://api.donkeylift.com";
+var REST_ROOT = "$DONKEYLIFT_API";  //set by gulp according to env var DONKEYLIFT_API. e.g. "http://api.donkeylift.com";
 var app = app || {};
 
 $(function () {
