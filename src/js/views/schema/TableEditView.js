@@ -1,10 +1,9 @@
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.TableEditView = Backbone.View.extend({
+	Donkeylift.TableEditView = Backbone.View.extend({
 		el:  '#modalEditTable',
 
 		events: {
@@ -26,18 +25,18 @@ var app = app || {};
 		updateClick: function() {
 			var newName = $('#modalInputTableName').val();
 			this.model.set('name', newName);
-			if ( ! app.schema.get('tables').contains(this.model)) {
-				app.schema.get('tables').add(this.model);
-				app.setTable(this.model);
+			if ( ! Donkeylift.app.schema.get('tables').contains(this.model)) {
+				Donkeylift.app.schema.get('tables').add(this.model);
+				Donkeylift.app.setTable(this.model);
 			}
-			app.schema.update();
+			Donkeylift.app.schema.update();
 		},
 
 		removeClick: function() {	
 			if (this.model.collection) {
 				this.model.collection.remove(this.model);
-				app.tableView.remove();
-				app.schema.update();
+				Donkeylift.app.tableView.remove();
+				Donkeylift.app.schema.update();
 			}
 		}
 

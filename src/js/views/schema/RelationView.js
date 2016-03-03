@@ -1,10 +1,9 @@
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.RelationView = Backbone.View.extend({
+	Donkeylift.RelationView = Backbone.View.extend({
 
 		tagName: 'tr',
 
@@ -36,8 +35,8 @@ var app = app || {};
 		},
 
 		editRelationClick: function(ev) {				
-			app.relationEditView.model = this.model;
-			app.relationEditView.render();
+			Donkeylift.app.relationEditView.model = this.model;
+			Donkeylift.app.relationEditView.render();
 		},
 
 

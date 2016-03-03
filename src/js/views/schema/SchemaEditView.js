@@ -1,10 +1,9 @@
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.SchemaEditView = Backbone.View.extend({
+	Donkeylift.SchemaEditView = Backbone.View.extend({
 		el:  '#modalEditSchema',
 
 		events: {
@@ -41,7 +40,7 @@ var app = app || {};
 				$('#modalSchemaResultButton').removeClass('btn-danger');
 			}
 			$('#modalSchemaActionResult').show();
-			app.schemaCurrentView.render();
+			Donkeylift.app.schemaCurrentView.render();
 		},
 
 		evSaveClick: function() {
@@ -55,7 +54,7 @@ var app = app || {};
 				this.model.set('name', newName);
 			}
 			this.model.save(function(err) { 
-				app.setSchema(me.model.get('name'));
+				Donkeylift.app.setSchema(me.model.get('name'));
 				return me.renderResult(err); 
 			});
 		},

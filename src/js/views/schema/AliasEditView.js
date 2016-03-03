@@ -1,10 +1,9 @@
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.AliasEditView = Backbone.View.extend({
+	Donkeylift.AliasEditView = Backbone.View.extend({
 		el:  '#modalEditAlias',
 
 		events: {
@@ -31,7 +30,7 @@ var app = app || {};
 			el.html('');
 
 			var aliasTables = [ this.model ]
-					.concat(app.schema.get('tables').getAncestors(this.model));
+					.concat(Donkeylift.app.schema.get('tables').getAncestors(this.model));
 						
 			_.each(aliasTables, function(table) {
 				el.append('<optgroup label="' + table.get('name') + '">');
@@ -55,7 +54,7 @@ var app = app || {};
 		evUpdateClick: function() {
 			var newFieldQName = $('#modalInputAliasField').val();
 //console.log(this.model.get('row_alias'));
-			var alias = app.Alias.parse(
+			var alias = Donkeylift.Alias.parse(
 							newFieldQName.split('.')[0],
 							newFieldQName.split('.')[1]
 			);	

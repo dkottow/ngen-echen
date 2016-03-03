@@ -1,17 +1,16 @@
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.DataTableView = Backbone.View.extend({
+	Donkeylift.DataTableView = Backbone.View.extend({
 
 		id: 'grid-panel',
 		className: 'panel',
 
 		initialize: function() {
 			console.log("DataTableView.init " + this.model);			
-			this.listenTo(app.filters, 'update', this.renderFilterButtons);
+			this.listenTo(Donkeylift.app.filters, 'update', this.renderFilterButtons);
 		},
 
 		tableTemplate: _.template($('#grid-table-template').html()),
@@ -21,7 +20,7 @@ var app = app || {};
 			var columns = this.model.getColumns();
 			_.each(columns, function(c, idx) {
 				
-				var filter = app.filters.getFilter(
+				var filter = Donkeylift.app.filters.getFilter(
 						this.model, 
 						c.field.get('name')
 					);
@@ -76,7 +75,7 @@ var app = app || {};
 
 			this.renderFilterButtons();
 
-			var filter = app.filters.getFilter(this.model);			
+			var filter = Donkeylift.app.filters.getFilter(this.model);			
 			var initSearch = {};
 			if (filter) initSearch.search = filter.get('value');
 
@@ -111,34 +110,34 @@ var app = app || {};
 				var field = me.model.get('fields').getByName(colName);
 				var el = me.$('#col-' + colName + ' div.dropdown-menu');
 
-				var filter = new app.Filter({
+				var filter = new Donkeylift.Filter({
 					table: me.model,
 					field: field
 				});
 
-				app.setFilterView(filter, el);
+				Donkeylift.app.setFilterView(filter, el);
 			});
 
 
 			this.$('#grid').on( 'page.dt', function () {
 				console.log("page.dt");
-				app.router.navigate("reload-table", {trigger: false});			
+				Donkeylift.app.router.navigate("reload-table", {trigger: false});			
 			});
 
 			//using order.dt event won't work because its fired otherwise, too
 			this.$('th.sorting').click(function () {
 				console.log("order.dt");
-				app.router.navigate("reload-table", {trigger: false});			
+				Donkeylift.app.router.navigate("reload-table", {trigger: false});			
 			});
 
 			//using search.dt event won't work because its fired otherwise, too
 			this.$('input[type="search"]').blur(function () {
 				console.log("search.dt");
-				app.router.navigate("reload-table", {trigger: false});			
+				Donkeylift.app.router.navigate("reload-table", {trigger: false});			
 			});
 			this.$('input[type="search"]').focus(function () {
 				console.log("search.dt");
-				app.router.navigate("reload-table", {trigger: false});			
+				Donkeylift.app.router.navigate("reload-table", {trigger: false});			
 			});
 
 

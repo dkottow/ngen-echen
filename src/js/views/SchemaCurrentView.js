@@ -1,10 +1,9 @@
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.SchemaCurrentView = Backbone.View.extend({
+	Donkeylift.SchemaCurrentView = Backbone.View.extend({
 		el:  '#schema-list',
 
 		initialize: function() {
@@ -12,8 +11,9 @@ var app = app || {};
 
 		render: function() {
 			console.log('SchemaCurrentView.render ');			
-			if (app.schema) {
-				this.$('a:first span').html(' DB ' + app.schema.get('name'));
+			if (Donkeylift.app.schema) {
+				this.$('a:first span').html(' DB ' 
+					+ Donkeylift.app.schema.get('name'));
 			} else {
 				this.$('a:first span').html(' Choose DB ');
 			}		

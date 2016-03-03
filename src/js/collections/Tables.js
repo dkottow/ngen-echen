@@ -1,5 +1,4 @@
-/*global Backbone, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, _ */
 
 (function () {
 	'use strict';
@@ -7,9 +6,9 @@ var app = app || {};
 	// Tables Collection
 	// ---------------
 
-	app.Tables = Backbone.Collection.extend({
+	Donkeylift.Tables = Backbone.Collection.extend({
 		// Reference to this collection's model.
-		model: app.Table,
+		model: Donkeylift.Table,
 
 		initialize : function(tables) {
 			_.each(tables, function(table) {				

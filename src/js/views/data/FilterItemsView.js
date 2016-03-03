@@ -1,10 +1,9 @@
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.FilterItemsView = Backbone.View.extend({
+	Donkeylift.FilterItemsView = Backbone.View.extend({
 
 		events: {
 			'click #selectReset': 'evFilterItemsReset',
@@ -31,11 +30,11 @@ var app = app || {};
 			this.$('a[href=#filterSelect]').tab('show');
 
 			this.$('#filterSelection').empty();
-			var current = app.filters.getFilter(
+			var current = Donkeylift.app.filters.getFilter(
 							this.model.get('table'),
 							this.model.get('field'));
 
-			if (current && current.get('op') == app.Filter.OPS.IN) {
+			if (current && current.get('op') == Donkeylift.Filter.OPS.IN) {
 				//get values from filter
 				var selected = current.get('value');		
 //console.log(selected);
@@ -65,14 +64,14 @@ var app = app || {};
 					return $(this).attr('data-target');
 			}).get();
 
-			app.filters.setFilter({
+			Donkeylift.app.filters.setFilter({
 				table: this.model.get('table'),
 				field: this.model.get('field'),
-				op: app.Filter.OPS.IN,
+				op: Donkeylift.Filter.OPS.IN,
 				value: filterValues
 			});
 			
-			app.router.navigate("reload-table", {trigger: true});			
+			Donkeylift.app.router.navigate("reload-table", {trigger: true});			
 			//window.location.hash = "#reload-table";
 		},
 

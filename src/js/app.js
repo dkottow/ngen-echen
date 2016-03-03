@@ -1,36 +1,35 @@
 /*global Backbone */
 var DONKEYLIFT_API = "$DONKEYLIFT_API";  //set by gulp according to env var DONKEYLIFT_API. e.g. "http://api.donkeylift.com";
-var app = app || {};
 
 $(function () {
 	'use strict';
-
+	var app = {};
 	/**** init app - called at the end ***/
 	app.init = function() {
 
 		//fixed user named demo
 		app.user = 'demo';
 
-		app.schemas = new app.Schemas(null, {url: DONKEYLIFT_API + '/' + app.user});
+		app.schemas = new Donkeylift.Schemas(null, {url: DONKEYLIFT_API + '/' + app.user});
 
-		app.filters = new app.Filters();
+		app.filters = new Donkeylift.Filters();
 
-		app.schemaCurrentView = new app.SchemaCurrentView();
+		app.schemaCurrentView = new Donkeylift.SchemaCurrentView();
 
-		app.schemaEditView = new app.SchemaEditView();
-		app.tableEditView = new app.TableEditView();
-		app.fieldEditView = new app.FieldEditView();
-		app.relationEditView = new app.RelationEditView();
-		app.aliasEditView = new app.AliasEditView();
+		app.schemaEditView = new Donkeylift.SchemaEditView();
+		app.tableEditView = new Donkeylift.TableEditView();
+		app.fieldEditView = new Donkeylift.FieldEditView();
+		app.relationEditView = new Donkeylift.RelationEditView();
+		app.aliasEditView = new Donkeylift.AliasEditView();
 
-		app.filterShowView = new app.FilterShowView();
+		app.filterShowView = new Donkeylift.FilterShowView();
 
 		app.schemas.fetch({success: function() {
-			app.schemaListView = new app.SchemaListView({collection: app.schemas});
+			app.schemaListView = new Donkeylift.SchemaListView({collection: app.schemas});
 			$('#schema-list').append(app.schemaListView.render().el);
 		}});
 
-		app.router = new app.Router();
+		app.router = new Donkeylift.Router();
 		Backbone.history.start();
 
 		app.gotoModule('data');
@@ -75,11 +74,11 @@ $(function () {
 		$("#content").empty();
 
 		if (name == 'schema') {
-			app.menuView = new app.MenuSchemaView();
+			app.menuView = new Donkeylift.MenuSchemaView();
 		} else if (name == 'data') {
-			app.menuView = new app.MenuDataView();
+			app.menuView = new Donkeylift.MenuDataView();
 		} else if (name == 'downloads') {
-			app.menuView = new app.DownloadsView();
+			app.menuView = new Donkeylift.DownloadsView();
 		}
 		app.menuView.render();
 
@@ -87,9 +86,9 @@ $(function () {
 
 	app.module = function() {
 		var m;
-		if (app.menuView instanceof app.MenuSchemaView) m = 'schema';
-		else if (app.menuView instanceof app.MenuDataView) m = 'data';
-		else if (app.menuView instanceof app.DownloadsView) m = 'downloads';
+		if (app.menuView instanceof Donkeylift.MenuSchemaView) m = 'schema';
+		else if (app.menuView instanceof Donkeylift.MenuDataView) m = 'data';
+		else if (app.menuView instanceof Donkeylift.DownloadsView) m = 'downloads';
 		//console.log('module ' + m);
 		return m;		
 	}
@@ -104,13 +103,13 @@ $(function () {
 		if (app.tableView) app.tableView.remove();
 
 		if (app.module() == 'data') {
-			app.tableView = new app.DataTableView({
+			app.tableView = new Donkeylift.DataTableView({
 				model: table, 
 				attributes: { params: params }
 						
 			});
 		} else if (app.module() == 'schema') {
-			app.tableView = new app.SchemaTableView({model: table});
+			app.tableView = new Donkeylift.SchemaTableView({model: table});
 		}
 
 		$('#content').html(app.tableView.render().el);			
@@ -144,9 +143,9 @@ $(function () {
 		if (loadRequired) {
 			console.log('app.setSchema loadRequired');
 			app.unsetSchema();
-			app.schema = new app.Database({name : name, id : name});
+			app.schema = new Donkeylift.Database({name : name, id : name});
 			app.schema.fetch(function() {
-				app.tableListView = new app.TableListView({
+				app.tableListView = new Donkeylift.TableListView({
 					collection: app.schema.get('tables')
 				});
 				$('#sidebar').append(app.tableListView.render().el);
@@ -161,41 +160,27 @@ $(function () {
 		}
 	}
 
-/*
-	app.newSchema = function(name) {
-		app.unsetSchema();
-		app.schema = new app.Database({name : name});
-		app.schema.save(function() {
-			app.tableListView = new app.TableListView({
-				collection: app.schema.get('tables')
-			});
-			$('#sidebar').append(app.tableListView.render().el);
-
-			//render current schema label
-			app.schemaCurrentView.render();
-		});
-	}
-*/
-
 	/**** data stuff ****/
 
 	app.setFilters = function(filters) {
-		app.filters = new app.Filters(filters);
+		app.filters = new Donkeylift.Filters(filters);
 	}
 
 	app.unsetFilters = function() {
-		app.filters = new app.Filters();
+		app.filters = new Donkeylift.Filters();
 	}
 
 	app.setFilterView = function(filter, $parentElem) {
 		if (app.filterView) app.filterView.remove();
-		app.filterView = new app.FilterView({ model: filter });
+		app.filterView = new Donkeylift.FilterView({ model: filter });
 		$parentElem.append(app.filterView.el);
 		app.filterView.render();
 	}
 
+	//make app global
+	Donkeylift.app = app;
+
 	//start
 	app.init();
-
 });
 

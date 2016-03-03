@@ -1,5 +1,4 @@
-/*global Backbone */
-var app = app || {};
+/*global Backbone, Donkeylift */
 
 (function () {
 	'use strict';
@@ -7,13 +6,13 @@ var app = app || {};
 	// Tables Collection
 	// ---------------
 
-	app.Relations = Backbone.Collection.extend({
+	Donkeylift.Relations = Backbone.Collection.extend({
 		// Reference to this collection's model.
-		model: app.Relation,
+		model: Donkeylift.Relation,
 		
 		addNew: function(table) {
 			console.log('Relations addNew ' + table.get('name'));
-			var relation = new app.Relation.create(table);
+			var relation = new Donkeylift.Relation.create(table);
 			this.add(relation);
 			return relation;
 		}

@@ -1,11 +1,10 @@
-/*global Backbone, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, _ */
 var pegParser = module.exports;
 
 (function () {
 	'use strict';
 
-	app.Router = Backbone.Router.extend({
+	Donkeylift.Router = Backbone.Router.extend({
 
         routes: {
             "data": "routeData",
@@ -20,18 +19,18 @@ var pegParser = module.exports;
         },
 
         routeDownloads: function() {
-			app.unsetSchema();
-            app.gotoModule("downloads");
+			Donkeylift.app.unsetSchema();
+            Donkeylift.app.gotoModule("downloads");
         },
 
         routeData: function() {
-            app.gotoModule("data");
-			app.resetTable();
+            Donkeylift.app.gotoModule("data");
+			Donkeylift.app.resetTable();
         },
 
         routeSchema: function() {
-            app.gotoModule("schema");
-			app.resetTable();
+            Donkeylift.app.gotoModule("schema");
+			Donkeylift.app.resetTable();
         },
 
 		routeUrlTableData: function(schemaName, tableName, paramStr) {
@@ -74,10 +73,10 @@ var pegParser = module.exports;
 			}
 
 			console.log("routeGotoRow " + tableName + " " + filter);
-			app.filters.setFilter({
+			Donkeylift.app.filters.setFilter({
 				table: filterTable,
 				field: 'id',
-				op: app.Filter.OPS.EQUAL,
+				op: Donkeylift.Filter.OPS.EQUAL,
 				value: kv[1]
 			});
 			
@@ -85,12 +84,12 @@ var pegParser = module.exports;
 		},
 
 		routeResetFilter: function() {
-			app.unsetFilters();
-			app.resetTable();
+			Donkeylift.app.unsetFilters();
+			Donkeylift.app.resetTable();
 		},
 
 		routeReloadTable: function() {
-			app.table.reload();
+			Donkeylift.app.table.reload();
 		},
 
 		parseParams: function(paramStr) {
@@ -133,28 +132,28 @@ var pegParser = module.exports;
 
 			var setOthers = function() {
 
-				var table = app.schema.get('tables').find(function(t) { 
+				var table = Donkeylift.app.schema.get('tables').find(function(t) { 
 					return t.get('name') == tableName; 
 				});			
 
 				if (options.params) {
 					//set filters
 					var filters = _.map(options.params.$filter, function(f) {
-						return new app.Filter(f);
+						return new Donkeylift.Filter(f);
 					});
-					app.setFilters(filters);
+					Donkeylift.app.setFilters(filters);
 				}
 				
 				//load data			
-				app.setTable(table, options.params);
+				Donkeylift.app.setTable(table, options.params);
 			}
 
 			if (options.module) {
-				app.gotoModule(options.module);
+				Donkeylift.app.gotoModule(options.module);
 			}
 
 			if (options.schema) {
-				app.setSchema(options.schema, setOthers);
+				Donkeylift.app.setSchema(options.schema, setOthers);
 
 			} else {
 				setOthers();

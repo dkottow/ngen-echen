@@ -1,10 +1,9 @@
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.FieldView = Backbone.View.extend({
+	Donkeylift.FieldView = Backbone.View.extend({
 
 		tagName: 'tr',
 
@@ -26,8 +25,8 @@ var app = app || {};
 		},
 
 		editFieldClick: function(ev) {				
-			app.fieldEditView.model = this.model;
-			app.fieldEditView.render();
+			Donkeylift.app.fieldEditView.model = this.model;
+			Donkeylift.app.fieldEditView.render();
 		},
 
 

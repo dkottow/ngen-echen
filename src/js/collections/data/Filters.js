@@ -1,5 +1,4 @@
-/*global Backbone */
-var app = app || {};
+/*global Donkeylift, Backbone */
 
 (function () {
 	'use strict';
@@ -7,12 +6,12 @@ var app = app || {};
 	// Tables Collection
 	// ---------------
 
-	app.Filters = Backbone.Collection.extend({
+	Donkeylift.Filters = Backbone.Collection.extend({
 		// Reference to this collection's model.
-		model: app.Filter,
+		model: Donkeylift.Filter,
 		
 		toParam: function() {
-			return app.Filters.toParam(this.models);	
+			return Donkeylift.Filters.toParam(this.models);	
 		},
 
 		//used by Datable.stats & Datatable.options to get context:
@@ -25,7 +24,7 @@ var app = app || {};
 				if (f.id == exFilter.id) return false;
 
 				//exclude existing search on same table
-				if (f.get('op') == app.Filter.OPS.SEARCH 
+				if (f.get('op') == Donkeylift.Filter.OPS.SEARCH 
 				 && f.get('table') == exFilter.get('table')) {
 					return false;
 				}
@@ -35,10 +34,10 @@ var app = app || {};
 			
 			//add search term
 			if (searchTerm && searchTerm.length > 0) {
-				var searchFilter = new app.Filter({
+				var searchFilter = new Donkeylift.Filter({
 						table: exFilter.get('table'),
 						field: exFilter.get('field'),
-						op: app.Filter.OPS.SEARCH,
+						op: Donkeylift.Filter.OPS.SEARCH,
 						value: searchTerm
 				});
 				filters.push(searchFilter);
@@ -48,7 +47,7 @@ var app = app || {};
 		},
 
 		setFilter: function(attrs) {
-			var filter = new app.Filter(attrs);		
+			var filter = new Donkeylift.Filter(attrs);		
 			var current = this.get(filter.id);
 			if (current) this.remove(current);
 			if (attrs.value.length > 0) {
@@ -57,7 +56,7 @@ var app = app || {};
 		},
 
 		getFilter: function(table, field) {
-			return this.get(app.Filter.Key(table, field));
+			return this.get(Donkeylift.Filter.Key(table, field));
 		},
 
 		clearFilter: function(table, field) {
@@ -67,12 +66,12 @@ var app = app || {};
 
 	});
 
-	app.Filters.toParam = function(filters) {
+	Donkeylift.Filters.toParam = function(filters) {
 		var result = '';
 		if (filters.length > 0) {
 			var params = _.reduce(filters, function(memo, f) {
 				return memo.length == 0 ? f.toParam() 
-					: memo + app.Filter.CONJUNCTION + f.toParam();
+					: memo + Donkeylift.Filter.CONJUNCTION + f.toParam();
 			}, '');				
 			result = '$filter=' + encodeURIComponent(params);
 		}

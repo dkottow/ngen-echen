@@ -1,10 +1,9 @@
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.FilterView = Backbone.View.extend({
+	Donkeylift.FilterView = Backbone.View.extend({
 
 		events: {
 			'click .filter-column': 'evFilterColumnClick',
@@ -13,11 +12,11 @@ var app = app || {};
 
 		initialize: function () {
 			console.log("FilterView.init " + this.model.get('table'));
-			this.rangeView = new app.FilterRangeView({
+			this.rangeView = new Donkeylift.FilterRangeView({
 										model: this.model,
 										el: this.el
 			});
-			this.itemsView = new app.FilterItemsView({
+			this.itemsView = new Donkeylift.FilterItemsView({
 										model: this.model,
 										el: this.el
 			});
@@ -33,7 +32,7 @@ var app = app || {};
 				name: field.get('name'),
 			}));
 
-			if (field.get('type') == app.Field.TYPES.VARCHAR
+			if (field.get('type') == Donkeylift.Field.TYPES.VARCHAR
 			 || field.get('fk') == 1) {
 				this.itemsView.loadRender();
 			} else {

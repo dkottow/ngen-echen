@@ -1,24 +1,23 @@
-/*global Backbone */
-var app = app || {};
+/*global Donkeylift, Backbone */
 
 (function () {
 	'use strict';
-	app.Relation = Backbone.Model.extend({ 
+	Donkeylift.Relation = Backbone.Model.extend({ 
 		initialize: function(relation) {
-			this.set('type', app.Relation.Type(relation));
+			this.set('type', Donkeylift.Relation.Type(relation));
 		}
 
 	});
 
-	app.Relation.create = function(table) {
-		return new app.Relation({
+	Donkeylift.Relation.create = function(table) {
+		return new Donkeylift.Relation({
 			table: table,
 			related: null, 
 			field: null, 
 		});	
 	}
 
-	app.Relation.Type = function(relation) {
+	Donkeylift.Relation.Type = function(relation) {
   		if (relation.field && relation.field.name == 'id') return 'one-to-one';
 		else return 'many-to-one';
 	}

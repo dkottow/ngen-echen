@@ -1,10 +1,9 @@
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.SchemaListView = Backbone.View.extend({
+	Donkeylift.SchemaListView = Backbone.View.extend({
 		//el:  '#schema-select',
 
 		tagName: 'ul',
@@ -35,13 +34,7 @@ var app = app || {};
 		evSchemaClick: function(ev) {
 			var name = $(ev.target).attr('data-target');
 			console.log('SchemaListView.evSchemaClick ' + name);
-			app.setSchema(name);
-/*
-			var schema = this.collection.find(function(c) { 
-				return c.get('name') == name; 
-			});
-			app.setSchema(schema);
-*/			
+			Donkeylift.app.setSchema(name);
 		}
 
 	});

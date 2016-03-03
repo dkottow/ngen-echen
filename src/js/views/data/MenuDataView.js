@@ -1,10 +1,9 @@
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.MenuDataView = Backbone.View.extend({
+	Donkeylift.MenuDataView = Backbone.View.extend({
 		el:  '#menu',
 
 		events: {
@@ -14,26 +13,26 @@ var app = app || {};
 
 		initialize: function() {
 			console.log("MenuView.init");
-			//this.listenTo(app.table, 'change', this.render);
+			//this.listenTo(Donkeylift.app.table, 'change', this.render);
 		},
 
 		template: _.template($('#data-menu-template').html()),
 
 		render: function() {
 			console.log('MenuDataView.render ');			
-			if (! app.table) this.$el.empty();
+			if (! Donkeylift.app.table) this.$el.empty();
 			else this.$el.html(this.template());
 			return this;
 		},
 
 		evResetAllFilters: function() {
-			app.unsetFilters();
-			app.resetTable();
+			Donkeylift.app.unsetFilters();
+			Donkeylift.app.resetTable();
 		},
 
 		evShowFilters: function() {
-			app.filterShowView.collection = app.filters;
-			app.filterShowView.render();
+			Donkeylift.app.filterShowView.collection = Donkeylift.app.filters;
+			Donkeylift.app.filterShowView.render();
 		},
 
 	});

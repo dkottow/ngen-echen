@@ -1,10 +1,9 @@
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.SchemaTableView = Backbone.View.extend({
+	Donkeylift.SchemaTableView = Backbone.View.extend({
 
 		//el:  '#content',
 
@@ -48,7 +47,7 @@ var app = app || {};
 			this.setFields();
 			this.setRelations();
 
-			this.aliasView = new app.AliasView({
+			this.aliasView = new Donkeylift.AliasView({
 				el: this.$('#alias'),
 				model: this.model,
 			});
@@ -66,16 +65,16 @@ var app = app || {};
 		},
 
 		evEditTableClick: function(ev) {				
-			app.tableEditView.model = this.model;
-			app.tableEditView.render();
+			Donkeylift.app.tableEditView.model = this.model;
+			Donkeylift.app.tableEditView.render();
 		},
 
 		evNewFieldClick: function() {
 			console.log('TableView.evNewFieldClick');
-			var field = app.Field.create();
+			var field = Donkeylift.Field.create();
 			//var field = this.model.get('fields').addNew();
-			app.fieldEditView.model = field;
-			app.fieldEditView.render();
+			Donkeylift.app.fieldEditView.model = field;
+			Donkeylift.app.fieldEditView.render();
 		},
 
 		removeField: function(field) {
@@ -85,7 +84,7 @@ var app = app || {};
 
 		addField: function(field) {
 			console.log('TableView.addField ' + field.get("name"));
-			var view = new app.FieldView({model: field});
+			var view = new Donkeylift.FieldView({model: field});
 			this.elFields().append(view.render().el);
 			this.fieldViews[field.cid] = view;
 		},
@@ -104,10 +103,10 @@ var app = app || {};
 
 		evNewRelationClick: function() {
 			console.log('TableView.evNewRelationClick');
-			var relation = app.Relation.create(this.model);
+			var relation = Donkeylift.Relation.create(this.model);
 			//console.log(relation.attributes);
-			app.relationEditView.model = relation;
-			app.relationEditView.render();
+			Donkeylift.app.relationEditView.model = relation;
+			Donkeylift.app.relationEditView.render();
 		},
 
 		removeRelation: function(relation) {
@@ -117,7 +116,7 @@ var app = app || {};
 
 		addRelation: function(relation) {
 			console.log('SchemaView.addRelation ' + relation.cid);
-			var view = new app.RelationView({model: relation});
+			var view = new Donkeylift.RelationView({model: relation});
 			this.elRelations().append(view.render().el);
 			this.relationViews[relation.cid] = view;
 		},
@@ -130,8 +129,8 @@ var app = app || {};
 
 		evNewAliasClick: function() {
 			console.log('TableView.evNewAliasClick');
-			app.aliasEditView.setModel(this.model, null);
-			app.aliasEditView.render();
+			Donkeylift.app.aliasEditView.setModel(this.model, null);
+			Donkeylift.app.aliasEditView.render();
 		}
 
 

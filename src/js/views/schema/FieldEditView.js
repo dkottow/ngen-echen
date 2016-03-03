@@ -1,10 +1,9 @@
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.FieldEditView = Backbone.View.extend({
+	Donkeylift.FieldEditView = Backbone.View.extend({
 		el:  '#modalEditField',
 
 		events: {
@@ -29,18 +28,18 @@ var app = app || {};
 			this.model.set('name', $('#modalInputFieldName').val());
 			this.model.set('type', $('#modalInputFieldType').val());
 			this.model.set('length', $('#modalInputFieldLength').val());
-			if ( ! app.table.get('fields').contains(this.model)) {
-				this.model.set('order', app.table.get('fields').length + 1);
-				app.table.get('fields').add(this.model);
+			if ( ! Donkeylift.app.table.get('fields').contains(this.model)) {
+				this.model.set('order', Donkeylift.app.table.get('fields').length + 1);
+				Donkeylift.app.table.get('fields').add(this.model);
 			}
-			app.schema.update();
+			Donkeylift.app.schema.update();
 		},
 
 		removeClick: function() {	
 			console.log("FieldEditView.removeClick " + this.model.collection);
 			if (this.model.collection) {
 				this.model.collection.remove(this.model);
-				app.schema.update();
+				Donkeylift.app.schema.update();
 			}
 		}
 

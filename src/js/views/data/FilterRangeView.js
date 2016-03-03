@@ -1,10 +1,9 @@
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.FilterRangeView = Backbone.View.extend({
+	Donkeylift.FilterRangeView = Backbone.View.extend({
 
 		events: {
 			//range filter evs
@@ -19,8 +18,8 @@ var app = app || {};
 
 		canSlide: function() {
 			var field = this.model.get('field');
-			var slideTypes = [app.Field.TYPES.INTEGER,
-								app.Field.TYPES.NUMERIC];
+			var slideTypes = [Donkeylift.Field.TYPES.INTEGER,
+								Donkeylift.Field.TYPES.NUMERIC];
 			return ( ! field.get('fk')) &&
 					_.contains(slideTypes, field.get('type'));
 		},
@@ -37,11 +36,11 @@ var app = app || {};
 
 			var stats = this.model.get('field').get('stats');
 
-			var current = app.filters.getFilter(
+			var current = Donkeylift.app.filters.getFilter(
 							this.model.get('table'),
 							this.model.get('field'));
 
-			if (current && current.get('op') == app.Filter.OPS.BETWEEN) {
+			if (current && current.get('op') == Donkeylift.Filter.OPS.BETWEEN) {
 				this.$("#inputFilterMin").val(current.get('value')[0]);
 				this.$("#inputFilterMax").val(current.get('value')[1]);
 			} else {
@@ -77,13 +76,13 @@ var app = app || {};
 				});
 			}
 			if (this.model.get('field').get('type') 
-				== app.Field.TYPES['DATE']) {
+				== Donkeylift.Field.TYPES['DATE']) {
 
-				var opts = { minDate: app.Field.toDate(stats.min), 
-							 maxDate: app.Field.toDate(stats.max),
+				var opts = { minDate: Donkeylift.Field.toDate(stats.min), 
+							 maxDate: Donkeylift.Field.toDate(stats.max),
 							dateFormat: 'yy-mm-dd' };
-				var minVal = app.Field.toDate($("#inputFilterMin").val());
-				var maxVal = app.Field.toDate($("#inputFilterMax").val());
+				var minVal = Donkeylift.Field.toDate($("#inputFilterMin").val());
+				var maxVal = Donkeylift.Field.toDate($("#inputFilterMax").val());
 				$("#inputFilterMin").datepicker(opts);
 				$("#inputFilterMin").datepicker("setDate", minVal);
 				$("#inputFilterMax").datepicker(opts);
@@ -124,26 +123,26 @@ var app = app || {};
 								this.$("#inputFilterMax").val()];
 
 			if (filterValues[0] != stats.min || filterValues[1] != stats.max) {
-				app.filters.setFilter({
+				Donkeylift.app.filters.setFilter({
 					table: this.model.get('table'),
 					field: this.model.get('field'),
-					op: app.Filter.OPS.BETWEEN,
+					op: Donkeylift.Filter.OPS.BETWEEN,
 					value: filterValues
 				});
 			} else {
-				app.filters.clearFilter(this.model.get('table'), 
+				Donkeylift.app.filters.clearFilter(this.model.get('table'), 
 										this.model.get('field'));
 			}
 
-			app.router.navigate("reload-table", {trigger: true});			
+			Donkeylift.app.router.navigate("reload-table", {trigger: true});			
 			//window.location.hash = "#reload-table";
 		},
 
 		evFilterRangeResetClick: function() {
-			app.filters.clearFilter(this.model.get('table'), 
+			Donkeylift.app.filters.clearFilter(this.model.get('table'), 
 									this.model.get('field'));
 
-			app.router.navigate("reload-table", {trigger: true});			
+			Donkeylift.app.router.navigate("reload-table", {trigger: true});			
 			//window.location.hash = "#reload-table";
 			this.render();
 		},

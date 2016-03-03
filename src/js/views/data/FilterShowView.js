@@ -1,10 +1,9 @@
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.FilterShowView = Backbone.View.extend({
+	Donkeylift.FilterShowView = Backbone.View.extend({
 		el:  '#modalShowFilters',
 
 		events: {
@@ -24,7 +23,7 @@ var app = app || {};
 				el.append(this.template(filter.toStrings()));
 			}, this);			
 
-			$('#modalInputDataUrl').val(app.table.getAllRowsUrl());
+			$('#modalInputDataUrl').val(Donkeylift.app.table.getAllRowsUrl());
 			$('#modalShowFilters').on('shown.bs.modal', function() {
 				$('#modalInputDataUrl').select();
 			});

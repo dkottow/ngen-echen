@@ -1,5 +1,4 @@
-/*global Backbone */
-var app = app || {};
+/*global Backbone, Donkeylift */
 
 (function () {
 	'use strict';
@@ -7,16 +6,16 @@ var app = app || {};
 	// Tables Collection
 	// ---------------
 
-	app.Fields = Backbone.Collection.extend({
+	Donkeylift.Fields = Backbone.Collection.extend({
 		// Reference to this collection's model.
-		model: app.Field,
+		model: Donkeylift.Field,
 		
 		initialize: function(attrs) {
 			//this.on('change', function(ev) { console.log('Fields.ev ' + ev); });
 		},
 
 		addNew: function() {
-			var field = app.Field.create('field' + this.length);
+			var field = Donkeylift.Field.create('field' + this.length);
 			field.set('order', this.length);
 			this.add(field);
 			return field;

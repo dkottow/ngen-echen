@@ -1,10 +1,9 @@
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.TableListView = Backbone.View.extend({
+	Donkeylift.TableListView = Backbone.View.extend({
 
 		
 		id: "table-list",

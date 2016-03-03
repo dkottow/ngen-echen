@@ -56,7 +56,8 @@ gulp.task('build-app-css', function() {
 });
 
 gulp.task('build-app-js', function() {
-	return gulp.src(["./src/js/models/**/*.js",
+	return gulp.src(["./src/js/init.js",
+					 "./src/js/models/**/*.js",
 					 "./src/js/collections/**/*.js",
 					 "./src/js/views/**/*.js",
 					 "./src/js/QueryParser.js",

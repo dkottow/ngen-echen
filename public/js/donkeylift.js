@@ -1,10 +1,11 @@
-/*global Backbone */
-var app = app || {};
+var Donkeylift = {};
+
+/*global Backbone, Donkeylift */
 
 (function () {
 	'use strict';
 	//console.log("Table class def");
-	app.Alias = Backbone.Model.extend({ 
+	Donkeylift.Alias = Backbone.Model.extend({ 
 		
 		initialize: function(attrs) {
 		},
@@ -16,26 +17,25 @@ var app = app || {};
 
 	});
 
-	app.Alias.parse = function(tableName, fieldName) {
+	Donkeylift.Alias.parse = function(tableName, fieldName) {
 console.log('Alias.parse ' + tableName + '.' + fieldName);
-		var table = app.schema.get('tables').getByName(tableName);
+		var table = Donkeylift.app.schema.get('tables').getByName(tableName);
 		var field = table.get('fields').getByName(fieldName);
-		return new app.Alias({table: table, field: field});
+		return new Donkeylift.Alias({table: table, field: field});
 	}
 
 })();
 
-/*global Backbone, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, _ */
 
 (function () {
 	'use strict';
 	//console.log("Field class def");
-	app.Field = Backbone.Model.extend({ 
+	Donkeylift.Field = Backbone.Model.extend({ 
 		initialize: function(field) {
 			var rxp = /(\w+)(\([0-9,]+\))?/
 			var match = field.type.match(rxp)
-			this.set('type', app.Field.TypeAlias(match[1]));
+			this.set('type', Donkeylift.Field.TypeAlias(match[1]));
 			var spec;
 			if (match[2]) spec = match[2].substr(1, match[2].length - 2);
 			this.set('length', spec);
@@ -52,7 +52,7 @@ var app = app || {};
 		},		
 
 		toJSON: function() {
-			var type = app.Field.ALIAS[this.get('type')];
+			var type = Donkeylift.Field.ALIAS[this.get('type')];
 			if (this.get('length')) {
 				type += '(' + this.get('length') + ')';
 			}
@@ -70,14 +70,14 @@ var app = app || {};
 				return val;
 			}
 			var t = this.get('type');
-			if (t == app.Field.TYPES.INTEGER) {
+			if (t == Donkeylift.Field.TYPES.INTEGER) {
 				return parseInt(val);
-			} else if(t == app.Field.TYPES.NUMERIC) {
+			} else if(t == Donkeylift.Field.TYPES.NUMERIC) {
 				return parseFloat(val);
-			} else if(t == app.Field.TYPES.DATE) {
+			} else if(t == Donkeylift.Field.TYPES.DATE) {
 				//return new Date(val); 
 				return new Date(val).toISOString().substr(0,10);
-			} else if (t == app.Field.TYPES.DATETIME) {
+			} else if (t == Donkeylift.Field.TYPES.DATETIME) {
 				//return new Date(val);
 				return new Date(val).toISOString();
 			} else {
@@ -91,7 +91,8 @@ var app = app || {};
 				return "'" + val + "'";
 			}
 			var t = this.get('type');
-			if (t == app.Field.TYPES.INTEGER || t == app.Field.TYPES.NUMERIC) {
+			if (t == Donkeylift.Field.TYPES.INTEGER
+				|| t == Donkeylift.Field.TYPES.NUMERIC) {
 				return val;
 			} else {
 				return "'" + val + "'";
@@ -100,15 +101,15 @@ var app = app || {};
 
 	});
 
-	app.Field.create = function(name) {
-		return new app.Field({
+	Donkeylift.Field.create = function(name) {
+		return new Donkeylift.Field({
 			name: name,
 			type: 'VARCHAR'
 		});
 	}
 
 
-	app.Field.TYPES = {
+	Donkeylift.Field.TYPES = {
 		'INTEGER': 'Integer',
 		'NUMERIC': 'Decimal',
 		'VARCHAR': 'Text',
@@ -116,19 +117,19 @@ var app = app || {};
 		'DATETIME': 'Timestamp'
 	}
 
-	app.Field.ALIAS = _.invert(app.Field.TYPES);
+	Donkeylift.Field.ALIAS = _.invert(Donkeylift.Field.TYPES);
 
-	app.Field.TypeAlias = function(type) {
-		return app.Field.TYPES[type]; 		
+	Donkeylift.Field.TypeAlias = function(type) {
+		return Donkeylift.Field.TYPES[type]; 		
 	}
 
-	app.Field.toDate = function(dateISOString) {
+	Donkeylift.Field.toDate = function(dateISOString) {
 		return new Date(dateISOString.split('-')[0], 
 						dateISOString.split('-')[1] - 1,
 						dateISOString.split('-')[2]);
 	}
 
-	app.Field.getIdFromRef = function(val) {
+	Donkeylift.Field.getIdFromRef = function(val) {
 		if (_.isNumber(val)) return val;
 		//extract fk from ref such as 'Book (12)'
 		var m = val.match(/^(.*)\(([0-9]+)\)$/);
@@ -139,44 +140,42 @@ var app = app || {};
 
 })();
 
-/*global Backbone */
-var app = app || {};
+/*global Donkeylift, Backbone */
 
 (function () {
 	'use strict';
-	app.Relation = Backbone.Model.extend({ 
+	Donkeylift.Relation = Backbone.Model.extend({ 
 		initialize: function(relation) {
-			this.set('type', app.Relation.Type(relation));
+			this.set('type', Donkeylift.Relation.Type(relation));
 		}
 
 	});
 
-	app.Relation.create = function(table) {
-		return new app.Relation({
+	Donkeylift.Relation.create = function(table) {
+		return new Donkeylift.Relation({
 			table: table,
 			related: null, 
 			field: null, 
 		});	
 	}
 
-	app.Relation.Type = function(relation) {
+	Donkeylift.Relation.Type = function(relation) {
   		if (relation.field && relation.field.name == 'id') return 'one-to-one';
 		else return 'many-to-one';
 	}
 })();
 
-/*global Backbone */
-var app = app || {};
+/*global Donkeylift, Backbone */
 
 (function () {
 	'use strict';
 	console.log("Schema class def");
-	app.Schema = Backbone.Model.extend({
+	Donkeylift.Schema = Backbone.Model.extend({
 
 		initialize: function(attrs) {
 			console.log("Schema.initialize " + attrs.name);
 
-			if ( ! attrs.table) this.set('tables', new app.Tables());
+			if ( ! attrs.table) this.set('tables', new Donkeylift.Tables());
 
 			//this.set('id', attrs.name); //unset me when new
 			//this.orgJSON = this.toJSON();
@@ -199,14 +198,14 @@ var app = app || {};
 		parse : function(response) {
 			console.log("Schema.parse " + response);
 			var tables = _.map(response.tables, function(table) {
-				return new app.Table(table);
+				return new Donkeylift.Table(table);
 			});
-			response.tables = new app.Tables(tables);
+			response.tables = new Donkeylift.Tables(tables);
 			return response;
 		},
 
 		url : function() {
-			return app.schemas.url() + '/' + this.get('name');
+			return Donkeylift.app.schemas.url() + '/' + this.get('name');
 		},
 
 		fetch : function(cbAfter) {
@@ -258,16 +257,16 @@ return;
 			} else {
 				this.unset('id'); 
 				saveOptions.parse = false;
-				saveOptions.url = app.schemas.url();
+				saveOptions.url = Donkeylift.app.schemas.url();
 				console.log("Schema.save " + saveOptions.url);
 				saveOptions.success = function(model) {
 					console.log("Schema.save new OK");
 					//set id to (new) name
 					model.set('id', model.get('name'));
-					app.schema = model;
+					Donkeylift.app.schema = model;
 
 					//reload schema list
-					app.schemas.fetch({
+					Donkeylift.app.schemas.fetch({
 						reset: true,
 						success: function() {
 							cbResult();
@@ -286,8 +285,8 @@ return;
 		destroy: function(cbResult) {
 			var destroyOptions = {
 				success: function() {			
-					app.unsetSchema();
-					app.schemas.fetch({
+					Donkeylift.app.unsetSchema();
+					Donkeylift.app.schemas.fetch({
 						reset: true,
 						success: function() {
 							cbResult();
@@ -317,21 +316,20 @@ return;
 
 })();
 
-/*global Backbone, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, _ */
 
 (function () {
 	'use strict';
 	//console.log("Table class def");
-	app.Table = Backbone.Model.extend({ 
+	Donkeylift.Table = Backbone.Model.extend({ 
 		
 		initialize: function(attrs) {
 			console.log("Table.initialize " + attrs.name);
 			var fields = _.map( _.sortBy(attrs.fields, 'order'), 
 						function(field) {
-				return new app.Field(field);
+				return new Donkeylift.Field(field);
 			});			
-			this.set('fields', new app.Fields(fields));
+			this.set('fields', new Donkeylift.Fields(fields));
 			//relations and row_alias are set in initRefs
 		},
 
@@ -356,14 +354,14 @@ var app = app || {};
 					function(field) {
 						return field.get('fk_table') == parent_name;
 				});
-				var relation = new app.Relation({
+				var relation = new Donkeylift.Relation({
 					table: this,
 					related: pt,
 					field: fk
 				});
 				relations.push(relation);
 			}, this);
-			this.set('relations', new app.Relations(relations), {silent: true});
+			this.set('relations', new Donkeylift.Relations(relations), {silent: true});
 		},
 
 		initAlias : function(tables) {
@@ -389,7 +387,7 @@ var app = app || {};
 					function(f) {
 						return f.get('name') == field_name;
 				});
-				row_alias.push(new app.Alias({
+				row_alias.push(new Donkeylift.Alias({
 							table : alias_table,
 							field : alias_field
 				}));
@@ -405,7 +403,7 @@ var app = app || {};
 		},
 
 		createView: function(options) {
-			return new app.TableView(options);
+			return new Donkeylift.TableView(options);
 		},
 
 		attrJSON: function() {
@@ -442,13 +440,13 @@ var app = app || {};
 
 	});
 
-	app.Table.create = function(name) {
+	Donkeylift.Table.create = function(name) {
 		var fields = [ 
 			{ name: 'id', type: 'INTEGER', order: 1 },
 			{ name : 'modified_by', type: 'VARCHAR', order: 2 },
 			{ name : 'modified_on', type: 'DATETIME', order: 3 }
 		];
-		var table = new app.Table({
+		var table = new Donkeylift.Table({
 			name: name,
 			fields: fields
 		});
@@ -458,8 +456,7 @@ var app = app || {};
 
 })();
 
-/*global Backbone */
-var app = app || {};
+/*global Donkeylift, Backbone */
 
 var ROWS_EXT = '.rows';
 var STATS_EXT = '.stats';
@@ -467,10 +464,10 @@ var STATS_EXT = '.stats';
 (function () {
 	'use strict';
 	//console.log("Table class def");
-	app.DataTable = app.Table.extend({ 
+	Donkeylift.DataTable = Donkeylift.Table.extend({ 
 
 		createView: function(options) {
-			return new app.DataTableView(options);
+			return new Donkeylift.DataTableView(options);
 		},
 
 		getColumns: function() {
@@ -505,7 +502,7 @@ var STATS_EXT = '.stats';
 						anchorFn = function(ref) {
 							var href = '#table' 
 								+ '/' + field.get('fk_table')
-								+ '/id=' + app.Field.getIdFromRef(ref)
+								+ '/id=' + Donkeylift.Field.getIdFromRef(ref)
 
 							return '<a href="' + href + '">' + abbrFn(ref) + '</a>';
 						}
@@ -535,7 +532,7 @@ var STATS_EXT = '.stats';
 		ajaxGetRowsFn: function() {
 			var me = this;
 			return function(data, callback, settings) {
-				console.log('request to REST');
+				console.log('request to api');
 				var orderField = me.get('fields')
 								.at(data.order[0].column);
 
@@ -548,15 +545,15 @@ var STATS_EXT = '.stats';
 
 				if (data.search.value.length == 0) {
 					//sometimes necessary after back/fwd
-					app.filters.clearFilter(me);
+					Donkeylift.app.filters.clearFilter(me);
 				}
 
-				var filters = app.filters.clone();
+				var filters = Donkeylift.app.filters.clone();
 				
 				if (data.search.value.length > 0) {
 					filters.setFilter({
 						table: me,
-						op: app.Filter.OPS.SEARCH,
+						op: Donkeylift.Filter.OPS.SEARCH,
 						value: data.search.value
 					});
 				}
@@ -565,28 +562,28 @@ var STATS_EXT = '.stats';
 					+ '&' + skipParam 
 					+ '&' + topParam
 					+ '&' + filters.toParam();
-				var url = REST_ROOT + me.get('url') + ROWS_EXT + '?' + q;
+				var url = DONKEYLIFT_API + me.get('url') + ROWS_EXT + '?' + q;
 
 				console.log(url);
 
-				me.lastFilterUrl = REST_ROOT
+				me.lastFilterUrl = DONKEYLIFT_API
 								 + me.get('url') + ROWS_EXT + '?'
 								 + filters.toParam();
 
 				$.ajax(url, {
 					cache: false
 				}).done(function(response) {
-					//console.log('response from REST');
+					//console.log('response from api');
 					//console.dir(response);
 
 					var fragment = 
-								app.module() 
-								+ '/' + app.schema.get('name')
-								+ '/' + app.table.get('name') 
+								Donkeylift.app.module() 
+								+ '/' + Donkeylift.app.schema.get('name')
+								+ '/' + Donkeylift.app.table.get('name') 
 								+ '/' + q; 
 
 					//console.log(fragment);
-					app.router.updateNavigation(fragment, { 
+					Donkeylift.app.router.updateNavigation(fragment, { 
 						block: 100,  
 						replace: true
 					}); 
@@ -621,10 +618,10 @@ var STATS_EXT = '.stats';
 			var q = _.map(params, function(v,k) { return k + "=" + v; })
 					.join('&');
 
-			var filters = app.filters.apply(filter);
-			q = q + '&' + app.Filters.toParam(filters);
+			var filters = Donkeylift.app.filters.apply(filter);
+			q = q + '&' + Donkeylift.Filters.toParam(filters);
 
-			var url = REST_ROOT + this.get('url') + STATS_EXT 
+			var url = DONKEYLIFT_API + this.get('url') + STATS_EXT 
 					+ '?' + q;
 
 			console.log('stats ' + me.get('name') + '.' + fieldName 
@@ -658,10 +655,10 @@ var STATS_EXT = '.stats';
 			var q = _.map(params, function(v,k) { return k + "=" + v; })
 					.join('&');
 
-			var filters = app.filters.apply(filter, searchTerm);
-			q = q + '&' + app.Filters.toParam(filters);
+			var filters = Donkeylift.app.filters.apply(filter, searchTerm);
+			q = q + '&' + Donkeylift.Filters.toParam(filters);
 
-			var url = REST_ROOT + this.get('url') + ROWS_EXT 
+			var url = DONKEYLIFT_API + this.get('url') + ROWS_EXT 
 					+ '?' + q;
 
 			console.log('options ' + me.get('name') + '.' + fieldName 
@@ -685,66 +682,36 @@ var STATS_EXT = '.stats';
 
 })();
 
-/*global Backbone, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, _ */
 
 (function () {
 	'use strict';
 	//console.log("Table class def");
-	app.Database = app.Schema.extend({ 
+	Donkeylift.Database = Donkeylift.Schema.extend({ 
 
 		initialize : function(attrs, options) {
 			console.log("Database.initialize " + (attrs.name || ''));
-			app.Schema.prototype.initialize.call(this, attrs);
+			Donkeylift.Schema.prototype.initialize.call(this, attrs);
 		},
 
 		parse : function(response) {
 			console.log("Database.parse " + response);
 
 			var tables = _.map(response.tables, function(table) {
-				return new app.DataTable(table);
+				return new Donkeylift.DataTable(table);
 			});
-			response.tables = new app.Tables(tables);
+			response.tables = new Donkeylift.Tables(tables);
 			return response;
 		},
-
 	});		
-
-/*
-	app.Database.load = function(name, baseUrl, cbAfter) {
-		var db = new app.Database({name: name});
-		db.url = function() {
-			return baseUrl + '/' + this.get('name');
-		}
-		db.fetch({success: function() {
-				db.orgJSON = db.toJSON();
-				cbAfter();
-		}});
-		return db;
-	}
-
-	app.Database.create = function(baseUrl, cbAfter) {
-		var db = new app.Database({tmp: true});
-		db.url = function() {
-			return this.get('name') 
-				? baseUrl + '/' + this.get('name')
-				: baseUrl;
-		}
-		db.save(function() {
-			cbAfter();
-		});
-		return db;
-	}
-*/
 
 })();
 
-/*global Backbone, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, _ */
 
 (function () {
 	'use strict';
-	app.Filter = Backbone.Model.extend({
+	Donkeylift.Filter = Backbone.Model.extend({
 
 		initialize: function(attrs) {
 			console.log("Filter.initialize ");			
@@ -752,7 +719,7 @@ var app = app || {};
 			
 			if (_.isString(attrs.table)) {
 				this.set('table', 
-					app.schema.get('tables').getByName(attrs.table));
+					Donkeylift.app.schema.get('tables').getByName(attrs.table));
 			}
 
 			if (attrs.field && _.isString(attrs.field)) {
@@ -760,7 +727,7 @@ var app = app || {};
 					this.get('table').get('fields').getByName(attrs.field));
 			}
 
-			this.set('id', app.Filter.Key(attrs.table, attrs.field));
+			this.set('id', Donkeylift.Filter.Key(attrs.table, attrs.field));
 
 		},
 
@@ -772,9 +739,9 @@ var app = app || {};
 
 			return val.map(function(v) {
 				if (me.get('field').get('fk') == 1 
-					&& me.get('op') == app.Filter.OPS.IN) {
+					&& me.get('op') == Donkeylift.Filter.OPS.IN) {
 
-					return app.Field.getIdFromRef(v);
+					return Donkeylift.Field.getIdFromRef(v);
 
 				} else {
 					return me.get('field').toQS(v);
@@ -784,23 +751,23 @@ var app = app || {};
 
 		toParam: function() {
 			var f = this.get('field') ? this.get('field').vname() : null;
-			var key = app.Filter.Key(this.get('table'), f);
+			var key = Donkeylift.Filter.Key(this.get('table'), f);
 			var param;
 
-			if (this.get('op') == app.Filter.OPS.SEARCH) {
+			if (this.get('op') == Donkeylift.Filter.OPS.SEARCH) {
 				param = key + " search '" + this.get('value') + "'";
 
-			} else if (this.get('op') == app.Filter.OPS.EQUAL) {
+			} else if (this.get('op') == Donkeylift.Filter.OPS.EQUAL) {
 				param = key + " eq " 
 						+ this.get('field').toQS(this.get('value'));
 
 			} else {
 				var values = this.values();
-				if (this.get('op') == app.Filter.OPS.BETWEEN) {
+				if (this.get('op') == Donkeylift.Filter.OPS.BETWEEN) {
 					param = key + " btwn " + values[0] + ',' + values[1];
 
-				} else if (this.get('op') == app.Filter.OPS.IN) {
-					key = app.Filter.Key(this.get('table'), this.get('field'));
+				} else if (this.get('op') == Donkeylift.Filter.OPS.IN) {
+					key = Donkeylift.Filter.Key(this.get('table'), this.get('field'));
 					param = key + " in " + values.join(",");
 				}
 			}
@@ -826,22 +793,22 @@ var app = app || {};
 
 		toStrings: function() {
 			var result = { table: this.get('table').get('name'), field: '' };
-			if (this.get('op') == app.Filter.OPS.SEARCH) {
+			if (this.get('op') == Donkeylift.Filter.OPS.SEARCH) {
 				result.op = 'search';
 				result.value = this.get('value');
 
-			} else if (this.get('op') == app.Filter.OPS.BETWEEN) {
+			} else if (this.get('op') == Donkeylift.Filter.OPS.BETWEEN) {
 				result.op = 'between';
 				result.field = this.get('field').get('name');
 				result.value = this.get('value')[0] 
 							+ ' and ' + this.get('value')[1];
 
-			} else if (this.get('op') == app.Filter.OPS.IN) {
+			} else if (this.get('op') == Donkeylift.Filter.OPS.IN) {
 				result.op = 'in';
 				result.field = this.get('field').get('name');
 				result.value = this.get('value').join(', '); 
 
-			} else if (this.get('op') == app.Filter.OPS.EQUAL) {
+			} else if (this.get('op') == Donkeylift.Filter.OPS.EQUAL) {
 				result.op = 'equal';
 				result.field = this.get('field').get('name');
 				result.value = this.get('value'); 
@@ -851,26 +818,25 @@ var app = app || {};
 
 	});
 
-	app.Filter.Key = function(table, field) {		
+	Donkeylift.Filter.Key = function(table, field) {		
 		if (_.isObject(table)) table = table.get('name');
 		if ( ! field) field = table;
 		else if (_.isObject(field)) field = field.get('name'); //not vname
 		return table + '.' + field;
 	}
 
-	app.Filter.OPS = {
+	Donkeylift.Filter.OPS = {
 		'SEARCH': 'search',
 		'BETWEEN': 'btwn',
 		'IN': 'in',
 		'EQUAL': 'eq'
 	}
 
-	app.Filter.CONJUNCTION = ' and ';
+	Donkeylift.Filter.CONJUNCTION = ' and ';
 
 })();
 
-/*global Backbone */
-var app = app || {};
+/*global Backbone, Donkeylift */
 
 (function () {
 	'use strict';
@@ -878,16 +844,16 @@ var app = app || {};
 	// Tables Collection
 	// ---------------
 
-	app.Fields = Backbone.Collection.extend({
+	Donkeylift.Fields = Backbone.Collection.extend({
 		// Reference to this collection's model.
-		model: app.Field,
+		model: Donkeylift.Field,
 		
 		initialize: function(attrs) {
 			//this.on('change', function(ev) { console.log('Fields.ev ' + ev); });
 		},
 
 		addNew: function() {
-			var field = app.Field.create('field' + this.length);
+			var field = Donkeylift.Field.create('field' + this.length);
 			field.set('order', this.length);
 			this.add(field);
 			return field;
@@ -902,8 +868,7 @@ var app = app || {};
 
 })();
 
-/*global Backbone */
-var app = app || {};
+/*global Backbone, Donkeylift */
 
 (function () {
 	'use strict';
@@ -911,13 +876,13 @@ var app = app || {};
 	// Tables Collection
 	// ---------------
 
-	app.Relations = Backbone.Collection.extend({
+	Donkeylift.Relations = Backbone.Collection.extend({
 		// Reference to this collection's model.
-		model: app.Relation,
+		model: Donkeylift.Relation,
 		
 		addNew: function(table) {
 			console.log('Relations addNew ' + table.get('name'));
-			var relation = new app.Relation.create(table);
+			var relation = new Donkeylift.Relation.create(table);
 			this.add(relation);
 			return relation;
 		}
@@ -926,12 +891,11 @@ var app = app || {};
 
 })();
 
-/*global Backbone */
-var app = app || {};
+/*global Backbone, Donkeylift */
 
 (function () {
 	'use strict';
-	app.Schemas = Backbone.Collection.extend({
+	Donkeylift.Schemas = Backbone.Collection.extend({
 
 		initialize: function(models, options) {
 			console.log("Schemas.initialize " + options);
@@ -939,11 +903,10 @@ var app = app || {};
 		},
 
 		//Schemas is just a list of schema names
-		//model: app.Schema,
+		//model: Donkeylift.Schema,
 
 		url	: function() { 
 			return this._url;
-			//return REST_ROOT + "/" + app.user; 
 		},
 
 		parse : function(response) {
@@ -956,8 +919,7 @@ var app = app || {};
 
 })();
 
-/*global Backbone, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, _ */
 
 (function () {
 	'use strict';
@@ -965,9 +927,9 @@ var app = app || {};
 	// Tables Collection
 	// ---------------
 
-	app.Tables = Backbone.Collection.extend({
+	Donkeylift.Tables = Backbone.Collection.extend({
 		// Reference to this collection's model.
-		model: app.Table,
+		model: Donkeylift.Table,
 
 		initialize : function(tables) {
 			_.each(tables, function(table) {				
@@ -1000,8 +962,7 @@ var app = app || {};
 
 })();
 
-/*global Backbone */
-var app = app || {};
+/*global Donkeylift, Backbone */
 
 (function () {
 	'use strict';
@@ -1009,12 +970,12 @@ var app = app || {};
 	// Tables Collection
 	// ---------------
 
-	app.Filters = Backbone.Collection.extend({
+	Donkeylift.Filters = Backbone.Collection.extend({
 		// Reference to this collection's model.
-		model: app.Filter,
+		model: Donkeylift.Filter,
 		
 		toParam: function() {
-			return app.Filters.toParam(this.models);	
+			return Donkeylift.Filters.toParam(this.models);	
 		},
 
 		//used by Datable.stats & Datatable.options to get context:
@@ -1027,7 +988,7 @@ var app = app || {};
 				if (f.id == exFilter.id) return false;
 
 				//exclude existing search on same table
-				if (f.get('op') == app.Filter.OPS.SEARCH 
+				if (f.get('op') == Donkeylift.Filter.OPS.SEARCH 
 				 && f.get('table') == exFilter.get('table')) {
 					return false;
 				}
@@ -1037,10 +998,10 @@ var app = app || {};
 			
 			//add search term
 			if (searchTerm && searchTerm.length > 0) {
-				var searchFilter = new app.Filter({
+				var searchFilter = new Donkeylift.Filter({
 						table: exFilter.get('table'),
 						field: exFilter.get('field'),
-						op: app.Filter.OPS.SEARCH,
+						op: Donkeylift.Filter.OPS.SEARCH,
 						value: searchTerm
 				});
 				filters.push(searchFilter);
@@ -1050,7 +1011,7 @@ var app = app || {};
 		},
 
 		setFilter: function(attrs) {
-			var filter = new app.Filter(attrs);		
+			var filter = new Donkeylift.Filter(attrs);		
 			var current = this.get(filter.id);
 			if (current) this.remove(current);
 			if (attrs.value.length > 0) {
@@ -1059,7 +1020,7 @@ var app = app || {};
 		},
 
 		getFilter: function(table, field) {
-			return this.get(app.Filter.Key(table, field));
+			return this.get(Donkeylift.Filter.Key(table, field));
 		},
 
 		clearFilter: function(table, field) {
@@ -1069,12 +1030,12 @@ var app = app || {};
 
 	});
 
-	app.Filters.toParam = function(filters) {
+	Donkeylift.Filters.toParam = function(filters) {
 		var result = '';
 		if (filters.length > 0) {
 			var params = _.reduce(filters, function(memo, f) {
 				return memo.length == 0 ? f.toParam() 
-					: memo + app.Filter.CONJUNCTION + f.toParam();
+					: memo + Donkeylift.Filter.CONJUNCTION + f.toParam();
 			}, '');				
 			result = '$filter=' + encodeURIComponent(params);
 		}
@@ -1083,13 +1044,12 @@ var app = app || {};
 
 })();
 
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.DownloadsView = Backbone.View.extend({
+	Donkeylift.DownloadsView = Backbone.View.extend({
 		el:  '#content',
 
 		events: {
@@ -1098,7 +1058,7 @@ var app = app || {};
 
 		initialize: function() {
 			console.log("MenuView.init");
-			//this.listenTo(app.table, 'change', this.render);
+			//this.listenTo(Donkeylift.table, 'change', this.render);
 		},
 
 		template: _.template($('#downloads-template').html()),
@@ -1115,13 +1075,12 @@ var app = app || {};
 
 
 
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.SchemaCurrentView = Backbone.View.extend({
+	Donkeylift.SchemaCurrentView = Backbone.View.extend({
 		el:  '#schema-list',
 
 		initialize: function() {
@@ -1129,8 +1088,9 @@ var app = app || {};
 
 		render: function() {
 			console.log('SchemaCurrentView.render ');			
-			if (app.schema) {
-				this.$('a:first span').html(' DB ' + app.schema.get('name'));
+			if (Donkeylift.app.schema) {
+				this.$('a:first span').html(' DB ' 
+					+ Donkeylift.app.schema.get('name'));
 			} else {
 				this.$('a:first span').html(' Choose DB ');
 			}		
@@ -1144,13 +1104,12 @@ var app = app || {};
 
 
 
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.SchemaListView = Backbone.View.extend({
+	Donkeylift.SchemaListView = Backbone.View.extend({
 		//el:  '#schema-select',
 
 		tagName: 'ul',
@@ -1181,13 +1140,7 @@ var app = app || {};
 		evSchemaClick: function(ev) {
 			var name = $(ev.target).attr('data-target');
 			console.log('SchemaListView.evSchemaClick ' + name);
-			app.setSchema(name);
-/*
-			var schema = this.collection.find(function(c) { 
-				return c.get('name') == name; 
-			});
-			app.setSchema(schema);
-*/			
+			Donkeylift.app.setSchema(name);
 		}
 
 	});
@@ -1196,13 +1149,12 @@ var app = app || {};
 
 
 
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.TableListView = Backbone.View.extend({
+	Donkeylift.TableListView = Backbone.View.extend({
 
 		
 		id: "table-list",
@@ -1240,20 +1192,19 @@ var app = app || {};
 
 
 
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.DataTableView = Backbone.View.extend({
+	Donkeylift.DataTableView = Backbone.View.extend({
 
 		id: 'grid-panel',
 		className: 'panel',
 
 		initialize: function() {
 			console.log("DataTableView.init " + this.model);			
-			this.listenTo(app.filters, 'update', this.renderFilterButtons);
+			this.listenTo(Donkeylift.app.filters, 'update', this.renderFilterButtons);
 		},
 
 		tableTemplate: _.template($('#grid-table-template').html()),
@@ -1263,7 +1214,7 @@ var app = app || {};
 			var columns = this.model.getColumns();
 			_.each(columns, function(c, idx) {
 				
-				var filter = app.filters.getFilter(
+				var filter = Donkeylift.app.filters.getFilter(
 						this.model, 
 						c.field.get('name')
 					);
@@ -1318,7 +1269,7 @@ var app = app || {};
 
 			this.renderFilterButtons();
 
-			var filter = app.filters.getFilter(this.model);			
+			var filter = Donkeylift.app.filters.getFilter(this.model);			
 			var initSearch = {};
 			if (filter) initSearch.search = filter.get('value');
 
@@ -1353,34 +1304,34 @@ var app = app || {};
 				var field = me.model.get('fields').getByName(colName);
 				var el = me.$('#col-' + colName + ' div.dropdown-menu');
 
-				var filter = new app.Filter({
+				var filter = new Donkeylift.Filter({
 					table: me.model,
 					field: field
 				});
 
-				app.setFilterView(filter, el);
+				Donkeylift.app.setFilterView(filter, el);
 			});
 
 
 			this.$('#grid').on( 'page.dt', function () {
 				console.log("page.dt");
-				app.router.navigate("reload-table", {trigger: false});			
+				Donkeylift.app.router.navigate("reload-table", {trigger: false});			
 			});
 
 			//using order.dt event won't work because its fired otherwise, too
 			this.$('th.sorting').click(function () {
 				console.log("order.dt");
-				app.router.navigate("reload-table", {trigger: false});			
+				Donkeylift.app.router.navigate("reload-table", {trigger: false});			
 			});
 
 			//using search.dt event won't work because its fired otherwise, too
 			this.$('input[type="search"]').blur(function () {
 				console.log("search.dt");
-				app.router.navigate("reload-table", {trigger: false});			
+				Donkeylift.app.router.navigate("reload-table", {trigger: false});			
 			});
 			this.$('input[type="search"]').focus(function () {
 				console.log("search.dt");
-				app.router.navigate("reload-table", {trigger: false});			
+				Donkeylift.app.router.navigate("reload-table", {trigger: false});			
 			});
 
 
@@ -1393,13 +1344,12 @@ var app = app || {};
 
 
 
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.FilterItemsView = Backbone.View.extend({
+	Donkeylift.FilterItemsView = Backbone.View.extend({
 
 		events: {
 			'click #selectReset': 'evFilterItemsReset',
@@ -1426,11 +1376,11 @@ var app = app || {};
 			this.$('a[href=#filterSelect]').tab('show');
 
 			this.$('#filterSelection').empty();
-			var current = app.filters.getFilter(
+			var current = Donkeylift.app.filters.getFilter(
 							this.model.get('table'),
 							this.model.get('field'));
 
-			if (current && current.get('op') == app.Filter.OPS.IN) {
+			if (current && current.get('op') == Donkeylift.Filter.OPS.IN) {
 				//get values from filter
 				var selected = current.get('value');		
 //console.log(selected);
@@ -1460,14 +1410,14 @@ var app = app || {};
 					return $(this).attr('data-target');
 			}).get();
 
-			app.filters.setFilter({
+			Donkeylift.app.filters.setFilter({
 				table: this.model.get('table'),
 				field: this.model.get('field'),
-				op: app.Filter.OPS.IN,
+				op: Donkeylift.Filter.OPS.IN,
 				value: filterValues
 			});
 			
-			app.router.navigate("reload-table", {trigger: true});			
+			Donkeylift.app.router.navigate("reload-table", {trigger: true});			
 			//window.location.hash = "#reload-table";
 		},
 
@@ -1513,13 +1463,12 @@ var app = app || {};
 
 
 
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.FilterRangeView = Backbone.View.extend({
+	Donkeylift.FilterRangeView = Backbone.View.extend({
 
 		events: {
 			//range filter evs
@@ -1534,8 +1483,8 @@ var app = app || {};
 
 		canSlide: function() {
 			var field = this.model.get('field');
-			var slideTypes = [app.Field.TYPES.INTEGER,
-								app.Field.TYPES.NUMERIC];
+			var slideTypes = [Donkeylift.Field.TYPES.INTEGER,
+								Donkeylift.Field.TYPES.NUMERIC];
 			return ( ! field.get('fk')) &&
 					_.contains(slideTypes, field.get('type'));
 		},
@@ -1552,11 +1501,11 @@ var app = app || {};
 
 			var stats = this.model.get('field').get('stats');
 
-			var current = app.filters.getFilter(
+			var current = Donkeylift.app.filters.getFilter(
 							this.model.get('table'),
 							this.model.get('field'));
 
-			if (current && current.get('op') == app.Filter.OPS.BETWEEN) {
+			if (current && current.get('op') == Donkeylift.Filter.OPS.BETWEEN) {
 				this.$("#inputFilterMin").val(current.get('value')[0]);
 				this.$("#inputFilterMax").val(current.get('value')[1]);
 			} else {
@@ -1592,13 +1541,13 @@ var app = app || {};
 				});
 			}
 			if (this.model.get('field').get('type') 
-				== app.Field.TYPES['DATE']) {
+				== Donkeylift.Field.TYPES['DATE']) {
 
-				var opts = { minDate: app.Field.toDate(stats.min), 
-							 maxDate: app.Field.toDate(stats.max),
+				var opts = { minDate: Donkeylift.Field.toDate(stats.min), 
+							 maxDate: Donkeylift.Field.toDate(stats.max),
 							dateFormat: 'yy-mm-dd' };
-				var minVal = app.Field.toDate($("#inputFilterMin").val());
-				var maxVal = app.Field.toDate($("#inputFilterMax").val());
+				var minVal = Donkeylift.Field.toDate($("#inputFilterMin").val());
+				var maxVal = Donkeylift.Field.toDate($("#inputFilterMax").val());
 				$("#inputFilterMin").datepicker(opts);
 				$("#inputFilterMin").datepicker("setDate", minVal);
 				$("#inputFilterMax").datepicker(opts);
@@ -1639,26 +1588,26 @@ var app = app || {};
 								this.$("#inputFilterMax").val()];
 
 			if (filterValues[0] != stats.min || filterValues[1] != stats.max) {
-				app.filters.setFilter({
+				Donkeylift.app.filters.setFilter({
 					table: this.model.get('table'),
 					field: this.model.get('field'),
-					op: app.Filter.OPS.BETWEEN,
+					op: Donkeylift.Filter.OPS.BETWEEN,
 					value: filterValues
 				});
 			} else {
-				app.filters.clearFilter(this.model.get('table'), 
+				Donkeylift.app.filters.clearFilter(this.model.get('table'), 
 										this.model.get('field'));
 			}
 
-			app.router.navigate("reload-table", {trigger: true});			
+			Donkeylift.app.router.navigate("reload-table", {trigger: true});			
 			//window.location.hash = "#reload-table";
 		},
 
 		evFilterRangeResetClick: function() {
-			app.filters.clearFilter(this.model.get('table'), 
+			Donkeylift.app.filters.clearFilter(this.model.get('table'), 
 									this.model.get('field'));
 
-			app.router.navigate("reload-table", {trigger: true});			
+			Donkeylift.app.router.navigate("reload-table", {trigger: true});			
 			//window.location.hash = "#reload-table";
 			this.render();
 		},
@@ -1668,13 +1617,12 @@ var app = app || {};
 
 
 
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.FilterShowView = Backbone.View.extend({
+	Donkeylift.FilterShowView = Backbone.View.extend({
 		el:  '#modalShowFilters',
 
 		events: {
@@ -1694,7 +1642,7 @@ var app = app || {};
 				el.append(this.template(filter.toStrings()));
 			}, this);			
 
-			$('#modalInputDataUrl').val(app.table.getAllRowsUrl());
+			$('#modalInputDataUrl').val(Donkeylift.app.table.getAllRowsUrl());
 			$('#modalShowFilters').on('shown.bs.modal', function() {
 				$('#modalInputDataUrl').select();
 			});
@@ -1711,13 +1659,12 @@ var app = app || {};
 
 
 
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.FilterView = Backbone.View.extend({
+	Donkeylift.FilterView = Backbone.View.extend({
 
 		events: {
 			'click .filter-column': 'evFilterColumnClick',
@@ -1726,11 +1673,11 @@ var app = app || {};
 
 		initialize: function () {
 			console.log("FilterView.init " + this.model.get('table'));
-			this.rangeView = new app.FilterRangeView({
+			this.rangeView = new Donkeylift.FilterRangeView({
 										model: this.model,
 										el: this.el
 			});
-			this.itemsView = new app.FilterItemsView({
+			this.itemsView = new Donkeylift.FilterItemsView({
 										model: this.model,
 										el: this.el
 			});
@@ -1746,7 +1693,7 @@ var app = app || {};
 				name: field.get('name'),
 			}));
 
-			if (field.get('type') == app.Field.TYPES.VARCHAR
+			if (field.get('type') == Donkeylift.Field.TYPES.VARCHAR
 			 || field.get('fk') == 1) {
 				this.itemsView.loadRender();
 			} else {
@@ -1776,13 +1723,12 @@ var app = app || {};
 
 
 
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.MenuDataView = Backbone.View.extend({
+	Donkeylift.MenuDataView = Backbone.View.extend({
 		el:  '#menu',
 
 		events: {
@@ -1792,26 +1738,26 @@ var app = app || {};
 
 		initialize: function() {
 			console.log("MenuView.init");
-			//this.listenTo(app.table, 'change', this.render);
+			//this.listenTo(Donkeylift.app.table, 'change', this.render);
 		},
 
 		template: _.template($('#data-menu-template').html()),
 
 		render: function() {
 			console.log('MenuDataView.render ');			
-			if (! app.table) this.$el.empty();
+			if (! Donkeylift.app.table) this.$el.empty();
 			else this.$el.html(this.template());
 			return this;
 		},
 
 		evResetAllFilters: function() {
-			app.unsetFilters();
-			app.resetTable();
+			Donkeylift.app.unsetFilters();
+			Donkeylift.app.resetTable();
 		},
 
 		evShowFilters: function() {
-			app.filterShowView.collection = app.filters;
-			app.filterShowView.render();
+			Donkeylift.app.filterShowView.collection = Donkeylift.app.filters;
+			Donkeylift.app.filterShowView.render();
 		},
 
 	});
@@ -1820,13 +1766,12 @@ var app = app || {};
 
 
 
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.AliasEditView = Backbone.View.extend({
+	Donkeylift.AliasEditView = Backbone.View.extend({
 		el:  '#modalEditAlias',
 
 		events: {
@@ -1853,7 +1798,7 @@ var app = app || {};
 			el.html('');
 
 			var aliasTables = [ this.model ]
-					.concat(app.schema.get('tables').getAncestors(this.model));
+					.concat(Donkeylift.app.schema.get('tables').getAncestors(this.model));
 						
 			_.each(aliasTables, function(table) {
 				el.append('<optgroup label="' + table.get('name') + '">');
@@ -1877,7 +1822,7 @@ var app = app || {};
 		evUpdateClick: function() {
 			var newFieldQName = $('#modalInputAliasField').val();
 //console.log(this.model.get('row_alias'));
-			var alias = app.Alias.parse(
+			var alias = Donkeylift.Alias.parse(
 							newFieldQName.split('.')[0],
 							newFieldQName.split('.')[1]
 			);	
@@ -1910,13 +1855,12 @@ console.log(i);
 
 
 
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.AliasView = Backbone.View.extend({
+	Donkeylift.AliasView = Backbone.View.extend({
 
 		//el: '#alias',
 
@@ -1955,8 +1899,8 @@ var app = app || {};
 			});
 
 			//console.log(fieldQName);
-			app.aliasEditView.setModel(this.model, alias);
-			app.aliasEditView.render();
+			Donkeylift.app.aliasEditView.setModel(this.model, alias);
+			Donkeylift.app.aliasEditView.render();
 		},
 
 	});
@@ -1965,13 +1909,12 @@ var app = app || {};
 
 
 
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.FieldEditView = Backbone.View.extend({
+	Donkeylift.FieldEditView = Backbone.View.extend({
 		el:  '#modalEditField',
 
 		events: {
@@ -1996,18 +1939,18 @@ var app = app || {};
 			this.model.set('name', $('#modalInputFieldName').val());
 			this.model.set('type', $('#modalInputFieldType').val());
 			this.model.set('length', $('#modalInputFieldLength').val());
-			if ( ! app.table.get('fields').contains(this.model)) {
-				this.model.set('order', app.table.get('fields').length + 1);
-				app.table.get('fields').add(this.model);
+			if ( ! Donkeylift.app.table.get('fields').contains(this.model)) {
+				this.model.set('order', Donkeylift.app.table.get('fields').length + 1);
+				Donkeylift.app.table.get('fields').add(this.model);
 			}
-			app.schema.update();
+			Donkeylift.app.schema.update();
 		},
 
 		removeClick: function() {	
 			console.log("FieldEditView.removeClick " + this.model.collection);
 			if (this.model.collection) {
 				this.model.collection.remove(this.model);
-				app.schema.update();
+				Donkeylift.app.schema.update();
 			}
 		}
 
@@ -2017,13 +1960,12 @@ var app = app || {};
 
 
 
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.FieldView = Backbone.View.extend({
+	Donkeylift.FieldView = Backbone.View.extend({
 
 		tagName: 'tr',
 
@@ -2045,8 +1987,8 @@ var app = app || {};
 		},
 
 		editFieldClick: function(ev) {				
-			app.fieldEditView.model = this.model;
-			app.fieldEditView.render();
+			Donkeylift.app.fieldEditView.model = this.model;
+			Donkeylift.app.fieldEditView.render();
 		},
 
 
@@ -2056,13 +1998,12 @@ var app = app || {};
 
 
 
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.MenuSchemaView = Backbone.View.extend({
+	Donkeylift.MenuSchemaView = Backbone.View.extend({
 		el:  '#menu',
 
 		events: {
@@ -2073,7 +2014,7 @@ var app = app || {};
 
 		initialize: function() {
 			console.log("MenuView.init");
-			//this.listenTo(app.schema, 'change', this.render);
+			//this.listenTo(Donkeylift.app.schema, 'change', this.render);
 		},
 
 		template: _.template($('#schema-menu-template').html()),
@@ -2082,29 +2023,29 @@ var app = app || {};
 			console.log('MenuSchemaView.render ');			
 			this.$el.show();
 			this.$el.html(this.template());
-			this.$('#add-table').prop('disabled', app.schema == null);
-			this.$('#save-schema').prop('disabled', app.schema == null);
+			this.$('#add-table').prop('disabled', Donkeylift.app.schema == null);
+			this.$('#save-schema').prop('disabled', Donkeylift.app.schema == null);
 
 			return this;
 		},
 
 		evAddTableClick: function() {
-			var table = app.Table.create();
-			app.tableEditView.model = table;
-			app.tableEditView.render();
+			var table = Donkeylift.Table.create();
+			Donkeylift.app.tableEditView.model = table;
+			Donkeylift.app.tableEditView.render();
 			
 		},
 
 
 		evSaveSchemaClick: function() {
-			app.schemaEditView.model = app.schema;
-			app.schemaEditView.render();
+			Donkeylift.app.schemaEditView.model = Donkeylift.app.schema;
+			Donkeylift.app.schemaEditView.render();
 		},
 
 
 		evNewSchemaClick: function() {
-			app.schemaEditView.model = new app.Database({});
-			app.schemaEditView.render();
+			Donkeylift.app.schemaEditView.model = new Donkeylift.Database({});
+			Donkeylift.app.schemaEditView.render();
 		},
 
 	});
@@ -2112,13 +2053,12 @@ var app = app || {};
 })(jQuery);
 
 
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.RelationEditView = Backbone.View.extend({
+	Donkeylift.RelationEditView = Backbone.View.extend({
 		el:  '#modalEditRelation',
 
 		events: {
@@ -2136,7 +2076,7 @@ var app = app || {};
 
 			var el = $('#modalInputRelationTable')
 			el.html('');
-			app.schema.get('tables').each(function(table) {
+			Donkeylift.app.schema.get('tables').each(function(table) {
 				el.append($('<option></option>')
 					.attr('value', table.get('name'))
 					.text(table.get('name')));
@@ -2176,11 +2116,11 @@ var app = app || {};
 				newField = newTable + "_id";
 				var f = this.model.get('table').get('fields').addNew();
 				f.set('name', newField);
-				f.set('type', app.Field.TYPES.INTEGER);
+				f.set('type', Donkeylift.Field.TYPES.INTEGER);
 			}
 
 			newField = this.model.get('table').get('fields').getByName(newField);
-			newTable = app.schema.get('tables').getByName(newTable);
+			newTable = Donkeylift.app.schema.get('tables').getByName(newTable);
 			//console.log('new field ' + fields.getByName(newField).get('name'));
 			//console.log('new related table ' + tables.getByName(newTable).get('name'));
 			
@@ -2189,17 +2129,17 @@ var app = app || {};
 				'field': newField,
 				'related': newTable
 			});	
-			if ( ! app.table.get('relations').contains(this.model)) {
-				app.table.get('relations').add(this.model);
+			if ( ! Donkeylift.app.table.get('relations').contains(this.model)) {
+				Donkeylift.app.table.get('relations').add(this.model);
 			}
-			app.schema.update();
+			Donkeylift.app.schema.update();
 		},
 
 		removeClick: function() {	
 			console.log("RelationEditView.removeClick " + this.model.collection);
 			if (this.model.collection) {
 				this.model.collection.remove(this.model);
-				app.schema.update();
+				Donkeylift.app.schema.update();
 			}
 		},
 
@@ -2219,13 +2159,12 @@ var app = app || {};
 
 
 
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.RelationView = Backbone.View.extend({
+	Donkeylift.RelationView = Backbone.View.extend({
 
 		tagName: 'tr',
 
@@ -2257,8 +2196,8 @@ var app = app || {};
 		},
 
 		editRelationClick: function(ev) {				
-			app.relationEditView.model = this.model;
-			app.relationEditView.render();
+			Donkeylift.app.relationEditView.model = this.model;
+			Donkeylift.app.relationEditView.render();
 		},
 
 
@@ -2268,13 +2207,12 @@ var app = app || {};
 
 
 
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.SchemaEditView = Backbone.View.extend({
+	Donkeylift.SchemaEditView = Backbone.View.extend({
 		el:  '#modalEditSchema',
 
 		events: {
@@ -2311,7 +2249,7 @@ var app = app || {};
 				$('#modalSchemaResultButton').removeClass('btn-danger');
 			}
 			$('#modalSchemaActionResult').show();
-			app.schemaCurrentView.render();
+			Donkeylift.app.schemaCurrentView.render();
 		},
 
 		evSaveClick: function() {
@@ -2325,7 +2263,7 @@ var app = app || {};
 				this.model.set('name', newName);
 			}
 			this.model.save(function(err) { 
-				app.setSchema(me.model.get('name'));
+				Donkeylift.app.setSchema(me.model.get('name'));
 				return me.renderResult(err); 
 			});
 		},
@@ -2342,13 +2280,12 @@ var app = app || {};
 
 
 
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.SchemaTableView = Backbone.View.extend({
+	Donkeylift.SchemaTableView = Backbone.View.extend({
 
 		//el:  '#content',
 
@@ -2392,7 +2329,7 @@ var app = app || {};
 			this.setFields();
 			this.setRelations();
 
-			this.aliasView = new app.AliasView({
+			this.aliasView = new Donkeylift.AliasView({
 				el: this.$('#alias'),
 				model: this.model,
 			});
@@ -2410,16 +2347,16 @@ var app = app || {};
 		},
 
 		evEditTableClick: function(ev) {				
-			app.tableEditView.model = this.model;
-			app.tableEditView.render();
+			Donkeylift.app.tableEditView.model = this.model;
+			Donkeylift.app.tableEditView.render();
 		},
 
 		evNewFieldClick: function() {
 			console.log('TableView.evNewFieldClick');
-			var field = app.Field.create();
+			var field = Donkeylift.Field.create();
 			//var field = this.model.get('fields').addNew();
-			app.fieldEditView.model = field;
-			app.fieldEditView.render();
+			Donkeylift.app.fieldEditView.model = field;
+			Donkeylift.app.fieldEditView.render();
 		},
 
 		removeField: function(field) {
@@ -2429,7 +2366,7 @@ var app = app || {};
 
 		addField: function(field) {
 			console.log('TableView.addField ' + field.get("name"));
-			var view = new app.FieldView({model: field});
+			var view = new Donkeylift.FieldView({model: field});
 			this.elFields().append(view.render().el);
 			this.fieldViews[field.cid] = view;
 		},
@@ -2448,10 +2385,10 @@ var app = app || {};
 
 		evNewRelationClick: function() {
 			console.log('TableView.evNewRelationClick');
-			var relation = app.Relation.create(this.model);
+			var relation = Donkeylift.Relation.create(this.model);
 			//console.log(relation.attributes);
-			app.relationEditView.model = relation;
-			app.relationEditView.render();
+			Donkeylift.app.relationEditView.model = relation;
+			Donkeylift.app.relationEditView.render();
 		},
 
 		removeRelation: function(relation) {
@@ -2461,7 +2398,7 @@ var app = app || {};
 
 		addRelation: function(relation) {
 			console.log('SchemaView.addRelation ' + relation.cid);
-			var view = new app.RelationView({model: relation});
+			var view = new Donkeylift.RelationView({model: relation});
 			this.elRelations().append(view.render().el);
 			this.relationViews[relation.cid] = view;
 		},
@@ -2474,8 +2411,8 @@ var app = app || {};
 
 		evNewAliasClick: function() {
 			console.log('TableView.evNewAliasClick');
-			app.aliasEditView.setModel(this.model, null);
-			app.aliasEditView.render();
+			Donkeylift.app.aliasEditView.setModel(this.model, null);
+			Donkeylift.app.aliasEditView.render();
 		}
 
 
@@ -2485,13 +2422,12 @@ var app = app || {};
 
 
 
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.TableEditView = Backbone.View.extend({
+	Donkeylift.TableEditView = Backbone.View.extend({
 		el:  '#modalEditTable',
 
 		events: {
@@ -2513,18 +2449,18 @@ var app = app || {};
 		updateClick: function() {
 			var newName = $('#modalInputTableName').val();
 			this.model.set('name', newName);
-			if ( ! app.schema.get('tables').contains(this.model)) {
-				app.schema.get('tables').add(this.model);
-				app.setTable(this.model);
+			if ( ! Donkeylift.app.schema.get('tables').contains(this.model)) {
+				Donkeylift.app.schema.get('tables').add(this.model);
+				Donkeylift.app.setTable(this.model);
 			}
-			app.schema.update();
+			Donkeylift.app.schema.update();
 		},
 
 		removeClick: function() {	
 			if (this.model.collection) {
 				this.model.collection.remove(this.model);
-				app.tableView.remove();
-				app.schema.update();
+				Donkeylift.app.tableView.remove();
+				Donkeylift.app.schema.update();
 			}
 		}
 
@@ -4356,14 +4292,13 @@ module.exports = (function() {
   };
 })();
 
-/*global Backbone, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, _ */
 var pegParser = module.exports;
 
 (function () {
 	'use strict';
 
-	app.Router = Backbone.Router.extend({
+	Donkeylift.Router = Backbone.Router.extend({
 
         routes: {
             "data": "routeData",
@@ -4378,18 +4313,18 @@ var pegParser = module.exports;
         },
 
         routeDownloads: function() {
-			app.unsetSchema();
-            app.gotoModule("downloads");
+			Donkeylift.app.unsetSchema();
+            Donkeylift.app.gotoModule("downloads");
         },
 
         routeData: function() {
-            app.gotoModule("data");
-			app.resetTable();
+            Donkeylift.app.gotoModule("data");
+			Donkeylift.app.resetTable();
         },
 
         routeSchema: function() {
-            app.gotoModule("schema");
-			app.resetTable();
+            Donkeylift.app.gotoModule("schema");
+			Donkeylift.app.resetTable();
         },
 
 		routeUrlTableData: function(schemaName, tableName, paramStr) {
@@ -4432,10 +4367,10 @@ var pegParser = module.exports;
 			}
 
 			console.log("routeGotoRow " + tableName + " " + filter);
-			app.filters.setFilter({
+			Donkeylift.app.filters.setFilter({
 				table: filterTable,
 				field: 'id',
-				op: app.Filter.OPS.EQUAL,
+				op: Donkeylift.Filter.OPS.EQUAL,
 				value: kv[1]
 			});
 			
@@ -4443,12 +4378,12 @@ var pegParser = module.exports;
 		},
 
 		routeResetFilter: function() {
-			app.unsetFilters();
-			app.resetTable();
+			Donkeylift.app.unsetFilters();
+			Donkeylift.app.resetTable();
 		},
 
 		routeReloadTable: function() {
-			app.table.reload();
+			Donkeylift.app.table.reload();
 		},
 
 		parseParams: function(paramStr) {
@@ -4491,28 +4426,28 @@ var pegParser = module.exports;
 
 			var setOthers = function() {
 
-				var table = app.schema.get('tables').find(function(t) { 
+				var table = Donkeylift.app.schema.get('tables').find(function(t) { 
 					return t.get('name') == tableName; 
 				});			
 
 				if (options.params) {
 					//set filters
 					var filters = _.map(options.params.$filter, function(f) {
-						return new app.Filter(f);
+						return new Donkeylift.Filter(f);
 					});
-					app.setFilters(filters);
+					Donkeylift.app.setFilters(filters);
 				}
 				
 				//load data			
-				app.setTable(table, options.params);
+				Donkeylift.app.setTable(table, options.params);
 			}
 
 			if (options.module) {
-				app.gotoModule(options.module);
+				Donkeylift.app.gotoModule(options.module);
 			}
 
 			if (options.schema) {
-				app.setSchema(options.schema, setOthers);
+				Donkeylift.app.setSchema(options.schema, setOthers);
 
 			} else {
 				setOthers();
@@ -4528,38 +4463,37 @@ var pegParser = module.exports;
 })();
 
 /*global Backbone */
-var REST_ROOT = "http://api.donkeylift.com";  //set by gulp according to env var DONKEYLIFT_API. e.g. "http://api.donkeylift.com";
-var app = app || {};
+var DONKEYLIFT_API = "http://api.donkeylift.com";  //set by gulp according to env var DONKEYLIFT_API. e.g. "http://api.donkeylift.com";
 
 $(function () {
 	'use strict';
-
+	var app = {};
 	/**** init app - called at the end ***/
 	app.init = function() {
 
 		//fixed user named demo
 		app.user = 'demo';
 
-		app.schemas = new app.Schemas(null, {url: REST_ROOT + '/' + app.user});
+		app.schemas = new Donkeylift.Schemas(null, {url: DONKEYLIFT_API + '/' + app.user});
 
-		app.filters = new app.Filters();
+		app.filters = new Donkeylift.Filters();
 
-		app.schemaCurrentView = new app.SchemaCurrentView();
+		app.schemaCurrentView = new Donkeylift.SchemaCurrentView();
 
-		app.schemaEditView = new app.SchemaEditView();
-		app.tableEditView = new app.TableEditView();
-		app.fieldEditView = new app.FieldEditView();
-		app.relationEditView = new app.RelationEditView();
-		app.aliasEditView = new app.AliasEditView();
+		app.schemaEditView = new Donkeylift.SchemaEditView();
+		app.tableEditView = new Donkeylift.TableEditView();
+		app.fieldEditView = new Donkeylift.FieldEditView();
+		app.relationEditView = new Donkeylift.RelationEditView();
+		app.aliasEditView = new Donkeylift.AliasEditView();
 
-		app.filterShowView = new app.FilterShowView();
+		app.filterShowView = new Donkeylift.FilterShowView();
 
 		app.schemas.fetch({success: function() {
-			app.schemaListView = new app.SchemaListView({collection: app.schemas});
+			app.schemaListView = new Donkeylift.SchemaListView({collection: app.schemas});
 			$('#schema-list').append(app.schemaListView.render().el);
 		}});
 
-		app.router = new app.Router();
+		app.router = new Donkeylift.Router();
 		Backbone.history.start();
 
 		app.gotoModule('data');
@@ -4604,11 +4538,11 @@ $(function () {
 		$("#content").empty();
 
 		if (name == 'schema') {
-			app.menuView = new app.MenuSchemaView();
+			app.menuView = new Donkeylift.MenuSchemaView();
 		} else if (name == 'data') {
-			app.menuView = new app.MenuDataView();
+			app.menuView = new Donkeylift.MenuDataView();
 		} else if (name == 'downloads') {
-			app.menuView = new app.DownloadsView();
+			app.menuView = new Donkeylift.DownloadsView();
 		}
 		app.menuView.render();
 
@@ -4616,9 +4550,9 @@ $(function () {
 
 	app.module = function() {
 		var m;
-		if (app.menuView instanceof app.MenuSchemaView) m = 'schema';
-		else if (app.menuView instanceof app.MenuDataView) m = 'data';
-		else if (app.menuView instanceof app.DownloadsView) m = 'downloads';
+		if (app.menuView instanceof Donkeylift.MenuSchemaView) m = 'schema';
+		else if (app.menuView instanceof Donkeylift.MenuDataView) m = 'data';
+		else if (app.menuView instanceof Donkeylift.DownloadsView) m = 'downloads';
 		//console.log('module ' + m);
 		return m;		
 	}
@@ -4633,13 +4567,13 @@ $(function () {
 		if (app.tableView) app.tableView.remove();
 
 		if (app.module() == 'data') {
-			app.tableView = new app.DataTableView({
+			app.tableView = new Donkeylift.DataTableView({
 				model: table, 
 				attributes: { params: params }
 						
 			});
 		} else if (app.module() == 'schema') {
-			app.tableView = new app.SchemaTableView({model: table});
+			app.tableView = new Donkeylift.SchemaTableView({model: table});
 		}
 
 		$('#content').html(app.tableView.render().el);			
@@ -4673,9 +4607,9 @@ $(function () {
 		if (loadRequired) {
 			console.log('app.setSchema loadRequired');
 			app.unsetSchema();
-			app.schema = new app.Database({name : name, id : name});
+			app.schema = new Donkeylift.Database({name : name, id : name});
 			app.schema.fetch(function() {
-				app.tableListView = new app.TableListView({
+				app.tableListView = new Donkeylift.TableListView({
 					collection: app.schema.get('tables')
 				});
 				$('#sidebar').append(app.tableListView.render().el);
@@ -4690,41 +4624,27 @@ $(function () {
 		}
 	}
 
-/*
-	app.newSchema = function(name) {
-		app.unsetSchema();
-		app.schema = new app.Database({name : name});
-		app.schema.save(function() {
-			app.tableListView = new app.TableListView({
-				collection: app.schema.get('tables')
-			});
-			$('#sidebar').append(app.tableListView.render().el);
-
-			//render current schema label
-			app.schemaCurrentView.render();
-		});
-	}
-*/
-
 	/**** data stuff ****/
 
 	app.setFilters = function(filters) {
-		app.filters = new app.Filters(filters);
+		app.filters = new Donkeylift.Filters(filters);
 	}
 
 	app.unsetFilters = function() {
-		app.filters = new app.Filters();
+		app.filters = new Donkeylift.Filters();
 	}
 
 	app.setFilterView = function(filter, $parentElem) {
 		if (app.filterView) app.filterView.remove();
-		app.filterView = new app.FilterView({ model: filter });
+		app.filterView = new Donkeylift.FilterView({ model: filter });
 		$parentElem.append(app.filterView.el);
 		app.filterView.render();
 	}
 
+	//make app global
+	Donkeylift.app = app;
+
 	//start
 	app.init();
-
 });
 

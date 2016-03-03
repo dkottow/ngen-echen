@@ -1,18 +1,17 @@
-/*global Backbone, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, _ */
 
 (function () {
 	'use strict';
 	//console.log("Table class def");
-	app.Table = Backbone.Model.extend({ 
+	Donkeylift.Table = Backbone.Model.extend({ 
 		
 		initialize: function(attrs) {
 			console.log("Table.initialize " + attrs.name);
 			var fields = _.map( _.sortBy(attrs.fields, 'order'), 
 						function(field) {
-				return new app.Field(field);
+				return new Donkeylift.Field(field);
 			});			
-			this.set('fields', new app.Fields(fields));
+			this.set('fields', new Donkeylift.Fields(fields));
 			//relations and row_alias are set in initRefs
 		},
 
@@ -37,14 +36,14 @@ var app = app || {};
 					function(field) {
 						return field.get('fk_table') == parent_name;
 				});
-				var relation = new app.Relation({
+				var relation = new Donkeylift.Relation({
 					table: this,
 					related: pt,
 					field: fk
 				});
 				relations.push(relation);
 			}, this);
-			this.set('relations', new app.Relations(relations), {silent: true});
+			this.set('relations', new Donkeylift.Relations(relations), {silent: true});
 		},
 
 		initAlias : function(tables) {
@@ -70,7 +69,7 @@ var app = app || {};
 					function(f) {
 						return f.get('name') == field_name;
 				});
-				row_alias.push(new app.Alias({
+				row_alias.push(new Donkeylift.Alias({
 							table : alias_table,
 							field : alias_field
 				}));
@@ -86,7 +85,7 @@ var app = app || {};
 		},
 
 		createView: function(options) {
-			return new app.TableView(options);
+			return new Donkeylift.TableView(options);
 		},
 
 		attrJSON: function() {
@@ -123,13 +122,13 @@ var app = app || {};
 
 	});
 
-	app.Table.create = function(name) {
+	Donkeylift.Table.create = function(name) {
 		var fields = [ 
 			{ name: 'id', type: 'INTEGER', order: 1 },
 			{ name : 'modified_by', type: 'VARCHAR', order: 2 },
 			{ name : 'modified_on', type: 'DATETIME', order: 3 }
 		];
-		var table = new app.Table({
+		var table = new Donkeylift.Table({
 			name: name,
 			fields: fields
 		});

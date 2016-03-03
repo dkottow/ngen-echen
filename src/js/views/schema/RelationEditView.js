@@ -1,10 +1,9 @@
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.RelationEditView = Backbone.View.extend({
+	Donkeylift.RelationEditView = Backbone.View.extend({
 		el:  '#modalEditRelation',
 
 		events: {
@@ -22,7 +21,7 @@ var app = app || {};
 
 			var el = $('#modalInputRelationTable')
 			el.html('');
-			app.schema.get('tables').each(function(table) {
+			Donkeylift.app.schema.get('tables').each(function(table) {
 				el.append($('<option></option>')
 					.attr('value', table.get('name'))
 					.text(table.get('name')));
@@ -62,11 +61,11 @@ var app = app || {};
 				newField = newTable + "_id";
 				var f = this.model.get('table').get('fields').addNew();
 				f.set('name', newField);
-				f.set('type', app.Field.TYPES.INTEGER);
+				f.set('type', Donkeylift.Field.TYPES.INTEGER);
 			}
 
 			newField = this.model.get('table').get('fields').getByName(newField);
-			newTable = app.schema.get('tables').getByName(newTable);
+			newTable = Donkeylift.app.schema.get('tables').getByName(newTable);
 			//console.log('new field ' + fields.getByName(newField).get('name'));
 			//console.log('new related table ' + tables.getByName(newTable).get('name'));
 			
@@ -75,17 +74,17 @@ var app = app || {};
 				'field': newField,
 				'related': newTable
 			});	
-			if ( ! app.table.get('relations').contains(this.model)) {
-				app.table.get('relations').add(this.model);
+			if ( ! Donkeylift.app.table.get('relations').contains(this.model)) {
+				Donkeylift.app.table.get('relations').add(this.model);
 			}
-			app.schema.update();
+			Donkeylift.app.schema.update();
 		},
 
 		removeClick: function() {	
 			console.log("RelationEditView.removeClick " + this.model.collection);
 			if (this.model.collection) {
 				this.model.collection.remove(this.model);
-				app.schema.update();
+				Donkeylift.app.schema.update();
 			}
 		},
 

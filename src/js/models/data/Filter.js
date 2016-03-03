@@ -1,9 +1,8 @@
-/*global Backbone, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, _ */
 
 (function () {
 	'use strict';
-	app.Filter = Backbone.Model.extend({
+	Donkeylift.Filter = Backbone.Model.extend({
 
 		initialize: function(attrs) {
 			console.log("Filter.initialize ");			
@@ -11,7 +10,7 @@ var app = app || {};
 			
 			if (_.isString(attrs.table)) {
 				this.set('table', 
-					app.schema.get('tables').getByName(attrs.table));
+					Donkeylift.app.schema.get('tables').getByName(attrs.table));
 			}
 
 			if (attrs.field && _.isString(attrs.field)) {
@@ -19,7 +18,7 @@ var app = app || {};
 					this.get('table').get('fields').getByName(attrs.field));
 			}
 
-			this.set('id', app.Filter.Key(attrs.table, attrs.field));
+			this.set('id', Donkeylift.Filter.Key(attrs.table, attrs.field));
 
 		},
 
@@ -31,9 +30,9 @@ var app = app || {};
 
 			return val.map(function(v) {
 				if (me.get('field').get('fk') == 1 
-					&& me.get('op') == app.Filter.OPS.IN) {
+					&& me.get('op') == Donkeylift.Filter.OPS.IN) {
 
-					return app.Field.getIdFromRef(v);
+					return Donkeylift.Field.getIdFromRef(v);
 
 				} else {
 					return me.get('field').toQS(v);
@@ -43,23 +42,23 @@ var app = app || {};
 
 		toParam: function() {
 			var f = this.get('field') ? this.get('field').vname() : null;
-			var key = app.Filter.Key(this.get('table'), f);
+			var key = Donkeylift.Filter.Key(this.get('table'), f);
 			var param;
 
-			if (this.get('op') == app.Filter.OPS.SEARCH) {
+			if (this.get('op') == Donkeylift.Filter.OPS.SEARCH) {
 				param = key + " search '" + this.get('value') + "'";
 
-			} else if (this.get('op') == app.Filter.OPS.EQUAL) {
+			} else if (this.get('op') == Donkeylift.Filter.OPS.EQUAL) {
 				param = key + " eq " 
 						+ this.get('field').toQS(this.get('value'));
 
 			} else {
 				var values = this.values();
-				if (this.get('op') == app.Filter.OPS.BETWEEN) {
+				if (this.get('op') == Donkeylift.Filter.OPS.BETWEEN) {
 					param = key + " btwn " + values[0] + ',' + values[1];
 
-				} else if (this.get('op') == app.Filter.OPS.IN) {
-					key = app.Filter.Key(this.get('table'), this.get('field'));
+				} else if (this.get('op') == Donkeylift.Filter.OPS.IN) {
+					key = Donkeylift.Filter.Key(this.get('table'), this.get('field'));
 					param = key + " in " + values.join(",");
 				}
 			}
@@ -85,22 +84,22 @@ var app = app || {};
 
 		toStrings: function() {
 			var result = { table: this.get('table').get('name'), field: '' };
-			if (this.get('op') == app.Filter.OPS.SEARCH) {
+			if (this.get('op') == Donkeylift.Filter.OPS.SEARCH) {
 				result.op = 'search';
 				result.value = this.get('value');
 
-			} else if (this.get('op') == app.Filter.OPS.BETWEEN) {
+			} else if (this.get('op') == Donkeylift.Filter.OPS.BETWEEN) {
 				result.op = 'between';
 				result.field = this.get('field').get('name');
 				result.value = this.get('value')[0] 
 							+ ' and ' + this.get('value')[1];
 
-			} else if (this.get('op') == app.Filter.OPS.IN) {
+			} else if (this.get('op') == Donkeylift.Filter.OPS.IN) {
 				result.op = 'in';
 				result.field = this.get('field').get('name');
 				result.value = this.get('value').join(', '); 
 
-			} else if (this.get('op') == app.Filter.OPS.EQUAL) {
+			} else if (this.get('op') == Donkeylift.Filter.OPS.EQUAL) {
 				result.op = 'equal';
 				result.field = this.get('field').get('name');
 				result.value = this.get('value'); 
@@ -110,20 +109,20 @@ var app = app || {};
 
 	});
 
-	app.Filter.Key = function(table, field) {		
+	Donkeylift.Filter.Key = function(table, field) {		
 		if (_.isObject(table)) table = table.get('name');
 		if ( ! field) field = table;
 		else if (_.isObject(field)) field = field.get('name'); //not vname
 		return table + '.' + field;
 	}
 
-	app.Filter.OPS = {
+	Donkeylift.Filter.OPS = {
 		'SEARCH': 'search',
 		'BETWEEN': 'btwn',
 		'IN': 'in',
 		'EQUAL': 'eq'
 	}
 
-	app.Filter.CONJUNCTION = ' and ';
+	Donkeylift.Filter.CONJUNCTION = ' and ';
 
 })();

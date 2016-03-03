@@ -1,10 +1,9 @@
-/*global Backbone, jQuery, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, jQuery, _ */
 
 (function ($) {
 	'use strict';
 
-	app.AliasView = Backbone.View.extend({
+	Donkeylift.AliasView = Backbone.View.extend({
 
 		//el: '#alias',
 
@@ -43,8 +42,8 @@ var app = app || {};
 			});
 
 			//console.log(fieldQName);
-			app.aliasEditView.setModel(this.model, alias);
-			app.aliasEditView.render();
+			Donkeylift.app.aliasEditView.setModel(this.model, alias);
+			Donkeylift.app.aliasEditView.render();
 		},
 
 	});

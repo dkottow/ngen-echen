@@ -1,15 +1,14 @@
-/*global Backbone */
-var app = app || {};
+/*global Donkeylift, Backbone */
 
 (function () {
 	'use strict';
 	console.log("Schema class def");
-	app.Schema = Backbone.Model.extend({
+	Donkeylift.Schema = Backbone.Model.extend({
 
 		initialize: function(attrs) {
 			console.log("Schema.initialize " + attrs.name);
 
-			if ( ! attrs.table) this.set('tables', new app.Tables());
+			if ( ! attrs.table) this.set('tables', new Donkeylift.Tables());
 
 			//this.set('id', attrs.name); //unset me when new
 			//this.orgJSON = this.toJSON();
@@ -32,14 +31,14 @@ var app = app || {};
 		parse : function(response) {
 			console.log("Schema.parse " + response);
 			var tables = _.map(response.tables, function(table) {
-				return new app.Table(table);
+				return new Donkeylift.Table(table);
 			});
-			response.tables = new app.Tables(tables);
+			response.tables = new Donkeylift.Tables(tables);
 			return response;
 		},
 
 		url : function() {
-			return app.schemas.url() + '/' + this.get('name');
+			return Donkeylift.app.schemas.url() + '/' + this.get('name');
 		},
 
 		fetch : function(cbAfter) {
@@ -91,16 +90,16 @@ return;
 			} else {
 				this.unset('id'); 
 				saveOptions.parse = false;
-				saveOptions.url = app.schemas.url();
+				saveOptions.url = Donkeylift.app.schemas.url();
 				console.log("Schema.save " + saveOptions.url);
 				saveOptions.success = function(model) {
 					console.log("Schema.save new OK");
 					//set id to (new) name
 					model.set('id', model.get('name'));
-					app.schema = model;
+					Donkeylift.app.schema = model;
 
 					//reload schema list
-					app.schemas.fetch({
+					Donkeylift.app.schemas.fetch({
 						reset: true,
 						success: function() {
 							cbResult();
@@ -119,8 +118,8 @@ return;
 		destroy: function(cbResult) {
 			var destroyOptions = {
 				success: function() {			
-					app.unsetSchema();
-					app.schemas.fetch({
+					Donkeylift.app.unsetSchema();
+					Donkeylift.app.schemas.fetch({
 						reset: true,
 						success: function() {
 							cbResult();

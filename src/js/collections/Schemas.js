@@ -1,9 +1,8 @@
-/*global Backbone */
-var app = app || {};
+/*global Backbone, Donkeylift */
 
 (function () {
 	'use strict';
-	app.Schemas = Backbone.Collection.extend({
+	Donkeylift.Schemas = Backbone.Collection.extend({
 
 		initialize: function(models, options) {
 			console.log("Schemas.initialize " + options);
@@ -11,7 +10,7 @@ var app = app || {};
 		},
 
 		//Schemas is just a list of schema names
-		//model: app.Schema,
+		//model: Donkeylift.Schema,
 
 		url	: function() { 
 			return this._url;

@@ -1,14 +1,13 @@
-/*global Backbone, _ */
-var app = app || {};
+/*global Donkeylift, Backbone, _ */
 
 (function () {
 	'use strict';
 	//console.log("Field class def");
-	app.Field = Backbone.Model.extend({ 
+	Donkeylift.Field = Backbone.Model.extend({ 
 		initialize: function(field) {
 			var rxp = /(\w+)(\([0-9,]+\))?/
 			var match = field.type.match(rxp)
-			this.set('type', app.Field.TypeAlias(match[1]));
+			this.set('type', Donkeylift.Field.TypeAlias(match[1]));
 			var spec;
 			if (match[2]) spec = match[2].substr(1, match[2].length - 2);
 			this.set('length', spec);
@@ -25,7 +24,7 @@ var app = app || {};
 		},		
 
 		toJSON: function() {
-			var type = app.Field.ALIAS[this.get('type')];
+			var type = Donkeylift.Field.ALIAS[this.get('type')];
 			if (this.get('length')) {
 				type += '(' + this.get('length') + ')';
 			}
@@ -43,14 +42,14 @@ var app = app || {};
 				return val;
 			}
 			var t = this.get('type');
-			if (t == app.Field.TYPES.INTEGER) {
+			if (t == Donkeylift.Field.TYPES.INTEGER) {
 				return parseInt(val);
-			} else if(t == app.Field.TYPES.NUMERIC) {
+			} else if(t == Donkeylift.Field.TYPES.NUMERIC) {
 				return parseFloat(val);
-			} else if(t == app.Field.TYPES.DATE) {
+			} else if(t == Donkeylift.Field.TYPES.DATE) {
 				//return new Date(val); 
 				return new Date(val).toISOString().substr(0,10);
-			} else if (t == app.Field.TYPES.DATETIME) {
+			} else if (t == Donkeylift.Field.TYPES.DATETIME) {
 				//return new Date(val);
 				return new Date(val).toISOString();
 			} else {
@@ -64,7 +63,8 @@ var app = app || {};
 				return "'" + val + "'";
 			}
 			var t = this.get('type');
-			if (t == app.Field.TYPES.INTEGER || t == app.Field.TYPES.NUMERIC) {
+			if (t == Donkeylift.Field.TYPES.INTEGER
+				|| t == Donkeylift.Field.TYPES.NUMERIC) {
 				return val;
 			} else {
 				return "'" + val + "'";
@@ -73,15 +73,15 @@ var app = app || {};
 
 	});
 
-	app.Field.create = function(name) {
-		return new app.Field({
+	Donkeylift.Field.create = function(name) {
+		return new Donkeylift.Field({
 			name: name,
 			type: 'VARCHAR'
 		});
 	}
 
 
-	app.Field.TYPES = {
+	Donkeylift.Field.TYPES = {
 		'INTEGER': 'Integer',
 		'NUMERIC': 'Decimal',
 		'VARCHAR': 'Text',
@@ -89,19 +89,19 @@ var app = app || {};
 		'DATETIME': 'Timestamp'
 	}
 
-	app.Field.ALIAS = _.invert(app.Field.TYPES);
+	Donkeylift.Field.ALIAS = _.invert(Donkeylift.Field.TYPES);
 
-	app.Field.TypeAlias = function(type) {
-		return app.Field.TYPES[type]; 		
+	Donkeylift.Field.TypeAlias = function(type) {
+		return Donkeylift.Field.TYPES[type]; 		
 	}
 
-	app.Field.toDate = function(dateISOString) {
+	Donkeylift.Field.toDate = function(dateISOString) {
 		return new Date(dateISOString.split('-')[0], 
 						dateISOString.split('-')[1] - 1,
 						dateISOString.split('-')[2]);
 	}
 
-	app.Field.getIdFromRef = function(val) {
+	Donkeylift.Field.getIdFromRef = function(val) {
 		if (_.isNumber(val)) return val;
 		//extract fk from ref such as 'Book (12)'
 		var m = val.match(/^(.*)\(([0-9]+)\)$/);
