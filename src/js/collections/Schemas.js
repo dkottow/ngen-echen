@@ -15,7 +15,6 @@ var app = app || {};
 
 		url	: function() { 
 			return this._url;
-			//return REST_ROOT + "/" + app.user; 
 		},
 
 		parse : function(response) {

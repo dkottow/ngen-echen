@@ -75,7 +75,7 @@ var STATS_EXT = '.stats';
 		ajaxGetRowsFn: function() {
 			var me = this;
 			return function(data, callback, settings) {
-				console.log('request to REST');
+				console.log('request to api');
 				var orderField = me.get('fields')
 								.at(data.order[0].column);
 
@@ -105,18 +105,18 @@ var STATS_EXT = '.stats';
 					+ '&' + skipParam 
 					+ '&' + topParam
 					+ '&' + filters.toParam();
-				var url = REST_ROOT + me.get('url') + ROWS_EXT + '?' + q;
+				var url = DONKEYLIFT_API + me.get('url') + ROWS_EXT + '?' + q;
 
 				console.log(url);
 
-				me.lastFilterUrl = REST_ROOT
+				me.lastFilterUrl = DONKEYLIFT_API
 								 + me.get('url') + ROWS_EXT + '?'
 								 + filters.toParam();
 
 				$.ajax(url, {
 					cache: false
 				}).done(function(response) {
-					//console.log('response from REST');
+					//console.log('response from api');
 					//console.dir(response);
 
 					var fragment = 
@@ -164,7 +164,7 @@ var STATS_EXT = '.stats';
 			var filters = app.filters.apply(filter);
 			q = q + '&' + app.Filters.toParam(filters);
 
-			var url = REST_ROOT + this.get('url') + STATS_EXT 
+			var url = DONKEYLIFT_API + this.get('url') + STATS_EXT 
 					+ '?' + q;
 
 			console.log('stats ' + me.get('name') + '.' + fieldName 
@@ -201,7 +201,7 @@ var STATS_EXT = '.stats';
 			var filters = app.filters.apply(filter, searchTerm);
 			q = q + '&' + app.Filters.toParam(filters);
 
-			var url = REST_ROOT + this.get('url') + ROWS_EXT 
+			var url = DONKEYLIFT_API + this.get('url') + ROWS_EXT 
 					+ '?' + q;
 
 			console.log('options ' + me.get('name') + '.' + fieldName 

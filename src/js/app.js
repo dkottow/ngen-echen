@@ -1,5 +1,5 @@
 /*global Backbone */
-var REST_ROOT = "$DONKEYLIFT_API";  //set by gulp according to env var DONKEYLIFT_API. e.g. "http://api.donkeylift.com";
+var DONKEYLIFT_API = "$DONKEYLIFT_API";  //set by gulp according to env var DONKEYLIFT_API. e.g. "http://api.donkeylift.com";
 var app = app || {};
 
 $(function () {
@@ -11,7 +11,7 @@ $(function () {
 		//fixed user named demo
 		app.user = 'demo';
 
-		app.schemas = new app.Schemas(null, {url: REST_ROOT + '/' + app.user});
+		app.schemas = new app.Schemas(null, {url: DONKEYLIFT_API + '/' + app.user});
 
 		app.filters = new app.Filters();
 

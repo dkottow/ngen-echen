@@ -51,7 +51,7 @@ gulp.task('build-3rdparty-js', function() {
 
 gulp.task('build-app-css', function() {
 	return gulp.src('./src/css/*.css')
-		.pipe(concat('app.css'))
+		.pipe(concat('donkeylift.css'))
 		.pipe(gulp.dest('./public/css/'));
 });
 
@@ -64,7 +64,7 @@ gulp.task('build-app-js', function() {
 					 "./src/js/app.js"
 			])
 		.pipe(replace("$DONKEYLIFT_API", process.env.DONKEYLIFT_API))
-		.pipe(concat('app.js'))
+		.pipe(concat('donkeylift.js'))
 		.pipe(gulp.dest('./public/js/'));
 			
 });
