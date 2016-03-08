@@ -36,6 +36,8 @@
 			params = params || {};
 			var dtOptions = {};
 			
+			dtOptions.lengthMenu = params.lengthMenu || [5, 10, 25, 50, 100];
+
 			dtOptions.displayStart = params.$skip || 0;
 			dtOptions.pageLength = params.$top || 10;
 
@@ -82,11 +84,12 @@
 			var dtOptions = this.getOptions(this.attributes.params, columns);
 			console.log(dtOptions);
 
-			this.$('#grid').dataTable({
+			me.dataTable = this.$('#grid').DataTable({
 				serverSide: true,
 				columns: this.model.getColumns(),				
 				ajax: this.model.ajaxGetRowsFn(),
 				search: initSearch,
+				lengthMenu: dtOptions.lengthMenu, 
 				displayStart: dtOptions.displayStart, 
 				pageLength: dtOptions.pageLength, 
 				order: dtOptions.order
@@ -139,7 +142,6 @@
 				console.log("search.dt");
 				Donkeylift.app.router.navigate("reload-table", {trigger: false});			
 			});
-
 
 			return this;
 		},
