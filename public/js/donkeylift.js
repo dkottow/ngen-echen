@@ -456,6 +456,31 @@ return;
 
 })();
 
+/*global Donkeylift, Backbone, _ */
+
+(function () {
+	'use strict';
+	//console.log("Table class def");
+	Donkeylift.Database = Donkeylift.Schema.extend({ 
+
+		initialize : function(attrs, options) {
+			console.log("Database.initialize " + (attrs.name || ''));
+			Donkeylift.Schema.prototype.initialize.call(this, attrs);
+		},
+
+		parse : function(response) {
+			console.log("Database.parse " + response);
+
+			var tables = _.map(response.tables, function(table) {
+				return new Donkeylift.DataTable(table);
+			});
+			response.tables = new Donkeylift.Tables(tables);
+			return response;
+		},
+	});		
+
+})();
+
 /*global Donkeylift, Backbone */
 
 var ROWS_EXT = '.rows';
@@ -686,31 +711,6 @@ var STATS_EXT = '.stats';
 
 (function () {
 	'use strict';
-	//console.log("Table class def");
-	Donkeylift.Database = Donkeylift.Schema.extend({ 
-
-		initialize : function(attrs, options) {
-			console.log("Database.initialize " + (attrs.name || ''));
-			Donkeylift.Schema.prototype.initialize.call(this, attrs);
-		},
-
-		parse : function(response) {
-			console.log("Database.parse " + response);
-
-			var tables = _.map(response.tables, function(table) {
-				return new Donkeylift.DataTable(table);
-			});
-			response.tables = new Donkeylift.Tables(tables);
-			return response;
-		},
-	});		
-
-})();
-
-/*global Donkeylift, Backbone, _ */
-
-(function () {
-	'use strict';
 	Donkeylift.Filter = Backbone.Model.extend({
 
 		initialize: function(attrs) {
@@ -751,26 +751,29 @@ var STATS_EXT = '.stats';
 
 		toParam: function() {
 			var f = this.get('field') ? this.get('field').vname() : null;
-			var key = Donkeylift.Filter.Key(this.get('table'), f);
 			var param;
 
 			if (this.get('op') == Donkeylift.Filter.OPS.SEARCH) {
+				var key = Donkeylift.Filter.Key(this.get('table'), f);
 				param = key + " search '" + this.get('value') + "'";
 
-			} else if (this.get('op') == Donkeylift.Filter.OPS.EQUAL) {
-				param = key + " eq " 
-						+ this.get('field').toQS(this.get('value'));
+			} else if (this.get('op') == Donkeylift.Filter.OPS.BETWEEN) {
+				var values = this.values();
+				var key = Donkeylift.Filter.Key(this.get('table'), f);
+				param = key + " btwn " + values[0] + ',' + values[1];
+
+			} else if (this.get('op') == Donkeylift.Filter.OPS.IN) {				
+				var values = this.values();
+				var key = Donkeylift.Filter.Key(this.get('table'), this.get('field'));
+				param = key + " in " + values.join(",");
 
 			} else {
-				var values = this.values();
-				if (this.get('op') == Donkeylift.Filter.OPS.BETWEEN) {
-					param = key + " btwn " + values[0] + ',' + values[1];
-
-				} else if (this.get('op') == Donkeylift.Filter.OPS.IN) {
-					key = Donkeylift.Filter.Key(this.get('table'), this.get('field'));
-					param = key + " in " + values.join(",");
-				}
+				//EQUAL, GREATER, LESSER
+				var key = Donkeylift.Filter.Key(this.get('table'), f);
+				param = key + " " + this.get('op') + " " 
+				    + this.get('field').toQS(this.get('value'));
 			}
+
 
 			return param;
 		},
@@ -829,7 +832,9 @@ var STATS_EXT = '.stats';
 		'SEARCH': 'search',
 		'BETWEEN': 'btwn',
 		'IN': 'in',
-		'EQUAL': 'eq'
+		'EQUAL': 'eq',
+		'LESSER': 'le',
+		'GREATER': 'ge'
 	}
 
 	Donkeylift.Filter.CONJUNCTION = ' and ';
@@ -1049,37 +1054,6 @@ var STATS_EXT = '.stats';
 (function ($) {
 	'use strict';
 
-	Donkeylift.DownloadsView = Backbone.View.extend({
-		el:  '#content',
-
-		events: {
-			//'click #reset-all-filters': 'evResetAllFilters'
-		},
-
-		initialize: function() {
-			console.log("MenuView.init");
-			//this.listenTo(Donkeylift.table, 'change', this.render);
-		},
-
-		template: _.template($('#downloads-template').html()),
-
-		render: function() {
-			console.log('DownloadsView.render ');			
-			this.$el.html(this.template());
-			return this;
-		},
-
-	});
-
-})(jQuery);
-
-
-
-/*global Donkeylift, Backbone, jQuery, _ */
-
-(function ($) {
-	'use strict';
-
 	Donkeylift.SchemaCurrentView = Backbone.View.extend({
 		el:  '#schema-list',
 
@@ -1230,6 +1204,8 @@ var STATS_EXT = '.stats';
 			params = params || {};
 			var dtOptions = {};
 			
+			dtOptions.lengthMenu = params.lengthMenu || [5, 10, 25, 50, 100];
+
 			dtOptions.displayStart = params.$skip || 0;
 			dtOptions.pageLength = params.$top || 10;
 
@@ -1276,11 +1252,12 @@ var STATS_EXT = '.stats';
 			var dtOptions = this.getOptions(this.attributes.params, columns);
 			console.log(dtOptions);
 
-			this.$('#grid').dataTable({
+			me.dataTable = this.$('#grid').DataTable({
 				serverSide: true,
 				columns: this.model.getColumns(),				
 				ajax: this.model.ajaxGetRowsFn(),
 				search: initSearch,
+				lengthMenu: dtOptions.lengthMenu, 
 				displayStart: dtOptions.displayStart, 
 				pageLength: dtOptions.pageLength, 
 				order: dtOptions.order
@@ -1333,7 +1310,6 @@ var STATS_EXT = '.stats';
 				console.log("search.dt");
 				Donkeylift.app.router.navigate("reload-table", {trigger: false});			
 			});
-
 
 			return this;
 		},
@@ -4463,7 +4439,7 @@ var pegParser = module.exports;
 })();
 
 /*global Backbone */
-var DONKEYLIFT_API = "http://api.donkeylift.com";  //set by gulp according to env var DONKEYLIFT_API. e.g. "http://api.donkeylift.com";
+var DONKEYLIFT_API = "http://10.121.20.19:3000";  //set by gulp according to env var DONKEYLIFT_API. e.g. "http://api.donkeylift.com";
 
 $(function () {
 	'use strict';

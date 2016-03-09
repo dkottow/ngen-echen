@@ -1,0 +1,206 @@
+<!doctype html>
+<html>
+  <head>
+        <title>DonkeyLift</title>
+		<link href="css/3rdparty.css" rel="stylesheet" type="text/css" />
+        <link href="css/donkeylift.css" rel="stylesheet" type="text/css" />
+		<style>
+#main {
+    margin-top: 0;
+} 
+		</style>
+  </head>
+
+  <body>
+<div id="wrapper" class="container-fluid">	
+
+<!-- inject:nav:html -->
+<!-- endinject -->
+
+	<div id="main" class="row">
+
+<!-- Sidebar -->
+
+ <!-- Dynamic Content -->
+		<div id="module" class="row">			
+			<div class="row">
+			    <section id="content"></section>
+			</div>
+			<div id="chart" class="row" style="margin: 10px"></div>
+			<div class="row data-url" style="margin: 10px; text-align: right; ">
+				Data URL: <input id="input-url" type="text"></input>
+			</div>
+		</div>		
+
+	</div><!-- main -->
+
+</div><!-- id wrapper -->
+
+<!-- end FIXED PAGE ELEMENTS --> 
+
+	<div id="ajax-progress-spinner">
+		<img src="img/progress-spinner.gif"></img>
+	</div>	
+
+<!-- inject:templates:html -->
+<!-- endinject -->
+
+  		<script src="js/3rdparty.js" type="text/javascript"></script>
+		<script src="js/donkeylift.js" type="text/javascript"></script>
+
+		<script src="https://code.highcharts.com/highcharts.js"></script>
+
+		<script>
+
+		    var DL = Donkeylift;				    
+
+		    var SoilConfig = {
+			schema: "soils02",
+			soilTable: "soil",
+			hideColumns: [3, 4],
+			psdTable: "grain_size_detail"
+		    }
+
+		    $(function() {
+	    		//on document ready
+
+			//initialize app				    
+			init();		
+
+			//load schema and soil table data
+			DL.app.setSchema(SoilConfig.schema, function() {
+			    loadSoils();
+			});
+		    });
+
+
+		    function onClickRow() {
+
+			var soilId = $(this).find("td:first").text();
+			var soilName = $(this).find("td:nth(1)").text();
+
+			loadPSDData(soilId, {name: soilName});
+
+			//visually highlight selected row
+		        DL.app.tableView.dataTable.$('tr.selected').removeClass('selected');
+            		$(this).addClass('selected');			
+		    }
+
+		    function drawChart(data) {
+			//console.log(data.data);
+			$('#chart').highcharts({
+				chart: {
+					type: 'line'
+				},
+        			title: {
+					text: data.title
+        			},
+        			xAxis: {
+					type: 'logarithmic',
+	    				title: {
+	                			text: 'Particle Size'
+		    			}
+        			},
+			        yAxis: {
+			        	title: {
+						text: 'Percent Passing'
+					},
+					min: 0,
+					max: 1
+				},
+				series: [{
+					name: 'PSD',
+					data: data.data
+				}]
+    			});
+		    }
+
+		    function loadPSDData(soilId, options) {
+			var soilTable = DL.app.schema.get("tables").getByName(SoilConfig.soilTable);
+			var psdTable = DL.app.schema.get("tables").getByName(SoilConfig.psdTable);
+			var idField = psdTable.get("fields").getByName("id");
+			var filter = new DL.Filter({
+					table: soilTable,
+					field: idField,
+					op: DL.Filter.OPS.EQUAL,
+					value: soilId
+			});
+
+			var psdDataUrl = DONKEYLIFT_API + psdTable.get('url') + ROWS_EXT
+					+ '?' + "$filter=" + filter.toParam()
+			console.log(psdDataUrl);
+			
+			var psdDataOrderedUrl = psdDataUrl + '&' + "$orderby=particle_diameter";
+			$.ajax(psdDataOrderedUrl, {
+				cache: false
+			}).done(function(response) {
+
+				var data = [];
+				_.each(response.rows, function(row) {
+				    data.push([row.particle_diameter, row.percent_passing]);
+				});
+
+				drawChart({ 
+					title: options.name, 
+					data: data
+				});					
+			});				
+
+			$("#input-url").val(psdDataUrl);
+			$(".data-url").show();
+
+		    }	
+		    
+		    function init() {
+
+			/*
+			    monkey patch app.setTable() 
+			    to hide columns each time the Datatable is set
+			*/  
+			var setTableFunc = Donkeylift.app.setTable;
+			DL.app.setTable = function(table, params) {
+				
+			    setTableFunc(table, params); //call base func
+
+
+			    if (table.get("name") == SoilConfig.soilTable) {
+
+				//hide some columns
+				_.each(SoilConfig.hideColumns, function(ci) {
+				    DL.app.tableView.dataTable.column(ci).visible(false);
+				});
+
+				//event click on row
+				$('#grid tbody').on('click', 'tr', onClickRow);
+			    }
+				
+			}
+			$(".data-url").hide();
+		    }
+
+		    function loadSoils()
+		    {
+			var soilTable = DL.app.schema.get('tables').getByName(SoilConfig.soilTable);	
+			//construct a filter to show only soils with PSD available
+			var options = {
+				params: {
+				    "$filter": [{
+					table: "soil_test",
+					field: "id",
+					op: "ge",
+					value: 0	
+				    }]
+				}
+			};		
+
+			DL.app.router.gotoTable(SoilConfig.soilTable, options);
+			DL.app.tableView.dataTable.page.len(5).draw();
+		    }
+
+		</script>
+
+    </body>
+</html>
+
+
+

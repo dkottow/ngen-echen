@@ -11,7 +11,8 @@
     "gulp-concat": "*",
     "gulp-inject": "~1.5.0",
     "gulp-replace": "*",
-    "gulp-if": "*"
+    "gulp-if": "*",
+    "merge-stream": "*"
   }
   , "main": "server.js"
 }

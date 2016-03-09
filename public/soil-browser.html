@@ -1,0 +1,447 @@
+<!doctype html>
+<html>
+  <head>
+        <title>DonkeyLift</title>
+		<link href="css/3rdparty.css" rel="stylesheet" type="text/css" />
+        <link href="css/donkeylift.css" rel="stylesheet" type="text/css" />
+		<style>
+#main {
+    margin-top: 0;
+} 
+		</style>
+  </head>
+
+  <body>
+<div id="wrapper" class="container-fluid">	
+
+<!-- inject:nav:html -->
+<!-- endinject -->
+
+	<div id="main" class="row">
+
+<!-- Sidebar -->
+
+ <!-- Dynamic Content -->
+		<div id="module" class="row">			
+			<div class="row">
+			    <section id="content"></section>
+			</div>
+			<div id="chart" class="row" style="margin: 10px"></div>
+			<div class="row data-url" style="margin: 10px; text-align: right; ">
+				Data URL: <input id="input-url" type="text"></input>
+			</div>
+		</div>		
+
+	</div><!-- main -->
+
+</div><!-- id wrapper -->
+
+<!-- end FIXED PAGE ELEMENTS --> 
+
+	<div id="ajax-progress-spinner">
+		<img src="img/progress-spinner.gif"></img>
+	</div>	
+
+<!-- inject:templates:html -->
+<script type="text/template" id="alias-field-template">
+  <tr>
+	<td><%= table  %></td>
+	<td><%= field  %></td>
+	<td>
+		<button class="edit-alias btn btn-default">
+			<i class="fa fa-pencil"></i>
+		</button>
+	</td>
+  </tr>
+</script>
+
+
+<script type="text/template" id="data-menu-template">
+	<div class="btn-group" role="group">
+			<button id="show-filters" type="button" class="btn btn-default navbar-btn">Filters</button>
+			<a href="#reset-filter" id="reset-all-filters" type="button" class="btn btn-default navbar-btn">Reset All</a>
+	</div>
+</script>
+
+
+<script type="text/template" id="field-template">
+	<td>
+		<i class="fa fa-arrows-v"></i>
+	</td>
+	<td><%= name %></td>
+	<td><%= type %></td>
+	<td><%= length %></td>
+	<td>
+		<button class="edit-field btn btn-default">
+			<i class="fa fa-pencil"></i>
+		</button>
+	</td>
+</script>
+
+
+<script type="text/template" id="filter-option-template">
+	<button type="button" data-target="<%= value %>" class="<%= name %> list-group-item input-sm"><%= value %></button>
+</script>
+
+<script type="text/template" id="filter-template">
+	<div class="filter-column">
+
+	  <!-- Nav tabs -->
+	  <ul class="nav nav-tabs">
+		<li class="active">
+			<a href="#filterRange" data-toggle="tab">Range</a>
+		</li>
+		<li>
+			<a href="#filterSelect" data-toggle="tab">Select</a>
+		</li>
+	  </ul>
+
+	  <!-- Tab panes -->
+	  <div class="tab-content">
+		<div class="tab-pane active" id="filterRange">
+			<form class="form-inline filter-form">				
+				<div class="form-group">
+					<label for="inputFilterMin" class="control-label">From</label>
+					<input type="text" class="form-control input-sm" id="inputFilterMin">
+				</div>
+				<div class="form-group">
+					<label for="inputFilterMax" class="control-label">To</label>
+					<input type="text" class="form-control input-sm" id="inputFilterMax">
+				</div>
+				<div id="sliderRange"></div>
+				<div class="filter-reset">
+					<button id="rangeReset" type="button" class="btn btn-primary">Reset</button>
+				</div>
+			</form>
+		</div>
+		<div class="tab-pane" id="filterSelect">
+			<form class="form-inline filter-form">				
+			<div class="pull-left" style="width: 45%">
+				<div class="form-group">
+					<label for="inputFilterItemsSearch" class="control-label">Search </label>						
+					<input type="text" class="form-control input-sm" id="inputFilterItemsSearch">
+				</div>
+				<div id="filterOptions" class="list-group scrollable-menu">
+				</div>						
+			</div>
+			<div class="pull-right" style="width: 45%">
+				<div class="form-group">
+					<label class="control-label">Selected </label>
+					<input style="visibility: hidden;"><!-- force equal heights -->
+				</div>
+				<div id="filterSelection" class="list-group scrollable-menu">
+				</div>
+			</div>
+			<div style="clear: both" class="filter-reset">
+				<button id="selectReset" type="button" class="btn btn-primary">Reset</button>
+			</div>
+			</form>
+		</div>
+	  </div>
+	</div>
+</script>		
+
+
+<script type="text/template" id="grid-column-template">
+	<th id="col-<%=name %>">
+		<div class="dropdown">
+			<%= name %>
+			<button data-toggle="dropdown" data-column="<%=name %>" class="field-filter btn btn-default btn-xs">
+				<i class="fa fa-filter fa-lg"></i>
+			</button>
+			<div class="dropdown-menu <%=dropalign %>">
+			</div>
+		</div>
+	</th>
+</script>
+
+
+<script type="text/template" id="grid-table-template">
+	<table id="grid" class="display" width="100%" cellspacing="0">
+		<thead>
+			<tr>
+			</tr>
+		</thead>
+		<tfoot>
+			<tr>
+			</tr>
+		</tfoot>
+	</table>
+</script>
+
+
+<script type="text/template" id="relation-template">
+	<td><% if (related) print(related.attributes.name) %></td>
+	<td><%= type %></td>
+	<td><% if (field) print(field.attributes.name) %></td>
+	<td>
+		<button class="edit-relation btn btn-default">
+			<i class="fa fa-pencil"></i>
+		</button>
+	</td>
+</script>
+
+
+<script type="text/template" id="schema-menu-template">
+	<div class="btn-group" role="group">
+			<button id="add-table" type="button" class="btn btn-default navbar-btn">Add Table</button>
+			<button id="save-schema" type="button" class="btn btn-info navbar-btn">Update Server</button>
+			<button id="new-schema" type="button" class="btn btn-default navbar-btn">New Database</button>
+	</div>
+</script>
+
+
+<script type="text/template" id="schema-select-template">
+	<li>
+		<a data-target="<%= name %>" class="schema-option" href="#">
+			<%= name %> 
+		</a>
+	</li>
+</script>
+
+
+<script type="text/template" id="show-filter-item-template">
+	<tr><td><%= table %></td><td><%= field %></td><td><%= op %></td><td><%= value %></td></tr>
+</script>
+
+
+<script type="text/template" id="table-item-template">
+	<a data-target="<%= name %>" class="list-group-item table-item" href="<%= href %>"> 
+		<%= name %> 
+	</a>
+</script>
+
+
+<script type="text/template" id="table-list-template">
+		<span href="#" class="list-group-item">
+			Tables
+		</span>
+		<!-- table items -->
+	</div>
+</script>
+
+
+<script type="text/template" id="table-template">
+	<div>
+		<div class="panel panel-heading">
+			<h3 class="panel-title">
+				<span>Table</span> <%= name%> &nbsp;
+				<button class="edit-table btn btn-default">
+					<i class="fa fa-pencil"></i>
+				</button>
+			</h3>
+			<br/>
+			<ul class="nav nav-tabs">
+				<li role="presentation" class="active"><a href="#fields" data-toggle="tab">Fields</a></li>
+				<li role="presentation"><a href="#relations" data-toggle="tab">References</a></li>
+				<li role="presentation"><a href="#alias" data-toggle="tab">Self Reference</a></li>
+			</ul>
+		</div>
+		<div class="tab-content">
+			<div role="tabpanel" class="panel tab-pane active" id="fields">
+				<table class="table field-table">
+					<thead>
+					<tr>
+						<th></th>
+						<th>Name</th>
+						<th>Type</th>
+						<th>Length</th>
+						<th></th>
+					</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+				<button id="add-field" class="btn btn-default">Add field</button>
+			</div>
+			<div role="tabpanel" class="panel tab-pane" id="relations">
+				<table class="table relation-table">
+					<thead>
+					<tr><th>Referenced Table</th>
+						<th>Type</th>
+						<th>Foreign Key</th>
+						<th></th>
+					</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+				<button id="add-relation" class="btn btn-default">Add reference</button>
+			</div>
+
+			<div role="tabpanel" class="panel tab-pane" id="alias">
+				<table class="table alias-table">
+					<thead><tr>
+						<th>Alias Table</th>
+						<th>Field</th>
+					</tr></thead>
+					<tbody></tbody>
+				</table>
+				<button id="add-alias" class="btn btn-default">Add field</button>
+			</div>
+
+		</div><!-- tabcontent -->
+
+	</div>
+</script>
+
+
+<!-- endinject -->
+
+  		<script src="js/3rdparty.js" type="text/javascript"></script>
+		<script src="js/donkeylift.js" type="text/javascript"></script>
+
+		<script src="https://code.highcharts.com/highcharts.js"></script>
+
+		<script>
+
+		    var DL = Donkeylift;				    
+
+		    var SoilConfig = {
+			schema: "soils02",
+			soilTable: "soil",
+			hideColumns: [3, 4],
+			psdTable: "grain_size_detail"
+		    }
+
+		    $(function() {
+	    		//on document ready
+
+			//initialize app				    
+			init();		
+
+			//load schema and soil table data
+			DL.app.setSchema(SoilConfig.schema, function() {
+			    loadSoils();
+			});
+		    });
+
+
+		    function onClickRow() {
+
+			var soilId = $(this).find("td:first").text();
+			var soilName = $(this).find("td:nth(1)").text();
+
+			loadPSDData(soilId, {name: soilName});
+
+			//visually highlight selected row
+		        DL.app.tableView.dataTable.$('tr.selected').removeClass('selected');
+            		$(this).addClass('selected');			
+		    }
+
+		    function drawChart(data) {
+			//console.log(data.data);
+			$('#chart').highcharts({
+				chart: {
+					type: 'line'
+				},
+        			title: {
+					text: data.title
+        			},
+        			xAxis: {
+					type: 'logarithmic',
+	    				title: {
+	                			text: 'Particle Size'
+		    			}
+        			},
+			        yAxis: {
+			        	title: {
+						text: 'Percent Passing'
+					},
+					min: 0,
+					max: 1
+				},
+				series: [{
+					name: 'PSD',
+					data: data.data
+				}]
+    			});
+		    }
+
+		    function loadPSDData(soilId, options) {
+			var soilTable = DL.app.schema.get("tables").getByName(SoilConfig.soilTable);
+			var psdTable = DL.app.schema.get("tables").getByName(SoilConfig.psdTable);
+			var idField = psdTable.get("fields").getByName("id");
+			var filter = new DL.Filter({
+					table: soilTable,
+					field: idField,
+					op: DL.Filter.OPS.EQUAL,
+					value: soilId
+			});
+
+			var psdDataUrl = DONKEYLIFT_API + psdTable.get('url') + ROWS_EXT
+					+ '?' + "$filter=" + filter.toParam()
+			console.log(psdDataUrl);
+			
+			var psdDataOrderedUrl = psdDataUrl + '&' + "$orderby=particle_diameter";
+			$.ajax(psdDataOrderedUrl, {
+				cache: false
+			}).done(function(response) {
+
+				var data = [];
+				_.each(response.rows, function(row) {
+				    data.push([row.particle_diameter, row.percent_passing]);
+				});
+
+				drawChart({ 
+					title: options.name, 
+					data: data
+				});					
+			});				
+
+			$("#input-url").val(psdDataUrl);
+			$(".data-url").show();
+
+		    }	
+		    
+		    function init() {
+
+			/*
+			    monkey patch app.setTable() 
+			    to hide columns each time the Datatable is set
+			*/  
+			var setTableFunc = Donkeylift.app.setTable;
+			DL.app.setTable = function(table, params) {
+				
+			    setTableFunc(table, params); //call base func
+
+
+			    if (table.get("name") == SoilConfig.soilTable) {
+
+				//hide some columns
+				_.each(SoilConfig.hideColumns, function(ci) {
+				    DL.app.tableView.dataTable.column(ci).visible(false);
+				});
+
+				//event click on row
+				$('#grid tbody').on('click', 'tr', onClickRow);
+			    }
+				
+			}
+			$(".data-url").hide();
+		    }
+
+		    function loadSoils()
+		    {
+			var soilTable = DL.app.schema.get('tables').getByName(SoilConfig.soilTable);	
+			//construct a filter to show only soils with PSD available
+			var options = {
+				params: {
+				    "$filter": [{
+					table: "soil_test",
+					field: "id",
+					op: "ge",
+					value: 0	
+				    }]
+				}
+			};		
+
+			DL.app.router.gotoTable(SoilConfig.soilTable, options);
+			DL.app.tableView.dataTable.page.len(5).draw();
+		    }
+
+		</script>
+
+    </body>
+</html>
+
+
+

@@ -6,7 +6,7 @@ var util = require('util');
 var app = express();
 
 var config = {
-	'ip'	:  '127.0.0.1',
+	'ip'	:  '10.121.20.19',
 	'port'	: 3001 
 }
 
