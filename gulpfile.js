@@ -57,33 +57,6 @@ gulp.task('build-3rdparty-js', function() {
 			
 });
 
-/*
-gulp.task('build-3rdparty-css', function() {
-	return gulp.src(['./src/3rdparty/bootstrap/css/bootstrap.min.css', 
-					'./src/3rdparty/jquery-ui/jquery-ui.min.css', 
-					'./src/3rdparty/font-awesome/css/font-awesome.min.css', 
-					'./src/3rdparty/DataTables/media/css/jquery.dataTables.min.css', 
-				])
-
-		.pipe(concat('3rdparty.css'))
-		.pipe(gulp.dest('./public/css/'));
-});
-
-gulp.task('build-3rdparty-js', function() {
-	return gulp.src(['./src/3rdparty/jquery/jquery.min.js', 
-					'./src/3rdparty/jquery-ui/jquery-ui.min.js', 
-					'./src/3rdparty/DataTables/media/js/jquery.dataTables.min.js', 
-					'./src/3rdparty/underscore/underscore.js', 
-					'./src/3rdparty/backbone/backbone.js', 
-					'./src/3rdparty/bootstrap/js/bootstrap.min.js', 
-				])
-
-		.pipe(concat('3rdparty.js'))
-		.pipe(gulp.dest('./public/js/'));
-			
-});
-*/
-
 gulp.task('build-app-css', function() {
 	return gulp.src('./src/css/*.css')
 		.pipe(concat('donkeylift.css'))
@@ -91,6 +64,12 @@ gulp.task('build-app-css', function() {
 });
 
 gulp.task('build-app-js', function() {
+
+	if ( ! process.env.DONKEYLIFT_API) {
+		console.log("ERROR. Define env var DONKEYLIFT_API");
+		process.exit(1);
+	}
+
 	return gulp.src(["./src/js/init.js",
 					 "./src/js/models/**/*.js",
 					 "./src/js/collections/**/*.js",
