@@ -6,7 +6,7 @@ var STATS_EXT = '.stats';
 (function () {
 	'use strict';
 	//console.log("Table class def");
-	Donkeylift.DataTable = Donkeylift.Table.extend({ 
+	Donkeylift.DataTable = Donkeylift.Table.extend({
 
 		createView: function(options) {
 			return new Donkeylift.DataTableView(options);
@@ -22,27 +22,28 @@ var STATS_EXT = '.stats';
 				.map(function(field) {
 
 					var abbrFn = function (data) {
-				   		return data.length > 40 
+							var s = field.toFS(data);
+				   		return s.length > 40
 							?  '<span title="'
-								+ data + '">'
-								+ data.substr( 0, 38) 
-								+ '...</span>' 
-							: data;
+								+ s + '">'
+								+ s.substr( 0, 38)
+								+ '...</span>'
+							: s;
 					}
 
-		    		var anchorFn = undefined;
-					if (field.get('name') == 'id' && me.get('children')) {
+		    	var anchorFn = undefined;
+					if (field.get('name') == 'id' && me.get('referenced').length > 0) {
 						anchorFn = function(id) {
-							var href = '#table' 
-								+ '/' + me.get('children')[0]
+							var href = '#table'
+								+ '/' + me.get('referenced')[0].table
 								+ '/' + me.get('name') + '.id=' + id;
-							
+
 							return '<a href="' + href + '">' + id + '</a>';
 						}
-						
+
 					} else if (field.get('fk') == 1) {
 						anchorFn = function(ref) {
-							var href = '#table' 
+							var href = '#table'
 								+ '/' + field.get('fk_table')
 								+ '/id=' + Donkeylift.Field.getIdFromRef(ref)
 
@@ -51,18 +52,18 @@ var STATS_EXT = '.stats';
 					}
 
 					var renderFn = function (data, type, full, meta ) {
-					
+
 						if (type == 'display' && data) {
 							return anchorFn ? anchorFn(data) : abbrFn(data);
 						} else {
 							return data;
 						}
 					}
-				
-					return { 
+
+					return {
 						data : field.vname(),
-		    			render: renderFn,
-						field: field 
+		    		render: renderFn,
+						field: field
 					};
 				});
 		},
@@ -78,10 +79,10 @@ var STATS_EXT = '.stats';
 				var orderField = me.get('fields')
 								.at(data.order[0].column);
 
-				var orderParam = '$orderby=' 
-								+ encodeURIComponent(orderField.vname() 
+				var orderParam = '$orderby='
+								+ encodeURIComponent(orderField.vname()
 								+ ' ' + data.order[0].dir);
-				
+
 				var skipParam = '$skip=' + data.start;
 				var topParam = '$top=' + data.length;
 
@@ -91,7 +92,7 @@ var STATS_EXT = '.stats';
 				}
 
 				var filters = Donkeylift.app.filters.clone();
-				
+
 				if (data.search.value.length > 0) {
 					filters.setFilter({
 						table: me,
@@ -101,7 +102,7 @@ var STATS_EXT = '.stats';
 				}
 
 				var q = orderParam
-					+ '&' + skipParam 
+					+ '&' + skipParam
 					+ '&' + topParam
 					+ '&' + filters.toParam();
 				var url = DONKEYLIFT_API + me.get('url') + ROWS_EXT + '?' + q;
@@ -118,17 +119,17 @@ var STATS_EXT = '.stats';
 					//console.log('response from api');
 					//console.dir(response);
 
-					var fragment = 
-								Donkeylift.app.module() 
+					var fragment =
+								Donkeylift.app.module()
 								+ '/' + Donkeylift.app.schema.get('name')
-								+ '/' + Donkeylift.app.table.get('name') 
-								+ '/' + q; 
+								+ '/' + Donkeylift.app.table.get('name')
+								+ '/' + q;
 
 					//console.log(fragment);
-					Donkeylift.app.router.updateNavigation(fragment, { 
-						block: 100,  
+					Donkeylift.app.router.updateNavigation(fragment, {
+						block: 100,
 						replace: true
-					}); 
+					});
 
 					var data = {
 						data: response.rows,
@@ -152,7 +153,7 @@ var STATS_EXT = '.stats';
 
 		stats : function(filter, callback) {
 			var me = this;
-			
+
 			var fieldName = filter.get('field').vname();
 
 			var params = { '$select' : fieldName };
@@ -163,10 +164,10 @@ var STATS_EXT = '.stats';
 			var filters = Donkeylift.app.filters.apply(filter);
 			q = q + '&' + Donkeylift.Filters.toParam(filters);
 
-			var url = DONKEYLIFT_API + this.get('url') + STATS_EXT 
+			var url = DONKEYLIFT_API + this.get('url') + STATS_EXT
 					+ '?' + q;
 
-			console.log('stats ' + me.get('name') + '.' + fieldName 
+			console.log('stats ' + me.get('name') + '.' + fieldName
 						+ ' ' + url);
 
 			if (this.dataCache[url]) {
@@ -181,16 +182,16 @@ var STATS_EXT = '.stats';
 				});
 			}
 		},
-		
+
 		options: function(filter, searchTerm, callback) {
 			var me = this;
 
 			var fieldName = filter.get('field').vname();
 
-			var params = { 
+			var params = {
 				'$top': 10,
 				'$distinct': true,
-				'$select': fieldName,				
+				'$select': fieldName,
 				'$orderby': fieldName
 			};
 
@@ -200,10 +201,10 @@ var STATS_EXT = '.stats';
 			var filters = Donkeylift.app.filters.apply(filter, searchTerm);
 			q = q + '&' + Donkeylift.Filters.toParam(filters);
 
-			var url = DONKEYLIFT_API + this.get('url') + ROWS_EXT 
+			var url = DONKEYLIFT_API + this.get('url') + ROWS_EXT
 					+ '?' + q;
 
-			console.log('options ' + me.get('name') + '.' + fieldName 
+			console.log('options ' + me.get('name') + '.' + fieldName
 						+ ' ' + url);
 
 			if (this.dataCache[url]) {
@@ -220,6 +221,6 @@ var STATS_EXT = '.stats';
 			}
 		},
 
-	});		
+	});
 
 })();

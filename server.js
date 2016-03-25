@@ -1,4 +1,5 @@
 var express = require('express');
+var url = require('url');
 
 var fs = require('fs');
 var util = require('util');
@@ -10,7 +11,11 @@ var config = {
 	'port'	: 3001 
 }
 
-if (process.env.OPENSHIFT_DATA_DIR) {
+if (process.env.DONKEYLIFT_WWW) {
+	var u = url.parse(process.env.DONKEYLIFT_WWW);
+	config.ip = u.hostname;
+	config.port = u.port;
+} else if (process.env.OPENSHIFT_DATA_DIR) {
 	config.ip = process.env.OPENSHIFT_NODEJS_IP;
 	config.port = process.env.OPENSHIFT_NODEJS_PORT;
 } else if (process.env.C9_USER) {

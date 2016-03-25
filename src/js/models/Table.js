@@ -26,22 +26,19 @@
 		},
 
 		initRelations : function(tables) {
-			var relations = [];
-			_.each(this.get('parents'), function(parent_name) {
-				//construct Relations
-				var pt = _.find(tables, function(t) { 
-					return t.get('name') == parent_name;
+			var relations = _.map(this.get('referencing'), function(ref) {
+				//console.log('adding relation to ' + ref.fk_table + ' fk ' + ref.fk);
+
+				var fk_table = _.find(tables, function(t) { 
+					return t.get('name') == ref.fk_table;
 				});
-				var fk = _.find(this.get('fields').models, 
-					function(field) {
-						return field.get('fk_table') == parent_name;
-				});
-				var relation = new Donkeylift.Relation({
+				var fk = this.get('fields').getByName(ref.fk);
+
+				return new Donkeylift.Relation({
 					table: this,
-					related: pt,
+					related: fk_table,
 					field: fk
 				});
-				relations.push(relation);
 			}, this);
 			this.set('relations', new Donkeylift.Relations(relations), {silent: true});
 		},

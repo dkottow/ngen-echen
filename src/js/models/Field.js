@@ -3,25 +3,35 @@
 (function () {
 	'use strict';
 	//console.log("Field class def");
-	Donkeylift.Field = Backbone.Model.extend({ 
+	Donkeylift.Field = Backbone.Model.extend({
 		initialize: function(field) {
 			var rxp = /(\w+)(\([0-9,]+\))?/
 			var match = field.type.match(rxp)
 			this.set('type', Donkeylift.Field.TypeAlias(match[1]));
-			var spec;
-			if (match[2]) spec = match[2].substr(1, match[2].length - 2);
-			this.set('length', spec);
+			if (match[2]) {
+				var spec = match[2].substr(1, match[2].length - 2);
+				this.set('length', spec);
+				if (spec.split(',').length > 1) {
+					this.set('scale', spec.split(',')[1]);
+				}
+			}
 		},
-		
+
 		vname: function() {
-			return (this.get('fk') == 1) ?
-				this.get('fk_table') + '_ref'
-			  : this.get('name');
+			if (this.get('fk') == 0) {
+				return this.get('name');
+
+			} else if (this.get('name').endsWith("id")) {
+				return this.get('name').replace(/id$/, "ref");
+
+			} else {
+				return this.get('name') + "_ref";
+			}
 		},
 
 		attrJSON: function() {
 			return _.clone(this.attributes);
-		},		
+		},
 
 		toJSON: function() {
 			var type = Donkeylift.Field.ALIAS[this.get('type')];
@@ -47,7 +57,7 @@
 			} else if(t == Donkeylift.Field.TYPES.NUMERIC) {
 				return parseFloat(val);
 			} else if(t == Donkeylift.Field.TYPES.DATE) {
-				//return new Date(val); 
+				//return new Date(val);
 				return new Date(val).toISOString().substr(0,10);
 			} else if (t == Donkeylift.Field.TYPES.DATETIME) {
 				//return new Date(val);
@@ -57,6 +67,20 @@
 			}
 		},
 
+		//to formatted string
+		toFS: function(val) {
+			if (this.get('length')) {
+				if (this.get('type') == Donkeylift.Field.TYPES.NUMERIC) {
+					return this.get('scale') ? val.toFixed(this.get('scale')) : String(val);
+				} else {
+					return String(val, this.get('length'));
+				}
+			} else {
+				return String(val);
+			}
+		},
+
+		//to query string
 		toQS: function(val) {
 			if (this.get('fk') == 1 && _.isString(val)) {
 				//its a string ref
@@ -92,11 +116,11 @@
 	Donkeylift.Field.ALIAS = _.invert(Donkeylift.Field.TYPES);
 
 	Donkeylift.Field.TypeAlias = function(type) {
-		return Donkeylift.Field.TYPES[type]; 		
+		return Donkeylift.Field.TYPES[type];
 	}
 
 	Donkeylift.Field.toDate = function(dateISOString) {
-		return new Date(dateISOString.split('-')[0], 
+		return new Date(dateISOString.split('-')[0],
 						dateISOString.split('-')[1] - 1,
 						dateISOString.split('-')[2]);
 	}
