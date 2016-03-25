@@ -132,7 +132,7 @@ console.log('Alias.parse ' + tableName + '.' + fieldName);
 	Donkeylift.Field.getIdFromRef = function(val) {
 		if (_.isNumber(val)) return val;
 		//extract fk from ref such as 'Book (12)'
-		var m = val.match(/^(.*)\(([0-9]+)\)$/);
+		var m = val.match(/^(.*)\[([0-9]+)\]$/);
 		//console.log(val + " matches " + m);
 		return m[2];
 	}
@@ -4463,7 +4463,7 @@ var pegParser = module.exports;
 })();
 
 /*global Backbone */
-var DONKEYLIFT_API = "http://api.donkeylift.com";  //set by gulp according to env var DONKEYLIFT_API. e.g. "http://api.donkeylift.com";
+var DONKEYLIFT_API = ",";  //set by gulp according to env var DONKEYLIFT_API. e.g. "http://api.donkeylift.com";
 
 $(function () {
 	'use strict';
