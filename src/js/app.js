@@ -128,9 +128,9 @@ $(function () {
 	/**** schema stuff ****/
 
 	app.unsetSchema = function() {
-		app.table = null;
+		app.unsetTable();
+		app.unsetFilters();
 		app.schema = null;
-		if (app.tableView) app.tableView.remove();
 		if (app.tableListView) app.tableListView.remove();
 		
 		app.schemaCurrentView.render();
