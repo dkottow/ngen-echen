@@ -49,7 +49,7 @@ console.log('Alias.parse ' + tableName + '.' + fieldName);
 			if (this.get('fk') == 0) {
 				return this.get('name');
 
-			} else if (this.get('name').endsWith("id")) {
+			} else if (this.get('name').match(/id$/)) { 
 				return this.get('name').replace(/id$/, "ref");
 
 			} else {
@@ -4460,17 +4460,17 @@ var pegParser = module.exports;
 
 })();
 
-/*global Backbone */
+/*global Backbone, Donkeylift, $ */
 var DONKEYLIFT_API = "http://api.donkeylift.com";  //set by gulp according to env var DONKEYLIFT_API. e.g. "http://api.donkeylift.com";
 
 $(function () {
 	'use strict';
 	var app = {};
-	/**** init app - called at the end ***/
-	app.init = function() {
-
-		//fixed user named demo
-		app.user = 'demo';
+	/**** init app - call me from your javascript ***/
+	app.init = function(opts) {
+		opts = opts || {};
+		
+		app.user = opts.user || 'demo';
 
 		app.schemas = new Donkeylift.Schemas(null, {url: DONKEYLIFT_API + '/' + app.user});
 
@@ -4643,6 +4643,6 @@ $(function () {
 	Donkeylift.app = app;
 
 	//start
-	app.init();
+	//app.init();
 });
 

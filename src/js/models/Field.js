@@ -21,7 +21,7 @@
 			if (this.get('fk') == 0) {
 				return this.get('name');
 
-			} else if (this.get('name').endsWith("id")) {
+			} else if (this.get('name').match(/id$/)) { 
 				return this.get('name').replace(/id$/, "ref");
 
 			} else {

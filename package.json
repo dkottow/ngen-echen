@@ -1,17 +1,18 @@
 {
-  "name": "g6-web",
-  "description": "",
-  "version": "0.0.1",
-  "private": true,
-  "dependencies": {
+  "name": "g6-web"
+  , "description": ""
+  , "version": "0.0.1"
+  , "private": true
+  , "dependencies": {
     "express": "4.x"
-  },
-  "devDependencies": {
-    "gulp": "~3.9.0",
-    "gulp-concat": "*",
-    "gulp-inject": "~1.5.0",
-    "gulp-replace": "*",
-    "gulp-if": "*"
+    , "basic-auth": "*"
+  } 
+  , "devDependencies": {
+    "gulp": "~3.9.0"
+    , "gulp-concat": "*"
+    , "gulp-inject": "~1.5.0"
+    , "gulp-replace": "*"
+    , "gulp-if": "*"
   }
   , "main": "server.js"
 }
