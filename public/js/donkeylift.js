@@ -1076,37 +1076,6 @@ var STATS_EXT = '.stats';
 (function ($) {
 	'use strict';
 
-	Donkeylift.DownloadsView = Backbone.View.extend({
-		el:  '#content',
-
-		events: {
-			//'click #reset-all-filters': 'evResetAllFilters'
-		},
-
-		initialize: function() {
-			console.log("MenuView.init");
-			//this.listenTo(Donkeylift.table, 'change', this.render);
-		},
-
-		template: _.template($('#downloads-template').html()),
-
-		render: function() {
-			console.log('DownloadsView.render ');			
-			this.$el.html(this.template());
-			return this;
-		},
-
-	});
-
-})(jQuery);
-
-
-
-/*global Donkeylift, Backbone, jQuery, _ */
-
-(function ($) {
-	'use strict';
-
 	Donkeylift.SchemaCurrentView = Backbone.View.extend({
 		el:  '#schema-list',
 
@@ -4492,7 +4461,7 @@ var pegParser = module.exports;
 })();
 
 /*global Backbone */
-var DONKEYLIFT_API = "http://localhost:3000";  //set by gulp according to env var DONKEYLIFT_API. e.g. "http://api.donkeylift.com";
+var DONKEYLIFT_API = "http://api.donkeylift.com";  //set by gulp according to env var DONKEYLIFT_API. e.g. "http://api.donkeylift.com";
 
 $(function () {
 	'use strict';
