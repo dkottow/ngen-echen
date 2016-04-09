@@ -5,16 +5,12 @@
 	//console.log("Field class def");
 	Donkeylift.Field = Backbone.Model.extend({
 		initialize: function(field) {
+
+			//strip type from e.g. VARCHAR(256) and NUMERIC(8,2) 
 			var rxp = /(\w+)(\([0-9,]+\))?/
 			var match = field.type.match(rxp)
 			this.set('type', Donkeylift.Field.TypeAlias(match[1]));
-			if (match[2]) {
-				var spec = match[2].substr(1, match[2].length - 2);
-				this.set('length', spec);
-				if (spec.split(',').length > 1) {
-					this.set('scale', spec.split(',')[1]);
-				}
-			}
+			this.set('props', field.props);
 		},
 
 		vname: function() {
@@ -29,20 +25,25 @@
 			}
 		},
 
+		getProp: function(name) {
+			return this.get('props')[name];
+		},
+
+		setProp: function(name, value) {
+			this.get('props')[name] = value;
+		},
+
 		attrJSON: function() {
 			return _.clone(this.attributes);
 		},
 
 		toJSON: function() {
 			var type = Donkeylift.Field.ALIAS[this.get('type')];
-			if (this.get('length')) {
-				type += '(' + this.get('length') + ')';
-			}
 
 			return {
 				name: this.get('name'),
 				type: type,
-				order: this.get('order')
+				props: this.get('props')
 			};
 		},
 
@@ -69,12 +70,11 @@
 
 		//to formatted string
 		toFS: function(val) {
-			if (this.get('length')) {
-				if (this.get('type') == Donkeylift.Field.TYPES.NUMERIC) {
-					return this.get('scale') ? val.toFixed(this.get('scale')) : String(val);
-				} else {
-					return String(val, this.get('length'));
-				}
+			if (this.get('type') == Donkeylift.Field.TYPES.NUMERIC) {
+				return this.getProp('scale') 
+					? val.toFixed(this.getProp('scale')) 
+					: String(val);
+
 			} else {
 				return String(val);
 			}
@@ -127,7 +127,7 @@
 
 	Donkeylift.Field.getIdFromRef = function(val) {
 		if (_.isNumber(val)) return val;
-		//extract fk from ref such as 'Book (12)'
+		//extract fk from ref such as 'Book [12]'
 		var m = val.match(/^(.*)\[([0-9]+)\]$/);
 		//console.log(val + " matches " + m);
 		return m[2];

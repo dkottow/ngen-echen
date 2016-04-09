@@ -5,13 +5,14 @@
 	//console.log("Table class def");
 	Donkeylift.Table = Backbone.Model.extend({ 
 		
-		initialize: function(attrs) {
-			console.log("Table.initialize " + attrs.name);
-			var fields = _.map( _.sortBy(attrs.fields, 'order'), 
+		initialize: function(table) {
+			console.log("Table.initialize " + table.name);
+			var fields = _.map( _.sortBy(table.fields, 'order'), 
 						function(field) {
 				return new Donkeylift.Field(field);
 			});			
 			this.set('fields', new Donkeylift.Fields(fields));
+			this.set('props', table.props);
 			//relations and row_alias are set in initRefs
 		},
 

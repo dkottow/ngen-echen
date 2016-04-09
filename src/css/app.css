@@ -108,6 +108,10 @@ body {
 	vertical-align: middle;
 }
 
+table.dataTable {
+	white-space: nowrap; 
+}
+
 .dataTable th {
 	white-space: nowrap; 
 }

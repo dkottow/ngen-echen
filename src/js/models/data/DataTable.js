@@ -12,62 +12,6 @@ var STATS_EXT = '.stats';
 			return new Donkeylift.DataTableView(options);
 		},
 
-		getColumns: function() {
-			var me = this;
-
-			return this.get('fields')
-				.sortBy(function(field) {
-					return field.get('order');
-				})
-				.map(function(field) {
-
-					var abbrFn = function (data) {
-							var s = field.toFS(data);
-				   		return s.length > 40
-							?  '<span title="'
-								+ s + '">'
-								+ s.substr( 0, 38)
-								+ '...</span>'
-							: s;
-					}
-
-		    	var anchorFn = undefined;
-					if (field.get('name') == 'id' && me.get('referenced').length > 0) {
-						anchorFn = function(id) {
-							var href = '#table'
-								+ '/' + me.get('referenced')[0].table
-								+ '/' + me.get('name') + '.id=' + id;
-
-							return '<a href="' + href + '">' + id + '</a>';
-						}
-
-					} else if (field.get('fk') == 1) {
-						anchorFn = function(ref) {
-							var href = '#table'
-								+ '/' + field.get('fk_table')
-								+ '/id=' + Donkeylift.Field.getIdFromRef(ref)
-
-							return '<a href="' + href + '">' + abbrFn(ref) + '</a>';
-						}
-					}
-
-					var renderFn = function (data, type, full, meta ) {
-
-						if (type == 'display' && data) {
-							return anchorFn ? anchorFn(data) : abbrFn(data);
-						} else {
-							return data;
-						}
-					}
-
-					return {
-						data : field.vname(),
-		    		render: renderFn,
-						field: field
-					};
-				});
-		},
-
 		getAllRowsUrl: function() {
 			return decodeURI(this.lastFilterUrl);
 		},
