@@ -1,9 +1,9 @@
 <!doctype html>
 <html>
   <head>
-        <title>DonkeyLift</title>
-		<link href="css/3rdparty.css" rel="stylesheet" type="text/css" />
-        <link href="css/donkeylift.css" rel="stylesheet" type="text/css" />
+        <title>Demo Jason</title>
+		<link href="/public/css/3rdparty.css" rel="stylesheet" type="text/css" />
+        <link href="/public/css/donkeylift.css" rel="stylesheet" type="text/css" />
 		<style></style>
   </head>
 
@@ -389,14 +389,6 @@
 </script>		
 
 
-<script type="text/template" id="grid-button-wrap-text-template">
-	<button type="button" id="grid_wrap_text" class="btn btn-default btn-xs" data-toggle="button" aria-pressed="false" autocomplete="off">
-		<span class="glyphicon glyphicon-text-height" aria-hidden="true">
-		</span>
-	</button>
-</script>
-
-
 <script type="text/template" id="grid-column-template">
 	<th id="col-<%=name %>">
 		<div class="dropdown">
@@ -541,10 +533,12 @@
 
 <!-- endinject -->
 
-  		<script src="js/3rdparty.js" type="text/javascript"></script>
-			<script src="js/donkeylift.js" type="text/javascript"></script>
+  		<script src="/public/js/3rdparty.js" type="text/javascript"></script>
+			<script src="/public/js/donkeylift.js" type="text/javascript"></script>
 			<script type="text/javascript"> 
-					$(function() { Donkeylift.app.init(); });
+					$(function() {
+    					Donkeylift.app.init({user: 'jstianson'}); 
+					});
 			</script>
     </body>
 </html>
