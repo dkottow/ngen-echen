@@ -26,7 +26,7 @@ if (process.env.DONKEYLIFT_WWW) {
 }
 
 app.use('/public', express.static('./public')); 
-app.use('/', auth, express.static('./private'));
+app.use('/account', auth, express.static('./private'));
 
 app.use(function(err, req, res, next) {
 	console.log(err);
