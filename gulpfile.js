@@ -85,7 +85,7 @@ gulp.task('build-dl-data-js', function() {
 //					 "./src/js/app.js"
 //			])
 
-	return gulp.src(["./src/js/data/init.js",
+	return gulp.src(["./src/js/common/AppBase.js",
 					 "./src/js/common/models/*.js",
 					 "./src/js/data/models/*.js",
 					 "./src/js/common/collections/*.js",
@@ -93,8 +93,8 @@ gulp.task('build-dl-data-js', function() {
 					 "./src/js/common/views/*.js",
 					 "./src/js/data/views/*.js",
 					 "./src/js/data/QueryParser.js",
-					 "./src/js/data/Router.js",
-					 "./src/js/data/app.js"
+					 "./src/js/data/RouterData.js",
+					 "./src/js/data/AppData.js"
 			])
 		.pipe(replace("$DONKEYLIFT_API", process.env.DONKEYLIFT_API))
 		.pipe(concat('dl_data.js'))
@@ -109,15 +109,15 @@ gulp.task('build-dl-schema-js', function() {
 		process.exit(1);
 	}
 
-	return gulp.src(["./src/js/schema/init.js",
+	return gulp.src(["./src/js/common/AppBase.js",
 					 , "./src/js/common/models/*.js"
 					 , "./src/js/schema/models/*.js"
 					 , "./src/js/common/collections/*.js"
 					 , "./src/js/schema/collections/*.js"
 					 , "./src/js/common/views/*.js"
 					 , "./src/js/schema/views/*.js"
-					 , "./src/js/schema/Router.js"
-					 , "./src/js/schema/app.js"
+					 , "./src/js/schema/RouterSchema.js"
+					 , "./src/js/schema/AppSchema.js"
 			])
 		.pipe(replace("$DONKEYLIFT_API", process.env.DONKEYLIFT_API))
 		.pipe(concat('dl_schema.js'))

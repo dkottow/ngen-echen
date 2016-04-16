@@ -1,41 +1,36 @@
 /*global Donkeylift, Backbone, jQuery, _ */
 
-(function ($) {
-	'use strict';
+Donkeylift.FilterShowView = Backbone.View.extend({
+	el:  '#modalShowFilters',
 
-	Donkeylift.FilterShowView = Backbone.View.extend({
-		el:  '#modalShowFilters',
+	events: {
+	},
 
-		events: {
-		},
+	template: _.template($('#show-filter-item-template').html()),
 
-		template: _.template($('#show-filter-item-template').html()),
+	initialize: function() {
+		console.log("FilterShowView.init");
+	},
 
-		initialize: function() {
-			console.log("FilterShowView.init");
-		},
+	render: function() {
+		var el = this.$('#modalTableFilters > tbody');
+		el.empty();
+		//el.children('tr:not(:first)').remove();	
+		this.collection.each(function(filter) {
+			el.append(this.template(filter.toStrings()));
+		}, this);			
 
-		render: function() {
-			var el = this.$('#modalTableFilters > tbody');
-			el.empty();
-			//el.children('tr:not(:first)').remove();	
-			this.collection.each(function(filter) {
-				el.append(this.template(filter.toStrings()));
-			}, this);			
+		$('#modalInputDataUrl').val(Donkeylift.app.table.getAllRowsUrl());
+		$('#modalShowFilters').on('shown.bs.modal', function() {
+			$('#modalInputDataUrl').select();
+		});
 
-			$('#modalInputDataUrl').val(Donkeylift.app.table.getAllRowsUrl());
-			$('#modalShowFilters').on('shown.bs.modal', function() {
-				$('#modalInputDataUrl').select();
-			});
+		$('#modalShowFilters').modal();
 
-			$('#modalShowFilters').modal();
-
-			return this;
-		},
+		return this;
+	},
 
 
-	});
-
-})(jQuery);
+});
 
 

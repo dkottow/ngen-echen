@@ -1,105 +1,100 @@
 /*global Donkeylift, Backbone, jQuery, _ */
 
-(function ($) {
-	'use strict';
+Donkeylift.RelationEditView = Backbone.View.extend({
+	el:  '#modalEditRelation',
 
-	Donkeylift.RelationEditView = Backbone.View.extend({
-		el:  '#modalEditRelation',
+	events: {
+		'click #modalRelationUpdate': 'updateClick',
+		'click #modalRelationRemove': 'removeClick',
+		'change #modalInputRelationType': 'typeChange'
+	},
 
-		events: {
-			'click #modalRelationUpdate': 'updateClick',
-			'click #modalRelationRemove': 'removeClick',
-			'change #modalInputRelationType': 'typeChange'
-		},
+	initialize: function() {
+		console.log("RelationEditView.init");
+	},
 
-		initialize: function() {
-			console.log("RelationEditView.init");
-		},
+	render: function() {
+		console.log("RelationEditView.render " + this.model);
 
-		render: function() {
-			console.log("RelationEditView.render " + this.model);
+		var el = $('#modalInputRelationTable')
+		el.html('');
+		Donkeylift.app.schema.get('tables').each(function(table) {
+			el.append($('<option></option>')
+				.attr('value', table.get('name'))
+				.text(table.get('name')));
+		});
+		
+		el.val('');
+		if (this.model.get('related'))
+			el.val(this.model.get('related').get('name'));
 
-			var el = $('#modalInputRelationTable')
-			el.html('');
-			Donkeylift.app.schema.get('tables').each(function(table) {
+		el = $('#modalInputRelationField')
+		el.html('');
+		this.model.get('table').get('fields').each(function(field) {
+			if (field.get('type') == 'Integer' && field.get('name') != 'id') {
 				el.append($('<option></option>')
-					.attr('value', table.get('name'))
-					.text(table.get('name')));
-			});
-			
-			el.val('');
-			if (this.model.get('related'))
-				el.val(this.model.get('related').get('name'));
-
-			el = $('#modalInputRelationField')
-			el.html('');
-			this.model.get('table').get('fields').each(function(field) {
-				if (field.get('type') == 'Integer' && field.get('name') != 'id') {
-					el.append($('<option></option>')
-						.attr('value', field.get('name'))
-						.text(field.get('name')));
-				}
-			});
-
-			el.val('');
-			if (this.model.get('field'))
-				el.val(this.model.get('field').get('name'));
-
-			$('#modalInputRelationType').val(this.model.get('type'));
-
-			$('#modalEditRelation').modal();
-			return this;
-		},
-
-		updateClick: function() {
-			var newTable = $('#modalInputRelationTable').val();	
-			var newType = $('#modalInputRelationType').val();
-			var newField = $('#modalInputRelationField').val();
-			if (newType == 'one-to-one') newField = 'id';
-			else if (_.isEmpty(newField)) {
-				//create field as <newTable>_id
-				newField = newTable + "_id";
-				var f = this.model.get('table').get('fields').addNew();
-				f.set('name', newField);
-				f.set('type', Donkeylift.Field.TYPES.INTEGER);
+					.attr('value', field.get('name'))
+					.text(field.get('name')));
 			}
+		});
 
-			newField = this.model.get('table').get('fields').getByName(newField);
-			newTable = Donkeylift.app.schema.get('tables').getByName(newTable);
-			//console.log('new field ' + fields.getByName(newField).get('name'));
-			//console.log('new related table ' + tables.getByName(newTable).get('name'));
-			
-			this.model.set({
-				'type': newType,
-				'field': newField,
-				'related': newTable
-			});	
-			if ( ! Donkeylift.app.table.get('relations').contains(this.model)) {
-				Donkeylift.app.table.get('relations').add(this.model);
-			}
-			Donkeylift.app.schema.update();
-		},
+		el.val('');
+		if (this.model.get('field'))
+			el.val(this.model.get('field').get('name'));
 
-		removeClick: function() {	
-			console.log("RelationEditView.removeClick " + this.model.collection);
-			if (this.model.collection) {
-				this.model.collection.remove(this.model);
-				Donkeylift.app.schema.update();
-			}
-		},
+		$('#modalInputRelationType').val(this.model.get('type'));
 
-		typeChange: function() {
-			var el = $('#modalInputRelationField');	
-			if ($('#modalInputRelationType').val() == 'one-to-one') {
-				el.val('id'); //doesnt work
-				el.prop('disabled', true);
-			} else {
-				el.prop('disabled', false);
-			}
+		$('#modalEditRelation').modal();
+		return this;
+	},
+
+	updateClick: function() {
+		var newTable = $('#modalInputRelationTable').val();	
+		var newType = $('#modalInputRelationType').val();
+		var newField = $('#modalInputRelationField').val();
+		if (newType == 'one-to-one') newField = 'id';
+		else if (_.isEmpty(newField)) {
+			//create field as <newTable>_id
+			newField = newTable + "_id";
+			var f = this.model.get('table').get('fields').addNew();
+			f.set('name', newField);
+			f.set('type', Donkeylift.Field.TYPES.INTEGER);
 		}
 
-	});
+		newField = this.model.get('table').get('fields').getByName(newField);
+		newTable = Donkeylift.app.schema.get('tables').getByName(newTable);
+		//console.log('new field ' + fields.getByName(newField).get('name'));
+		//console.log('new related table ' + tables.getByName(newTable).get('name'));
+		
+		this.model.set({
+			'type': newType,
+			'field': newField,
+			'related': newTable
+		});	
+		if ( ! Donkeylift.app.table.get('relations').contains(this.model)) {
+			Donkeylift.app.table.get('relations').add(this.model);
+		}
+		Donkeylift.app.schema.update();
+	},
 
-})(jQuery);
+	removeClick: function() {	
+		console.log("RelationEditView.removeClick " + this.model.collection);
+		if (this.model.collection) {
+			this.model.collection.remove(this.model);
+			Donkeylift.app.schema.update();
+		}
+	},
+
+	typeChange: function() {
+		var el = $('#modalInputRelationField');	
+		if ($('#modalInputRelationType').val() == 'one-to-one') {
+			el.val('id'); //doesnt work
+			el.prop('disabled', true);
+		} else {
+			el.prop('disabled', false);
+		}
+	}
+
+});
 
 

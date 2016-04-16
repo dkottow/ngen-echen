@@ -4,14 +4,23 @@ var pegParser = module.exports;
 (function () {
 	'use strict';
 
-	Donkeylift.Router = Backbone.Router.extend({
+	Donkeylift.RouterData = Backbone.Router.extend({
 
         routes: {
+/*
+            "data": "routeData",
+            "schema": "routeSchema",
+            "downloads": "routeDownloads",
+*/
 			"table/:table": "routeGotoTable",
+			"table/:table/:filter": "routeGotoRows",
+			"reset-filter": "routeResetFilter",
+			"reload-table": "routeReloadTable",
 			"data/:schema/:table(/*params)": "routeUrlTableData",
 			"schema/:schema/:table": "routeUrlTableSchema"
         },
 
+/*
         routeDownloads: function() {
 			Donkeylift.app.unsetSchema();
             Donkeylift.app.gotoModule("downloads");
@@ -26,6 +35,7 @@ var pegParser = module.exports;
             Donkeylift.app.gotoModule("schema");
 			Donkeylift.app.resetTable();
         },
+*/
 
 		routeUrlTableData: function(schemaName, tableName, paramStr) {
 			console.log("routeUrlTableData " 
@@ -39,15 +49,8 @@ var pegParser = module.exports;
 			if (this.isBlockedGotoUrl) return;
 
 			this.gotoTable(tableName, { 
-				module: 'data', 
 				schema: schemaName,
 				params: this.parseParams(paramStr)
-			});
-		},
-
-		routeUrlTableSchema: function(schemaName, tableName) {
-			this.gotoTable(tableName, {
-				schema: schemaName
 			});
 		},
 
@@ -74,6 +77,15 @@ var pegParser = module.exports;
 			});
 			
 			this.gotoTable(tableName);
+		},
+
+		routeResetFilter: function() {
+			Donkeylift.app.unsetFilters();
+			Donkeylift.app.resetTable();
+		},
+
+		routeReloadTable: function() {
+			Donkeylift.app.table.reload();
 		},
 
 		parseParams: function(paramStr) {

@@ -1,1848 +1,1861 @@
+/*global Backbone, $ */
+var DONKEYLIFT_API = "https://api-donkeylift-dkottow.c9.io";  //set by gulp according to env var DONKEYLIFT_API. e.g. "http://api.donkeylift.com";
 var Donkeylift = {};
+
+function AppBase(opts) {
+    
+		opts = opts || {};
+
+		this.user = opts.user || 'demo';
+        this.schemas = new Donkeylift.Schemas(null, {url: DONKEYLIFT_API + '/' + this.user});
+		this.schemaCurrentView = new Donkeylift.SchemaCurrentView();
+
+}
+
+AppBase.prototype.start = function() {
+	var me = this;
+	this.schemas.fetch({success: function() {
+		me.schemaListView = new Donkeylift.SchemaListView({collection: me.schemas});
+		$('#schema-list').append(me.schemaListView.render().el);
+	}});
+
+	this.menuView.render();
+
+	Backbone.history.start();
+
+	$('#toggle-sidebar').hide();
+
+	$('#toggle-sidebar').click(function() {
+		this.toggleSidebar();
+	}); 
+
+	$(document).ajaxStart(function() {
+		$('#ajax-progress-spinner').show();
+	});
+	$(document).ajaxStop(function() {
+		$('#ajax-progress-spinner').hide();
+	});
+	
+}
+
+AppBase.prototype.toggleSidebar = function() {
+	if ($('#table-list').is(':visible')) {
+        $('#menu').hide('slide');
+        $('#table-list').hide('slide', function() {
+		   	$('#module').toggleClass('col-sm-16 col-sm-13');             
+		   	$('#sidebar').toggleClass('col-sm-3 col-sm-0');
+		});
+	} else {
+		$('#module').toggleClass('col-sm-16 col-sm-13');             
+		$('#sidebar').toggleClass('col-sm-3 col-sm-0');
+    	$('#table-list').show('slide');
+        $('#menu').show('slide');
+	}
+}
+
+AppBase.prototype.createTableView = function(table, params) {
+	//overwrite me
+}
+
+AppBase.prototype.setTable = function(table, params) {
+	console.log('app.setTable ' + params);
+	var $a = $("#table-list a[data-target='" + table.get('name') + "']");
+	$('#table-list a').removeClass('active');
+	$a.addClass('active');
+
+	this.table = table;
+	if (this.tableView) this.tableView.remove();
+
+	this.tableView = this.createTableView(table, params);
+
+	$('#content').html(this.tableView.render().el);			
+	this.menuView.render();
+}
+
+AppBase.prototype.resetTable = function() {
+	if (this.table) this.setTable(this.table);
+}
+
+AppBase.prototype.unsetTable = function() {
+	this.table = null;
+	if (this.tableView) this.tableView.remove();
+}
+
+/**** schema stuff ****/
+
+AppBase.prototype.unsetSchema = function() {
+	this.unsetTable();
+	this.schema = null;
+	if (this.tableListView) this.tableListView.remove();
+	
+	this.schemaCurrentView.render();
+}
+
+AppBase.prototype.createSchema = function(name) {
+	//overwrite me
+}
+
+AppBase.prototype.setSchema = function(name, cbAfter) {
+	var me = this;
+	console.log('AppBase.setSchema ' + name);
+	var loadRequired = ! this.schema || this.schema.get('name') != name;
+
+	if (loadRequired) {
+		console.log('app.setSchema loadRequired');
+		this.unsetSchema();
+		this.schema = this.createSchema(name);
+		this.schema.fetch(function() {
+			me.tableListView = new Donkeylift.TableListView({
+				collection: me.schema.get('tables')
+			});
+			$('#sidebar').append(me.tableListView.render().el);
+			$('#toggle-sidebar').show();
+
+			//render current schema label
+			me.schemaCurrentView.render();
+			if (cbAfter) cbAfter();
+		});
+	} else {
+		if (cbAfter) cbAfter();
+	}
+}
+
+Donkeylift.AppBase = AppBase;
+
 
 /*global Backbone, Donkeylift */
 
-(function () {
-	'use strict';
-	//console.log("Table class def");
-	Donkeylift.Alias = Backbone.Model.extend({ 
-		
-		initialize: function(attrs) {
-		},
+Donkeylift.Alias = Backbone.Model.extend({ 
+	
+	initialize: function(attrs) {
+	},
 
-		toString: function() {
-			return this.get('table').get('name') + '.' 
-				 + this.get('field').get('name');
-		}
-
-	});
-
-	Donkeylift.Alias.parse = function(tableName, fieldName) {
-console.log('Alias.parse ' + tableName + '.' + fieldName);
-		var table = Donkeylift.app.schema.get('tables').getByName(tableName);
-		var field = table.get('fields').getByName(fieldName);
-		return new Donkeylift.Alias({table: table, field: field});
+	toString: function() {
+		return this.get('table').get('name') + '.' 
+			 + this.get('field').get('name');
 	}
 
-})();
+});
+
+Donkeylift.Alias.parse = function(tableName, fieldName) {
+	//console.log('Alias.parse ' + tableName + '.' + fieldName);
+	var table = Donkeylift.app.schema.get('tables').getByName(tableName);
+	var field = table.get('fields').getByName(fieldName);
+	return new Donkeylift.Alias({table: table, field: field});
+}
+
 
 /*global Donkeylift, Backbone, _ */
 
-(function () {
-	'use strict';
-	//console.log("Field class def");
-	Donkeylift.Field = Backbone.Model.extend({
-		initialize: function(field) {
+Donkeylift.Field = Backbone.Model.extend({
+	initialize: function(field) {
 
-			//strip type from e.g. VARCHAR(256) and NUMERIC(8,2) 
-			var rxp = /(\w+)(\([0-9,]+\))?/
-			var match = field.type.match(rxp)
-			this.set('type', Donkeylift.Field.TypeAlias(match[1]));
-			this.set('props', field.props);
-		},
+		//strip type from e.g. VARCHAR(256) and NUMERIC(8,2) 
+		var rxp = /(\w+)(\([0-9,]+\))?/
+		var match = field.type.match(rxp)
+		this.set('type', Donkeylift.Field.TypeAlias(match[1]));
+		this.set('props', field.props);
+	},
 
-		vname: function() {
-			if (this.get('fk') == 0) {
-				return this.get('name');
+	vname: function() {
+		if (this.get('fk') == 0) {
+			return this.get('name');
 
-			} else if (this.get('name').match(/id$/)) { 
-				return this.get('name').replace(/id$/, "ref");
+		} else if (this.get('name').match(/id$/)) { 
+			return this.get('name').replace(/id$/, "ref");
 
-			} else {
-				return this.get('name') + "_ref";
-			}
-		},
-
-		getProp: function(name) {
-			return this.get('props')[name];
-		},
-
-		setProp: function(name, value) {
-			this.get('props')[name] = value;
-		},
-
-		attrJSON: function() {
-			return _.clone(this.attributes);
-		},
-
-		toJSON: function() {
-			var type = Donkeylift.Field.ALIAS[this.get('type')];
-
-			return {
-				name: this.get('name'),
-				type: type,
-				props: this.get('props')
-			};
-		},
-
-		parse: function(val) {
-			if (this.get('fk') == 1 && _.isString(val)) {
-				//its a string ref
-				return val;
-			}
-			var t = this.get('type');
-			if (t == Donkeylift.Field.TYPES.INTEGER) {
-				return parseInt(val);
-			} else if(t == Donkeylift.Field.TYPES.NUMERIC) {
-				return parseFloat(val);
-			} else if(t == Donkeylift.Field.TYPES.DATE) {
-				//return new Date(val);
-				return new Date(val).toISOString().substr(0,10);
-			} else if (t == Donkeylift.Field.TYPES.DATETIME) {
-				//return new Date(val);
-				return new Date(val).toISOString();
-			} else {
-				return val;
-			}
-		},
-
-		//to formatted string
-		toFS: function(val) {
-			if (this.get('type') == Donkeylift.Field.TYPES.NUMERIC) {
-				return this.getProp('scale') 
-					? val.toFixed(this.getProp('scale')) 
-					: String(val);
-
-			} else {
-				return String(val);
-			}
-		},
-
-		//to query string
-		toQS: function(val) {
-			if (this.get('fk') == 1 && _.isString(val)) {
-				//its a string ref
-				return "'" + val + "'";
-			}
-			var t = this.get('type');
-			if (t == Donkeylift.Field.TYPES.INTEGER
-				|| t == Donkeylift.Field.TYPES.NUMERIC) {
-				return val;
-			} else {
-				return "'" + val + "'";
-			}
+		} else {
+			return this.get('name') + "_ref";
 		}
+	},
 
+	getProp: function(name) {
+		return this.get('props')[name];
+	},
+
+	setProp: function(name, value) {
+		this.get('props')[name] = value;
+	},
+
+	attrJSON: function() {
+		return _.clone(this.attributes);
+	},
+
+	toJSON: function() {
+		var type = Donkeylift.Field.ALIAS[this.get('type')];
+
+		return {
+			name: this.get('name'),
+			type: type,
+			props: this.get('props')
+		};
+	},
+
+	parse: function(val) {
+		if (this.get('fk') == 1 && _.isString(val)) {
+			//its a string ref
+			return val;
+		}
+		var t = this.get('type');
+		if (t == Donkeylift.Field.TYPES.INTEGER) {
+			return parseInt(val);
+		} else if(t == Donkeylift.Field.TYPES.NUMERIC) {
+			return parseFloat(val);
+		} else if(t == Donkeylift.Field.TYPES.DATE) {
+			//return new Date(val);
+			return new Date(val).toISOString().substr(0,10);
+		} else if (t == Donkeylift.Field.TYPES.DATETIME) {
+			//return new Date(val);
+			return new Date(val).toISOString();
+		} else {
+			return val;
+		}
+	},
+
+	//to formatted string
+	toFS: function(val) {
+		if (this.get('type') == Donkeylift.Field.TYPES.NUMERIC) {
+			return this.getProp('scale') 
+				? val.toFixed(this.getProp('scale')) 
+				: String(val);
+
+		} else {
+			return String(val);
+		}
+	},
+
+	//to query string
+	toQS: function(val) {
+		if (this.get('fk') == 1 && _.isString(val)) {
+			//its a string ref
+			return "'" + val + "'";
+		}
+		var t = this.get('type');
+		if (t == Donkeylift.Field.TYPES.INTEGER
+			|| t == Donkeylift.Field.TYPES.NUMERIC) {
+			return val;
+		} else {
+			return "'" + val + "'";
+		}
+	}
+
+});
+
+Donkeylift.Field.create = function(name) {
+	return new Donkeylift.Field({
+		name: name,
+		type: 'VARCHAR'
 	});
+}
 
-	Donkeylift.Field.create = function(name) {
-		return new Donkeylift.Field({
-			name: name,
-			type: 'VARCHAR'
+
+Donkeylift.Field.TYPES = {
+	'INTEGER': 'Integer',
+	'NUMERIC': 'Decimal',
+	'VARCHAR': 'Text',
+	'DATE': 'Date',
+	'DATETIME': 'Timestamp'
+}
+
+Donkeylift.Field.ALIAS = _.invert(Donkeylift.Field.TYPES);
+
+Donkeylift.Field.TypeAlias = function(type) {
+	return Donkeylift.Field.TYPES[type];
+}
+
+Donkeylift.Field.toDate = function(dateISOString) {
+	return new Date(dateISOString.split('-')[0],
+					dateISOString.split('-')[1] - 1,
+					dateISOString.split('-')[2]);
+}
+
+Donkeylift.Field.getIdFromRef = function(val) {
+	if (_.isNumber(val)) return val;
+	//extract fk from ref such as 'Book [12]'
+	var m = val.match(/^(.*)\[([0-9]+)\]$/);
+	//console.log(val + " matches " + m);
+	return m[2];
+}
+
+
+
+/*global Donkeylift, Backbone */
+
+Donkeylift.Relation = Backbone.Model.extend({ 
+	initialize: function(relation) {
+		this.set('type', Donkeylift.Relation.Type(relation));
+	}
+
+});
+
+Donkeylift.Relation.create = function(table) {
+	return new Donkeylift.Relation({
+		table: table,
+		related: null, 
+		field: null, 
+	});	
+}
+
+Donkeylift.Relation.Type = function(relation) {
+  	if (relation.field && relation.field.name == 'id') return 'one-to-one';
+	else return 'many-to-one';
+}
+
+/*global _, Donkeylift, Backbone */
+
+Donkeylift.Schema = Backbone.Model.extend({
+
+	initialize: function(attrs) {
+		console.log("Schema.initialize " + attrs.name);
+
+		if ( ! attrs.table) this.set('tables', new Donkeylift.Tables());
+
+		//this.set('id', attrs.name); //unset me when new
+		//this.orgJSON = this.toJSON();
+	},
+
+	attrJSON: function() {
+		return _.clone(this.attributes);
+	},		
+
+	toJSON : function() {
+		var tables = this.get('tables').map(function(table) {
+			return table.toJSON();	
 		});
-	}
+		return {
+			name: this.get('name'),
+			tables: tables
+		};
+	},	
 
+	parse : function(response) {
+		console.log("Schema.parse " + response);
+		var tables = _.map(response.tables, function(table) {
+			return new Donkeylift.Table(table);
+		});
+		response.tables = new Donkeylift.Tables(tables);
+		return response;
+	},
 
-	Donkeylift.Field.TYPES = {
-		'INTEGER': 'Integer',
-		'NUMERIC': 'Decimal',
-		'VARCHAR': 'Text',
-		'DATE': 'Date',
-		'DATETIME': 'Timestamp'
-	}
+	url : function() {
+		return Donkeylift.app.schemas.url() + '/' + this.get('name');
+	},
 
-	Donkeylift.Field.ALIAS = _.invert(Donkeylift.Field.TYPES);
+	fetch : function(cbAfter) {
+		var me = this;
+		console.log("Schema.fetch...");
+		Backbone.Model.prototype.fetch.call(this, {
+			success: function() {
+				console.log("Schema.fetch OK");
+				cbAfter();
+			}
+		});
+	},
 
-	Donkeylift.Field.TypeAlias = function(type) {
-		return Donkeylift.Field.TYPES[type];
-	}
-
-	Donkeylift.Field.toDate = function(dateISOString) {
-		return new Date(dateISOString.split('-')[0],
-						dateISOString.split('-')[1] - 1,
-						dateISOString.split('-')[2]);
-	}
-
-	Donkeylift.Field.getIdFromRef = function(val) {
-		if (_.isNumber(val)) return val;
-		//extract fk from ref such as 'Book [12]'
-		var m = val.match(/^(.*)\[([0-9]+)\]$/);
-		//console.log(val + " matches " + m);
-		return m[2];
-	}
-
-
-})();
-
-/*global Donkeylift, Backbone */
-
-(function () {
-	'use strict';
-	Donkeylift.Relation = Backbone.Model.extend({ 
-		initialize: function(relation) {
-			this.set('type', Donkeylift.Relation.Type(relation));
-		}
-
-	});
-
-	Donkeylift.Relation.create = function(table) {
-		return new Donkeylift.Relation({
-			table: table,
-			related: null, 
-			field: null, 
-		});	
-	}
-
-	Donkeylift.Relation.Type = function(relation) {
-  		if (relation.field && relation.field.name == 'id') return 'one-to-one';
-		else return 'many-to-one';
-	}
-})();
-
-/*global Donkeylift, Backbone */
-
-(function () {
-	'use strict';
-	console.log("Schema class def");
-	Donkeylift.Schema = Backbone.Model.extend({
-
-		initialize: function(attrs) {
-			console.log("Schema.initialize " + attrs.name);
-
-			if ( ! attrs.table) this.set('tables', new Donkeylift.Tables());
-
-			//this.set('id', attrs.name); //unset me when new
-			//this.orgJSON = this.toJSON();
-		},
-
-		attrJSON: function() {
-			return _.clone(this.attributes);
-		},		
-
-		toJSON : function() {
-			var tables = this.get('tables').map(function(table) {
-				return table.toJSON();	
-			});
-			return {
-				name: this.get('name'),
-				tables: tables
-			};
-		},	
-
-		parse : function(response) {
-			console.log("Schema.parse " + response);
-			var tables = _.map(response.tables, function(table) {
-				return new Donkeylift.Table(table);
-			});
-			response.tables = new Donkeylift.Tables(tables);
-			return response;
-		},
-
-		url : function() {
-			return Donkeylift.app.schemas.url() + '/' + this.get('name');
-		},
-
-		fetch : function(cbAfter) {
-			var me = this;
-			console.log("Schema.fetch...");
-			Backbone.Model.prototype.fetch.call(this, {
-				success: function() {
-					console.log("Schema.fetch OK");
-					cbAfter();
-				}
-			});
-		},
-
-		update : function() {
+	update : function() {
 return;
-			var me = this;			
-			this.save(function(err) {
-				if (err) {
-					//TODO
-					console.log(err);
-					alert('ERROR on update ' + me.get('name') + '. ' 
-						+ err.status + " " + err.responseText);
-				}
-			});
-		},
+		var me = this;			
+		this.save(function(err) {
+			if (err) {
+				//TODO
+				console.log(err);
+				alert('ERROR on update ' + me.get('name') + '. ' 
+					+ err.status + " " + err.responseText);
+			}
+		});
+	},
 
 
-		save : function(cbResult) {
-			console.log("Schema.save...");
-			var saveOptions = {
-				error: function(model, response) {
-					console.log("Schema.save ERROR");
-					console.dir(response);
-					cbResult(response);
-				},
-			};
+	save : function(cbResult) {
+		console.log("Schema.save...");
+		var saveOptions = {
+			error: function(model, response) {
+				console.log("Schema.save ERROR");
+				console.dir(response);
+				cbResult(response);
+			},
+		};
 
-			//save existing database
-			if (this.get('id') == this.get('name')) {
-				saveOptions.parse = false;
-				saveOptions.url = this.url();
-				console.log("Schema.save " + saveOptions.url);
-				saveOptions.success = function(model) {	
-					console.log("Schema.save OK");
-					cbResult();
-				}
-
-			//save new database
-			} else {
-				this.unset('id'); 
-				saveOptions.parse = false;
-				saveOptions.url = Donkeylift.app.schemas.url();
-				console.log("Schema.save " + saveOptions.url);
-				saveOptions.success = function(model) {
-					console.log("Schema.save new OK");
-					//set id to (new) name
-					model.set('id', model.get('name'));
-					Donkeylift.app.schema = model;
-
-					//reload schema list
-					Donkeylift.app.schemas.fetch({
-						reset: true,
-						success: function() {
-							cbResult();
-						},
-						error: function(model, response) {
-							cbResult(response);
-						}
-					});
-				}
+		//save existing database
+		if (this.get('id') == this.get('name')) {
+			saveOptions.parse = false;
+			saveOptions.url = this.url();
+			console.log("Schema.save " + saveOptions.url);
+			saveOptions.success = function(model) {	
+				console.log("Schema.save OK");
+				cbResult();
 			}
 
-			Backbone.Model.prototype.save.call(this, null, saveOptions);
-		},
+		//save new database
+		} else {
+			this.unset('id'); 
+			saveOptions.parse = false;
+			saveOptions.url = Donkeylift.app.schemas.url();
+			console.log("Schema.save " + saveOptions.url);
+			saveOptions.success = function(model) {
+				console.log("Schema.save new OK");
+				//set id to (new) name
+				model.set('id', model.get('name'));
+				Donkeylift.app.schema = model;
 
-
-		destroy: function(cbResult) {
-			var destroyOptions = {
-				success: function() {			
-					Donkeylift.app.unsetSchema();
-					Donkeylift.app.schemas.fetch({
-						reset: true,
-						success: function() {
-							cbResult();
-						},
-						error: function(model, response) {
-							cbResult(response);
-						}
-					});
-				},
-				error: function(model, response) {
-					console.dir(response);
-					cbResult(response);
-				}
-			};
-
-			Backbone.Model.prototype.destroy.call(this, destroyOptions);
-		},
-
-		getFieldFromQN: function(fieldQName) {
-			var parts = fieldQName.split('.');
-			var table = this.get('tables').getByName(parts[0]);
-			var field = table.get('fields').getByName(parts[1]);
-			return { table: table, field: field };
+				//reload schema list
+				Donkeylift.app.schemas.fetch({
+					reset: true,
+					success: function() {
+						cbResult();
+					},
+					error: function(model, response) {
+						cbResult(response);
+					}
+				});
+			}
 		}
 
-	});
+		Backbone.Model.prototype.save.call(this, null, saveOptions);
+	},
 
-})();
+
+	destroy: function(cbResult) {
+		var destroyOptions = {
+			success: function() {			
+				Donkeylift.app.unsetSchema();
+				Donkeylift.app.schemas.fetch({
+					reset: true,
+					success: function() {
+						cbResult();
+					},
+					error: function(model, response) {
+						cbResult(response);
+					}
+				});
+			},
+			error: function(model, response) {
+				console.dir(response);
+				cbResult(response);
+			}
+		};
+
+		Backbone.Model.prototype.destroy.call(this, destroyOptions);
+	},
+
+	getFieldFromQN: function(fieldQName) {
+		var parts = fieldQName.split('.');
+		var table = this.get('tables').getByName(parts[0]);
+		var field = table.get('fields').getByName(parts[1]);
+		return { table: table, field: field };
+	}
+
+});
 
 /*global Donkeylift, Backbone, _ */
 
-(function () {
-	'use strict';
-	//console.log("Table class def");
-	Donkeylift.Table = Backbone.Model.extend({ 
-		
-		initialize: function(table) {
-			console.log("Table.initialize " + table.name);
-			var fields = _.map( _.sortBy(table.fields, 'order'), 
-						function(field) {
-				return new Donkeylift.Field(field);
-			});			
-			this.set('fields', new Donkeylift.Fields(fields));
-			this.set('props', table.props);
-			//relations and row_alias are set in initRefs
-		},
+//console.log("Table class def");
+Donkeylift.Table = Backbone.Model.extend({ 
+	
+	initialize: function(table) {
+		console.log("Table.initialize " + table.name);
+		var fields = _.map( _.sortBy(table.fields, 'order'), 
+					function(field) {
+			return new Donkeylift.Field(field);
+		});			
+		this.set('fields', new Donkeylift.Fields(fields));
+		this.set('props', table.props);
+		//relations and row_alias are set in initRefs
+	},
 
-		initRefs: function(tables) {
-			this.initRelations(tables);
-			this.initAlias(tables);
-			this.initJSON = this.toJSON();
-		},
+	initRefs: function(tables) {
+		this.initRelations(tables);
+		this.initAlias(tables);
+		this.initJSON = this.toJSON();
+	},
 
-		isDirty: function() {
-			return ! _.isEqual(this.initJSON, this.toJSON());
-		},
+	isDirty: function() {
+		return ! _.isEqual(this.initJSON, this.toJSON());
+	},
 
-		initRelations : function(tables) {
-			var relations = _.map(this.get('referencing'), function(ref) {
-				//console.log('adding relation to ' + ref.fk_table + ' fk ' + ref.fk);
+	initRelations : function(tables) {
+		var relations = _.map(this.get('referencing'), function(ref) {
+			//console.log('adding relation to ' + ref.fk_table + ' fk ' + ref.fk);
 
-				var fk_table = _.find(tables, function(t) { 
-					return t.get('name') == ref.fk_table;
-				});
-				var fk = this.get('fields').getByName(ref.fk);
-
-				return new Donkeylift.Relation({
-					table: this,
-					related: fk_table,
-					field: fk
-				});
-			}, this);
-			this.set('relations', new Donkeylift.Relations(relations), {silent: true});
-		},
-
-		initAlias : function(tables) {
-
-			//console.log('table: ' + this.get('name'));
-			//console.log('row_alias: ' + this.get('row_alias'));
-			var row_alias = [];
-			_.each(this.get('row_alias'), function(a) {
-				//console.log('alias_part: ' + a);
-				var alias = a.split('.');
-				var alias_table;
-				var field_name;
-				if (alias.length == 2) {
-					var alias_table = _.find(tables, function(t) {
-							return t.get('name') == alias[0];
-					});
-					field_name = alias[1];
-				} else {
-					alias_table = this;
-					field_name = alias;
-				}
-				var alias_field = _.find(alias_table.get('fields').models, 
-					function(f) {
-						return f.get('name') == field_name;
-				});
-				row_alias.push(new Donkeylift.Alias({
-							table : alias_table,
-							field : alias_field
-				}));
-
-			}, this);
-			this.set('row_alias', row_alias, {silent: true});
-		},
-		
-		getFieldQN: function(field) {
-			return _.isString(field) 
-				? this.get('name') + '.' + field
-				: this.get('name') + '.' + field.get('name');
-		},
-
-		createView: function(options) {
-			return new Donkeylift.TableView(options);
-		},
-
-		attrJSON: function() {
-			return _.clone(this.attributes);
-		},		
-
-		toJSON: function() {
-			var fields = this.get('fields').map(function(field) {
-				return field.toJSON();
-			}); 
-			fields = _.object(_.pluck(fields, 'name'), fields);
-
-			this.get('relations').each(function(relation) {
-				var field = fields[relation.get('field').get('name')];
-				field.fk_table = relation.get('related').get('name');
+			var fk_table = _.find(tables, function(t) { 
+				return t.get('name') == ref.fk_table;
 			});
+			var fk = this.get('fields').getByName(ref.fk);
 
-			var row_alias = _.map(this.get('row_alias'), function(a) {
-				if (a.get('table') == this) return a.get('field').get('name');
-				else return a.toString();	
-/*
-				var parts = fieldQName.split('.');
-				if (parts[0] == this.get('name')) return parts[1];
-				else return fieldQName;
-*/
-			}, this);
+			return new Donkeylift.Relation({
+				table: this,
+				related: fk_table,
+				field: fk
+			});
+		}, this);
+		this.set('relations', new Donkeylift.Relations(relations), {silent: true});
+	},
 
-			return {
-				name: this.get('name'),
-				row_alias: row_alias,
-				fields: fields
-			};
-		}
+	initAlias : function(tables) {
 
-	});
+		//console.log('table: ' + this.get('name'));
+		//console.log('row_alias: ' + this.get('row_alias'));
+		var row_alias = [];
+		_.each(this.get('row_alias'), function(a) {
+			//console.log('alias_part: ' + a);
+			var alias = a.split('.');
+			var alias_table;
+			var field_name;
+			if (alias.length == 2) {
+				var alias_table = _.find(tables, function(t) {
+						return t.get('name') == alias[0];
+				});
+				field_name = alias[1];
+			} else {
+				alias_table = this;
+				field_name = alias;
+			}
+			var alias_field = _.find(alias_table.get('fields').models, 
+				function(f) {
+					return f.get('name') == field_name;
+			});
+			row_alias.push(new Donkeylift.Alias({
+						table : alias_table,
+						field : alias_field
+			}));
 
-	Donkeylift.Table.create = function(name) {
-		var fields = [ 
-			{ name: 'id', type: 'INTEGER', order: 1 },
-			{ name : 'modified_by', type: 'VARCHAR', order: 2 },
-			{ name : 'modified_on', type: 'DATETIME', order: 3 }
-		];
-		var table = new Donkeylift.Table({
-			name: name,
-			fields: fields
+		}, this);
+		this.set('row_alias', row_alias, {silent: true});
+	},
+	
+	getFieldQN: function(field) {
+		return _.isString(field) 
+			? this.get('name') + '.' + field
+			: this.get('name') + '.' + field.get('name');
+	},
+
+	createView: function(options) {
+		return new Donkeylift.TableView(options);
+	},
+
+	attrJSON: function() {
+		return _.clone(this.attributes);
+	},		
+
+	toJSON: function() {
+		var fields = this.get('fields').map(function(field) {
+			return field.toJSON();
+		}); 
+		fields = _.object(_.pluck(fields, 'name'), fields);
+
+		this.get('relations').each(function(relation) {
+			var field = fields[relation.get('field').get('name')];
+			field.fk_table = relation.get('related').get('name');
 		});
-		table.initRefs();
-		return table;
+
+		var row_alias = _.map(this.get('row_alias'), function(a) {
+			if (a.get('table') == this) return a.get('field').get('name');
+			else return a.toString();	
+/*
+			var parts = fieldQName.split('.');
+			if (parts[0] == this.get('name')) return parts[1];
+			else return fieldQName;
+*/
+		}, this);
+
+		return {
+			name: this.get('name'),
+			row_alias: row_alias,
+			fields: fields
+		};
 	}
 
-})();
+});
+
+Donkeylift.Table.create = function(name) {
+	var fields = [ 
+		{ name: 'id', type: 'INTEGER', order: 1 },
+		{ name : 'modified_by', type: 'VARCHAR', order: 2 },
+		{ name : 'modified_on', type: 'DATETIME', order: 3 }
+	];
+	var table = new Donkeylift.Table({
+		name: name,
+		fields: fields
+	});
+	table.initRefs();
+	return table;
+}
 
 /*global Donkeylift, Backbone */
 
 var ROWS_EXT = '.rows';
 var STATS_EXT = '.stats';
 
-(function () {
-	'use strict';
-	//console.log("Table class def");
-	Donkeylift.DataTable = Donkeylift.Table.extend({
+Donkeylift.DataTable = Donkeylift.Table.extend({
 
-		createView: function(options) {
-			return new Donkeylift.DataTableView(options);
-		},
+	createView: function(options) {
+		return new Donkeylift.DataTableView(options);
+	},
 
-		getAllRowsUrl: function() {
-			return decodeURI(this.lastFilterUrl);
-		},
+	getAllRowsUrl: function() {
+		return decodeURI(this.lastFilterUrl);
+	},
 
-		ajaxGetRowsFn: function() {
-			var me = this;
-			return function(data, callback, settings) {
-				console.log('request to api');
-				var orderField = me.get('fields')
-								.at(data.order[0].column);
+	ajaxGetRowsFn: function() {
+		var me = this;
+		return function(data, callback, settings) {
+			console.log('request to api');
+			var orderField = me.get('fields')
+							.at(data.order[0].column);
 
-				var orderParam = '$orderby='
-								+ encodeURIComponent(orderField.vname()
-								+ ' ' + data.order[0].dir);
+			var orderParam = '$orderby='
+							+ encodeURIComponent(orderField.vname()
+							+ ' ' + data.order[0].dir);
 
-				var skipParam = '$skip=' + data.start;
-				var topParam = '$top=' + data.length;
+			var skipParam = '$skip=' + data.start;
+			var topParam = '$top=' + data.length;
 
-				if (data.search.value.length == 0) {
-					//sometimes necessary after back/fwd
-					Donkeylift.app.filters.clearFilter(me);
-				}
+			if (data.search.value.length == 0) {
+				//sometimes necessary after back/fwd
+				Donkeylift.app.filters.clearFilter(me);
+			}
 
-				var filters = Donkeylift.app.filters.clone();
+			var filters = Donkeylift.app.filters.clone();
 
-				if (data.search.value.length > 0) {
-					filters.setFilter({
-						table: me,
-						op: Donkeylift.Filter.OPS.SEARCH,
-						value: data.search.value
-					});
-				}
-
-				var q = orderParam
-					+ '&' + skipParam
-					+ '&' + topParam
-					+ '&' + filters.toParam();
-				var url = DONKEYLIFT_API + me.get('url') + ROWS_EXT + '?' + q;
-
-				console.log(url);
-
-				me.lastFilterUrl = DONKEYLIFT_API
-								 + me.get('url') + ROWS_EXT + '?'
-								 + filters.toParam();
-
-				$.ajax(url, {
-					cache: false
-				}).done(function(response) {
-					//console.log('response from api');
-					//console.dir(response);
-
-					var fragment = 'data'
-								+ '/' + Donkeylift.app.schema.get('name')
-								+ '/' + Donkeylift.app.table.get('name')
-								+ '/' + q;
-
-					//console.log(fragment);
-					Donkeylift.app.router.updateNavigation(fragment, {
-						block: 100,
-						replace: true
-					});
-
-					var data = {
-						data: response.rows,
-						recordsTotal: response.totalCount,
-						recordsFiltered: response.count,
-					};
-					callback(data);
+			if (data.search.value.length > 0) {
+				filters.setFilter({
+					table: me,
+					op: Donkeylift.Filter.OPS.SEARCH,
+					value: data.search.value
 				});
 			}
-		},
 
-		reload: function() {
-			$('#grid').DataTable().ajax.reload();
-		},
+			var q = orderParam
+				+ '&' + skipParam
+				+ '&' + topParam
+				+ '&' + filters.toParam();
+			var url = DONKEYLIFT_API + me.get('url') + ROWS_EXT + '?' + q;
 
-		load: function(url) {
-			$('#grid').DataTable().ajax.url(url).load();
-		},
+			console.log(url);
 
-		dataCache: {},
+			me.lastFilterUrl = DONKEYLIFT_API
+							 + me.get('url') + ROWS_EXT + '?'
+							 + filters.toParam();
 
-		stats : function(filter, callback) {
-			var me = this;
+			$.ajax(url, {
+				cache: false
+			}).done(function(response) {
+				//console.log('response from api');
+				//console.dir(response);
 
-			var fieldName = filter.get('field').vname();
+				var fragment = 'data'
+							+ '/' + Donkeylift.app.schema.get('name')
+							+ '/' + Donkeylift.app.table.get('name')
+							+ '/' + q;
 
-			var params = { '$select' : fieldName };
-
-			var q = _.map(params, function(v,k) { return k + "=" + v; })
-					.join('&');
-
-			var filters = Donkeylift.app.filters.apply(filter);
-			q = q + '&' + Donkeylift.Filters.toParam(filters);
-
-			var url = DONKEYLIFT_API + this.get('url') + STATS_EXT
-					+ '?' + q;
-
-			console.log('stats ' + me.get('name') + '.' + fieldName
-						+ ' ' + url);
-
-			if (this.dataCache[url]) {
-				callback(this.dataCache[url][fieldName]);
-
-			} else {
-				$.ajax(url, {
-				}).done(function(response) {
-					//console.dir(response);
-					me.dataCache[url] = response;
-					callback(response[fieldName]);
+				//console.log(fragment);
+				Donkeylift.app.router.updateNavigation(fragment, {
+					block: 100,
+					replace: true
 				});
-			}
-		},
 
-		options: function(filter, searchTerm, callback) {
-			var me = this;
+				var data = {
+					data: response.rows,
+					recordsTotal: response.totalCount,
+					recordsFiltered: response.count,
+				};
+				callback(data);
+			});
+		}
+	},
 
-			var fieldName = filter.get('field').vname();
+	reload: function() {
+		$('#grid').DataTable().ajax.reload();
+	},
 
-			var params = {
-				'$top': 10,
-				'$distinct': true,
-				'$select': fieldName,
-				'$orderby': fieldName
-			};
+	load: function(url) {
+		$('#grid').DataTable().ajax.url(url).load();
+	},
 
-			var q = _.map(params, function(v,k) { return k + "=" + v; })
-					.join('&');
+	dataCache: {},
 
-			var filters = Donkeylift.app.filters.apply(filter, searchTerm);
-			q = q + '&' + Donkeylift.Filters.toParam(filters);
+	stats : function(filter, callback) {
+		var me = this;
 
-			var url = DONKEYLIFT_API + this.get('url') + ROWS_EXT
-					+ '?' + q;
+		var fieldName = filter.get('field').vname();
 
-			console.log('options ' + me.get('name') + '.' + fieldName
-						+ ' ' + url);
+		var params = { '$select' : fieldName };
 
-			if (this.dataCache[url]) {
-	//console.log(this.dataCache[url]);
-				callback(this.dataCache[url]['rows']);
+		var q = _.map(params, function(v,k) { return k + "=" + v; })
+				.join('&');
 
-			} else {
-				$.ajax(url, {
-				}).done(function(response) {
-					//console.dir(response.rows);
-					me.dataCache[url] = response;
-					callback(response.rows);
-				});
-			}
-		},
+		var filters = Donkeylift.app.filters.apply(filter);
+		q = q + '&' + Donkeylift.Filters.toParam(filters);
 
-	});
+		var url = DONKEYLIFT_API + this.get('url') + STATS_EXT
+				+ '?' + q;
 
-})();
+		console.log('stats ' + me.get('name') + '.' + fieldName
+					+ ' ' + url);
+
+		if (this.dataCache[url]) {
+			callback(this.dataCache[url][fieldName]);
+
+		} else {
+			$.ajax(url, {
+			}).done(function(response) {
+				//console.dir(response);
+				me.dataCache[url] = response;
+				callback(response[fieldName]);
+			});
+		}
+	},
+
+	options: function(filter, searchTerm, callback) {
+		var me = this;
+
+		var fieldName = filter.get('field').vname();
+
+		var params = {
+			'$top': 10,
+			'$distinct': true,
+			'$select': fieldName,
+			'$orderby': fieldName
+		};
+
+		var q = _.map(params, function(v,k) { return k + "=" + v; })
+				.join('&');
+
+		var filters = Donkeylift.app.filters.apply(filter, searchTerm);
+		q = q + '&' + Donkeylift.Filters.toParam(filters);
+
+		var url = DONKEYLIFT_API + this.get('url') + ROWS_EXT
+				+ '?' + q;
+
+		console.log('options ' + me.get('name') + '.' + fieldName
+					+ ' ' + url);
+
+		if (this.dataCache[url]) {
+//console.log(this.dataCache[url]);
+			callback(this.dataCache[url]['rows']);
+
+		} else {
+			$.ajax(url, {
+			}).done(function(response) {
+				//console.dir(response.rows);
+				me.dataCache[url] = response;
+				callback(response.rows);
+			});
+		}
+	},
+
+});
 
 /*global Donkeylift, Backbone, _ */
 
-(function () {
-	'use strict';
-	//console.log("Table class def");
-	Donkeylift.Database = Donkeylift.Schema.extend({ 
+Donkeylift.Database = Donkeylift.Schema.extend({ 
 
-		initialize : function(attrs, options) {
-			console.log("Database.initialize " + (attrs.name || ''));
-			Donkeylift.Schema.prototype.initialize.call(this, attrs);
-		},
+	initialize : function(attrs, options) {
+		console.log("Database.initialize " + (attrs.name || ''));
+		Donkeylift.Schema.prototype.initialize.call(this, attrs);
+	},
 
-		parse : function(response) {
-			console.log("Database.parse " + response);
+	parse : function(response) {
+		console.log("Database.parse " + response);
 
-			var tables = _.map(response.tables, function(table) {
-				return new Donkeylift.DataTable(table);
-			});
-			response.tables = new Donkeylift.Tables(tables);
-			return response;
-		},
-	});		
-
-})();
+		var tables = _.map(response.tables, function(table) {
+			return new Donkeylift.DataTable(table);
+		});
+		response.tables = new Donkeylift.Tables(tables);
+		return response;
+	},
+});		
 
 /*global Donkeylift, Backbone, _ */
 
-(function () {
-	'use strict';
-	Donkeylift.Filter = Backbone.Model.extend({
+Donkeylift.Filter = Backbone.Model.extend({
 
-		initialize: function(attrs) {
-			console.log("Filter.initialize ");			
+	initialize: function(attrs) {
+		console.log("Filter.initialize ");			
 
-			
-			if (_.isString(attrs.table)) {
-				this.set('table', 
-					Donkeylift.app.schema.get('tables').getByName(attrs.table));
-			}
+		
+		if (_.isString(attrs.table)) {
+			this.set('table', 
+				Donkeylift.app.schema.get('tables').getByName(attrs.table));
+		}
 
-			if (attrs.field && _.isString(attrs.field)) {
-				this.set('field', 
-					this.get('table').get('fields').getByName(attrs.field));
-			}
+		if (attrs.field && _.isString(attrs.field)) {
+			this.set('field', 
+				this.get('table').get('fields').getByName(attrs.field));
+		}
 
-			this.set('id', Donkeylift.Filter.Key(attrs.table, attrs.field));
+		this.set('id', Donkeylift.Filter.Key(attrs.table, attrs.field));
 
-		},
+	},
 
-		values: function() {
-			var me = this;
+	values: function() {
+		var me = this;
 
-			var val = _.isArray(this.get('value')) ? 
-						this.get('value') : [ this.get('value') ];
+		var val = _.isArray(this.get('value')) ? 
+					this.get('value') : [ this.get('value') ];
 
-			return val.map(function(v) {
-				if (me.get('field').get('fk') == 1 
-					&& me.get('op') == Donkeylift.Filter.OPS.IN) {
+		return val.map(function(v) {
+			if (me.get('field').get('fk') == 1 
+				&& me.get('op') == Donkeylift.Filter.OPS.IN) {
 
-					return Donkeylift.Field.getIdFromRef(v);
-
-				} else {
-					return me.get('field').toQS(v);
-				}
-			});
-		},
-
-		toParam: function() {
-			var f = this.get('field') ? this.get('field').vname() : null;
-			var param;
-
-			if (this.get('op') == Donkeylift.Filter.OPS.SEARCH) {
-				var key = Donkeylift.Filter.Key(this.get('table'), f);
-				param = key + " search '" + this.get('value') + "'";
-
-			} else if (this.get('op') == Donkeylift.Filter.OPS.BETWEEN) {
-				var values = this.values();
-				var key = Donkeylift.Filter.Key(this.get('table'), f);
-				param = key + " btwn " + values[0] + ',' + values[1];
-
-			} else if (this.get('op') == Donkeylift.Filter.OPS.IN) {				
-				var values = this.values();
-				var key = Donkeylift.Filter.Key(this.get('table'), this.get('field'));
-				param = key + " in " + values.join(",");
+				return Donkeylift.Field.getIdFromRef(v);
 
 			} else {
-				//EQUAL, GREATER, LESSER
-				var key = Donkeylift.Filter.Key(this.get('table'), f);
-				param = key + " " + this.get('op') + " " 
-				    + this.get('field').toQS(this.get('value'));
+				return me.get('field').toQS(v);
 			}
+		});
+	},
 
+	toParam: function() {
+		var f = this.get('field') ? this.get('field').vname() : null;
+		var param;
 
-			return param;
-		},
+		if (this.get('op') == Donkeylift.Filter.OPS.SEARCH) {
+			var key = Donkeylift.Filter.Key(this.get('table'), f);
+			param = key + " search '" + this.get('value') + "'";
 
-		loadRange: function(cbAfter) {
-			var field = this.get('field');
-			this.get('table').stats(this, function(stats) {
-				field.set('stats', stats);
-				cbAfter();
-			});
-		},
+		} else if (this.get('op') == Donkeylift.Filter.OPS.BETWEEN) {
+			var values = this.values();
+			var key = Donkeylift.Filter.Key(this.get('table'), f);
+			param = key + " btwn " + values[0] + ',' + values[1];
 
-		loadSelect: function(searchTerm, cbAfter) {
-			var field = this.get('field');
-			this.get('table').options(this, searchTerm, function(opts) {
-				field.set('options', opts);
-				cbAfter();
-			});
-		},
+		} else if (this.get('op') == Donkeylift.Filter.OPS.IN) {				
+			var values = this.values();
+			var key = Donkeylift.Filter.Key(this.get('table'), this.get('field'));
+			param = key + " in " + values.join(",");
 
-		toStrings: function() {
-			var result = { table: this.get('table').get('name'), field: '' };
-			if (this.get('op') == Donkeylift.Filter.OPS.SEARCH) {
-				result.op = 'search';
-				result.value = this.get('value');
-
-			} else if (this.get('op') == Donkeylift.Filter.OPS.BETWEEN) {
-				result.op = 'between';
-				result.field = this.get('field').get('name');
-				result.value = this.get('value')[0] 
-							+ ' and ' + this.get('value')[1];
-
-			} else if (this.get('op') == Donkeylift.Filter.OPS.IN) {
-				result.op = 'in';
-				result.field = this.get('field').get('name');
-				result.value = this.get('value').join(', '); 
-
-			} else if (this.get('op') == Donkeylift.Filter.OPS.EQUAL) {
-				result.op = 'equal';
-				result.field = this.get('field').get('name');
-				result.value = this.get('value'); 
-			}
-			return result;
+		} else {
+			//EQUAL, GREATER, LESSER
+			var key = Donkeylift.Filter.Key(this.get('table'), f);
+			param = key + " " + this.get('op') + " " 
+			    + this.get('field').toQS(this.get('value'));
 		}
 
-	});
 
-	Donkeylift.Filter.Key = function(table, field) {		
-		if (_.isObject(table)) table = table.get('name');
-		if ( ! field) field = table;
-		else if (_.isObject(field)) field = field.get('name'); //not vname
-		return table + '.' + field;
-	}
+		return param;
+	},
 
-	Donkeylift.Filter.OPS = {
-		'SEARCH': 'search',
-		'BETWEEN': 'btwn',
-		'IN': 'in',
-		'EQUAL': 'eq',
-		'LESSER': 'le',
-		'GREATER': 'ge'
-	}
+	loadRange: function(cbAfter) {
+		var field = this.get('field');
+		this.get('table').stats(this, function(stats) {
+			field.set('stats', stats);
+			cbAfter();
+		});
+	},
 
-	Donkeylift.Filter.CONJUNCTION = ' and ';
+	loadSelect: function(searchTerm, cbAfter) {
+		var field = this.get('field');
+		this.get('table').options(this, searchTerm, function(opts) {
+			field.set('options', opts);
+			cbAfter();
+		});
+	},
 
-})();
+	toStrings: function() {
+		var result = { table: this.get('table').get('name'), field: '' };
+		if (this.get('op') == Donkeylift.Filter.OPS.SEARCH) {
+			result.op = 'search';
+			result.value = this.get('value');
 
-/*global Backbone, Donkeylift */
+		} else if (this.get('op') == Donkeylift.Filter.OPS.BETWEEN) {
+			result.op = 'between';
+			result.field = this.get('field').get('name');
+			result.value = this.get('value')[0] 
+						+ ' and ' + this.get('value')[1];
 
-(function () {
-	'use strict';
+		} else if (this.get('op') == Donkeylift.Filter.OPS.IN) {
+			result.op = 'in';
+			result.field = this.get('field').get('name');
+			result.value = this.get('value').join(', '); 
 
-	// Tables Collection
-	// ---------------
-
-	Donkeylift.Fields = Backbone.Collection.extend({
-		// Reference to this collection's model.
-		model: Donkeylift.Field,
-		
-		initialize: function(attrs) {
-			//this.on('change', function(ev) { console.log('Fields.ev ' + ev); });
-		},
-
-		addNew: function() {
-			var field = Donkeylift.Field.create('field' + this.length);
-			field.set('order', this.length);
-			this.add(field);
-			return field;
-		},
-
-		getByName: function(name) {
-			return this.find(function(f) { 
-				return f.vname() == name || f.get('name') == name; 
-			});
-		}
-	});
-
-})();
-
-/*global Backbone, Donkeylift */
-
-(function () {
-	'use strict';
-
-	// Tables Collection
-	// ---------------
-
-	Donkeylift.Relations = Backbone.Collection.extend({
-		// Reference to this collection's model.
-		model: Donkeylift.Relation,
-		
-		addNew: function(table) {
-			console.log('Relations addNew ' + table.get('name'));
-			var relation = new Donkeylift.Relation.create(table);
-			this.add(relation);
-			return relation;
-		}
-
-	});
-
-})();
-
-/*global Backbone, Donkeylift */
-
-(function () {
-	'use strict';
-	Donkeylift.Schemas = Backbone.Collection.extend({
-
-		initialize: function(models, options) {
-			console.log("Schemas.initialize " + options);
-			this._url = options.url;
-		},
-
-		//Schemas is just a list of schema names
-		//model: Donkeylift.Schema,
-
-		url	: function() { 
-			return this._url;
-		},
-
-		parse : function(response) {
-			console.log("Schemas.parse ");
-			return _.values(response.databases);
-			//return _.values(response);
-		},
-
-	});
-
-})();
-
-/*global Donkeylift, Backbone, _ */
-
-(function () {
-	'use strict';
-
-	// Tables Collection
-	// ---------------
-
-	Donkeylift.Tables = Backbone.Collection.extend({
-		// Reference to this collection's model.
-		model: Donkeylift.Table,
-
-		initialize : function(tables) {
-			_.each(tables, function(table) {				
-				table.initRefs(tables);
-			});
-		},
-
-		getByName: function(name) {
-			return this.find(function(t) { return t.get('name') == name; });
-		},
-
-		getAncestors: function(table) {
-			var result = [];
-			var tables = [table];
-			while(tables.length > 0) {
-				var it = tables.shift();
-				var parents = it.get('parents');
-				_.each(parents, function(tn) {
-					var pt = this.getByName(tn);
-					if (pt != it) {
-						result.push(pt);
-						tables.push(pt);
-					}
-				}, this);
-			}
-			return result;
-		}
-
-	});
-
-})();
-
-/*global Donkeylift, Backbone */
-
-(function () {
-	'use strict';
-
-	// Tables Collection
-	// ---------------
-
-	Donkeylift.Filters = Backbone.Collection.extend({
-		// Reference to this collection's model.
-		model: Donkeylift.Filter,
-		
-		toParam: function() {
-			return Donkeylift.Filters.toParam(this.models);	
-		},
-
-		//used by Datable.stats & Datatable.options to get context:
-		//min/max, opts
-		apply: function(exFilter, searchTerm) {
-
-			var filters = this.filter(function(f) {
-
-				//exclude callee
-				if (f.id == exFilter.id) return false;
-
-				//exclude existing search on same table
-				if (f.get('op') == Donkeylift.Filter.OPS.SEARCH 
-				 && f.get('table') == exFilter.get('table')) {
-					return false;
-				}
-
-				return true;
-			});
-			
-			//add search term
-			if (searchTerm && searchTerm.length > 0) {
-				var searchFilter = new Donkeylift.Filter({
-						table: exFilter.get('table'),
-						field: exFilter.get('field'),
-						op: Donkeylift.Filter.OPS.SEARCH,
-						value: searchTerm
-				});
-				filters.push(searchFilter);
-			}
-			
-			return filters;
-		},
-
-		setFilter: function(attrs) {
-			var filter = new Donkeylift.Filter(attrs);		
-			var current = this.get(filter.id);
-			if (current) this.remove(current);
-			if (attrs.value.length > 0) {
-				this.add(filter);
-			}
-		},
-
-		getFilter: function(table, field) {
-			return this.get(Donkeylift.Filter.Key(table, field));
-		},
-
-		clearFilter: function(table, field) {
-			var current = this.getFilter(table, field);
-			if (current) this.remove(current);
-		},
-
-	});
-
-	Donkeylift.Filters.toParam = function(filters) {
-		var result = '';
-		if (filters.length > 0) {
-			var params = _.reduce(filters, function(memo, f) {
-				return memo.length == 0 ? f.toParam() 
-					: memo + Donkeylift.Filter.CONJUNCTION + f.toParam();
-			}, '');				
-			result = '$filter=' + encodeURIComponent(params);
+		} else if (this.get('op') == Donkeylift.Filter.OPS.EQUAL) {
+			result.op = 'equal';
+			result.field = this.get('field').get('name');
+			result.value = this.get('value'); 
 		}
 		return result;
 	}
 
-})();
+});
 
-/*global Donkeylift, Backbone, jQuery, _ */
+Donkeylift.Filter.Key = function(table, field) {		
+	if (_.isObject(table)) table = table.get('name');
+	if ( ! field) field = table;
+	else if (_.isObject(field)) field = field.get('name'); //not vname
+	return table + '.' + field;
+}
 
-(function ($) {
-	'use strict';
+Donkeylift.Filter.OPS = {
+	'SEARCH': 'search',
+	'BETWEEN': 'btwn',
+	'IN': 'in',
+	'EQUAL': 'eq',
+	'LESSER': 'le',
+	'GREATER': 'ge'
+}
 
-	Donkeylift.DownloadsView = Backbone.View.extend({
-		el:  '#content',
+Donkeylift.Filter.CONJUNCTION = ' and ';
 
-		events: {
-			//'click #reset-all-filters': 'evResetAllFilters'
-		},
+/*global Backbone, Donkeylift */
 
-		initialize: function() {
-			console.log("MenuView.init");
-			//this.listenTo(Donkeylift.table, 'change', this.render);
-		},
+Donkeylift.Fields = Backbone.Collection.extend({
+	// Reference to this collection's model.
+	model: Donkeylift.Field,
+	
+	initialize: function(attrs) {
+		//this.on('change', function(ev) { console.log('Fields.ev ' + ev); });
+	},
 
-		template: _.template($('#downloads-template').html()),
+	addNew: function() {
+		var field = Donkeylift.Field.create('field' + this.length);
+		field.set('order', this.length);
+		this.add(field);
+		return field;
+	},
 
-		render: function() {
-			console.log('DownloadsView.render ');			
-			this.$el.html(this.template());
-			return this;
-		},
-
-	});
-
-})(jQuery);
-
-
-
-/*global Donkeylift, Backbone, jQuery, _ */
-
-(function ($) {
-	'use strict';
-
-	Donkeylift.SchemaCurrentView = Backbone.View.extend({
-		el:  '#schema-list',
-
-		initialize: function() {
-		},
-
-		render: function() {
-			console.log('SchemaCurrentView.render ');			
-			if (Donkeylift.app.schema) {
-				this.$('a:first span').html(' DB ' 
-					+ Donkeylift.app.schema.get('name'));
-			} else {
-				this.$('a:first span').html(' Choose DB ');
-			}		
-			return this;
-		},
+	getByName: function(name) {
+		return this.find(function(f) { 
+			return f.vname() == name || f.get('name') == name; 
+		});
+	}
+});
 
 
-	});
+/*global Backbone, Donkeylift */
 
-})(jQuery);
+// Tables Collection
+// ---------------
+
+Donkeylift.Relations = Backbone.Collection.extend({
+	// Reference to this collection's model.
+	model: Donkeylift.Relation,
+	
+	addNew: function(table) {
+		console.log('Relations addNew ' + table.get('name'));
+		var relation = new Donkeylift.Relation.create(table);
+		this.add(relation);
+		return relation;
+	}
+
+});
 
 
+/*global Backbone, Donkeylift */
 
-/*global Donkeylift, Backbone, jQuery, _ */
+Donkeylift.Schemas = Backbone.Collection.extend({
 
-(function ($) {
-	'use strict';
+	initialize: function(models, options) {
+		console.log("Schemas.initialize " + options);
+		this._url = options.url;
+	},
 
-	Donkeylift.SchemaListView = Backbone.View.extend({
-		//el:  '#schema-select',
+	//Schemas is just a list of schema names
+	//model: Donkeylift.Schema,
 
-		tagName: 'ul',
-		className: 'dropdown-menu alert-dropdown',
+	url	: function() { 
+		return this._url;
+	},
 
-		events: {
-			'click .schema-option': 'evSchemaClick'
-		},
+	parse : function(response) {
+		console.log("Schemas.parse ");
+		return _.values(response.databases);
+		//return _.values(response);
+	},
 
-		initialize: function() {
-			console.log("SchemaListView.init");
-			this.listenTo(this.collection, 'reset', this.render);
-		},
+});
 
-		template: _.template($('#schema-select-template').html()),
 
-		render: function() {
-			console.log('SchemaListView.render ');			
-			//var el = this.$('ul');
-			this.$el.empty();	
-			this.collection.each(function(schema) {
-				this.$el.append(this.template({name: schema.get('name')}));
+/*global Donkeylift, Backbone, _ */
+
+// Tables Collection
+// ---------------
+
+Donkeylift.Tables = Backbone.Collection.extend({
+	// Reference to this collection's model.
+	model: Donkeylift.Table,
+
+	initialize : function(tables) {
+		_.each(tables, function(table) {				
+			table.initRefs(tables);
+		});
+	},
+
+	getByName: function(name) {
+		return this.find(function(t) { return t.get('name') == name; });
+	},
+
+	getAncestors: function(table) {
+		var result = [];
+		var tables = [table];
+		while(tables.length > 0) {
+			var it = tables.shift();
+			var parents = it.get('parents');
+			_.each(parents, function(tn) {
+				var pt = this.getByName(tn);
+				if (pt != it) {
+					result.push(pt);
+					tables.push(pt);
+				}
 			}, this);
-			
-			return this;
-		},
+		}
+		return result;
+	}
 
-		evSchemaClick: function(ev) {
-			var name = $(ev.target).attr('data-target');
-			console.log('SchemaListView.evSchemaClick ' + name);
-			Donkeylift.app.setSchema(name);
+});
+
+/*global Donkeylift, Backbone */
+
+Donkeylift.Filters = Backbone.Collection.extend({
+	// Reference to this collection's model.
+	model: Donkeylift.Filter,
+	
+	toParam: function() {
+		return Donkeylift.Filters.toParam(this.models);	
+	},
+
+	//used by Datable.stats & Datatable.options to get context:
+	//min/max, opts
+	apply: function(exFilter, searchTerm) {
+
+		var filters = this.filter(function(f) {
+
+			//exclude callee
+			if (f.id == exFilter.id) return false;
+
+			//exclude existing search on same table
+			if (f.get('op') == Donkeylift.Filter.OPS.SEARCH 
+			 && f.get('table') == exFilter.get('table')) {
+				return false;
+			}
+
+			return true;
+		});
+		
+		//add search term
+		if (searchTerm && searchTerm.length > 0) {
+			var searchFilter = new Donkeylift.Filter({
+					table: exFilter.get('table'),
+					field: exFilter.get('field'),
+					op: Donkeylift.Filter.OPS.SEARCH,
+					value: searchTerm
+			});
+			filters.push(searchFilter);
+		}
+		
+		return filters;
+	},
+
+	setFilter: function(attrs) {
+		var filter = new Donkeylift.Filter(attrs);		
+		var current = this.get(filter.id);
+		if (current) this.remove(current);
+		if (attrs.value.length > 0) {
+			this.add(filter);
+		}
+	},
+
+	getFilter: function(table, field) {
+		return this.get(Donkeylift.Filter.Key(table, field));
+	},
+
+	clearFilter: function(table, field) {
+		var current = this.getFilter(table, field);
+		if (current) this.remove(current);
+	},
+
+});
+
+Donkeylift.Filters.toParam = function(filters) {
+	var result = '';
+	if (filters.length > 0) {
+		var params = _.reduce(filters, function(memo, f) {
+			return memo.length == 0 ? f.toParam() 
+				: memo + Donkeylift.Filter.CONJUNCTION + f.toParam();
+		}, '');				
+		result = '$filter=' + encodeURIComponent(params);
+	}
+	return result;
+}
+
+/*global Donkeylift, Backbone, jQuery, _ */
+
+Donkeylift.DownloadsView = Backbone.View.extend({
+	el:  '#content',
+
+	events: {
+		//'click #reset-all-filters': 'evResetAllFilters'
+	},
+
+	initialize: function() {
+		console.log("MenuView.init");
+		//this.listenTo(Donkeylift.table, 'change', this.render);
+	},
+
+	template: _.template($('#downloads-template').html()),
+
+	render: function() {
+		console.log('DownloadsView.render ');			
+		this.$el.html(this.template());
+		return this;
+	},
+
+});
+
+
+
+/*global Donkeylift, Backbone, jQuery, _ */
+
+Donkeylift.SchemaCurrentView = Backbone.View.extend({
+	el:  '#schema-list',
+
+	initialize: function() {
+	},
+
+	render: function() {
+		console.log('SchemaCurrentView.render ');			
+		if (Donkeylift.app.schema) {
+			this.$('a:first span').html(' DB ' 
+				+ Donkeylift.app.schema.get('name'));
+		} else {
+			this.$('a:first span').html(' Choose DB ');
+		}		
+		return this;
+	},
+
+
+});
+
+
+
+/*global Donkeylift, Backbone, $, _ */
+
+Donkeylift.SchemaListView = Backbone.View.extend({
+	//el:  '#schema-select',
+
+	tagName: 'ul',
+	className: 'dropdown-menu alert-dropdown',
+
+	events: {
+		'click .schema-option': 'evSchemaClick'
+	},
+
+	initialize: function() {
+		console.log("SchemaListView.init");
+		this.listenTo(this.collection, 'reset', this.render);
+	},
+
+	template: _.template($('#schema-select-template').html()),
+
+	render: function() {
+		console.log('SchemaListView.render ');			
+		//var el = this.$('ul');
+		this.$el.empty();	
+		this.collection.each(function(schema) {
+			this.$el.append(this.template({name: schema.get('name')}));
+		}, this);
+		
+		return this;
+	},
+
+	evSchemaClick: function(ev) {
+		var name = $(ev.target).attr('data-target');
+		console.log('SchemaListView.evSchemaClick ' + name);
+		Donkeylift.app.setSchema(name);
+	}
+
+});
+
+
+
+/*global Donkeylift, Backbone, jQuery, _ */
+
+Donkeylift.TableListView = Backbone.View.extend({
+
+	
+	id: "table-list",
+	className: "list-group",
+
+	events: {
+		//'click .table-item': 'evTableClick'
+	},
+
+	initialize: function() {
+		console.log("TableListView.init " + this.collection);
+		this.listenTo(this.collection, 'update', this.render);
+		this.listenTo(this.collection, 'change', this.render);
+	},
+
+	template: _.template($('#table-list-template').html()),
+	itemTemplate: _.template($('#table-item-template').html()),
+
+	render: function() {
+		console.log('TableListView.render ');			
+		this.$el.html(this.template());
+		this.collection.each(function(table) {
+			var href = "#table" 
+					+ "/" + table.get('name');
+			this.$el.append(this.itemTemplate({
+				name: table.get('name'),
+				href: href
+			}));
+		}, this);			
+		return this;
+	},
+});
+
+
+
+
+/*global Donkeylift, Backbone, jQuery, _ */
+
+Donkeylift.DataTableView = Backbone.View.extend({
+
+	id: 'grid-panel',
+	className: 'panel',
+
+	initialize: function() {
+		console.log("DataTableView.init " + this.model);			
+		this.listenTo(Donkeylift.app.filters, 'update', this.renderFilterButtons);
+	},
+
+	tableTemplate: _.template($('#grid-table-template').html()),
+	columnTemplate: _.template($('#grid-column-template').html()),
+	buttonWrapTextTemplate: _.template($('#grid-button-wrap-text-template').html()),
+
+	getFieldsInColumnOrder: function() {
+		return this.model.get('fields')
+			.sortBy(function(field) {
+				return field.getProp('order');
+		}, this);
+	},
+
+	renderFilterButtons: function() {
+		var fields = this.getFieldsInColumnOrder();
+		_.each(fields, function(field, idx) {
+			
+			var filter = Donkeylift.app.filters.getFilter(
+					this.model, 
+					field.get('name')
+				);
+			
+			var active = filter ? true : false;
+			var $el = this.$('#col-' + field.vname() + ' button').first();
+			$el.toggleClass('filter-btn-active', active); 
+
+		}, this);
+	},
+
+	renderTextWrapCheck: function() {
+		
+		this.$('#grid_length').prepend(this.buttonWrapTextTemplate());
+		this.$('#grid_wrap_text').click(function(ev) {
+			var currentWrap = $("table.dataTable").css("white-space");
+			var toggleWrap = currentWrap == 'normal' ? 'nowrap' : 'normal';
+				
+			$("table.dataTable").css("white-space", toggleWrap);
+			$('#grid_wrap_text span')
+				.toggleClass("glyphicon-text-height glyphicon-text-width");
+		});
+		
+	},
+
+	getOptions: function(params, fields) {
+		params = params || {};
+		var dtOptions = {};
+		
+		dtOptions.lengthMenu = params.lengthMenu || [5, 10, 25, 50, 100];
+
+		dtOptions.displayStart = params.$skip || 0;
+		dtOptions.pageLength = params.$top || 10;
+
+		dtOptions.order = [0, 'asc'];
+		if (params.$orderby) {
+			var order = _.pairs(params.$orderby[0]) [0];
+			for(var i = 0; i < fields.length; ++i) {
+				if (fields[i].vname() == order[0]) {
+					dtOptions.order[0] = i;
+					dtOptions.order[1] = order[1];
+					break;
+				}
+			}
 		}
 
-	});
+		var totalWidth = _.reduce(fields, function(s, f) {
+			return s + f.getProp('width');
+		}, 0);
 
-})(jQuery);
+		var columns = _.map(fields, function(field) {
+			var col = {
+				data: field.vname(),
+			}
 
+			var width = (100 * field.getProp('width')) / totalWidth;
+			col.width = String(Math.floor(width)) + '%';
 
+			col.render = this.columnDataFn(field);
 
-/*global Donkeylift, Backbone, jQuery, _ */
+			return col;
+		}, this);
 
-(function ($) {
-	'use strict';
+		dtOptions.columns = columns;
 
-	Donkeylift.TableListView = Backbone.View.extend({
+		return dtOptions;
+	},
 
-		
-		id: "table-list",
-		className: "list-group",
+	render: function() {
+		console.log('DataTableView.render ');			
+		this.$el.html(this.tableTemplate());
 
-		events: {
-			//'click .table-item': 'evTableClick'
-		},
+		var fields = this.getFieldsInColumnOrder();
 
-		initialize: function() {
-			console.log("TableListView.init " + this.collection);
-			this.listenTo(this.collection, 'update', this.render);
-			this.listenTo(this.collection, 'change', this.render);
-		},
-
-		template: _.template($('#table-list-template').html()),
-		itemTemplate: _.template($('#table-item-template').html()),
-
-		render: function() {
-			console.log('TableListView.render ');			
-			this.$el.html(this.template());
-			this.collection.each(function(table) {
-				var href = "#table" 
-						+ "/" + table.get('name');
-				this.$el.append(this.itemTemplate({
-					name: table.get('name'),
-					href: href
-				}));
-			}, this);			
-			return this;
-		},
-	});
-
-})(jQuery);
-
-
-
-/*global Donkeylift, Backbone, jQuery, _ */
-
-(function ($) {
-	'use strict';
-
-	Donkeylift.DataTableView = Backbone.View.extend({
-
-		id: 'grid-panel',
-		className: 'panel',
-
-		initialize: function() {
-			console.log("DataTableView.init " + this.model);			
-			this.listenTo(Donkeylift.app.filters, 'update', this.renderFilterButtons);
-		},
-
-		tableTemplate: _.template($('#grid-table-template').html()),
-		columnTemplate: _.template($('#grid-column-template').html()),
-		buttonWrapTextTemplate: _.template($('#grid-button-wrap-text-template').html()),
-
-		getFieldsInColumnOrder: function() {
-			return this.model.get('fields')
-				.sortBy(function(field) {
-					return field.getProp('order');
-			}, this);
-		},
-
-		renderFilterButtons: function() {
-			var fields = this.getFieldsInColumnOrder();
-			_.each(fields, function(field, idx) {
-				
-				var filter = Donkeylift.app.filters.getFilter(
-						this.model, 
-						field.get('name')
-					);
-				
-				var active = filter ? true : false;
-				var $el = this.$('#col-' + field.vname() + ' button').first();
-				$el.toggleClass('filter-btn-active', active); 
-
-			}, this);
-		},
-
-		renderTextWrapCheck: function() {
+		_.each(fields, function(field, idx) {
+			var align = idx < fields.length / 2 ? 
+				'dropdown-menu-left' : 'dropdown-menu-right';
 			
-			this.$('#grid_length').prepend(this.buttonWrapTextTemplate());
-			this.$('#grid_wrap_text').click(function(ev) {
-				var currentWrap = $("table.dataTable").css("white-space");
-				var toggleWrap = currentWrap == 'normal' ? 'nowrap' : 'normal';
-					
-				$("table.dataTable").css("white-space", toggleWrap);
-				$('#grid_wrap_text span')
-					.toggleClass("glyphicon-text-height glyphicon-text-width");
+			this.$('thead > tr').append(this.columnTemplate({
+				name: field.vname(),
+				dropalign: align	
+			}));					
+
+		}, this);
+
+		this.renderFilterButtons();
+
+
+		var filter = Donkeylift.app.filters.getFilter(this.model);			
+		var initSearch = {};
+		if (filter) initSearch.search = filter.get('value');
+
+		var dtOptions = this.getOptions(this.attributes.params, fields);
+		console.log(dtOptions);
+
+		this.dataTable = this.$('#grid').DataTable({
+			serverSide: true,
+			columns: dtOptions.columns,				
+			ajax: this.model.ajaxGetRowsFn(),
+			search: initSearch,
+			lengthMenu: dtOptions.lengthMenu, 
+			displayStart: dtOptions.displayStart, 
+			pageLength: dtOptions.pageLength, 
+			order: dtOptions.order
+		});
+
+		if (filter) {
+			this.$('#grid_filter input').val(filter.get('value'));
+		}
+
+		this.renderTextWrapCheck();
+
+		this.addEvents();
+		return this;
+	},
+
+	addEvents: function() {
+		var me = this;
+
+		this.$('.field-filter').click(function(ev) {
+			ev.stopPropagation();
+
+			if ( ! $(this).data('bs.dropdown')) {
+				//workaround for first click to show dropdown
+				$(this).dropdown('toggle');
+			} else {
+				$(this).dropdown();
+			}
+
+			var colName = $(this).data('column');
+			var field = me.model.get('fields').getByName(colName);
+			var el = me.$('#col-' + colName + ' div.dropdown-menu');
+
+			var filter = new Donkeylift.Filter({
+				table: me.model,
+				field: field
 			});
-			
-		},
 
-		getOptions: function(params, fields) {
-			params = params || {};
-			var dtOptions = {};
-			
-			dtOptions.lengthMenu = params.lengthMenu || [5, 10, 25, 50, 100];
+			Donkeylift.app.setFilterView(filter, el);
+		});
 
-			dtOptions.displayStart = params.$skip || 0;
-			dtOptions.pageLength = params.$top || 10;
+		this.$('#grid').on('draw.dt', function() {
 
-			dtOptions.order = [0, 'asc'];
-			if (params.$orderby) {
-				var order = _.pairs(params.$orderby[0]) [0];
-				for(var i = 0; i < fields.length; ++i) {
-					if (fields[i].vname() == order[0]) {
-						dtOptions.order[0] = i;
-						dtOptions.order[1] = order[1];
-						break;
+			//expand ellipsis on click
+			me.$('button.ellipsis').click(function(ev) {				
+				//wrap text before expaning
+				$(ev.target).parents('span').css('white-space', 'normal');	
+
+				var fullText = $(ev.target).parents('span').attr('title');
+				$(ev.target).parents('span').html(fullText);
+			});
+		});
+
+		this.$('#grid').on('page.dt', function() {
+			console.log("page.dt");
+			Donkeylift.app.router.navigate("reload-table", {trigger: false});			
+		});
+
+		//using order.dt event won't work because its fired otherwise, too
+		this.$('th.sorting').click(function() {
+			console.log("order.dt");
+			Donkeylift.app.router.navigate("reload-table", {trigger: false});			
+		});
+
+		//using search.dt event won't work because its fired otherwise, too
+		this.$('input[type="search"]').blur(function() {
+			console.log("search.dt");
+			Donkeylift.app.router.navigate("reload-table", {trigger: false});			
+		});
+		this.$('input[type="search"]').focus(function() {
+			console.log("search.dt");
+			Donkeylift.app.router.navigate("reload-table", {trigger: false});			
+		});
+
+	},
+
+	columnDataFn: function(field) {
+
+		var me = this;
+
+		var btnExpand = '<button class="ellipsis btn btn-default btn-xs"><span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span></button>'
+		var w = field.getProp('width');
+		var abbrFn = function (data) {
+			var s = field.toFS(data);
+	   		return s.length > w
+				?  '<span title="' + s.replace(/"/g, '&quot;') + '">'
+					+ s.substr( 0, w)
+					+ ' ' + btnExpand
+				: s;
+		}
+
+		var anchorFn = undefined;
+		if (field.get('name') == 'id' 
+			&& me.model.get('referenced').length > 0) {
+			anchorFn = function(id) {
+				var href = '#table'
+					+ '/' + me.model.get('referenced')[0].table
+					+ '/' + me.model.get('name') + '.id=' + id;
+
+				return '<a href="' + href + '">' + id + '</a>';
+			}
+
+		} else if (field.get('fk') == 1) {
+			anchorFn = function(ref) {
+				var href = '#table'
+					+ '/' + field.get('fk_table')
+					+ '/id=' + Donkeylift.Field.getIdFromRef(ref)
+
+				return '<a href="' + href + '">' + ref + '</a>';
+			}
+		}
+
+		var dataFn = function (data, type, full, meta ) {
+
+			if (type == 'display' && data) {
+				return anchorFn ? anchorFn(data) : abbrFn(data);
+			} else {
+				return data;
+			}
+		}								
+
+		return dataFn;	
+	}
+
+});
+
+
+
+/*global Donkeylift, Backbone, jQuery, _ */
+
+Donkeylift.FilterItemsView = Backbone.View.extend({
+
+	events: {
+		'click #selectReset': 'evFilterItemsReset',
+		'click .filter-option': 'evFilterOptionClick',
+		'click .filter-selected': 'evFilterSelectedClick',
+		'input #inputFilterItemsSearch': 'evInputFilterSearchChange',
+	},
+
+	initialize: function () {
+		console.log("FilterItemsView.init " + this.model.get('table'));
+	},
+
+	template: _.template($('#filter-option-template').html()),
+
+	loadRender: function() {
+		var me = this;
+		var s = this.$('#inputFilterItemsSearch').val();
+		this.model.loadSelect(s, function() {
+			me.render();
+		});
+	},
+
+	render: function() {
+		this.$('a[href=#filterSelect]').tab('show');
+
+		this.$('#filterSelection').empty();
+		var current = Donkeylift.app.filters.getFilter(
+						this.model.get('table'),
+						this.model.get('field'));
+
+		if (current && current.get('op') == Donkeylift.Filter.OPS.IN) {
+			//get values from filter
+			var selected = current.get('value');		
+//console.log(selected);
+			_.each(selected, function(val) {
+				this.$('#filterSelection').append(this.template({
+					name: 'filter-selected',
+					value: val
+				}));
+			}, this);
+		}
+
+		this.$('#filterOptions').empty();
+		var fn = this.model.get('field').vname();
+		var opts = this.model.get('field').get('options');		
+//console.log(opts);
+		_.each(opts, function(opt) {
+			this.$('#filterOptions').append(this.template({
+				name: 'filter-option',
+				value: opt[fn]
+			}));
+		}, this);
+	},
+
+	setFilter: function() {
+		var filterValues = this.$('#filterSelection').children()
+			.map(function() {
+				return $(this).attr('data-target');
+		}).get();
+
+		Donkeylift.app.filters.setFilter({
+			table: this.model.get('table'),
+			field: this.model.get('field'),
+			op: Donkeylift.Filter.OPS.IN,
+			value: filterValues
+		});
+		
+		Donkeylift.app.router.navigate("reload-table", {trigger: true});			
+		//window.location.hash = "#reload-table";
+	},
+
+	evFilterOptionClick: function(ev) {
+		ev.stopPropagation();
+		//console.log(ev.target);
+		var opt = $(ev.target).attr('data-target');
+		var attr = '[data-target="' + opt + '"]';
+
+		//avoid duplicate items in filterSelection
+		if (this.$('#filterSelection').has(attr).length == 0) {
+			var item = this.template({
+				name: 'filter-selected',
+				value: opt
+			});
+			this.$('#filterSelection').append(item);
+			this.setFilter();
+		}
+	},
+
+	evFilterSelectedClick: function(ev) {
+		ev.stopPropagation();
+		//console.log(ev.target);
+		$(ev.target).remove();
+		this.setFilter();
+	},
+
+	evInputFilterSearchChange: function(ev) {
+		this.loadRender();
+	},
+
+
+	evFilterItemsReset: function() {
+		this.$('#filterSelection').empty();			
+		this.setFilter(); //actually clears filter
+		this.$('#inputFilterItemsSearch').val('');
+		this.loadRender();
+	},
+
+});
+
+
+
+/*global Donkeylift, Backbone, jQuery, _ */
+
+Donkeylift.FilterRangeView = Backbone.View.extend({
+
+	events: {
+		//range filter evs
+		'click #rangeReset': 'evFilterRangeResetClick',
+		'change #inputFilterMin': 'evInputFilterChange',
+		'change #inputFilterMax': 'evInputFilterChange',
+	},
+
+	initialize: function () {
+		console.log("FilterRangeView.init " + this.model.get('table'));
+	},
+
+	canSlide: function() {
+		var field = this.model.get('field');
+		var slideTypes = [Donkeylift.Field.TYPES.INTEGER,
+							Donkeylift.Field.TYPES.NUMERIC];
+		return ( ! field.get('fk')) &&
+				_.contains(slideTypes, field.get('type'));
+	},
+
+	loadRender: function() {
+		var me = this;
+		this.model.loadRange(function() {
+			me.render();
+		});
+	},
+
+	render: function() {
+		this.$('a[href=#filterRange]').tab('show');
+
+		var stats = this.model.get('field').get('stats');
+
+		var current = Donkeylift.app.filters.getFilter(
+						this.model.get('table'),
+						this.model.get('field'));
+
+		if (current && current.get('op') == Donkeylift.Filter.OPS.BETWEEN) {
+			this.$("#inputFilterMin").val(current.get('value')[0]);
+			this.$("#inputFilterMax").val(current.get('value')[1]);
+		} else {
+			this.$("#inputFilterMin").val(stats.min);
+			this.$("#inputFilterMax").val(stats.max);
+		}
+
+		//console.log('el ' + this.$el.html());
+
+		if (this.canSlide()) {
+			this.$("#sliderRange").slider({
+				range: true,
+				min: stats.min,
+				max: stats.max,
+				values: [
+					this.$("#inputFilterMin").val(),
+					this.$("#inputFilterMax").val()
+				],	
+				slide: function(ev, ui) {
+					if ($(ui.handle).index() == 1) {
+						$("#inputFilterMin").val(ui.values[0]);
+					} else {
+						$("#inputFilterMax").val(ui.values[1]);
+					}
+			  	},
+				stop: function(ev, ui) {
+					if ($(ui.handle).index() == 1) {
+						$("#inputFilterMin").change();
+					} else {
+						$("#inputFilterMax").change();
 					}
 				}
-			}
-
-			var totalWidth = _.reduce(fields, function(s, f) {
-				return s + f.getProp('width');
-			}, 0);
-
-			var columns = _.map(fields, function(field) {
-				var col = {
-					data: field.vname(),
-				}
-
-				var width = (100 * field.getProp('width')) / totalWidth;
-				col.width = String(Math.floor(width)) + '%';
-
-				col.render = this.columnDataFn(field);
-
-				return col;
-			}, this);
-
-			dtOptions.columns = columns;
-
-			return dtOptions;
-		},
-
-		render: function() {
-			console.log('DataTableView.render ');			
-			this.$el.html(this.tableTemplate());
-
-			var fields = this.getFieldsInColumnOrder();
-
-			_.each(fields, function(field, idx) {
-				var align = idx < fields.length / 2 ? 
-					'dropdown-menu-left' : 'dropdown-menu-right';
-				
-				this.$('thead > tr').append(this.columnTemplate({
-					name: field.vname(),
-					dropalign: align	
-				}));					
-
-			}, this);
-
-			this.renderFilterButtons();
-
-
-			var filter = Donkeylift.app.filters.getFilter(this.model);			
-			var initSearch = {};
-			if (filter) initSearch.search = filter.get('value');
-
-			var dtOptions = this.getOptions(this.attributes.params, fields);
-			console.log(dtOptions);
-
-			this.dataTable = this.$('#grid').DataTable({
-				serverSide: true,
-				columns: dtOptions.columns,				
-				ajax: this.model.ajaxGetRowsFn(),
-				search: initSearch,
-				lengthMenu: dtOptions.lengthMenu, 
-				displayStart: dtOptions.displayStart, 
-				pageLength: dtOptions.pageLength, 
-				order: dtOptions.order
 			});
+		}
+		if (this.model.get('field').get('type') 
+			== Donkeylift.Field.TYPES['DATE']) {
 
-			if (filter) {
-				this.$('#grid_filter input').val(filter.get('value'));
-			}
+			var opts = { minDate: Donkeylift.Field.toDate(stats.min), 
+						 maxDate: Donkeylift.Field.toDate(stats.max),
+						dateFormat: 'yy-mm-dd' };
+			var minVal = Donkeylift.Field.toDate($("#inputFilterMin").val());
+			var maxVal = Donkeylift.Field.toDate($("#inputFilterMax").val());
+			$("#inputFilterMin").datepicker(opts);
+			$("#inputFilterMin").datepicker("setDate", minVal);
+			$("#inputFilterMax").datepicker(opts);
+			$("#inputFilterMax").datepicker("setDate", maxVal);
 
-			this.renderTextWrapCheck();
-
-			this.addEvents();
-			return this;
-		},
-
-		addEvents: function() {
-			var me = this;
-
-			this.$('.field-filter').click(function(ev) {
-				ev.stopPropagation();
-
-				if ( ! $(this).data('bs.dropdown')) {
-					//workaround for first click to show dropdown
-					$(this).dropdown('toggle');
-				} else {
-					$(this).dropdown();
-				}
-
-				var colName = $(this).data('column');
-				var field = me.model.get('fields').getByName(colName);
-				var el = me.$('#col-' + colName + ' div.dropdown-menu');
-
-				var filter = new Donkeylift.Filter({
-					table: me.model,
-					field: field
-				});
-
-				Donkeylift.app.setFilterView(filter, el);
+			$('#ui-datepicker-div').click(function(e) {
+				e.stopPropagation();
 			});
-
-			this.$('#grid').on('draw.dt', function() {
-
-				//expand ellipsis on click
-				me.$('button.ellipsis').click(function(ev) {				
-					//wrap text before expaning
-					$(ev.target).parents('span').css('white-space', 'normal');	
-
-					var fullText = $(ev.target).parents('span').attr('title');
-					$(ev.target).parents('span').html(fullText);
-				});
-			});
-
-			this.$('#grid').on('page.dt', function() {
-				console.log("page.dt");
-				Donkeylift.app.router.navigate("reload-table", {trigger: false});			
-			});
-
-			//using order.dt event won't work because its fired otherwise, too
-			this.$('th.sorting').click(function() {
-				console.log("order.dt");
-				Donkeylift.app.router.navigate("reload-table", {trigger: false});			
-			});
-
-			//using search.dt event won't work because its fired otherwise, too
-			this.$('input[type="search"]').blur(function() {
-				console.log("search.dt");
-				Donkeylift.app.router.navigate("reload-table", {trigger: false});			
-			});
-			this.$('input[type="search"]').focus(function() {
-				console.log("search.dt");
-				Donkeylift.app.router.navigate("reload-table", {trigger: false});			
-			});
-
-		},
-
-		columnDataFn: function(field) {
-
-			var me = this;
-
-			var btnExpand = '<button class="ellipsis btn btn-default btn-xs"><span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span></button>'
-			var w = field.getProp('width');
-			var abbrFn = function (data) {
-				var s = field.toFS(data);
-		   		return s.length > w
-					?  '<span title="' + s.replace(/"/g, '&quot;') + '">'
-						+ s.substr( 0, w)
-						+ ' ' + btnExpand
-					: s;
-			}
-
-			var anchorFn = undefined;
-			if (field.get('name') == 'id' 
-				&& me.model.get('referenced').length > 0) {
-				anchorFn = function(id) {
-					var href = '#table'
-						+ '/' + me.model.get('referenced')[0].table
-						+ '/' + me.model.get('name') + '.id=' + id;
-
-					return '<a href="' + href + '">' + id + '</a>';
-				}
-
-			} else if (field.get('fk') == 1) {
-				anchorFn = function(ref) {
-					var href = '#table'
-						+ '/' + field.get('fk_table')
-						+ '/id=' + Donkeylift.Field.getIdFromRef(ref)
-
-					return '<a href="' + href + '">' + ref + '</a>';
-				}
-			}
-
-			var dataFn = function (data, type, full, meta ) {
-
-				if (type == 'display' && data) {
-					return anchorFn ? anchorFn(data) : abbrFn(data);
-				} else {
-					return data;
-				}
-			}								
-
-			return dataFn;	
 		}
 
-	});
+	},
 
-})(jQuery);
+	sanitizeInputFilterValue: function(el, bounds) {
 
+		if (/Min$/.test(el.id)) {
+			bounds = [bounds[0], this.$("#inputFilterMax").val()];
+		} else {
+			bounds = [this.$("#inputFilterMin").val(), bounds[1]];
+		}
 
+		var val = this.model.get('field').parse(el.value);
+		if (val < bounds[0]) val = bounds[0];
+		if (val > bounds[1]) val = bounds[1];
+		$(el).val(val);
 
-/*global Donkeylift, Backbone, jQuery, _ */
+		if (this.canSlide()) {
+			var idx = /Min$/.test(el.id) ? 0 : 1;	
+			this.$("#sliderRange").slider("values", idx, val);
+		}
+	},
 
-(function ($) {
-	'use strict';
+	evInputFilterChange: function(ev) {
+		var stats = this.model.get('field').get('stats');
 
-	Donkeylift.FilterItemsView = Backbone.View.extend({
+		this.sanitizeInputFilterValue(ev.target, [stats.min, stats.max]);
 
-		events: {
-			'click #selectReset': 'evFilterItemsReset',
-			'click .filter-option': 'evFilterOptionClick',
-			'click .filter-selected': 'evFilterSelectedClick',
-			'input #inputFilterItemsSearch': 'evInputFilterSearchChange',
-		},
+		var filterValues = [this.$("#inputFilterMin").val(),
+							this.$("#inputFilterMax").val()];
 
-		initialize: function () {
-			console.log("FilterItemsView.init " + this.model.get('table'));
-		},
-
-		template: _.template($('#filter-option-template').html()),
-
-		loadRender: function() {
-			var me = this;
-			var s = this.$('#inputFilterItemsSearch').val();
-			this.model.loadSelect(s, function() {
-				me.render();
-			});
-		},
-
-		render: function() {
-			this.$('a[href=#filterSelect]').tab('show');
-
-			this.$('#filterSelection').empty();
-			var current = Donkeylift.app.filters.getFilter(
-							this.model.get('table'),
-							this.model.get('field'));
-
-			if (current && current.get('op') == Donkeylift.Filter.OPS.IN) {
-				//get values from filter
-				var selected = current.get('value');		
-//console.log(selected);
-				_.each(selected, function(val) {
-					this.$('#filterSelection').append(this.template({
-						name: 'filter-selected',
-						value: val
-					}));
-				}, this);
-			}
-
-			this.$('#filterOptions').empty();
-			var fn = this.model.get('field').vname();
-			var opts = this.model.get('field').get('options');		
-//console.log(opts);
-			_.each(opts, function(opt) {
-				this.$('#filterOptions').append(this.template({
-					name: 'filter-option',
-					value: opt[fn]
-				}));
-			}, this);
-		},
-
-		setFilter: function() {
-			var filterValues = this.$('#filterSelection').children()
-				.map(function() {
-					return $(this).attr('data-target');
-			}).get();
-
+		if (filterValues[0] != stats.min || filterValues[1] != stats.max) {
 			Donkeylift.app.filters.setFilter({
 				table: this.model.get('table'),
 				field: this.model.get('field'),
-				op: Donkeylift.Filter.OPS.IN,
+				op: Donkeylift.Filter.OPS.BETWEEN,
 				value: filterValues
 			});
-			
-			Donkeylift.app.router.navigate("reload-table", {trigger: true});			
-			//window.location.hash = "#reload-table";
-		},
-
-		evFilterOptionClick: function(ev) {
-			ev.stopPropagation();
-			//console.log(ev.target);
-			var opt = $(ev.target).attr('data-target');
-			var attr = '[data-target="' + opt + '"]';
-
-			//avoid duplicate items in filterSelection
-			if (this.$('#filterSelection').has(attr).length == 0) {
-				var item = this.template({
-					name: 'filter-selected',
-					value: opt
-				});
-				this.$('#filterSelection').append(item);
-				this.setFilter();
-			}
-		},
-
-		evFilterSelectedClick: function(ev) {
-			ev.stopPropagation();
-			//console.log(ev.target);
-			$(ev.target).remove();
-			this.setFilter();
-		},
-
-		evInputFilterSearchChange: function(ev) {
-			this.loadRender();
-		},
-
-
-		evFilterItemsReset: function() {
-			this.$('#filterSelection').empty();			
-			this.setFilter(); //actually clears filter
-			this.$('#inputFilterItemsSearch').val('');
-			this.loadRender();
-		},
-
-	});
-
-})(jQuery);
-
-
-
-/*global Donkeylift, Backbone, jQuery, _ */
-
-(function ($) {
-	'use strict';
-
-	Donkeylift.FilterRangeView = Backbone.View.extend({
-
-		events: {
-			//range filter evs
-			'click #rangeReset': 'evFilterRangeResetClick',
-			'change #inputFilterMin': 'evInputFilterChange',
-			'change #inputFilterMax': 'evInputFilterChange',
-		},
-
-		initialize: function () {
-			console.log("FilterRangeView.init " + this.model.get('table'));
-		},
-
-		canSlide: function() {
-			var field = this.model.get('field');
-			var slideTypes = [Donkeylift.Field.TYPES.INTEGER,
-								Donkeylift.Field.TYPES.NUMERIC];
-			return ( ! field.get('fk')) &&
-					_.contains(slideTypes, field.get('type'));
-		},
-
-		loadRender: function() {
-			var me = this;
-			this.model.loadRange(function() {
-				me.render();
-			});
-		},
-
-		render: function() {
-			this.$('a[href=#filterRange]').tab('show');
-
-			var stats = this.model.get('field').get('stats');
-
-			var current = Donkeylift.app.filters.getFilter(
-							this.model.get('table'),
-							this.model.get('field'));
-
-			if (current && current.get('op') == Donkeylift.Filter.OPS.BETWEEN) {
-				this.$("#inputFilterMin").val(current.get('value')[0]);
-				this.$("#inputFilterMax").val(current.get('value')[1]);
-			} else {
-				this.$("#inputFilterMin").val(stats.min);
-				this.$("#inputFilterMax").val(stats.max);
-			}
-
-			//console.log('el ' + this.$el.html());
-
-			if (this.canSlide()) {
-				this.$("#sliderRange").slider({
-					range: true,
-					min: stats.min,
-					max: stats.max,
-					values: [
-						this.$("#inputFilterMin").val(),
-						this.$("#inputFilterMax").val()
-					],	
-					slide: function(ev, ui) {
-						if ($(ui.handle).index() == 1) {
-							$("#inputFilterMin").val(ui.values[0]);
-						} else {
-							$("#inputFilterMax").val(ui.values[1]);
-						}
-				  	},
-					stop: function(ev, ui) {
-						if ($(ui.handle).index() == 1) {
-							$("#inputFilterMin").change();
-						} else {
-							$("#inputFilterMax").change();
-						}
-					}
-				});
-			}
-			if (this.model.get('field').get('type') 
-				== Donkeylift.Field.TYPES['DATE']) {
-
-				var opts = { minDate: Donkeylift.Field.toDate(stats.min), 
-							 maxDate: Donkeylift.Field.toDate(stats.max),
-							dateFormat: 'yy-mm-dd' };
-				var minVal = Donkeylift.Field.toDate($("#inputFilterMin").val());
-				var maxVal = Donkeylift.Field.toDate($("#inputFilterMax").val());
-				$("#inputFilterMin").datepicker(opts);
-				$("#inputFilterMin").datepicker("setDate", minVal);
-				$("#inputFilterMax").datepicker(opts);
-				$("#inputFilterMax").datepicker("setDate", maxVal);
-
-				$('#ui-datepicker-div').click(function(e) {
-					e.stopPropagation();
-				});
-			}
-
-		},
-
-		sanitizeInputFilterValue: function(el, bounds) {
-
-			if (/Min$/.test(el.id)) {
-				bounds = [bounds[0], this.$("#inputFilterMax").val()];
-			} else {
-				bounds = [this.$("#inputFilterMin").val(), bounds[1]];
-			}
-
-			var val = this.model.get('field').parse(el.value);
-			if (val < bounds[0]) val = bounds[0];
-			if (val > bounds[1]) val = bounds[1];
-			$(el).val(val);
-
-			if (this.canSlide()) {
-				var idx = /Min$/.test(el.id) ? 0 : 1;	
-				this.$("#sliderRange").slider("values", idx, val);
-			}
-		},
-
-		evInputFilterChange: function(ev) {
-			var stats = this.model.get('field').get('stats');
-
-			this.sanitizeInputFilterValue(ev.target, [stats.min, stats.max]);
-
-			var filterValues = [this.$("#inputFilterMin").val(),
-								this.$("#inputFilterMax").val()];
-
-			if (filterValues[0] != stats.min || filterValues[1] != stats.max) {
-				Donkeylift.app.filters.setFilter({
-					table: this.model.get('table'),
-					field: this.model.get('field'),
-					op: Donkeylift.Filter.OPS.BETWEEN,
-					value: filterValues
-				});
-			} else {
-				Donkeylift.app.filters.clearFilter(this.model.get('table'), 
-										this.model.get('field'));
-			}
-
-			Donkeylift.app.router.navigate("reload-table", {trigger: true});			
-			//window.location.hash = "#reload-table";
-		},
-
-		evFilterRangeResetClick: function() {
+		} else {
 			Donkeylift.app.filters.clearFilter(this.model.get('table'), 
 									this.model.get('field'));
-
-			Donkeylift.app.router.navigate("reload-table", {trigger: true});			
-			//window.location.hash = "#reload-table";
-			this.render();
-		},
-	});
-
-})(jQuery);
-
-
-
-/*global Donkeylift, Backbone, jQuery, _ */
-
-(function ($) {
-	'use strict';
-
-	Donkeylift.FilterShowView = Backbone.View.extend({
-		el:  '#modalShowFilters',
-
-		events: {
-		},
-
-		template: _.template($('#show-filter-item-template').html()),
-
-		initialize: function() {
-			console.log("FilterShowView.init");
-		},
-
-		render: function() {
-			var el = this.$('#modalTableFilters > tbody');
-			el.empty();
-			//el.children('tr:not(:first)').remove();	
-			this.collection.each(function(filter) {
-				el.append(this.template(filter.toStrings()));
-			}, this);			
-
-			$('#modalInputDataUrl').val(Donkeylift.app.table.getAllRowsUrl());
-			$('#modalShowFilters').on('shown.bs.modal', function() {
-				$('#modalInputDataUrl').select();
-			});
-
-			$('#modalShowFilters').modal();
-
-			return this;
-		},
-
-
-	});
-
-})(jQuery);
-
-
-
-/*global Donkeylift, Backbone, jQuery, _ */
-
-(function ($) {
-	'use strict';
-
-	Donkeylift.FilterView = Backbone.View.extend({
-
-		events: {
-			'click .filter-column': 'evFilterColumnClick',
-			'click .nav-tabs a': 'evFilterTabClick'
-		},
-
-		initialize: function () {
-			console.log("FilterView.init " + this.model.get('table'));
-			this.rangeView = new Donkeylift.FilterRangeView({
-										model: this.model,
-										el: this.el
-			});
-			this.itemsView = new Donkeylift.FilterItemsView({
-										model: this.model,
-										el: this.el
-			});
-		},
-
-		template: _.template($('#filter-template').html()),
-
-		render: function() {
-			var field = this.model.get('field');
-			console.log("FilterView.render " + field.get('name'));
-
-			this.$el.html(this.template({
-				name: field.get('name'),
-			}));
-
-			if (field.get('type') == Donkeylift.Field.TYPES.VARCHAR
-			 || field.get('fk') == 1) {
-				this.itemsView.loadRender();
-			} else {
-				this.rangeView.loadRender();
-			}
-
-			return this;
-		},
-
-		evFilterColumnClick: function(ev) {
-			ev.stopPropagation();
-		},
-
-		evFilterTabClick: function(ev) {
-			//ev.preventDefault();
-
-	//console.log('evFilterTab ' + ev.target);
-			if (/filterSelect$/.test(ev.target.href)) {
-				this.itemsView.loadRender();
-			} else if (/filterRange$/.test(ev.target.href)) {
-				this.rangeView.loadRender();
-			}
 		}
-	});
 
-})(jQuery);
+		Donkeylift.app.router.navigate("reload-table", {trigger: true});			
+		//window.location.hash = "#reload-table";
+	},
+
+	evFilterRangeResetClick: function() {
+		Donkeylift.app.filters.clearFilter(this.model.get('table'), 
+								this.model.get('field'));
+
+		Donkeylift.app.router.navigate("reload-table", {trigger: true});			
+		//window.location.hash = "#reload-table";
+		this.render();
+	},
+});
 
 
 
 /*global Donkeylift, Backbone, jQuery, _ */
 
-(function ($) {
-	'use strict';
+Donkeylift.FilterShowView = Backbone.View.extend({
+	el:  '#modalShowFilters',
 
-	Donkeylift.MenuDataView = Backbone.View.extend({
-		el:  '#menu',
+	events: {
+	},
 
-		events: {
-			'click #show-filters': 'evShowFilters',
-			//'click #reset-all-filters': 'evResetAllFilters'
-		},
+	template: _.template($('#show-filter-item-template').html()),
 
-		initialize: function() {
-			console.log("MenuView.init");
-			//this.listenTo(Donkeylift.app.table, 'change', this.render);
-		},
+	initialize: function() {
+		console.log("FilterShowView.init");
+	},
 
-		template: _.template($('#data-menu-template').html()),
+	render: function() {
+		var el = this.$('#modalTableFilters > tbody');
+		el.empty();
+		//el.children('tr:not(:first)').remove();	
+		this.collection.each(function(filter) {
+			el.append(this.template(filter.toStrings()));
+		}, this);			
 
-		render: function() {
-			console.log('MenuDataView.render ');			
-			if (! Donkeylift.app.table) this.$el.empty();
-			else this.$el.html(this.template());
-			return this;
-		},
+		$('#modalInputDataUrl').val(Donkeylift.app.table.getAllRowsUrl());
+		$('#modalShowFilters').on('shown.bs.modal', function() {
+			$('#modalInputDataUrl').select();
+		});
 
-		evResetAllFilters: function() {
-			Donkeylift.app.unsetFilters();
-			Donkeylift.app.resetTable();
-		},
+		$('#modalShowFilters').modal();
 
-		evShowFilters: function() {
-			Donkeylift.app.filterShowView.collection = Donkeylift.app.filters;
-			Donkeylift.app.filterShowView.render();
-		},
+		return this;
+	},
 
-	});
 
-})(jQuery);
+});
+
+
+
+/*global Donkeylift, Backbone, jQuery, _ */
+
+Donkeylift.FilterView = Backbone.View.extend({
+
+	events: {
+		'click .filter-column': 'evFilterColumnClick',
+		'click .nav-tabs a': 'evFilterTabClick'
+	},
+
+	initialize: function () {
+		console.log("FilterView.init " + this.model.get('table'));
+		this.rangeView = new Donkeylift.FilterRangeView({
+									model: this.model,
+									el: this.el
+		});
+		this.itemsView = new Donkeylift.FilterItemsView({
+									model: this.model,
+									el: this.el
+		});
+	},
+
+	template: _.template($('#filter-template').html()),
+
+	render: function() {
+		var field = this.model.get('field');
+		console.log("FilterView.render " + field.get('name'));
+
+		this.$el.html(this.template({
+			name: field.get('name'),
+		}));
+
+		if (field.get('type') == Donkeylift.Field.TYPES.VARCHAR
+		 || field.get('fk') == 1) {
+			this.itemsView.loadRender();
+		} else {
+			this.rangeView.loadRender();
+		}
+
+		return this;
+	},
+
+	evFilterColumnClick: function(ev) {
+		ev.stopPropagation();
+	},
+
+	evFilterTabClick: function(ev) {
+		//ev.preventDefault();
+
+//console.log('evFilterTab ' + ev.target);
+		if (/filterSelect$/.test(ev.target.href)) {
+			this.itemsView.loadRender();
+		} else if (/filterRange$/.test(ev.target.href)) {
+			this.rangeView.loadRender();
+		}
+	}
+});
+
+
+
+/*global Donkeylift, Backbone, jQuery, _ */
+
+Donkeylift.MenuDataView = Backbone.View.extend({
+	el:  '#menu',
+
+	events: {
+		'click #show-filters': 'evShowFilters',
+		//'click #reset-all-filters': 'evResetAllFilters'
+	},
+
+	initialize: function() {
+		console.log("MenuView.init");
+		//this.listenTo(Donkeylift.app.table, 'change', this.render);
+	},
+
+	template: _.template($('#data-menu-template').html()),
+
+	render: function() {
+		console.log('MenuDataView.render ');			
+		if (! Donkeylift.app.table) this.$el.empty();
+		else this.$el.html(this.template());
+		return this;
+	},
+
+	evResetAllFilters: function() {
+		Donkeylift.app.unsetFilters();
+		Donkeylift.app.resetTable();
+	},
+
+	evShowFilters: function() {
+		Donkeylift.app.filterShowView.collection = Donkeylift.app.filters;
+		Donkeylift.app.filterShowView.render();
+	},
+
+});
 
 
 
@@ -3674,7 +3687,7 @@ var pegParser = module.exports;
 (function () {
 	'use strict';
 
-	Donkeylift.Router = Backbone.Router.extend({
+	Donkeylift.RouterData = Backbone.Router.extend({
 
         routes: {
 /*
@@ -3831,148 +3844,57 @@ var pegParser = module.exports;
 })();
 
 /*global Backbone, Donkeylift, $ */
-var DONKEYLIFT_API = "http://localhost:3000";  //set by gulp according to env var DONKEYLIFT_API. e.g. "http://api.donkeylift.com";
 
-$(function () {
-	'use strict';
-	var app = {};
-	/**** init app - call me from your javascript ***/
-	app.init = function(opts) {
-		opts = opts || {};
-		
-		app.user = opts.user || 'demo';
+AppData.prototype = new Donkeylift.AppBase();
+AppData.prototype.constructor=AppData; 
 
-		app.schemas = new Donkeylift.Schemas(null, {url: DONKEYLIFT_API + '/' + app.user});
+function AppData(opts) {
 
-		app.filters = new Donkeylift.Filters();
+	this.filters = new Donkeylift.Filters();
+	this.filterShowView = new Donkeylift.FilterShowView();
+	this.menuView = new Donkeylift.MenuDataView();
+	this.router = new Donkeylift.RouterData();
+}
 
-		app.schemaCurrentView = new Donkeylift.SchemaCurrentView();
+AppData.prototype.start = function() {
+	Donkeylift.AppBase.prototype.start.call(this);
+	$('#nav-data').closest("li").addClass("active");
+}
 
-		app.filterShowView = new Donkeylift.FilterShowView();
+AppData.prototype.createTableView = function(table, params) {
+	return new Donkeylift.DataTableView({
+		model: table,
+		attributes: { params: params }
+	});
+}
 
-		app.schemas.fetch({success: function() {
-			app.schemaListView = new Donkeylift.SchemaListView({collection: app.schemas});
-			$('#schema-list').append(app.schemaListView.render().el);
-		}});
+AppData.prototype.createSchema = function(name) {
+	return new Donkeylift.Database({name : name, id : name});
+}
 
-		app.menuView = new Donkeylift.MenuDataView();
-		app.menuView.render();
-
-		app.router = new Donkeylift.Router();
-		Backbone.history.start();
-
-		$('#toggle-sidebar').hide();
-	}
 	
-	$('#toggle-sidebar').click(function() {
-		app.toggleSidebar();
-	}); 
-
-	$(document).ajaxStart(function() {
-		$('#ajax-progress-spinner').show();
-	});
-	$(document).ajaxStop(function() {
-		$('#ajax-progress-spinner').hide();
-	});
-
-	app.toggleSidebar = function() {
-		if ($('#table-list').is(':visible')) {
-	        $('#menu').hide('slide');
-	        $('#table-list').hide('slide', function() {
-			   	$('#module').toggleClass('col-sm-16 col-sm-13');             
-			   	$('#sidebar').toggleClass('col-sm-3 col-sm-0');
-			});
-		} else {
-			$('#module').toggleClass('col-sm-16 col-sm-13');             
-			$('#sidebar').toggleClass('col-sm-3 col-sm-0');
-        	$('#table-list').show('slide');
-	        $('#menu').show('slide');
-		}
-	}
-
-	app.setTable = function(table, params) {
-		console.log('app.setTable ' + params);
-		var $a = $("#table-list a[data-target='" + table.get('name') + "']");
-		$('#table-list a').removeClass('active');
-		$a.addClass('active');
-
-		app.table = table;
-		if (app.tableView) app.tableView.remove();
-
-		app.tableView = new Donkeylift.DataTableView({
-			model: table, 
-			attributes: { params: params }
-		});
-
-		$('#content').html(app.tableView.render().el);			
-		app.menuView.render();
-	}
-
-	app.resetTable = function() {
-		if (app.table) app.setTable(app.table);
-	}
-
-	app.unsetTable = function() {
-		app.table = null;
-		if (app.tableView) app.tableView.remove();
-	}
-
 	/**** schema stuff ****/
 
-	app.unsetSchema = function() {
-		app.unsetTable();
-		app.unsetFilters();
-		app.schema = null;
-		if (app.tableListView) app.tableListView.remove();
-		
-		app.schemaCurrentView.render();
-	}
+AppData.prototype.unsetSchema = function() {
+	Donkeylift.AppBase.prototype.unsetSchema.call(this);
+	this.unsetFilters();
+}
 
-	app.setSchema = function(name, cbAfter) {
-		console.log('app.setSchema ' + name);
-		var loadRequired = ! app.schema || app.schema.get('name') != name;
+/**** data stuff ****/
 
-		if (loadRequired) {
-			console.log('app.setSchema loadRequired');
-			app.unsetSchema();
-			app.schema = new Donkeylift.Database({name : name, id : name});
-			app.schema.fetch(function() {
-				app.tableListView = new Donkeylift.TableListView({
-					collection: app.schema.get('tables')
-				});
-				$('#sidebar').append(app.tableListView.render().el);
-				$('#toggle-sidebar').show();
+AppData.prototype.setFilters = function(filters) {
+	this.filters = new Donkeylift.Filters(filters);
+}
 
-				//render current schema label
-				app.schemaCurrentView.render();
-				if (cbAfter) cbAfter();
-			});
-		} else {
-			if (cbAfter) cbAfter();
-		}
-	}
+AppData.prototype.unsetFilters = function() {
+	this.filters = new Donkeylift.Filters();
+}
 
-	/**** data stuff ****/
+AppData.prototype.setFilterView = function(filter, $parentElem) {
+	if (this.filterView) this.filterView.remove();
+	this.filterView = new Donkeylift.FilterView({ model: filter });
+	$parentElem.append(this.filterView.el);
+	this.filterView.render();
+}
 
-	app.setFilters = function(filters) {
-		app.filters = new Donkeylift.Filters(filters);
-	}
-
-	app.unsetFilters = function() {
-		app.filters = new Donkeylift.Filters();
-	}
-
-	app.setFilterView = function(filter, $parentElem) {
-		if (app.filterView) app.filterView.remove();
-		app.filterView = new Donkeylift.FilterView({ model: filter });
-		$parentElem.append(app.filterView.el);
-		app.filterView.render();
-	}
-
-	//make app global
-	Donkeylift.app = app;
-
-	//start
-	//app.init();
-});
-
+Donkeylift.AppData = AppData;

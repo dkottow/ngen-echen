@@ -1,63 +1,58 @@
 /*global Donkeylift, Backbone, jQuery, _ */
 
-(function ($) {
-	'use strict';
+Donkeylift.FilterView = Backbone.View.extend({
 
-	Donkeylift.FilterView = Backbone.View.extend({
+	events: {
+		'click .filter-column': 'evFilterColumnClick',
+		'click .nav-tabs a': 'evFilterTabClick'
+	},
 
-		events: {
-			'click .filter-column': 'evFilterColumnClick',
-			'click .nav-tabs a': 'evFilterTabClick'
-		},
+	initialize: function () {
+		console.log("FilterView.init " + this.model.get('table'));
+		this.rangeView = new Donkeylift.FilterRangeView({
+									model: this.model,
+									el: this.el
+		});
+		this.itemsView = new Donkeylift.FilterItemsView({
+									model: this.model,
+									el: this.el
+		});
+	},
 
-		initialize: function () {
-			console.log("FilterView.init " + this.model.get('table'));
-			this.rangeView = new Donkeylift.FilterRangeView({
-										model: this.model,
-										el: this.el
-			});
-			this.itemsView = new Donkeylift.FilterItemsView({
-										model: this.model,
-										el: this.el
-			});
-		},
+	template: _.template($('#filter-template').html()),
 
-		template: _.template($('#filter-template').html()),
+	render: function() {
+		var field = this.model.get('field');
+		console.log("FilterView.render " + field.get('name'));
 
-		render: function() {
-			var field = this.model.get('field');
-			console.log("FilterView.render " + field.get('name'));
+		this.$el.html(this.template({
+			name: field.get('name'),
+		}));
 
-			this.$el.html(this.template({
-				name: field.get('name'),
-			}));
-
-			if (field.get('type') == Donkeylift.Field.TYPES.VARCHAR
-			 || field.get('fk') == 1) {
-				this.itemsView.loadRender();
-			} else {
-				this.rangeView.loadRender();
-			}
-
-			return this;
-		},
-
-		evFilterColumnClick: function(ev) {
-			ev.stopPropagation();
-		},
-
-		evFilterTabClick: function(ev) {
-			//ev.preventDefault();
-
-	//console.log('evFilterTab ' + ev.target);
-			if (/filterSelect$/.test(ev.target.href)) {
-				this.itemsView.loadRender();
-			} else if (/filterRange$/.test(ev.target.href)) {
-				this.rangeView.loadRender();
-			}
+		if (field.get('type') == Donkeylift.Field.TYPES.VARCHAR
+		 || field.get('fk') == 1) {
+			this.itemsView.loadRender();
+		} else {
+			this.rangeView.loadRender();
 		}
-	});
 
-})(jQuery);
+		return this;
+	},
+
+	evFilterColumnClick: function(ev) {
+		ev.stopPropagation();
+	},
+
+	evFilterTabClick: function(ev) {
+		//ev.preventDefault();
+
+//console.log('evFilterTab ' + ev.target);
+		if (/filterSelect$/.test(ev.target.href)) {
+			this.itemsView.loadRender();
+		} else if (/filterRange$/.test(ev.target.href)) {
+			this.rangeView.loadRender();
+		}
+	}
+});
 
 

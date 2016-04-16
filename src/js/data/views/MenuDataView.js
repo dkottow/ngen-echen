@@ -1,42 +1,37 @@
 /*global Donkeylift, Backbone, jQuery, _ */
 
-(function ($) {
-	'use strict';
+Donkeylift.MenuDataView = Backbone.View.extend({
+	el:  '#menu',
 
-	Donkeylift.MenuDataView = Backbone.View.extend({
-		el:  '#menu',
+	events: {
+		'click #show-filters': 'evShowFilters',
+		//'click #reset-all-filters': 'evResetAllFilters'
+	},
 
-		events: {
-			'click #show-filters': 'evShowFilters',
-			//'click #reset-all-filters': 'evResetAllFilters'
-		},
+	initialize: function() {
+		console.log("MenuView.init");
+		//this.listenTo(Donkeylift.app.table, 'change', this.render);
+	},
 
-		initialize: function() {
-			console.log("MenuView.init");
-			//this.listenTo(Donkeylift.app.table, 'change', this.render);
-		},
+	template: _.template($('#data-menu-template').html()),
 
-		template: _.template($('#data-menu-template').html()),
+	render: function() {
+		console.log('MenuDataView.render ');			
+		if (! Donkeylift.app.table) this.$el.empty();
+		else this.$el.html(this.template());
+		return this;
+	},
 
-		render: function() {
-			console.log('MenuDataView.render ');			
-			if (! Donkeylift.app.table) this.$el.empty();
-			else this.$el.html(this.template());
-			return this;
-		},
+	evResetAllFilters: function() {
+		Donkeylift.app.unsetFilters();
+		Donkeylift.app.resetTable();
+	},
 
-		evResetAllFilters: function() {
-			Donkeylift.app.unsetFilters();
-			Donkeylift.app.resetTable();
-		},
+	evShowFilters: function() {
+		Donkeylift.app.filterShowView.collection = Donkeylift.app.filters;
+		Donkeylift.app.filterShowView.render();
+	},
 
-		evShowFilters: function() {
-			Donkeylift.app.filterShowView.collection = Donkeylift.app.filters;
-			Donkeylift.app.filterShowView.render();
-		},
-
-	});
-
-})(jQuery);
+});
 
 
