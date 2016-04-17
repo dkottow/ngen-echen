@@ -4,9 +4,10 @@ Donkeylift.MenuSchemaView = Backbone.View.extend({
 	el:  '#menu',
 
 	events: {
-		'click #add-table': 'evAddTableClick',
-		'click #new-schema': 'evNewSchemaClick',
-		'click #save-schema': 'evSaveSchemaClick',
+		'click #add-table': 'evAddTableClick'
+		, 'click #new-schema': 'evNewSchemaClick'
+		, 'click #save-schema': 'evSaveSchemaClick'
+		, 'click #vis-tablegraph': 'evVisTableGraphClick'
 	},
 
 	initialize: function() {
@@ -17,7 +18,7 @@ Donkeylift.MenuSchemaView = Backbone.View.extend({
 	template: _.template($('#schema-menu-template').html()),
 
 	render: function() {
-		console.log('MenuSchemaView.render ');			
+		console.log('MenuSchemaView.render ' + Donkeylift.app.schema);			
 		this.$el.show();
 		this.$el.html(this.template());
 		this.$('#add-table').prop('disabled', Donkeylift.app.schema == null);
@@ -45,5 +46,10 @@ Donkeylift.MenuSchemaView = Backbone.View.extend({
 		Donkeylift.app.schemaEditView.render();
 	},
 
+	evVisTableGraphClick: function() {
+		var model = Donkeylift.app.schema;
+		var graphView = new Donkeylift.TableGraphView({model: model});
+		graphView.render();
+	},
 });
 

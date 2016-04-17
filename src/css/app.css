@@ -174,4 +174,9 @@ table.dataTable {
     min-height: 1px;
 }
 
+/***** schema.css *****/
+
+#vis-graph {
+	height: 600px;
+} 
 

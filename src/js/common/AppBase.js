@@ -87,7 +87,7 @@ AppBase.prototype.unsetSchema = function() {
 	this.unsetTable();
 	this.schema = null;
 	if (this.tableListView) this.tableListView.remove();
-	
+	$('#content').empty();
 	this.schemaCurrentView.render();
 }
 
@@ -111,6 +111,7 @@ AppBase.prototype.setSchema = function(name, cbAfter) {
 			$('#sidebar').append(me.tableListView.render().el);
 			$('#toggle-sidebar').show();
 
+			me.menuView.render();
 			//render current schema label
 			me.schemaCurrentView.render();
 			if (cbAfter) cbAfter();

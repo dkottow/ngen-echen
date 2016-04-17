@@ -14,15 +14,8 @@ Donkeylift.DataTableView = Backbone.View.extend({
 	columnTemplate: _.template($('#grid-column-template').html()),
 	buttonWrapTextTemplate: _.template($('#grid-button-wrap-text-template').html()),
 
-	getFieldsInColumnOrder: function() {
-		return this.model.get('fields')
-			.sortBy(function(field) {
-				return field.getProp('order');
-		}, this);
-	},
-
 	renderFilterButtons: function() {
-		var fields = this.getFieldsInColumnOrder();
+		var fields = this.model.get('fields').sortByOrder();
 		_.each(fields, function(field, idx) {
 			
 			var filter = Donkeylift.app.filters.getFilter(
@@ -98,7 +91,7 @@ Donkeylift.DataTableView = Backbone.View.extend({
 		console.log('DataTableView.render ');			
 		this.$el.html(this.tableTemplate());
 
-		var fields = this.getFieldsInColumnOrder();
+		var fields = this.model.get('fields').sortByOrder();
 
 		_.each(fields, function(field, idx) {
 			var align = idx < fields.length / 2 ? 

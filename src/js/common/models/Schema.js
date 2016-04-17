@@ -25,6 +25,14 @@ Donkeylift.Schema = Backbone.Model.extend({
 		};
 	},	
 
+	isEmpty : function() {
+		var totalRowCount = this.get('tables').reduce(function(sum, table) {
+			return sum + table.get('row_count');
+		}, 0);	
+		console.log(this.get('name') + ' has ' + totalRowCount + ' rows.');
+		return totalRowCount == 0;
+	},
+
 	parse : function(response) {
 		console.log("Schema.parse " + response);
 		var tables = _.map(response.tables, function(table) {
@@ -51,6 +59,7 @@ Donkeylift.Schema = Backbone.Model.extend({
 
 	update : function() {
 return;
+		//TODO
 		var me = this;			
 		this.save(function(err) {
 			if (err) {

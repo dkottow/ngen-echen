@@ -17,7 +17,11 @@ Donkeylift.FieldView = Backbone.View.extend({
 
 	render: function() {
 		//console.log("FieldView.render " + this.model.get("name"));
-		this.$el.html(this.template(this.model.attrJSON()));
+		var attrs = this.model.attrJSON();
+		attrs.props = _.map(attrs.props, function(v, k) {
+			return k + ": " + v;
+		}).join(' | ');
+		this.$el.html(this.template(attrs));
 		return this;
 	},
 

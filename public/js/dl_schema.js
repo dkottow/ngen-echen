@@ -87,7 +87,7 @@ AppBase.prototype.unsetSchema = function() {
 	this.unsetTable();
 	this.schema = null;
 	if (this.tableListView) this.tableListView.remove();
-	
+	$('#content').empty();
 	this.schemaCurrentView.render();
 }
 
@@ -111,6 +111,7 @@ AppBase.prototype.setSchema = function(name, cbAfter) {
 			$('#sidebar').append(me.tableListView.render().el);
 			$('#toggle-sidebar').show();
 
+			me.menuView.render();
 			//render current schema label
 			me.schemaCurrentView.render();
 			if (cbAfter) cbAfter();
@@ -328,6 +329,14 @@ Donkeylift.Schema = Backbone.Model.extend({
 		};
 	},	
 
+	isEmpty : function() {
+		var totalRowCount = this.get('tables').reduce(function(sum, table) {
+			return sum + table.get('row_count');
+		}, 0);	
+		console.log(this.get('name') + ' has ' + totalRowCount + ' rows.');
+		return totalRowCount == 0;
+	},
+
 	parse : function(response) {
 		console.log("Schema.parse " + response);
 		var tables = _.map(response.tables, function(table) {
@@ -354,6 +363,7 @@ Donkeylift.Schema = Backbone.Model.extend({
 
 	update : function() {
 return;
+		//TODO
 		var me = this;			
 		this.save(function(err) {
 			if (err) {
@@ -602,6 +612,12 @@ Donkeylift.Fields = Backbone.Collection.extend({
 		return this.find(function(f) { 
 			return f.vname() == name || f.get('name') == name; 
 		});
+	},
+	
+	sortByOrder: function() {
+		return this.sortBy(function(field) {
+				return field.getProp('order');
+		}, this);
 	}
 });
 
@@ -1015,7 +1031,11 @@ Donkeylift.FieldView = Backbone.View.extend({
 
 	render: function() {
 		//console.log("FieldView.render " + this.model.get("name"));
-		this.$el.html(this.template(this.model.attrJSON()));
+		var attrs = this.model.attrJSON();
+		attrs.props = _.map(attrs.props, function(v, k) {
+			return k + ": " + v;
+		}).join(' | ');
+		this.$el.html(this.template(attrs));
 		return this;
 	},
 
@@ -1035,9 +1055,10 @@ Donkeylift.MenuSchemaView = Backbone.View.extend({
 	el:  '#menu',
 
 	events: {
-		'click #add-table': 'evAddTableClick',
-		'click #new-schema': 'evNewSchemaClick',
-		'click #save-schema': 'evSaveSchemaClick',
+		'click #add-table': 'evAddTableClick'
+		, 'click #new-schema': 'evNewSchemaClick'
+		, 'click #save-schema': 'evSaveSchemaClick'
+		, 'click #vis-tablegraph': 'evVisTableGraphClick'
 	},
 
 	initialize: function() {
@@ -1048,7 +1069,7 @@ Donkeylift.MenuSchemaView = Backbone.View.extend({
 	template: _.template($('#schema-menu-template').html()),
 
 	render: function() {
-		console.log('MenuSchemaView.render ');			
+		console.log('MenuSchemaView.render ' + Donkeylift.app.schema);			
 		this.$el.show();
 		this.$el.html(this.template());
 		this.$('#add-table').prop('disabled', Donkeylift.app.schema == null);
@@ -1076,6 +1097,11 @@ Donkeylift.MenuSchemaView = Backbone.View.extend({
 		Donkeylift.app.schemaEditView.render();
 	},
 
+	evVisTableGraphClick: function() {
+		var model = Donkeylift.app.schema;
+		var graphView = new Donkeylift.TableGraphView({model: model});
+		graphView.render();
+	},
 });
 
 
@@ -1326,11 +1352,12 @@ Donkeylift.SchemaTableView = Backbone.View.extend({
 		this.elFields().sortable({
 			stop: function() {
 				$('tr', me.elFields()).each(function(index) {
-					var name = $('td:eq(1)', this).text();
+					var name = $('td:eq(2)', this).text();
 					//console.log(name + ' = ' + (index + 1));
 					var field = me.model.get('fields').getByName(name);
-					field.set('order', index + 1);
+					field.setProp('order', index + 1);
 				});
+				me.render();
 			}
 		});
 
@@ -1386,9 +1413,7 @@ Donkeylift.SchemaTableView = Backbone.View.extend({
 		});
 		this.elFields().html('');
 
-		_.each(this.model.get('fields').sortBy(function(field) {
-				return field.get('order');
-			}), this.addField, this);
+		_.each(this.model.get('fields').sortByOrder(), this.addField, this);
 	},
 
 	evNewRelationClick: function() {
@@ -1466,6 +1491,76 @@ Donkeylift.TableEditView = Backbone.View.extend({
 			Donkeylift.app.schema.update();
 		}
 	}
+
+});
+
+
+
+/*global Donkeylift, Backbone, jQuery, _ */
+
+Donkeylift.TableGraphView = Backbone.View.extend({
+
+	el:  '#content',
+
+	initialize: function() {
+		console.log("TableGraphView.init");
+	},
+
+	template: _.template('<div id="vis-graph"></div>'),
+
+	render: function() {
+		console.log("TableGraphView.render " + this.model.get("name"));
+		this.$el.html(this.template());
+		var nodes = this.model.get("tables").map(function(table) {
+			return { 
+				id: table.get('name'), 
+				label: table.get('name')
+			};
+		}); 
+		var edges = _.flatten(this.model.get('tables').map(function(table) {
+			return _.map(table.get('referencing'), function(ref) {
+				return { 
+					from: table.get('name'), 
+					to: ref.fk_table,
+					title: ref.fk
+				};
+			});
+		})); 
+		console.log(edges);
+		
+	   // provide the data in the vis format
+	    var data = {
+	        nodes: new vis.DataSet(nodes),
+	        edges: new vis.DataSet(edges)
+	    };
+	    var options = {
+	    	nodes: {
+	    		shape: 'box'	
+	    	}
+	    	, edges : {
+	    		font: {
+	    			align: 'horizontal'
+	    		}
+	    		, arrows: 'to'
+	    	}
+	    	, layout: {
+	    		hierarchical: {
+	    			enabled: false
+	    			, direction: 'UD'
+	    		}
+	    	}
+	    	, physics: {
+	    		barnesHut: {
+	    			springConstant: 0.03
+	    		}
+	    	}
+	    };
+	
+	    // initialize your network!
+	    var network = new vis.Network(this.$("#vis-graph").get(0), data, options);		
+		
+		return this;
+	},
 
 });
 

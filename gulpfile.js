@@ -25,6 +25,7 @@ var ver3rd = {
 	JQUERY_UI : 'jquery-ui-1.11.4.custom',
 	FONT_AWESOME : 'font-awesome-4.3.0',
 	DATATABLES : 'DataTables-1.10.7',
+	VIS : 'vis',
 
 };
 
@@ -44,6 +45,7 @@ gulp.task('build-3rdparty-css', function() {
 					, src3rd + ver3rd.JQUERY_UI + '/jquery-ui.min.css' 
 					, src3rd + ver3rd.FONT_AWESOME + '/css/font-awesome.min.css'
 					, src3rd + ver3rd.DATATABLES + '/media/css/jquery.dataTables.min.css'
+					, src3rd + ver3rd.VIS + '/vis.min.css'
 		])
 
 		.pipe(concat('3rdparty.css'))
@@ -207,6 +209,6 @@ gulp.task('watch', function() {
 		'build-schema-html']);
     gulp.watch('./src/data.html', ['build-data-html']);
     gulp.watch('./src/schema.html', ['build-schema-html']);
-    gulp.watch('./src/css/*.css', ['build-app-css']);
+    gulp.watch('./src/css/*.css', ['build-donkeylift-css']);
 });
 

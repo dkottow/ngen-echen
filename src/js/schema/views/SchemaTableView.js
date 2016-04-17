@@ -33,11 +33,12 @@ Donkeylift.SchemaTableView = Backbone.View.extend({
 		this.elFields().sortable({
 			stop: function() {
 				$('tr', me.elFields()).each(function(index) {
-					var name = $('td:eq(1)', this).text();
+					var name = $('td:eq(2)', this).text();
 					//console.log(name + ' = ' + (index + 1));
 					var field = me.model.get('fields').getByName(name);
-					field.set('order', index + 1);
+					field.setProp('order', index + 1);
 				});
+				me.render();
 			}
 		});
 
@@ -93,9 +94,7 @@ Donkeylift.SchemaTableView = Backbone.View.extend({
 		});
 		this.elFields().html('');
 
-		_.each(this.model.get('fields').sortBy(function(field) {
-				return field.get('order');
-			}), this.addField, this);
+		_.each(this.model.get('fields').sortByOrder(), this.addField, this);
 	},
 
 	evNewRelationClick: function() {

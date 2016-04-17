@@ -87,7 +87,7 @@ AppBase.prototype.unsetSchema = function() {
 	this.unsetTable();
 	this.schema = null;
 	if (this.tableListView) this.tableListView.remove();
-	
+	$('#content').empty();
 	this.schemaCurrentView.render();
 }
 
@@ -111,6 +111,7 @@ AppBase.prototype.setSchema = function(name, cbAfter) {
 			$('#sidebar').append(me.tableListView.render().el);
 			$('#toggle-sidebar').show();
 
+			me.menuView.render();
 			//render current schema label
 			me.schemaCurrentView.render();
 			if (cbAfter) cbAfter();
@@ -328,6 +329,14 @@ Donkeylift.Schema = Backbone.Model.extend({
 		};
 	},	
 
+	isEmpty : function() {
+		var totalRowCount = this.get('tables').reduce(function(sum, table) {
+			return sum + table.get('row_count');
+		}, 0);	
+		console.log(this.get('name') + ' has ' + totalRowCount + ' rows.');
+		return totalRowCount == 0;
+	},
+
 	parse : function(response) {
 		console.log("Schema.parse " + response);
 		var tables = _.map(response.tables, function(table) {
@@ -354,6 +363,7 @@ Donkeylift.Schema = Backbone.Model.extend({
 
 	update : function() {
 return;
+		//TODO
 		var me = this;			
 		this.save(function(err) {
 			if (err) {
@@ -917,6 +927,12 @@ Donkeylift.Fields = Backbone.Collection.extend({
 		return this.find(function(f) { 
 			return f.vname() == name || f.get('name') == name; 
 		});
+	},
+	
+	sortByOrder: function() {
+		return this.sortBy(function(field) {
+				return field.getProp('order');
+		}, this);
 	}
 });
 
@@ -1222,15 +1238,8 @@ Donkeylift.DataTableView = Backbone.View.extend({
 	columnTemplate: _.template($('#grid-column-template').html()),
 	buttonWrapTextTemplate: _.template($('#grid-button-wrap-text-template').html()),
 
-	getFieldsInColumnOrder: function() {
-		return this.model.get('fields')
-			.sortBy(function(field) {
-				return field.getProp('order');
-		}, this);
-	},
-
 	renderFilterButtons: function() {
-		var fields = this.getFieldsInColumnOrder();
+		var fields = this.model.get('fields').sortByOrder();
 		_.each(fields, function(field, idx) {
 			
 			var filter = Donkeylift.app.filters.getFilter(
@@ -1306,7 +1315,7 @@ Donkeylift.DataTableView = Backbone.View.extend({
 		console.log('DataTableView.render ');			
 		this.$el.html(this.tableTemplate());
 
-		var fields = this.getFieldsInColumnOrder();
+		var fields = this.model.get('fields').sortByOrder();
 
 		_.each(fields, function(field, idx) {
 			var align = idx < fields.length / 2 ? 
