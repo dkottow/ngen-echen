@@ -26,7 +26,7 @@ AppBase.prototype.start = function() {
 	$('#toggle-sidebar').hide();
 
 	$('#toggle-sidebar').click(function() {
-		this.toggleSidebar();
+		me.toggleSidebar();
 	}); 
 
 	$(document).ajaxStart(function() {

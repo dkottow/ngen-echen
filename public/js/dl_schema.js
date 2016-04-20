@@ -1,5 +1,5 @@
 /*global Backbone, $ */
-var DONKEYLIFT_API = "https://api-donkeylift-dkottow.c9.io";  //set by gulp according to env var DONKEYLIFT_API. e.g. "http://api.donkeylift.com";
+var DONKEYLIFT_API = "http://localhost:3000";  //set by gulp according to env var DONKEYLIFT_API. e.g. "http://api.donkeylift.com";
 var Donkeylift = {};
 
 function AppBase(opts) {
@@ -26,7 +26,7 @@ AppBase.prototype.start = function() {
 	$('#toggle-sidebar').hide();
 
 	$('#toggle-sidebar').click(function() {
-		this.toggleSidebar();
+		me.toggleSidebar();
 	}); 
 
 	$(document).ajaxStart(function() {
