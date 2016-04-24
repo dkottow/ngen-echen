@@ -47,9 +47,11 @@ Donkeylift.MenuSchemaView = Backbone.View.extend({
 	},
 
 	evVisTableGraphClick: function() {
-		var model = Donkeylift.app.schema;
-		var graphView = new Donkeylift.TableGraphView({model: model});
-		graphView.render();
+		if ( ! this.graphView) {
+			this.graphView = new Donkeylift.SchemaGraphView();
+		}
+		this.graphView.model = Donkeylift.app.schema;
+		this.graphView.render();
 	},
 });
 
