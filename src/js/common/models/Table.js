@@ -120,9 +120,9 @@ Donkeylift.Table = Backbone.Model.extend({
 
 Donkeylift.Table.create = function(name) {
 	var fields = [ 
-		{ name: 'id', type: 'INTEGER', order: 1 },
-		{ name : 'modified_by', type: 'VARCHAR', order: 2 },
-		{ name : 'modified_on', type: 'DATETIME', order: 3 }
+		{ name: 'id', type: 'INTEGER', props: { order: 1} },
+		{ name : 'mod_by', type: 'VARCHAR', props: {order: 2} },
+		{ name : 'mod_on', type: 'DATETIME', props: {order: 3} }
 	];
 	var table = new Donkeylift.Table({
 		name: name,

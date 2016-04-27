@@ -22,13 +22,12 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 	},
 
 	updateClick: function() {
+		console.log("FieldEditView.updateClick ");
 		this.model.set('name', $('#modalInputFieldName').val());
 		this.model.set('type', $('#modalInputFieldType').val());
 		this.model.set('length', $('#modalInputFieldLength').val());
-		if ( ! Donkeylift.app.table.get('fields').contains(this.model)) {
-			this.model.set('order', Donkeylift.app.table.get('fields').length + 1);
-			Donkeylift.app.table.get('fields').add(this.model);
-		}
+
+		Donkeylift.app.table.get('fields').addNew(this.model);
 		Donkeylift.app.schema.update();
 	},
 

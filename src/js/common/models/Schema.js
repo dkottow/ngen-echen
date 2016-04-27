@@ -58,6 +58,7 @@ Donkeylift.Schema = Backbone.Model.extend({
 	},
 
 	update : function() {
+		console.log("Schema.update...");
 return;
 		//TODO
 		var me = this;			
@@ -80,11 +81,11 @@ return;
 				console.dir(response);
 				cbResult(response);
 			},
+			parse: false
 		};
 
 		//save existing database
 		if (this.get('id') == this.get('name')) {
-			saveOptions.parse = false;
 			saveOptions.url = this.url();
 			console.log("Schema.save " + saveOptions.url);
 			saveOptions.success = function(model) {	
@@ -95,7 +96,6 @@ return;
 		//save new database
 		} else {
 			this.unset('id'); 
-			saveOptions.parse = false;
 			saveOptions.url = Donkeylift.app.schemas.url();
 			console.log("Schema.save " + saveOptions.url);
 			saveOptions.success = function(model) {

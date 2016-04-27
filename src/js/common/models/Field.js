@@ -7,7 +7,7 @@ Donkeylift.Field = Backbone.Model.extend({
 		var rxp = /(\w+)(\([0-9,]+\))?/
 		var match = field.type.match(rxp)
 		this.set('type', Donkeylift.Field.TypeAlias(match[1]));
-		this.set('props', field.props);
+		this.set('props', field.props || {});
 	},
 
 	vname: function() {
@@ -97,7 +97,7 @@ Donkeylift.Field = Backbone.Model.extend({
 Donkeylift.Field.create = function(name) {
 	return new Donkeylift.Field({
 		name: name,
-		type: 'VARCHAR'
+		type: 'VARCHAR',
 	});
 }
 

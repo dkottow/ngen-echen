@@ -1,5 +1,5 @@
 /*global Backbone, $ */
-var DONKEYLIFT_API = "http://api.donkeylift.com";  //set by gulp according to env var DONKEYLIFT_API. e.g. "http://api.donkeylift.com";
+var DONKEYLIFT_API = "http://localhost:3000";  //set by gulp according to env var DONKEYLIFT_API. e.g. "http://api.donkeylift.com";
 var Donkeylift = {};
 
 function AppBase(opts) {
@@ -155,7 +155,7 @@ Donkeylift.Field = Backbone.Model.extend({
 		var rxp = /(\w+)(\([0-9,]+\))?/
 		var match = field.type.match(rxp)
 		this.set('type', Donkeylift.Field.TypeAlias(match[1]));
-		this.set('props', field.props);
+		this.set('props', field.props || {});
 	},
 
 	vname: function() {
@@ -245,7 +245,7 @@ Donkeylift.Field = Backbone.Model.extend({
 Donkeylift.Field.create = function(name) {
 	return new Donkeylift.Field({
 		name: name,
-		type: 'VARCHAR'
+		type: 'VARCHAR',
 	});
 }
 
@@ -362,6 +362,7 @@ Donkeylift.Schema = Backbone.Model.extend({
 	},
 
 	update : function() {
+		console.log("Schema.update...");
 return;
 		//TODO
 		var me = this;			
@@ -384,11 +385,11 @@ return;
 				console.dir(response);
 				cbResult(response);
 			},
+			parse: false
 		};
 
 		//save existing database
 		if (this.get('id') == this.get('name')) {
-			saveOptions.parse = false;
 			saveOptions.url = this.url();
 			console.log("Schema.save " + saveOptions.url);
 			saveOptions.success = function(model) {	
@@ -399,7 +400,6 @@ return;
 		//save new database
 		} else {
 			this.unset('id'); 
-			saveOptions.parse = false;
 			saveOptions.url = Donkeylift.app.schemas.url();
 			console.log("Schema.save " + saveOptions.url);
 			saveOptions.success = function(model) {
@@ -579,9 +579,9 @@ Donkeylift.Table = Backbone.Model.extend({
 
 Donkeylift.Table.create = function(name) {
 	var fields = [ 
-		{ name: 'id', type: 'INTEGER', order: 1 },
-		{ name : 'modified_by', type: 'VARCHAR', order: 2 },
-		{ name : 'modified_on', type: 'DATETIME', order: 3 }
+		{ name: 'id', type: 'INTEGER', props: { order: 1} },
+		{ name : 'mod_by', type: 'VARCHAR', props: {order: 2} },
+		{ name : 'mod_on', type: 'DATETIME', props: {order: 3} }
 	];
 	var table = new Donkeylift.Table({
 		name: name,
@@ -601,9 +601,9 @@ Donkeylift.Fields = Backbone.Collection.extend({
 		//this.on('change', function(ev) { console.log('Fields.ev ' + ev); });
 	},
 
-	addNew: function() {
-		var field = Donkeylift.Field.create('field' + this.length);
-		field.set('order', this.length);
+	addNew: function(field) {
+		field = field || Donkeylift.Field.create('field' + this.length);
+		field.setProp('order', this.length + 1);
 		this.add(field);
 		return field;
 	},
@@ -990,13 +990,12 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 	},
 
 	updateClick: function() {
+		console.log("FieldEditView.updateClick ");
 		this.model.set('name', $('#modalInputFieldName').val());
 		this.model.set('type', $('#modalInputFieldType').val());
 		this.model.set('length', $('#modalInputFieldLength').val());
-		if ( ! Donkeylift.app.table.get('fields').contains(this.model)) {
-			this.model.set('order', Donkeylift.app.table.get('fields').length + 1);
-			Donkeylift.app.table.get('fields').add(this.model);
-		}
+
+		Donkeylift.app.table.get('fields').addNew(this.model);
 		Donkeylift.app.schema.update();
 	},
 
