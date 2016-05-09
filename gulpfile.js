@@ -14,6 +14,7 @@ var allTasks = [ 'build-3rdparty-js'
 				, 'build-donkeylift-css'
 				, 'build-data-html'
 				, 'build-schema-html'
+				, 'build-docs'
 				, 'watch'
 ];
 
@@ -26,11 +27,14 @@ var ver3rd = {
 	FONT_AWESOME : 'font-awesome-4.3.0',
 	DATATABLES : 'DataTables-1.10.7',
 	VIS : 'vis',
+	SWAGGER_UI : 'swagger-ui-2.1.4',
 
 };
 
 gulp.task('default', allTasks, function() {
 
+	return gulp.src(['./src/index.html'])
+		.pipe(gulp.dest('./public/'));
 	
 });
 
@@ -201,6 +205,15 @@ gulp.task('build-schema-html', function() {
 		.pipe(gulp.dest('./public/'));
 });
 
+gulp.task('build-docs', function() {
+	
+
+	return gulp.src(['./src/docs/swagger.json', 
+					src3rd + ver3rd.SWAGGER_UI + '/dist/**'])
+	.pipe(gulp.dest('./public/docs'));
+
+});
+
 // Watch Files For Changes
 gulp.task('watch', function() {
     gulp.watch('./src/js/**/*.js', ['build-dl-data-js', 
@@ -210,5 +223,6 @@ gulp.task('watch', function() {
     gulp.watch('./src/data.html', ['build-data-html']);
     gulp.watch('./src/schema.html', ['build-schema-html']);
     gulp.watch('./src/css/*.css', ['build-donkeylift-css']);
+    gulp.watch('./src/docs/*', ['build-docs']);
 });
 

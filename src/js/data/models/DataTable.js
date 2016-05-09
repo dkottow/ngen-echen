@@ -10,7 +10,7 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 	},
 
 	getAllRowsUrl: function() {
-		return decodeURI(this.lastFilterUrl);
+		return decodeURI(this.lastFilterUrl).replace(/\t/g, '%09');
 	},
 
 	ajaxGetRowsFn: function() {
@@ -130,7 +130,6 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 
 		var params = {
 			'$top': 10,
-			'$distinct': true,
 			'$select': fieldName,
 			'$orderby': fieldName
 		};
