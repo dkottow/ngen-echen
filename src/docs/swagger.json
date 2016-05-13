@@ -1,0 +1,301 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Donkeylift API",
+        "description": "A data access layer to SQL databases (sqlite).",
+        "version": "1.0.0"
+    },
+    "host": "localhost:3000",
+    "schemes": [
+        "http"
+    ],
+    "basePath": "/",
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/": {
+            "get": {
+                "summary": "List Accounts",
+                "description": "",
+                "tags": [
+                    "account"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "returns all available accounts.",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "url": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/{account}": {
+            "get": {
+                "summary": "Get Account",
+                "description": "Get account properties including list of databases.",
+                "tags": [
+                    "account"
+                ],
+                "parameters": [
+                    {
+                        "name": "account",
+                        "in": "path",
+                        "description": "account to fetch",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "returns account object",
+                        "schema": {
+                            "$ref": "#/definitions/Account"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/{account}/{database}": {
+            "get": {
+                "summary": "Get Database Schema",
+                "description": "Get database schema definition and a few other properties.",
+                "operationId": "getSchema",
+                "parameters": [
+                    {
+                        "name": "account",
+                        "in": "path",
+                        "description": "account that holds database",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "database",
+                        "in": "path",
+                        "description": "database to fetch",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "tags": [
+                    "database"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A database object",
+                        "schema": {
+                            "$ref": "#/definitions/Database"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/{account}/{database}/{table}.rows": {
+            "get": {
+                "summary": "Get row data from table",
+                "operationId": "getRows",
+                "description": "Get a data subset of table rows. Supports selection, projection, sorting and paging. Adopts most syntax from OData.\n#### Example\n    http://api.donkeylift.com/demo/sales/order_items.rows?$filter=customers.name search 'F'%09orders.date btwn '2015-06-01','2015-07-01'%09sandwiches.price ge 8&$fields=sandwich_ref,order_ref  \n\n### Row Selection \nRow selection is specificed by a set of filters. \nFilters are combined internally by logical conjunction and formatted as a TSV string (f1 TAB f2 becomes f1 AND f2). Individual filter definition options follow.\n#### Syntax\n    [table].field {op} values\n\nEach filter has three parts: the table field it acts upon, the operator to apply to that field, and the values that parametrize the filter operation. \n\nThe filter field may be specified as 'table.field' because it can refer to any table, not just the table being queried. If table is omitted, the field refers to the data table.   \n\nValues are given as a CSV string of literals. \n#### Operators\n##### eq / ne / gt / ge / lt / le\nEqual, Not equal, Greater than, Greater or equal than, Lesser than and Lesser or equal than operators. Operation parameter must be a single value.\n\n    Name eq 'Fred'\n    Product.Price le 100\n##### in / ex\nIn and Ex (not in) operators. Supports multiple values.\n\n    Country in 'Belgium','Netherlands','Luxemburg'\n    Product.id ex 0,99\n    \n##### btwn\nBetween operator. A convenience operator equivalent to 'greater or equal than and lesser or equal than'. Requires two values.\n\n    Price btwn 0.01,9.99\n    Name btwn 'A','D'\n\n##### search\nSearch operator. Searches for words in individual table fields or full rows starting with 'value'. To query full rows use table.table as first parameter.\n\n    Name search 'fr'\n    Product.Product search 'bacon'\n\n### Row Projection\nRow projection is specified by a set of fields formatted as CSV string.\n\n    \n",
+                "parameters": [
+                    {
+                        "name": "account",
+                        "in": "path",
+                        "description": "account holding data",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "database",
+                        "in": "path",
+                        "description": "database holding data",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "table",
+                        "in": "path",
+                        "description": "table holding data",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "$filter",
+                        "in": "query",
+                        "description": "select rows by these filter operations.",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "tsv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "$select",
+                        "in": "query",
+                        "description": "project rows onto these table fields.",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "table"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A database object",
+                        "schema": {
+                            "$ref": "#/definitions/Database"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "Account": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "databases": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "url": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "Database": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "tables": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Table"
+                    }
+                },
+                "join_trees": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/JoinTree"
+                    }
+                }
+            }
+        },
+        "Table": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "row_count": {
+                    "type": "integer"
+                },
+                "fields": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Field"
+                    }
+                }
+            }
+        },
+        "Field": {
+            "type": "object"
+        },
+        "JoinTree": {
+            "type": "object",
+            "description": "A join tree represents a possible subset of  existing joins between tables. It is a graph tree with tables as nodes and edges that must refer to existing joins beween tables through one or more foreign keys. <br>If the table graph resulting from connecting all tables by their fk's has no cycles, there is no reason to have more than one join tree. But if any two tables can be joined together through different sets of keys, refering to an individual join tree disambiguates how to query data rows filtered by related tables.",
+            "properties": {
+                "tables": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "description": "table name"
+                    }
+                },
+                "joins": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "v": {
+                                "type": "string",
+                                "description": "table name"
+                            },
+                            "w": {
+                                "type": "string",
+                                "description": "table name"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "Error": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "fields": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

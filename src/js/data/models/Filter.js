@@ -112,7 +112,7 @@ Donkeylift.Filter = Backbone.Model.extend({
 
 Donkeylift.Filter.Key = function(table, field) {		
 	if (_.isObject(table)) table = table.get('name');
-	if ( ! field) field = table;
+	if ( ! field) field = '*';
 	else if (_.isObject(field)) field = field.get('name'); //not vname
 	return table + '.' + field;
 }
