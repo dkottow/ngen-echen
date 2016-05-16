@@ -1,5 +1,5 @@
 /*global Backbone, $ */
-var DONKEYLIFT_API = "http://api.donkeylift.com";  //set by gulp according to env var DONKEYLIFT_API. e.g. "http://api.donkeylift.com";
+var DONKEYLIFT_API = "api.donkeylift.com";  //set by gulp according to env var DONKEYLIFT_API. e.g. "http://api.donkeylift.com";
 var Donkeylift = {};
 
 function AppBase(opts) {
