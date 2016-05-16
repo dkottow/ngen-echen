@@ -3,9 +3,9 @@
     "info": {
         "title": "Donkeylift API",
         "description": "A data access layer to SQL databases (sqlite).",
-        "version": "1.0.0"
+        "version": "1.0.0-alpha"
     },
-    "host": "localhost:3000",
+    "host": "$DONKEYLIFT_API",
     "schemes": [
         "http"
     ],
@@ -14,44 +14,10 @@
         "application/json"
     ],
     "paths": {
-        "/": {
-            "get": {
-                "summary": "List Accounts",
-                "description": "",
-                "tags": [
-                    "account"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "returns all available accounts.",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    },
-                                    "url": {
-                                        "type": "string"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "description": "Unexpected error",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    }
-                }
-            }
-        },
         "/{account}": {
             "get": {
                 "summary": "Get Account",
-                "description": "Get account properties including list of databases.",
+                "description": "Get account information including a list of its databases.",
                 "tags": [
                     "account"
                 ],
@@ -122,35 +88,35 @@
         },
         "/{account}/{database}/{table}.rows": {
             "get": {
-                "summary": "Get row data from table",
+                "summary": "Get row data",
                 "operationId": "getRows",
-                "description": "Get a data subset of table rows. Supports selection, projection, sorting and paging. Adopts most syntax from OData.\n#### Example\n    http://api.donkeylift.com/demo/sales/order_items.rows?$filter=customers.name search 'F'%09orders.date btwn '2015-06-01','2015-07-01'%09sandwiches.price ge 8&$fields=sandwich_ref,order_ref  \n\n### Row Selection \nRow selection is specificed by a set of filters. \nFilters are combined internally by logical conjunction and formatted as a TSV string (f1 TAB f2 becomes f1 AND f2). Individual filter definition options follow.\n#### Syntax\n    [table].field {op} values\n\nEach filter has three parts: the table field it acts upon, the operator to apply to that field, and the values that parametrize the filter operation. \n\nThe filter field may be specified as 'table.field' because it can refer to any table, not just the table being queried. If table is omitted, the field refers to the data table.   \n\nValues are given as a CSV string of literals. \n#### Operators\n##### eq / ne / gt / ge / lt / le\nEqual, Not equal, Greater than, Greater or equal than, Lesser than and Lesser or equal than operators. Operation parameter must be a single value.\n\n    Name eq 'Fred'\n    Product.Price le 100\n##### in / ex\nIn and Ex (not in) operators. Supports multiple values.\n\n    Country in 'Belgium','Netherlands','Luxemburg'\n    Product.id ex 0,99\n    \n##### btwn\nBetween operator. A convenience operator equivalent to 'greater or equal than and lesser or equal than'. Requires two values.\n\n    Price btwn 0.01,9.99\n    Name btwn 'A','D'\n\n##### search\nSearch operator. Searches for words in individual table fields or full rows starting with 'value'. To query full rows use table.table as first parameter.\n\n    Name search 'fr'\n    Product.Product search 'bacon'\n\n### Row Projection\nRow projection is specified by a set of fields formatted as CSV string.\n\n    \n",
+                "description": "Get rows from a table or a set of related tables. Supports data selection, projection, sorting and paging. \n\nSelection and projection may refer to fields from other tables than the url path table. If so, the API will automatically join tables through foreign keys to obtain the result. \n\nQuery syntax is largely borrowed from OData.\n#### Example\n\n\n    http://api.donkeylift.com/demo/sandwiches/orders.rows?$filter=order_date btwn '2015-01-01','2015-03-31'%09sandwiches.price ge 8.00&$select=id,order_date,sandwiches.name,sandwiches.price,total_amount,customers.name&$orderby=order_date,sandwiches.name\n\n\n\nGet data from orders table in the sandwiches database. Select sandwiches ordered in Q1 2015 and priced higher than $8.00. Return customer name, order date, total order amount, sandwich name and price. Note that the result set includes orders more than once if there are several expensive sandwiches in that order.\n### Selection \nSelection means filtering out rows. It is the equivalent of the WHERE clause in SQL. \n\nSelection is specificed by a set of filters. Filters are combined using AND logic, meaning rows must fulfill all filters to be returned in the result set. \n\nFields in filter condition are typically part of the table in url path, but fields from related tables are also supported. \n\nIf omitted, the result rows are not filtered. This is all url path table rows except for special projection cases. \n\nIndividual filter definition options follow.\n#### Syntax\n    [table].field {op} values\n\nEach filter has three parts: the table field it acts upon, the operator to apply to that field, and the values that parametrize the filter operation. \n\nA filter field should be specified as 'table.field' to refer to a related table different from the url path table. If table prefix is omitted, the field should belong to the url path table.   \n\nOnly literals are supported as filter values. \n#### Operators\n##### eq / ne / gt / ge / lt / le\nEqual, Not equal, Greater than, Greater or equal than, Lesser than and Lesser or equal than operators. Operation parameter must be a single value.\n\n    Name eq 'Fred'\n    Product.Price le 100\n##### in / ex\nIn and Ex (not in) operators. Supports multiple values.\n\n    Country in 'Belgium','Netherlands','Luxemburg'\n    Product.Accessory ex 'Headset','Microphone'\n    \n##### btwn\nBetween operator. A convenience operator equivalent to 'greater or equal than and lesser or equal than'. Requires two values.\n\n    Price btwn 0.01,9.99\n    Name btwn 'A','D'\n\n##### search\nSearch operator. Searches for words starting with 'value' in individual table fields or full rows. To query full rows use table.* as first parameter.\n\n    Description search 'Paris'\n    Product.* search 'France'\n\n### Projection\nProjection means choosing specific fields for the output rows. It is the equivalent of the list of fields specified after the SELECT keyword in SQL. \n\nProjection fields are typically part of the url path table, but fields from related tables are also supported. \n\nFields should be specified as 'table.field' to refer to a related table different from the url path table. If table prefix is omitted, the field should belong to the url path table.\n\nIf omitted, all fields from the url path table are returned.\n### Ordering\nOrdering sorts result rows according to one or more result fields, it is the  equivalent of the ORDERBY clause in SQL. \n\nOrdering is specificed a list of table fields; each optionally followed by the asc or desc keyword to specify ordering direction. \n\nTable fields in ordering clauses should be already part of the result rows: either because they are explicitly in the projection expression or part of the path url table (if no projection was specified). \n#### Syntax\n    [table].field (asc|desc)\n\n    \n",
                 "parameters": [
                     {
                         "name": "account",
                         "in": "path",
-                        "description": "account holding data",
+                        "description": "database account",
                         "required": true,
                         "type": "string"
                     },
                     {
                         "name": "database",
                         "in": "path",
-                        "description": "database holding data",
+                        "description": "table database",
                         "required": true,
                         "type": "string"
                     },
                     {
                         "name": "table",
                         "in": "path",
-                        "description": "table holding data",
+                        "description": "table with data rows",
                         "required": true,
                         "type": "string"
                     },
                     {
                         "name": "$filter",
                         "in": "query",
-                        "description": "select rows by these filter operations.",
+                        "description": "array of row filters.",
                         "required": false,
                         "type": "array",
                         "collectionFormat": "tsv",
@@ -161,12 +127,88 @@
                     {
                         "name": "$select",
                         "in": "query",
-                        "description": "project rows onto these table fields.",
+                        "description": "array of table fields.",
                         "required": false,
                         "type": "array",
                         "collectionFormat": "csv",
                         "items": {
                             "type": "string"
+                        }
+                    },
+                    {
+                        "name": "$orderby",
+                        "in": "query",
+                        "description": "array of order clauses.",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "$skip",
+                        "in": "query",
+                        "description": "skip this number of rows.",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "$top",
+                        "in": "query",
+                        "description": "number of rows to be returned.",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ],
+                "tags": [
+                    "table"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A row result set"
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Add rows",
+                "operationId": "addRows",
+                "description": "Add rows to a table\n",
+                "parameters": [
+                    {
+                        "name": "account",
+                        "in": "path",
+                        "description": "database account",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "database",
+                        "in": "path",
+                        "description": "database table",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "table",
+                        "in": "path",
+                        "description": "table that gets new rows added",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "rows",
+                        "in": "body",
+                        "description": "array with new rows",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/NewRows"
                         }
                     }
                 ],
@@ -175,16 +217,103 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "A database object",
-                        "schema": {
-                            "$ref": "#/definitions/Database"
-                        }
+                        "description": "A row result set"
                     },
                     "default": {
                         "description": "Unexpected error",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
+                    }
+                }
+            },
+            "put": {
+                "summary": "Modify rows",
+                "operationId": "modRows",
+                "description": "Modify existing rows in table\n",
+                "parameters": [
+                    {
+                        "name": "account",
+                        "in": "path",
+                        "description": "database account",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "database",
+                        "in": "path",
+                        "description": "table database",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "table",
+                        "in": "path",
+                        "description": "table with row being modified",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "rows",
+                        "in": "body",
+                        "description": "modified row data",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Rows"
+                        }
+                    }
+                ],
+                "tags": [
+                    "table"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A row result set"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete rows",
+                "operationId": "delRows",
+                "description": "Delete row in table\n",
+                "parameters": [
+                    {
+                        "name": "account",
+                        "in": "path",
+                        "description": "database account",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "database",
+                        "in": "path",
+                        "description": "table database",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "table",
+                        "in": "path",
+                        "description": "table with row being deleted",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "rowIds",
+                        "in": "body",
+                        "description": "row identifiers",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/RowIds"
+                        }
+                    }
+                ],
+                "tags": [
+                    "table"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A row result set"
                     }
                 }
             }
@@ -239,19 +368,77 @@
                 "name": {
                     "type": "string"
                 },
-                "row_count": {
-                    "type": "integer"
-                },
                 "fields": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/Field"
                     }
+                },
+                "row_count": {
+                    "type": "integer"
                 }
             }
         },
         "Field": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "Row": {
+            "type": "object",
+            "example": {
+                "name": "Your Name"
+            }
+        },
+        "Rows": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/Row"
+            },
+            "example": [
+                {
+                    "id": 1,
+                    "name": "New Name",
+                    "email": "new@email"
+                },
+                {
+                    "id": 2,
+                    "name": "Other Name",
+                    "email": "other@foo.bar"
+                }
+            ]
+        },
+        "NewRows": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/Row"
+            },
+            "example": [
+                {
+                    "name": "New Name",
+                    "email": "new@foo"
+                },
+                {
+                    "name": "Next New",
+                    "email": "other@bar"
+                }
+            ]
+        },
+        "RowIds": {
+            "type": "array",
+            "items": {
+                "type": "integer"
+            },
+            "example": [
+                6,
+                9
+            ]
         },
         "JoinTree": {
             "type": "object",
@@ -290,9 +477,6 @@
                     "format": "int32"
                 },
                 "message": {
-                    "type": "string"
-                },
-                "fields": {
                     "type": "string"
                 }
             }
