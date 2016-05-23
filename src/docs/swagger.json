@@ -48,9 +48,9 @@
         },
         "/{account}/{database}": {
             "get": {
-                "summary": "Get Database Schema",
+                "summary": "Get Database",
                 "description": "Get database schema definition and a few other properties.",
-                "operationId": "getSchema",
+                "operationId": "getInfo",
                 "parameters": [
                     {
                         "name": "account",
@@ -76,6 +76,120 @@
                         "schema": {
                             "$ref": "#/definitions/Database"
                         }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create Database",
+                "description": "Create new Database or replace existing one, if empty. Returns an error if existing database has data.",
+                "operationId": "writeSchema",
+                "parameters": [
+                    {
+                        "name": "account",
+                        "in": "path",
+                        "description": "account that holds database",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "database",
+                        "in": "path",
+                        "description": "database to fetch",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "tags": [
+                    "database"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A binary sqlite file"
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete Database",
+                "description": ".",
+                "operationId": "delDatabase",
+                "parameters": [
+                    {
+                        "name": "account",
+                        "in": "path",
+                        "description": "account that holds database",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "database",
+                        "in": "path",
+                        "description": "database to fetch",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "force",
+                        "in": "query",
+                        "description": "Force delete database, even if it has data.",
+                        "required": false,
+                        "type": "boolean"
+                    }
+                ],
+                "tags": [
+                    "database"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A binary sqlite file"
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/{account}/{database}.sqlite": {
+            "get": {
+                "summary": "Download Database",
+                "description": "Download database sqlite file.",
+                "operationId": "getFile",
+                "parameters": [
+                    {
+                        "name": "account",
+                        "in": "path",
+                        "description": "account that holds database",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "database",
+                        "in": "path",
+                        "description": "database to fetch",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "tags": [
+                    "database"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A binary sqlite file"
                     },
                     "default": {
                         "description": "Unexpected error",
@@ -314,6 +428,72 @@
                 "responses": {
                     "200": {
                         "description": "A row result set"
+                    }
+                }
+            }
+        },
+        "/{account}/{database}/{table}.stats": {
+            "get": {
+                "summary": "Get row statistics",
+                "operationId": "getStats",
+                "description": "Returns min, max of result rows. See getRows for parameter description.",
+                "parameters": [
+                    {
+                        "name": "account",
+                        "in": "path",
+                        "description": "database account",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "database",
+                        "in": "path",
+                        "description": "table database",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "table",
+                        "in": "path",
+                        "description": "table with data rows",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "$filter",
+                        "in": "query",
+                        "description": "array of row filters.",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "tsv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "$select",
+                        "in": "query",
+                        "description": "array of table fields.",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "table"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A row result set"
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
                     }
                 }
             }
