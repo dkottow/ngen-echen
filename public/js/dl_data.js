@@ -380,30 +380,9 @@ return;
 	save : function(cbResult) {
 		console.log("Schema.save...");
 		var saveOptions = {
-			error: function(model, response) {
-				console.log("Schema.save ERROR");
-				console.dir(response);
-				cbResult(response);
-			},
-			parse: false
-		};
-
-		//save existing database
-		if (this.get('id') == this.get('name')) {
-			saveOptions.url = this.url();
-			console.log("Schema.save " + saveOptions.url);
-			saveOptions.success = function(model) {	
-				console.log("Schema.save OK");
-				cbResult();
-			}
-
-		//save new database
-		} else {
-			this.unset('id'); 
-			saveOptions.url = Donkeylift.app.schemas.url();
-			console.log("Schema.save " + saveOptions.url);
-			saveOptions.success = function(model) {
-				console.log("Schema.save new OK");
+			url: Donkeylift.app.schemas.url()
+			, parse: false
+			, success: function(model) {
 				//set id to (new) name
 				model.set('id', model.get('name'));
 				Donkeylift.app.schema = model;
@@ -419,7 +398,15 @@ return;
 					}
 				});
 			}
-		}
+			, error: function(model, response) {
+				console.log("Schema.save ERROR");
+				console.dir(response);
+				cbResult(response);
+			}
+		};
+
+		this.unset('id'); 
+		console.log("Schema.save " + saveOptions.url);
 
 		Backbone.Model.prototype.save.call(this, null, saveOptions);
 	},
