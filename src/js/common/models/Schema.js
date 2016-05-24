@@ -76,11 +76,9 @@ return;
 	save : function(cbResult) {
 		console.log("Schema.save...");
 		var saveOptions = {
-			url: Donkeylift.app.schemas.url()
+			url: this.url()
 			, parse: false
 			, success: function(model) {
-				//set id to (new) name
-				model.set('id', model.get('name'));
 				Donkeylift.app.schema = model;
 
 				//reload schema list
@@ -101,7 +99,8 @@ return;
 			}
 		};
 
-		this.unset('id'); 
+		//set id to (new) name
+		this.set('id', this.get('name'));
 		console.log("Schema.save " + saveOptions.url);
 
 		Backbone.Model.prototype.save.call(this, null, saveOptions);

@@ -85,22 +85,22 @@
                     }
                 }
             },
-            "post": {
+            "put": {
                 "summary": "Create Database",
                 "description": "Create new Database or replace existing one, if empty. Returns an error if existing database has data.",
-                "operationId": "writeSchema",
+                "operationId": "createDatabase",
                 "parameters": [
                     {
                         "name": "account",
                         "in": "path",
-                        "description": "account that holds database",
+                        "description": "account of database",
                         "required": true,
                         "type": "string"
                     },
                     {
                         "name": "database",
                         "in": "path",
-                        "description": "database to fetch",
+                        "description": "database name",
                         "required": true,
                         "type": "string"
                     }
