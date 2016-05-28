@@ -7,7 +7,11 @@ var gulpif = require('gulp-if');
 //var gulp_data = require('./gulp-data.js');
 //var gulp_schema = require('./gulp-schema.js');
 
-var allTasks = [ 'build-3rdparty-js' 
+var allTasks = [ 'copy-images'
+				, 'copy-fonts'
+				, 'copy-3rdparty-js' 
+				, 'copy-3rdparty-css' 
+				, 'build-3rdparty-js' 
 				, 'build-dl-data-js' 
 				, 'build-dl-schema-js' 
 				, 'build-3rdparty-css' 
@@ -16,7 +20,6 @@ var allTasks = [ 'build-3rdparty-js'
 				, 'build-schema-html'
 				, 'build-swaggerui'
 				, 'build-apispec'
-				, 'watch'
 ];
 
 var src3rd = './src/3rdparty/';
@@ -27,6 +30,7 @@ var ver3rd = {
 	JQUERY_UI : 'jquery-ui-1.11.4.custom',
 	FONT_AWESOME : 'font-awesome-4.3.0',
 	DATATABLES : 'DataTables-1.10.7',
+	DATATABLES_EDITOR : 'Editor-1.5.6',
 	VIS : 'vis',
 	SWAGGER_UI : 'swagger-ui-2.1.4',
 
@@ -41,16 +45,34 @@ gulp.task('default', allTasks, function() {
 
 //TODO
 gulp.task('copy-images', function() {
+	return gulp.src([
+				src3rd + ver3rd.DATATABLES + '/media/images/*.png'
+				, './src/images/*'
+		])	
+
+		.pipe(gulp.dest('./public/images/'));
 });
+
 gulp.task('copy-fonts', function() {
+	return gulp.src([
+				src3rd + ver3rd.BOOTSTRAP + '/fonts/*'
+				, src3rd + ver3rd.FONT_AWESOME + '/fonts/*'
+		])	
+
+		.pipe(gulp.dest('./public/fonts/'));
 });
 
 gulp.task('build-3rdparty-css', function() {
-	return gulp.src([src3rd + ver3rd.BOOTSTRAP + '/css/bootstrap.min.css' 
-					, src3rd + ver3rd.JQUERY_UI + '/jquery-ui.min.css' 
-					, src3rd + ver3rd.FONT_AWESOME + '/css/font-awesome.min.css'
-					, src3rd + ver3rd.DATATABLES + '/media/css/jquery.dataTables.min.css'
-					, src3rd + ver3rd.VIS + '/vis.min.css'
+
+	gulp.src([
+				src3rd + ver3rd.JQUERY_UI + '/images/*' 
+		])
+		.pipe(gulp.dest('./public/css/images/'));
+
+	return gulp.src([
+				src3rd + ver3rd.BOOTSTRAP + '/css/bootstrap.min.css' 
+				, src3rd + ver3rd.JQUERY_UI + '/jquery-ui.min.css' 
+				, src3rd + ver3rd.FONT_AWESOME + '/css/font-awesome.min.css'
 		])
 
 		.pipe(concat('3rdparty.css'))
@@ -58,15 +80,38 @@ gulp.task('build-3rdparty-css', function() {
 });
 
 gulp.task('build-3rdparty-js', function() {
-	return gulp.src([src3rd + ver3rd.JQUERY + '/jquery.min.js' 
-					, src3rd + ver3rd.JQUERY_UI + '/jquery-ui.min.js' 
-					, './src/3rdparty/underscore/underscore.js' 
-					, './src/3rdparty/backbone/backbone.js' 
-					, src3rd + ver3rd.BOOTSTRAP + '/js/bootstrap.min.js' 
-				])
+	return gulp.src([
+				src3rd + ver3rd.JQUERY + '/jquery.min.js' 
+				, src3rd + ver3rd.JQUERY_UI + '/jquery-ui.min.js' 
+				, './src/3rdparty/underscore/underscore.js' 
+				, './src/3rdparty/backbone/backbone.js' 
+				, src3rd + ver3rd.BOOTSTRAP + '/js/bootstrap.min.js' 
+		])
 
 		.pipe(concat('3rdparty.js'))
 		.pipe(gulp.dest('./public/js/'));
+			
+});
+
+gulp.task('copy-3rdparty-js', function() {
+	return gulp.src([
+				src3rd + ver3rd.DATATABLES + '/media/js/jquery.dataTables.min.js' 
+				, src3rd + ver3rd.VIS + '/vis.min.js' 
+				, './ext/' + ver3rd.DATATABLES_EDITOR + '/js/dataTables.editor.min.js' 
+		])
+
+		.pipe(gulp.dest('./public/js/'));
+			
+});
+
+gulp.task('copy-3rdparty-css', function() {
+	return gulp.src([
+				src3rd + ver3rd.DATATABLES + '/media/css/jquery.dataTables.min.css'
+				, src3rd + ver3rd.VIS + '/vis.min.css'
+				, './ext/' + ver3rd.DATATABLES_EDITOR + '/css/editor.dataTables.min.css' 
+		])
+
+		.pipe(gulp.dest('./public/css/'));
 			
 });
 
@@ -212,7 +257,7 @@ gulp.task('build-swaggerui', function() {
 
 });
 
-gulp.task('build-apispec', function() {
+gulp.task('build-apispec', ['build-swaggerui'], function() {
 	
 	var host = process.env.DONKEYLIFT_API.replace(new RegExp('http://'), '');
 
