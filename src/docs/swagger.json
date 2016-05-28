@@ -72,9 +72,9 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "A database object",
+                        "description": "Schema object",
                         "schema": {
-                            "$ref": "#/definitions/Database"
+                            "$ref": "#/definitions/Schema"
                         }
                     },
                     "default": {
@@ -103,6 +103,15 @@
                         "description": "database name",
                         "required": true,
                         "type": "string"
+                    },
+                    {
+                        "name": "schema",
+                        "in": "body",
+                        "description": "Database definition",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Schema"
+                        }
                     }
                 ],
                 "tags": [
@@ -111,6 +120,50 @@
                 "responses": {
                     "200": {
                         "description": "A binary sqlite file"
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "summary": "Patch Database",
+                "description": "Modify Database applying a list of patches.",
+                "operationId": "patchDatabase",
+                "parameters": [
+                    {
+                        "name": "account",
+                        "in": "path",
+                        "description": "account of database",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "database",
+                        "in": "path",
+                        "description": "database name",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "patches",
+                        "in": "body",
+                        "description": "array with patches",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Patches"
+                        }
+                    }
+                ],
+                "tags": [
+                    "database"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Patches applied."
                     },
                     "default": {
                         "description": "Unexpected error",
@@ -522,7 +575,7 @@
                 }
             }
         },
-        "Database": {
+        "Schema": {
             "type": "object",
             "properties": {
                 "name": {
@@ -553,9 +606,6 @@
                     "items": {
                         "$ref": "#/definitions/Field"
                     }
-                },
-                "row_count": {
-                    "type": "integer"
                 }
             }
         },
@@ -647,6 +697,32 @@
                         }
                     }
                 }
+            }
+        },
+        "Patch": {
+            "type": "object",
+            "properties": {
+                "op": {
+                    "type": "string",
+                    "description": "patch operation."
+                },
+                "path": {
+                    "type": "string",
+                    "description": "path to item being patched"
+                },
+                "value": {
+                    "type": "string",
+                    "description": "patch value (payload)."
+                }
+            },
+            "example": {
+                "name": "Your Name"
+            }
+        },
+        "Patches": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/Patch"
             }
         },
         "Error": {
