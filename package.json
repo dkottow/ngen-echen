@@ -7,9 +7,7 @@
   , "dependencies": {
     "express": "4.x"
     , "basic-auth": "*"
-  } 
-  , "devDependencies": {
-    "gulp": "~3.9.0"
+    , "gulp": "~3.9.0"
     , "gulp-concat": "*"
     , "gulp-inject": "~1.5.0"
     , "gulp-replace": "*"
@@ -17,6 +15,6 @@
   }
   , "main": "server.js"
   , "scripts": {
-    "postinstall": "gulp"
+    "postinstall": "node_modules/gulp/bin/gulp.js"
   }
 }
