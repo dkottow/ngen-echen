@@ -17,8 +17,11 @@ Donkeylift.MenuDataView = Backbone.View.extend({
 
 	render: function() {
 		console.log('MenuDataView.render ');			
-		if (! Donkeylift.app.table) this.$el.empty();
-		else this.$el.html(this.template());
+		if (! Donkeylift.app.table) {
+			this.$el.empty();
+		} else {
+			this.$el.html(this.template());
+		}
 		return this;
 	},
 

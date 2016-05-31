@@ -29,7 +29,8 @@ var ver3rd = {
 	JQUERY : 'jquery-2.1.4',
 	JQUERY_UI : 'jquery-ui-1.11.4.custom',
 	FONT_AWESOME : 'font-awesome-4.3.0',
-	DATATABLES : 'DataTables-1.10.7',
+	DATATABLES : 'DataTables-custom',
+	//DATATABLES : 'DataTables-1.10.7',
 	DATATABLES_EDITOR : 'Editor-1.5.6',
 	VIS : 'vis',
 	SWAGGER_UI : 'swagger-ui-2.1.4',
@@ -45,8 +46,14 @@ gulp.task('default', allTasks, function() {
 
 //TODO
 gulp.task('copy-images', function() {
+	gulp.src([
+		src3rd + ver3rd.DATATABLES + '/DataTables-1.10.12/images/*.png'
+		])
+		.pipe(gulp.dest('./public/css/DataTables-1.10.12/images'));
+		
+
 	return gulp.src([
-				src3rd + ver3rd.DATATABLES + '/media/images/*.png'
+				//src3rd + ver3rd.DATATABLES + '/media/images/*.png'
 				, './src/images/*'
 		])	
 
@@ -95,7 +102,8 @@ gulp.task('build-3rdparty-js', function() {
 
 gulp.task('copy-3rdparty-js', function() {
 	return gulp.src([
-				src3rd + ver3rd.DATATABLES + '/media/js/jquery.dataTables.min.js' 
+				//src3rd + ver3rd.DATATABLES + '/media/js/jquery.dataTables.min.js' 
+				src3rd + ver3rd.DATATABLES + '/datatables.min.js' 
 				, src3rd + ver3rd.VIS + '/vis.min.js' 
 				, './ext/' + ver3rd.DATATABLES_EDITOR + '/js/dataTables.editor.min.js' 
 		])
@@ -106,7 +114,8 @@ gulp.task('copy-3rdparty-js', function() {
 
 gulp.task('copy-3rdparty-css', function() {
 	return gulp.src([
-				src3rd + ver3rd.DATATABLES + '/media/css/jquery.dataTables.min.css'
+				//src3rd + ver3rd.DATATABLES + '/media/css/jquery.dataTables.min.css'
+				src3rd + ver3rd.DATATABLES + '/datatables.min.css'
 				, src3rd + ver3rd.VIS + '/vis.min.css'
 				, './ext/' + ver3rd.DATATABLES_EDITOR + '/css/editor.dataTables.min.css' 
 		])

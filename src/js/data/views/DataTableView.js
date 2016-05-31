@@ -37,6 +37,7 @@ Donkeylift.DataTableView = Backbone.View.extend({
 			var currentWrap = $("table.dataTable").css("white-space");
 			var toggleWrap = currentWrap == 'normal' ? 'nowrap' : 'normal';
 				
+console.log( Donkeylift.app.tableView.dataTable.buttons().container() );
 			$("table.dataTable").css("white-space", toggleWrap);
 			$('#grid_wrap_text span')
 				.toggleClass("glyphicon-text-height glyphicon-text-width");
@@ -114,6 +115,10 @@ Donkeylift.DataTableView = Backbone.View.extend({
 		var dtOptions = this.getOptions(this.attributes.params, fields);
 		console.log(dtOptions);
 
+		this.dataEditor = new $.fn.dataTable.Editor({
+			table: "#grid"
+		});
+
 		this.dataTable = this.$('#grid').DataTable({
 			serverSide: true,
 			columns: dtOptions.columns,				
@@ -122,8 +127,20 @@ Donkeylift.DataTableView = Backbone.View.extend({
 			lengthMenu: dtOptions.lengthMenu, 
 			displayStart: dtOptions.displayStart, 
 			pageLength: dtOptions.pageLength, 
-			order: dtOptions.order
+			order: dtOptions.order,
+			select: true,
+			//dom: "lfrtip",
+			buttons: [
+				{ extend: "create", editor: this.dataEditor },
+				{ extend: "edit", editor: this.dataEditor },
+				{ extend: "remove", editor: this.dataEditor }
+			]
 		});
+
+/* make select row on click work calling select()
+   see comment in datatables source about 'Initialisation'
+*/
+		this.dataTable.select(); 
 
 		if (filter) {
 			this.$('#grid_filter input').val(filter.get('value'));
@@ -175,6 +192,21 @@ Donkeylift.DataTableView = Backbone.View.extend({
 		this.$('#grid').on('page.dt', function() {
 			console.log("page.dt");
 			Donkeylift.app.router.navigate("reload-table", {trigger: false});			
+		});
+
+		this.$('#grid').on('init.dt', function() {
+			console.log("init.dt");
+
+			me.dataTable.buttons().container()
+				.removeClass('dt-buttons')
+				.addClass('btn-group');
+
+			me.dataTable.buttons().container().children()
+				.removeClass('dt-button')
+				.addClass('btn')
+				.addClass('btn-default')
+
+			$('#menu').append(me.dataTable.buttons().container());
 		});
 
 		//using order.dt event won't work because its fired otherwise, too
