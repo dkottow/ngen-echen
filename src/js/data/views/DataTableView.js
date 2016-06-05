@@ -37,7 +37,6 @@ Donkeylift.DataTableView = Backbone.View.extend({
 			var currentWrap = $("table.dataTable").css("white-space");
 			var toggleWrap = currentWrap == 'normal' ? 'nowrap' : 'normal';
 				
-console.log( Donkeylift.app.tableView.dataTable.buttons().container() );
 			$("table.dataTable").css("white-space", toggleWrap);
 			$('#grid_wrap_text span')
 				.toggleClass("glyphicon-text-height glyphicon-text-width");
@@ -88,6 +87,36 @@ console.log( Donkeylift.app.tableView.dataTable.buttons().container() );
 		return dtOptions;
 	},
 
+	getEditorOptions: function(fields) {
+		var dtEditorOptions = {};
+
+		var excludeFields = ['id', 'mod_by', 'mod_on'];
+
+		var editFields = _.filter(fields, function(field) {
+			return ! _.contains(excludeFields, field.get('name'));
+		});
+
+		dtEditorOptions.fields = _.map(editFields, function(field) {
+			var edField = {};
+
+			edField.name = field.vname(); 
+			edField.label = field.vname(); 
+
+			if (field.get('type') == Donkeylift.Field.TYPES.DATE) {
+				edField.type = 'datetime';
+
+			} else if (field.getProp('width') > 60) {
+				edField.type = 'textarea';
+
+			} else {
+				edField.type = 'text';
+			}
+			return edField;
+		});
+
+		return dtEditorOptions;
+	},
+
 	render: function() {
 		console.log('DataTableView.render ');			
 		this.$el.html(this.tableTemplate());
@@ -113,11 +142,16 @@ console.log( Donkeylift.app.tableView.dataTable.buttons().container() );
 		if (filter) initSearch.search = filter.get('value');
 
 		var dtOptions = this.getOptions(this.attributes.params, fields);
-		console.log(dtOptions);
+		var dtEditorOptions = this.getEditorOptions(fields);
+		//console.log(dtEditorOptions);
 
 		this.dataEditor = new $.fn.dataTable.Editor({
-			table: "#grid"
+			table: "#grid",
+			idSrc: "id",
+			fields: dtEditorOptions.fields,
+			ajax: this.model.ajaxGetEditorFn(),
 		});
+
 
 		this.dataTable = this.$('#grid').DataTable({
 			serverSide: true,
@@ -203,8 +237,7 @@ console.log( Donkeylift.app.tableView.dataTable.buttons().container() );
 
 			me.dataTable.buttons().container().children()
 				.removeClass('dt-button')
-				.addClass('btn')
-				.addClass('btn-default')
+				.addClass('btn btn-default navbar-btn')
 
 			$('#menu').append(me.dataTable.buttons().container());
 		});
@@ -225,6 +258,12 @@ console.log( Donkeylift.app.tableView.dataTable.buttons().container() );
 			Donkeylift.app.router.navigate("reload-table", {trigger: false});			
 		});
 
+		this.dataEditor.on('preSubmit', function(ev, req, action) {
+			me.model.sanitizeEditorData(req);
+			if (req.error) {
+				me.dataEditor.error(req.error.field, req.error.message);
+			}
+		});
 	},
 
 	columnDataFn: function(field) {

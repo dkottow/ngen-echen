@@ -54,7 +54,8 @@ gulp.task('copy-images', function() {
 
 	return gulp.src([
 				//src3rd + ver3rd.DATATABLES + '/media/images/*.png'
-				, './src/images/*'
+			'./ext/' + ver3rd.DATATABLES_EDITOR + '/images/*',
+			'./src/images/*'
 		])	
 
 		.pipe(gulp.dest('./public/images/'));

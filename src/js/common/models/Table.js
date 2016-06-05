@@ -114,6 +114,13 @@ Donkeylift.Table = Backbone.Model.extend({
 			row_alias: row_alias,
 			fields: fields
 		};
+	},
+
+	parse: function(row, opts) {
+		return _.object(_.map(row, function(val, fn) {
+			return [fn, this.get('fields').getByName(fn).parse(val, opts)];
+		}, this));
+
 	}
 
 });

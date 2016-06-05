@@ -1,5 +1,9 @@
 /*global Donkeylift, Backbone, _ */
 
+function escapeStr(str) {
+	return str.replace("'", "\\'");
+}
+
 Donkeylift.Field = Backbone.Model.extend({
 	initialize: function(field) {
 
@@ -44,25 +48,44 @@ Donkeylift.Field = Backbone.Model.extend({
 		};
 	},
 
-	parse: function(val) {
-		if (this.get('fk') == 1 && _.isString(val)) {
-			//its a string ref
-			return val;
-		}
+	parse: function(val, opts) {
+		var validate = (opts && opts.validate) || false;
+		var result = null;
+		var resultError = true;
 		var t = this.get('type');
-		if (t == Donkeylift.Field.TYPES.INTEGER) {
-			return parseInt(val);
+
+		if (t == Donkeylift.Field.TYPES.VARCHAR || this.get('fk') == 1) {
+			result = val.toString();
+			resultError = false;
+
+		} else if (t == Donkeylift.Field.TYPES.INTEGER) {
+			result = parseInt(val);
+			resultError = isNaN(result); 
+
 		} else if(t == Donkeylift.Field.TYPES.NUMERIC) {
-			return parseFloat(val);
+			result = parseFloat(val);
+			resultError = isNaN(result); 
+
 		} else if(t == Donkeylift.Field.TYPES.DATE) {
 			//return new Date(val);
-			return new Date(val).toISOString().substr(0,10);
+			result = new Date(val);
+			resultError = isNaN(Date.parse(val)); 
+			if ( ! resultError) result = result.toISOString().substr(0,10);
+
 		} else if (t == Donkeylift.Field.TYPES.DATETIME) {
 			//return new Date(val);
-			return new Date(val).toISOString();
-		} else {
-			return val;
+			result = new Date(val);
+			resultError = isNaN(Date.parse(val)); 
+			if ( ! resultError) result = result.toISOString();
+
 		}
+
+		if (validate && resultError) {
+			var err = new Error("Parse '" + val + "'" + " to " + t + " failed.");
+			err.field = this.get('name');
+			throw err;
+		}
+		return result;
 	},
 
 	//to formatted string
@@ -81,14 +104,16 @@ Donkeylift.Field = Backbone.Model.extend({
 	toQS: function(val) {
 		if (this.get('fk') == 1 && _.isString(val)) {
 			//its a string ref
-			return "'" + val + "'";
+			return "'" + escapeStr(val) + "'";
 		}
+
 		var t = this.get('type');
 		if (t == Donkeylift.Field.TYPES.INTEGER
 			|| t == Donkeylift.Field.TYPES.NUMERIC) {
 			return val;
+
 		} else {
-			return "'" + val + "'";
+			return "'" + escapeStr(val) + "'";
 		}
 	}
 
@@ -129,5 +154,6 @@ Donkeylift.Field.getIdFromRef = function(val) {
 	//console.log(val + " matches " + m);
 	return m[2];
 }
+
 
 

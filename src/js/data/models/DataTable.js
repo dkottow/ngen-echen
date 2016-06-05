@@ -9,36 +9,111 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 		return new Donkeylift.DataTableView(options);
 	},
 
+	fullUrl: function(ext) {
+		ext = ext || ROWS_EXT;
+		return DONKEYLIFT_API + this.get('url') + ext;
+	},
+
 	getAllRowsUrl: function() {
-		return decodeURI(this.lastFilterUrl).replace(/\t/g, '%09');
+		return this.lastFilterUrl;
+		//return decodeURI(this.lastFilterUrl).replace(/\t/g, '%09');
+	},
+
+	sanitizeEditorData: function(req) {
+		var me = this;
+
+		try {
+			var rows = [];
+			switch(req.action) {
+				case 'create':
+					method = 'POST';
+					rows = _.map(req.data, function(strRow) {
+						return me.parse(strRow, {validate: true});
+					});
+				break;
+				case 'edit':
+					method = 'PUT';
+					rows = _.map(req.data, function(strRow, id) {
+						var row = me.parse(strRow, {validate: true});
+						row.id = id;
+						return row;
+					});
+				break;
+				case 'remove':
+					method = 'DELETE';
+					rows = _.map(_.keys(req.data), function(id) {
+						return parseInt(id);
+					});
+				break;
+			}
+
+			var data = JSON.stringify(rows);
+
+		} catch(err) {
+			req.error = err;
+		}
+
+		req.data = data;
+	},
+
+	ajaxGetEditorFn: function() {
+		var me = this;
+		return function(U1, U2, req, success, error) {
+			console.log('api call edit row ');
+			console.log(req);
+
+			if (req.error) {
+				error(null, '', '');
+				return;
+			}
+
+			var q = 'retmod=true';
+			var url = me.fullUrl() + '?' + q;
+
+			$.ajax(url, {
+				method: method,
+				data: req.data,
+				contentType: "application/json",
+				processData: false
+
+			}).done(function(response) {
+				console.log(response);
+				success({data: response.rows});
+
+			}).fail(function(jqXHR, textStatus, errThrown) {
+				error(jqXHR, textStatus, errThrown);
+				console.log("Error requesting " + url);
+				console.log(textStatus + " " + errThrown);
+			});
+		}
 	},
 
 	ajaxGetRowsFn: function() {
 		var me = this;
-		return function(data, callback, settings) {
-			console.log('request to api');
+		return function(query, callback, settings) {
+			console.log('api call get rows');
 			var orderField = me.get('fields')
-							.at(data.order[0].column);
+							.at(query.order[0].column);
 
 			var orderParam = '$orderby='
 							+ encodeURIComponent(orderField.vname()
-							+ ' ' + data.order[0].dir);
+							+ ' ' + query.order[0].dir);
 
-			var skipParam = '$skip=' + data.start;
-			var topParam = '$top=' + data.length;
+			var skipParam = '$skip=' + query.start;
+			var topParam = '$top=' + query.length;
 
-			if (data.search.value.length == 0) {
+			if (query.search.value.length == 0) {
 				//sometimes necessary after back/fwd
 				Donkeylift.app.filters.clearFilter(me);
 			}
 
 			var filters = Donkeylift.app.filters.clone();
 
-			if (data.search.value.length > 0) {
+			if (query.search.value.length > 0) {
 				filters.setFilter({
 					table: me,
 					op: Donkeylift.Filter.OPS.SEARCH,
-					value: data.search.value
+					value: query.search.value
 				});
 			}
 
@@ -46,13 +121,11 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 				+ '&' + skipParam
 				+ '&' + topParam
 				+ '&' + filters.toParam();
-			var url = DONKEYLIFT_API + me.get('url') + ROWS_EXT + '?' + q;
+			var url = me.fullUrl() + '?' + q;
 
 			console.log(url);
 
-			me.lastFilterUrl = DONKEYLIFT_API
-							 + me.get('url') + ROWS_EXT + '?'
-							 + filters.toParam();
+			me.lastFilterUrl = me.fullUrl() + '?' + filters.toParam();
 
 			$.ajax(url, {
 				cache: false
@@ -77,6 +150,9 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 					recordsFiltered: response.count,
 				};
 				callback(data);
+			}).fail(function(jqXHR, textStatus, errThrown) {
+				console.log("Error requesting " + url);
+				console.log(textStatus + " " + errThrown);
 			});
 		}
 	},
@@ -104,8 +180,7 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 		var filters = Donkeylift.app.filters.apply(filter);
 		q = q + '&' + Donkeylift.Filters.toParam(filters);
 
-		var url = DONKEYLIFT_API + this.get('url') + STATS_EXT
-				+ '?' + q;
+		var url = me.fullUrl(STATS_EXT) + '?' + q;
 
 		console.log('stats ' + me.get('name') + '.' + fieldName
 					+ ' ' + url);
@@ -140,8 +215,7 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 		var filters = Donkeylift.app.filters.apply(filter, searchTerm);
 		q = q + '&' + Donkeylift.Filters.toParam(filters);
 
-		var url = DONKEYLIFT_API + this.get('url') + ROWS_EXT
-				+ '?' + q;
+		var url = me.fullUrl() + '?' + q;
 
 		console.log('options ' + me.get('name') + '.' + fieldName
 					+ ' ' + url);

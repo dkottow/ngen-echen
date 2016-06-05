@@ -126,4 +126,4 @@ Donkeylift.Filter.OPS = {
 	'GREATER': 'ge'
 }
 
-Donkeylift.Filter.CONJUNCTION = '\t';
+Donkeylift.Filter.CONJUNCTION = ' and ';
