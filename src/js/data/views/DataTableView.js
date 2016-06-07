@@ -264,6 +264,10 @@ Donkeylift.DataTableView = Backbone.View.extend({
 				me.dataEditor.error(req.error.field, req.error.message);
 			}
 		});
+
+		this.dataEditor.on('submitError', function(ev, xhr, err, thrown, data) {
+			me.dataEditor.error(xhr.responseText);
+		});
 	},
 
 	columnDataFn: function(field) {
@@ -284,6 +288,7 @@ Donkeylift.DataTableView = Backbone.View.extend({
 		var anchorFn = undefined;
 		if (field.get('name') == 'id' 
 			&& me.model.get('referenced').length > 0) {
+			//link to table rows referencing this id.
 			anchorFn = function(id) {
 				var href = '#table'
 					+ '/' + me.model.get('referenced')[0].table
@@ -293,6 +298,7 @@ Donkeylift.DataTableView = Backbone.View.extend({
 			}
 
 		} else if (field.get('fk') == 1) {
+			//link to referenced table row.
 			anchorFn = function(ref) {
 				var href = '#table'
 					+ '/' + field.get('fk_table')

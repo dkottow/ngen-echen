@@ -23,18 +23,19 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 		var me = this;
 
 		try {
+			var parseOpts = { validate: true, resolveRefs: true };
 			var rows = [];
 			switch(req.action) {
 				case 'create':
 					method = 'POST';
 					rows = _.map(req.data, function(strRow) {
-						return me.parse(strRow, {validate: true});
+						return me.parse(strRow, parseOpts);
 					});
 				break;
 				case 'edit':
 					method = 'PUT';
 					rows = _.map(req.data, function(strRow, id) {
-						var row = me.parse(strRow, {validate: true});
+						var row = me.parse(strRow, parseOpts);
 						row.id = id;
 						return row;
 					});

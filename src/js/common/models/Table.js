@@ -117,8 +117,13 @@ Donkeylift.Table = Backbone.Model.extend({
 	},
 
 	parse: function(row, opts) {
+		opts = opts || {};
+		var resolveRefs = opts.resolveRefs || false;
+
 		return _.object(_.map(row, function(val, fn) {
-			return [fn, this.get('fields').getByName(fn).parse(val, opts)];
+			var field = this.get('fields').getByName(fn);			
+			if (resolveRefs) fn = field.get('name');
+			return [fn, field.parse(val, opts)];
 		}, this));
 
 	}

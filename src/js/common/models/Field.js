@@ -14,15 +14,18 @@ Donkeylift.Field = Backbone.Model.extend({
 		this.set('props', field.props || {});
 	},
 
-	vname: function() {
-		if (this.get('fk') == 0) {
-			return this.get('name');
+	vname: function(opts) {
+		opts = opts || {};
+		var resolveRefs = opts.resolveRefs || true;
 
-		} else if (this.get('name').match(/id$/)) { 
-			return this.get('name').replace(/id$/, "ref");
-
+		if (this.get('fk') == 1 && resolveRefs) {
+			if (this.get('name').match(/id$/)) { 
+				return this.get('name').replace(/id$/, "ref");
+			} else {
+				return this.get('name') + "_ref";
+			}
 		} else {
-			return this.get('name') + "_ref";
+			return this.get('name');
 		}
 	},
 
@@ -49,12 +52,22 @@ Donkeylift.Field = Backbone.Model.extend({
 	},
 
 	parse: function(val, opts) {
-		var validate = (opts && opts.validate) || false;
+		opts = opts || {};
+		var validate = opts.validate || false;
+		var resolveRefs = opts.resolveRefs || false;
 		var result = null;
 		var resultError = true;
 		var t = this.get('type');
 
-		if (t == Donkeylift.Field.TYPES.VARCHAR || this.get('fk') == 1) {
+		if (this.get('fk') == 1 && resolveRefs) {
+			result = Donkeylift.Field.getIdFromRef(val);
+			resultError = isNaN(result); 
+
+		} else if (this.get('fk') == 1 && ! resolveRefs) {
+			result = val.toString();
+			resultError = false;
+
+		} else if (t == Donkeylift.Field.TYPES.VARCHAR) {
 			result = val.toString();
 			resultError = false;
 
@@ -81,8 +94,13 @@ Donkeylift.Field = Backbone.Model.extend({
 		}
 
 		if (validate && resultError) {
-			var err = new Error("Parse '" + val + "'" + " to " + t + " failed.");
-			err.field = this.get('name');
+			var err;
+			if (this.get('fk') == 1) {
+				err = new Error("Parse '" + val + "' ref failed.");
+			} else {
+				err = new Error("Parse '" + val + "'" + " to " + t + " failed.");
+			}
+			err.field = this.vname(opts);
 			throw err;
 		}
 		return result;
@@ -101,9 +119,13 @@ Donkeylift.Field = Backbone.Model.extend({
 	},
 
 	//to query string
-	toQS: function(val) {
-		if (this.get('fk') == 1 && _.isString(val)) {
-			//its a string ref
+	toQS: function(val, opts) {
+		opts = opts || {};
+		var resolveRefs = opts.resolveRefs || false;
+
+		if (this.get('fk') == 1 && resolveRefs) {
+			return Donkeylift.Field.getIdFromRef(val);
+		} else if (this.get('fk') == 1 && ! resolveRefs) {
 			return "'" + escapeStr(val) + "'";
 		}
 
@@ -152,7 +174,8 @@ Donkeylift.Field.getIdFromRef = function(val) {
 	//extract fk from ref such as 'Book [12]'
 	var m = val.match(/^(.*)\[([0-9]+)\]$/);
 	//console.log(val + " matches " + m);
-	return m[2];
+	if (m && m.length == 3) return parseInt(m[2]);
+	else return NaN;
 }
 
 

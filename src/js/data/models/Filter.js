@@ -20,45 +20,41 @@ Donkeylift.Filter = Backbone.Model.extend({
 
 	},
 
-	values: function() {
+	values: function(opts) {
 		var me = this;
 
 		var val = _.isArray(this.get('value')) ? 
 					this.get('value') : [ this.get('value') ];
 
 		return val.map(function(v) {
-			if (me.get('field').get('fk') == 1 
-				&& me.get('op') == Donkeylift.Filter.OPS.IN) {
-
-				return Donkeylift.Field.getIdFromRef(v);
-
-			} else {
-				return me.get('field').toQS(v);
-			}
+			return me.get('field').toQS(v, opts);
 		});
 	},
 
 	toParam: function() {
-		var f = this.get('field') ? this.get('field').vname() : null;
 		var param;
 
 		if (this.get('op') == Donkeylift.Filter.OPS.SEARCH) {
-			var key = Donkeylift.Filter.Key(this.get('table'), f);
+			var key = Donkeylift.Filter.Key(this.get('table'), null);
 			param = key + " search '" + this.get('value') + "'";
 
 		} else if (this.get('op') == Donkeylift.Filter.OPS.BETWEEN) {
 			var values = this.values();
-			var key = Donkeylift.Filter.Key(this.get('table'), f);
+			var key = Donkeylift.Filter.Key(this.get('table'), 
+						this.get('field').vname());
 			param = key + " btwn " + values[0] + ',' + values[1];
 
 		} else if (this.get('op') == Donkeylift.Filter.OPS.IN) {				
-			var values = this.values();
-			var key = Donkeylift.Filter.Key(this.get('table'), this.get('field'));
+			//do not use ref string, use foreign key ids instead.
+			var values = this.values({resolveRefs: true});
+			var key = Donkeylift.Filter.Key(this.get('table'), 
+						this.get('field'));
 			param = key + " in " + values.join(",");
 
 		} else {
 			//EQUAL, GREATER, LESSER
-			var key = Donkeylift.Filter.Key(this.get('table'), f);
+			var key = Donkeylift.Filter.Key(this.get('table'),
+						this.get('field').vname());
 			param = key + " " + this.get('op') + " " 
 			    + this.get('field').toQS(this.get('value'));
 		}
