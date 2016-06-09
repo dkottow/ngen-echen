@@ -109,7 +109,8 @@ gulp.task('build-3rdparty-js', function() {
 gulp.task('copy-3rdparty-js', function() {
 	return gulp.src([
 				//src3rd + ver3rd.DATATABLES + '/media/js/jquery.dataTables.min.js' 
-				src3rd + ver3rd.DATATABLES + '/datatables.min.js' 
+				src3rd + ver3rd.DATATABLES + '/datatables.js' 
+				, src3rd + ver3rd.DATATABLES + '/datatables.min.js' 
 				, src3rd + ver3rd.VIS + '/vis.min.js' 
 				, extdir + ver3rd.DATATABLES_EDITOR + '/js/dataTables.editor.min.js' 
 				, extdir + ver3rd.DATATABLES_EDITOR + '/js/editor.autoComplete.js' 
