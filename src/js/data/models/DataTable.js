@@ -216,13 +216,49 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 		var filters = Donkeylift.app.filters.apply(filter, searchTerm);
 		q = q + '&' + Donkeylift.Filters.toParam(filters);
 
-		var url = me.fullUrl() + '?' + q;
+		var url = this.fullUrl() + '?' + q;
 
-		console.log('options ' + me.get('name') + '.' + fieldName
+		console.log('options ' + this.get('name') + '.' + fieldName
 					+ ' ' + url);
 
 		if (this.dataCache[url]) {
-//console.log(this.dataCache[url]);
+			//console.log(this.dataCache[url]);
+			callback(this.dataCache[url]['rows']);
+
+		} else {
+			$.ajax(url, {
+			}).done(function(response) {
+				//console.dir(response.rows);
+				me.dataCache[url] = response;
+				callback(response.rows);
+			});
+		}
+	},
+
+	fieldValues: function(field, searchTerm, callback) {
+ 		var me = this;
+
+		var filter = new Donkeylift.Filter({
+			table: this,
+			field: field,
+			op: Donkeylift.Filter.OPS.SEARCH,
+			value: searchTerm
+		});
+		
+		var params = {
+			'$top': 10,
+			'$select': field.vname(),
+			'$orderby': field.vname(),
+			'$filter': filter.toParam()
+		};
+
+		var q = _.map(params, function(v,k) { return k + "=" + v; })
+				.join('&');
+
+		var url = this.fullUrl() + '?' + q;
+		//console.log(url);
+		if (this.dataCache[url]) {
+			//console.log(this.dataCache[url]);
 			callback(this.dataCache[url]['rows']);
 
 		} else {

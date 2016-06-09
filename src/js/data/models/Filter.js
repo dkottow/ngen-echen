@@ -35,7 +35,8 @@ Donkeylift.Filter = Backbone.Model.extend({
 		var param;
 
 		if (this.get('op') == Donkeylift.Filter.OPS.SEARCH) {
-			var key = Donkeylift.Filter.Key(this.get('table'), null);
+			var f = this.get('field') ? this.get('field').vname() : null;
+			var key = Donkeylift.Filter.Key(this.get('table'), f);
 			param = key + " search '" + this.get('value') + "'";
 
 		} else if (this.get('op') == Donkeylift.Filter.OPS.BETWEEN) {
@@ -59,7 +60,7 @@ Donkeylift.Filter = Backbone.Model.extend({
 			    + this.get('field').toQS(this.get('value'));
 		}
 
-
+		//console.log(param);
 		return param;
 	},
 

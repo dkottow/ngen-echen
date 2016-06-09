@@ -88,6 +88,7 @@ Donkeylift.DataTableView = Backbone.View.extend({
 	},
 
 	getEditorOptions: function(fields) {
+		var me = this;
 		var dtEditorOptions = {};
 
 		var excludeFields = ['id', 'mod_by', 'mod_on'];
@@ -107,6 +108,20 @@ Donkeylift.DataTableView = Backbone.View.extend({
 
 			} else if (field.getProp('width') > 60) {
 				edField.type = 'textarea';
+
+			} else if (field.get('fk') == 1) {
+				var sourceFn = function(req, response) {
+					me.model.fieldValues(field, req.term, function(rows) {
+						var options = _.map(rows, function(row) {
+							return row[field.vname()];
+						});
+						response(options);
+					});
+				}
+				edField.type = 'autoComplete';
+				edField.opts = {
+					source: sourceFn
+				};
 
 			} else {
 				edField.type = 'text';
@@ -149,6 +164,11 @@ Donkeylift.DataTableView = Backbone.View.extend({
 			table: "#grid",
 			idSrc: "id",
 			fields: dtEditorOptions.fields,
+			formOptions: {
+				main: { 
+					focus: -1 
+				}
+			},
 			ajax: this.model.ajaxGetEditorFn(),
 		});
 
