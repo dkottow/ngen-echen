@@ -125,7 +125,7 @@ gulp.task('copy-3rdparty-css', function() {
 				//src3rd + ver3rd.DATATABLES + '/media/css/jquery.dataTables.min.css'
 				src3rd + ver3rd.DATATABLES + '/datatables.min.css'
 				, src3rd + ver3rd.VIS + '/vis.min.css'
-				, './ext/' + ver3rd.DATATABLES_EDITOR + '/css/editor.dataTables.min.css' 
+				, extdir + ver3rd.DATATABLES_EDITOR + '/css/editor.dataTables.min.css' 
 		])
 
 		.pipe(gulp.dest('./public/css/'));
