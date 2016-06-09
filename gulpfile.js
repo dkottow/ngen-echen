@@ -24,6 +24,11 @@ var allTasks = [ 'copy-images'
 
 var src3rd = './src/3rdparty/';
 
+var extdir = './ext/';
+if (process.env.OPENSHIFT_DATA_DIR) {
+	extdir = process.env.OPENSHIFT_DATA_DIR + '/ext/';
+}
+
 var ver3rd = {
 	BOOTSTRAP : 'bootstrap-custom',
 	JQUERY : 'jquery-2.1.4',
@@ -54,7 +59,7 @@ gulp.task('copy-images', function() {
 
 	return gulp.src([
 				//src3rd + ver3rd.DATATABLES + '/media/images/*.png'
-			'./ext/' + ver3rd.DATATABLES_EDITOR + '/images/*',
+			extdir + ver3rd.DATATABLES_EDITOR + '/images/*',
 			'./src/images/*'
 		])	
 
@@ -106,8 +111,8 @@ gulp.task('copy-3rdparty-js', function() {
 				//src3rd + ver3rd.DATATABLES + '/media/js/jquery.dataTables.min.js' 
 				src3rd + ver3rd.DATATABLES + '/datatables.min.js' 
 				, src3rd + ver3rd.VIS + '/vis.min.js' 
-				, './ext/' + ver3rd.DATATABLES_EDITOR + '/js/dataTables.editor.min.js' 
-				, './ext/' + ver3rd.DATATABLES_EDITOR + '/js/editor.autoComplete.js' 
+				, extdir + ver3rd.DATATABLES_EDITOR + '/js/dataTables.editor.min.js' 
+				, extdir + ver3rd.DATATABLES_EDITOR + '/js/editor.autoComplete.js' 
 		])
 
 		.pipe(gulp.dest('./public/js/'));
