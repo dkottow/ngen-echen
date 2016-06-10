@@ -84,9 +84,9 @@ AppBase.prototype.unsetTable = function() {
 /**** schema stuff ****/
 
 AppBase.prototype.unsetSchema = function() {
-	this.unsetTable();
 	this.schema = null;
 	if (this.tableListView) this.tableListView.remove();
+	this.unsetTable();
 	$('#content').empty();
 	this.schemaCurrentView.render();
 }
@@ -96,27 +96,37 @@ AppBase.prototype.createSchema = function(name) {
 }
 
 AppBase.prototype.setSchema = function(name, cbAfter) {
-	var me = this;
 	console.log('AppBase.setSchema ' + name);
-	var loadRequired = ! this.schema || this.schema.get('name') != name;
+	var me = this;
+
+	var loadRequired = (! this.schema) || (this.schema.get('name') != name);
+
+	var updateViewsFn = function() {
+		//always false if (me.tableListView) me.tableListView.remove();
+		me.tableListView = new Donkeylift.TableListView({
+			collection: me.schema.get('tables')
+		});
+		$('#sidebar').append(me.tableListView.render().el);
+		$('#toggle-sidebar').show();
+
+		me.menuView.render();
+		//render current schema label
+		me.schemaCurrentView.render();
+	}
 
 	if (loadRequired) {
-		console.log('app.setSchema loadRequired');
 		this.unsetSchema();
 		this.schema = this.createSchema(name);
 		this.schema.fetch(function() {
-			me.tableListView = new Donkeylift.TableListView({
-				collection: me.schema.get('tables')
-			});
-			$('#sidebar').append(me.tableListView.render().el);
-			$('#toggle-sidebar').show();
-
-			me.menuView.render();
-			//render current schema label
-			me.schemaCurrentView.render();
+			updateViewsFn();
 			if (cbAfter) cbAfter();
 		});
 	} else {
+		console.log(' ! loadRequired ' + this.schema.get('name'));
+		var currentSchema = this.schema;
+		this.unsetSchema();
+		this.schema = currentSchema;
+		updateViewsFn();
 		if (cbAfter) cbAfter();
 	}
 }

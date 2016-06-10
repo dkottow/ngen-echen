@@ -6,7 +6,7 @@ Donkeylift.MenuSchemaView = Backbone.View.extend({
 	events: {
 		'click #add-table': 'evAddTableClick'
 		, 'click #new-schema': 'evNewSchemaClick'
-		, 'click #save-schema': 'evSaveSchemaClick'
+		, 'click #save-schema': 'evUpdateSchemaClick'
 		, 'click #vis-tablegraph': 'evVisTableGraphClick'
 	},
 
@@ -21,8 +21,8 @@ Donkeylift.MenuSchemaView = Backbone.View.extend({
 		console.log('MenuSchemaView.render ' + Donkeylift.app.schema);			
 		this.$el.show();
 		this.$el.html(this.template());
-		this.$('#add-table').prop('disabled', Donkeylift.app.schema == null);
-		this.$('#save-schema').prop('disabled', Donkeylift.app.schema == null);
+		//this.$('#add-table').prop('disabled', Donkeylift.app.schema == null);
+		//this.$('#save-schema').prop('disabled', Donkeylift.app.schema == null);
 
 		return this;
 	},
@@ -35,7 +35,7 @@ Donkeylift.MenuSchemaView = Backbone.View.extend({
 	},
 
 
-	evSaveSchemaClick: function() {
+	evUpdateSchemaClick: function() {
 		Donkeylift.app.schemaEditView.model = Donkeylift.app.schema;
 		Donkeylift.app.schemaEditView.render();
 	},

@@ -5,7 +5,9 @@ Donkeylift.Schema = Backbone.Model.extend({
 	initialize: function(attrs) {
 		console.log("Schema.initialize " + attrs.name);
 
-		if ( ! attrs.table) this.set('tables', new Donkeylift.Tables());
+		if ( ! attrs.tables) {
+			this.set('tables', new Donkeylift.Tables());
+		}
 
 		//this.set('id', attrs.name); //unset me when new
 		//this.orgJSON = this.toJSON();
@@ -75,11 +77,10 @@ return;
 
 	save : function(cbResult) {
 		console.log("Schema.save...");
+
 		var saveOptions = {
 			url: this.url()
-			, parse: false
 			, success: function(model) {
-				Donkeylift.app.schema = model;
 
 				//reload schema list
 				Donkeylift.app.schemas.fetch({

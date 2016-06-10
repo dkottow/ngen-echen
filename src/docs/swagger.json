@@ -333,7 +333,10 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "A row result set"
+                        "description": "A row result set",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseRows"
+                        }
                     },
                     "default": {
                         "description": "Unexpected error",
@@ -622,8 +625,10 @@
         },
         "Row": {
             "type": "object",
-            "example": {
-                "name": "Your Name"
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
             }
         },
         "Rows": {
@@ -643,6 +648,23 @@
                     "email": "other@foo.bar"
                 }
             ]
+        },
+        "ResponseRows": {
+            "type": "object",
+            "properties": {
+                "rows": {
+                    "$ref": "#/definitions/Rows"
+                },
+                "count": {
+                    "type": "integer"
+                },
+                "totalCount": {
+                    "type": "integer"
+                },
+                "nextUrl": {
+                    "type": "string"
+                }
+            }
         },
         "NewRows": {
             "type": "array",
