@@ -6,7 +6,9 @@ var util = require('util');
 
 var app = express();
 
-var auth = require('./auth.js').auth;
+//require('dotenv').config();
+
+var Controller = require('./app/Controller.js').Controller;
 
 var config = {
 	'ip'	:  '127.0.0.1',
@@ -25,13 +27,9 @@ if (process.env.DONKEYLIFT_WWW) {
 	config.port = process.env.PORT;
 }
 
-app.use('/public', express.static('./public')); 
-app.use('/account', auth, express.static('./private'));
 
-app.use(function(err, req, res, next) {
-	console.log(err);
-	res.send(500, err.stack);
-});
+var controller = new Controller();
+app.use('/', controller.router);
 
 app.listen(config.port, config.ip, function() {
 	console.log("Started server on " + config.ip + ":" + config.port);

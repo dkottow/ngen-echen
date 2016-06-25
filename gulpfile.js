@@ -4,6 +4,8 @@ var inject = require('gulp-inject');
 var replace = require('gulp-replace');
 var gulpif = require('gulp-if');
 
+require('dotenv').config();
+
 //var gulp_data = require('./gulp-data.js');
 //var gulp_schema = require('./gulp-schema.js');
 
@@ -145,15 +147,6 @@ gulp.task('build-dl-data-js', function() {
 		process.exit(1);
 	}
 
-//	return gulp.src(["./src/js/init.js",
-//					 "./src/js/models/**/*.js",
-//					 "./src/js/collections/**/*.js",
-//					 "./src/js/views/**/*.js",
-//					 "./src/js/QueryParser.js",
-//					 "./src/js/Router.js",
-//					 "./src/js/app.js"
-//			])
-
 	return gulp.src(["./src/js/common/AppBase.js",
 					 "./src/js/common/models/*.js",
 					 "./src/js/data/models/*.js",
@@ -166,6 +159,8 @@ gulp.task('build-dl-data-js', function() {
 					 "./src/js/data/AppData.js"
 			])
 		.pipe(replace("$DONKEYLIFT_API", process.env.DONKEYLIFT_API))
+		.pipe(replace("$AUTH0_CLIENT_ID", process.env.AUTH0_CLIENT_ID))
+		.pipe(replace("$AUTH0_DOMAIN", process.env.AUTH0_DOMAIN))
 		.pipe(concat('dl_data.js'))
 		.pipe(gulp.dest('./public/js/'));
 			

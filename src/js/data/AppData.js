@@ -1,15 +1,16 @@
 /*global Backbone, Donkeylift, $ */
 
-AppData.prototype = new Donkeylift.AppBase();
-AppData.prototype.constructor=AppData; 
-
 function AppData(opts) {
-
+    console.log('AppData ctor');
+	AppBase.call(this, opts);
 	this.filters = new Donkeylift.Filters();
 	this.filterShowView = new Donkeylift.FilterShowView();
 	this.menuView = new Donkeylift.MenuDataView();
 	this.router = new Donkeylift.RouterData();
 }
+
+AppData.prototype = Object.create(AppBase.prototype);
+AppData.prototype.constructor = AppData; 
 
 AppData.prototype.start = function() {
 	Donkeylift.AppBase.prototype.start.call(this);

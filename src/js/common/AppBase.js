@@ -1,19 +1,70 @@
 /*global Backbone, $ */
-var DONKEYLIFT_API = "$DONKEYLIFT_API";  //set by gulp according to env var DONKEYLIFT_API. e.g. "http://api.donkeylift.com";
+
+//set by gulp according to env vars
+// e.g. DONKEYLIFT_API. "http://api.donkeylift.com";
+
+var DONKEYLIFT_API = "$DONKEYLIFT_API";  
+
+var AUTH0_CLIENT_ID = "$AUTH0_CLIENT_ID";
+var AUTH0_DOMAIN = "$AUTH0_DOMAIN";
+
 var Donkeylift = {};
 
 function AppBase(opts) {
-    
-		opts = opts || {};
-
-		this.user = opts.user || 'demo';
-        this.schemas = new Donkeylift.Schemas(null, {url: DONKEYLIFT_API + '/' + this.user});
-		this.schemaCurrentView = new Donkeylift.SchemaCurrentView();
-
+    console.log('AppBase ctor');
+	opts = opts || {};
+	this.auth = opts.auth || false;
+	this.account = opts.account || null;
 }
 
 AppBase.prototype.start = function() {
 	var me = this;
+
+	if ( ! this.auth) {
+		this.loadAccount(this.account);
+		return;
+	}
+
+	var lock = new Auth0Lock(AUTH0_CLIENT_ID, AUTH0_DOMAIN);
+	$('#nav-login').click(function(e) {
+		e.preventDefault();
+
+		var opts = {
+			signupLink: 'https://yoursite.com/signup'
+			, authParams: { scope: 'openid email app_metadata' } 
+		};
+		lock.show(opts, function(err, profile, id_token) {
+			if (err) {
+				console.log("There was an error :/", err);
+				return;
+		  	}
+
+			console.log("user ", profile);
+			me.profile = profile;
+			me.id_token = id_token;
+
+			$.ajaxSetup({
+				'beforeSend': function(xhr) {
+      				xhr.setRequestHeader('Authorization', 'Bearer ' + id_token);
+				}
+			});
+
+			me.loadAccount('demo');
+		});
+	});
+}
+
+AppBase.prototype.loadAccount = function(accountName) {
+	var me = this;
+
+	//this.userView = new Donkeylift.NavUserView();
+	this.schemaCurrentView = new Donkeylift.SchemaCurrentView();
+
+	var opts = {
+		url: DONKEYLIFT_API + '/' + accountName 
+	};
+    this.schemas = new Donkeylift.Schemas(null, opts);
+
 	this.schemas.fetch({success: function() {
 		me.schemaListView = new Donkeylift.SchemaListView({collection: me.schemas});
 		$('#schema-list').append(me.schemaListView.render().el);
