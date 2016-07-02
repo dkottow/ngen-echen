@@ -8,20 +8,30 @@ var DONKEYLIFT_API = "$DONKEYLIFT_API";
 var AUTH0_CLIENT_ID = "$AUTH0_CLIENT_ID";
 var AUTH0_DOMAIN = "$AUTH0_DOMAIN";
 
+var DEFAULT_ACCOUNT = 'demo';
+
 var Donkeylift = {};
 
 function AppBase(opts) {
     console.log('AppBase ctor');
 	opts = opts || {};
 	this.auth = opts.auth || false;
-	this.account = opts.account || null;
+
+	$(document).ajaxStart(function() {
+		$('#ajax-progress-spinner').show();
+	});
+	$(document).ajaxStop(function() {
+		$('#ajax-progress-spinner').hide();
+	});
+	
+	Backbone.history.start();
 }
 
 AppBase.prototype.start = function() {
 	var me = this;
 
 	if ( ! this.auth) {
-		this.loadAccount(this.account);
+		this.loadAccount({name: DEFAULT_ACCOUNT});
 		return;
 	}
 
@@ -39,40 +49,33 @@ AppBase.prototype.start = function() {
 				return;
 		  	}
 
-			console.log("user ", profile);
-			me.profile = profile;
-			me.id_token = id_token;
-
 			$.ajaxSetup({
 				'beforeSend': function(xhr) {
       				xhr.setRequestHeader('Authorization', 'Bearer ' + id_token);
 				}
 			});
 
-			me.loadAccount('demo');
+			console.log("user ", profile);
+
+			var account = profile.account;
+			if (account == '*') account = DEFAULT_ACCOUNT;
+
+			me.loadAccount({name: account, profile: profile});
 		});
 	});
 }
 
-AppBase.prototype.loadAccount = function(accountName) {
+AppBase.prototype.loadAccount = function(attrs) {
 	var me = this;
 
-	//this.userView = new Donkeylift.NavUserView();
-	this.schemaCurrentView = new Donkeylift.SchemaCurrentView();
+	this.account = new Donkeylift.Account(attrs);
 
-	var opts = {
-		url: DONKEYLIFT_API + '/' + accountName 
-	};
-    this.schemas = new Donkeylift.Schemas(null, opts);
+	this.navbarView = new Donkeylift.NavbarView({ model: this.account });
 
-	this.schemas.fetch({success: function() {
-		me.schemaListView = new Donkeylift.SchemaListView({collection: me.schemas});
-		$('#schema-list').append(me.schemaListView.render().el);
+	this.account.fetch({ success: function() {
+		me.navbarView.render();
+		me.menuView.render();
 	}});
-
-	this.menuView.render();
-
-	Backbone.history.start();
 
 	$('#toggle-sidebar').hide();
 
@@ -80,13 +83,6 @@ AppBase.prototype.loadAccount = function(accountName) {
 		me.toggleSidebar();
 	}); 
 
-	$(document).ajaxStart(function() {
-		$('#ajax-progress-spinner').show();
-	});
-	$(document).ajaxStop(function() {
-		$('#ajax-progress-spinner').hide();
-	});
-	
 }
 
 AppBase.prototype.toggleSidebar = function() {
@@ -115,6 +111,7 @@ AppBase.prototype.setTable = function(table, params) {
 	$a.addClass('active');
 
 	this.table = table;
+
 	if (this.tableView) this.tableView.remove();
 
 	this.tableView = this.createTableView(table, params);
@@ -139,7 +136,7 @@ AppBase.prototype.unsetSchema = function() {
 	if (this.tableListView) this.tableListView.remove();
 	this.unsetTable();
 	$('#content').empty();
-	this.schemaCurrentView.render();
+	this.navbarView.render();
 }
 
 AppBase.prototype.createSchema = function(name) {
@@ -160,9 +157,8 @@ AppBase.prototype.setSchema = function(name, cbAfter) {
 		$('#sidebar').append(me.tableListView.render().el);
 		$('#toggle-sidebar').show();
 
+		me.navbarView.render();
 		me.menuView.render();
-		//render current schema label
-		me.schemaCurrentView.render();
 	}
 
 	if (loadRequired) {
@@ -172,6 +168,7 @@ AppBase.prototype.setSchema = function(name, cbAfter) {
 			updateViewsFn();
 			if (cbAfter) cbAfter();
 		});
+
 	} else {
 		console.log(' ! loadRequired ' + this.schema.get('name'));
 		var currentSchema = this.schema;

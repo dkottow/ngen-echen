@@ -45,7 +45,7 @@ Donkeylift.Schema = Backbone.Model.extend({
 	},
 
 	url : function() {
-		return Donkeylift.app.schemas.url() + '/' + this.get('name');
+		return Donkeylift.app.account.url() + '/' + this.get('name');
 	},
 
 	fetch : function(cbAfter) {
@@ -83,7 +83,7 @@ return;
 			, success: function(model) {
 
 				//reload schema list
-				Donkeylift.app.schemas.fetch({
+				Donkeylift.app.account.fetch({
 					reset: true,
 					success: function() {
 						cbResult();
@@ -112,7 +112,9 @@ return;
 		var destroyOptions = {
 			success: function() {			
 				Donkeylift.app.unsetSchema();
-				Donkeylift.app.schemas.fetch({
+
+				//reload schema list
+				Donkeylift.app.account.fetch({
 					reset: true,
 					success: function() {
 						cbResult();
