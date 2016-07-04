@@ -8,8 +8,6 @@ var app = express();
 
 //require('dotenv').config();
 
-var Controller = require('./app/Controller.js').Controller;
-
 var config = {
 	'ip'	:  '127.0.0.1',
 	'port'	: 3001 
@@ -27,9 +25,7 @@ if (process.env.DONKEYLIFT_WWW) {
 	config.port = process.env.PORT;
 }
 
-
-var controller = new Controller();
-app.use('/', controller.router);
+app.use('/public', express.static('./public')); 
 
 app.listen(config.port, config.ip, function() {
 	console.log("Started server on " + config.ip + ":" + config.port);

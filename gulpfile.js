@@ -20,6 +20,7 @@ var allTasks = [ 'copy-images'
 				, 'build-donkeylift-css'
 				, 'build-data-html'
 				, 'build-schema-html'
+				, 'build-signup'
 				, 'build-swaggerui'
 				, 'build-apispec'
 ];
@@ -279,6 +280,13 @@ gulp.task('build-apispec', ['build-swaggerui'], function() {
 
 });
 
+gulp.task('build-signup', function() {
+
+	return gulp.src(['./src/signup.html'])
+		.pipe(gulp.dest('./public/'));
+	
+});
+
 // Watch Files For Changes
 gulp.task('watch', function() {
     gulp.watch('./src/js/**/*.js', ['build-dl-data-js', 
@@ -289,5 +297,6 @@ gulp.task('watch', function() {
     gulp.watch('./src/schema.html', ['build-schema-html']);
     gulp.watch('./src/css/*.css', ['build-donkeylift-css']);
     gulp.watch('./src/docs/*', ['build-apispec']);
+    gulp.watch('./src/signup.html', ['build-signup']);
 });
 

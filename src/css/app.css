@@ -55,6 +55,11 @@ body {
 	border: 0;
 }
 
+#nav-login {
+	color: darkred;
+	font-weight: bold;
+}
+
 #modalSchemaResultMessage {
 	margin-right: 1em;
 }

@@ -7,8 +7,10 @@
   , "dependencies": {
     "express": "4.x"
     , "body-parser": "*"
-    , "express-jwt": "*"
+    , "jsonwebtoken": "*"
     , "dotenv": "*"
+    , "validator": "*"
+    , "request": "*"
     , "gulp": "~3.9.0"
     , "gulp-concat": "*"
     , "gulp-inject": "~1.5.0"

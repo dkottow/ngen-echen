@@ -10,28 +10,38 @@ Donkeylift.NavbarView = Backbone.View.extend({
 	initialize: function() {
 	},
 
-	schemaSelectTemplate: _.template($('#schema-select-template').html()),
+	navSchemaTemplate: _.template($('#nav-schema-template').html()),
+	navProfileTemplate: _.template($('#nav-profile-template').html()),
 
 	render: function() {
 
-		this.renderDBDropDown();
-		this.renderCurrentDBName();
+		this.renderSchemaDropDown();
+		this.renderCurrentSchemaName();
+		this.renderProfileDropDown();
 
 		return this;
 	},
 
-	renderDBDropDown: function() {
-		console.log('NavbarView.render() schema list items');			
+	renderSchemaDropDown: function() {
 		var $ul = this.$('#schema-list ul');
 		$ul.empty();	
 		this.model.get('databases').each(function(schema) {
-			var html = this.schemaSelectTemplate({name: schema.get('name')});
+			var html = this.navSchemaTemplate({name: schema.get('name')});
 			$ul.append(html);
 		}, this);
 	},
 
-	renderCurrentDBName: function() {
-		console.log('NavbarView.render() current schema label');			
+	renderProfileDropDown: function() {
+		var $el = this.$('#menu-profile');
+		$el.empty();	
+		var html = this.navProfileTemplate({
+			logout: "https://" + AUTH0_DOMAIN + "/v2/logout",
+			account: this.model.get('name')
+		});
+		$el.append(html);
+	},
+
+	renderCurrentSchemaName: function() {
 		var $span = this.$('#schema-list a:first span');
 		if (Donkeylift.app.schema) {
 			$span.html(' DB ' + Donkeylift.app.schema.get('name'));

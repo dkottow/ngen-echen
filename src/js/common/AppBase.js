@@ -40,7 +40,7 @@ AppBase.prototype.start = function() {
 		e.preventDefault();
 
 		var opts = {
-			signupLink: 'https://yoursite.com/signup'
+			signupLink: '/public/signup.html'
 			, authParams: { scope: 'openid email app_metadata' } 
 		};
 		lock.show(opts, function(err, profile, id_token) {
