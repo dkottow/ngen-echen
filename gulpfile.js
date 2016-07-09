@@ -283,7 +283,8 @@ gulp.task('build-apispec', ['build-swaggerui'], function() {
 gulp.task('build-signup', function() {
 
 	return gulp.src(['./src/signup.html'])
-		.pipe(gulp.dest('./public/'));
+	.pipe(replace("$DONKEYLIFT_API", process.env.DONKEYLIFT_API))
+	.pipe(gulp.dest('./public/'));
 	
 });
 
