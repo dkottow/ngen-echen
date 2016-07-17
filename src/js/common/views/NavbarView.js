@@ -4,10 +4,12 @@ Donkeylift.NavbarView = Backbone.View.extend({
 	el:  'nav',
 
 	events: {
-		'click .schema-option': 'evSchemaClick'
+		'click .schema-option': 'evSchemaClick',
+		'click #nav-login': 'evLoginClick'
 	},
 
 	initialize: function() {
+		this.lock = new Auth0Lock(AUTH0_CLIENT_ID, AUTH0_DOMAIN);
 	},
 
 	navSchemaTemplate: _.template($('#nav-schema-template').html()),
@@ -32,13 +34,17 @@ Donkeylift.NavbarView = Backbone.View.extend({
 	},
 
 	renderProfileDropDown: function() {
+		var me = this;
 		var $el = this.$('#menu-profile');
 		$el.empty();	
 		var html = this.navProfileTemplate({
-			logout: "https://" + AUTH0_DOMAIN + "/v2/logout",
 			account: this.model.get('name')
 		});
 		$el.append(html);
+		
+		this.$('#nav-logout').click(function(ev) { 
+			me.evLogoutClick(ev); 
+		});
 	},
 
 	renderCurrentSchemaName: function() {
@@ -54,8 +60,29 @@ Donkeylift.NavbarView = Backbone.View.extend({
 		var name = $(ev.target).attr('data-target');
 		console.log('NavbarView.evSchemaClick ' + name);
 		Donkeylift.app.setSchema(name);
-	}
+	},
 
+	evLogoutClick: function(ev) {
+		sessionStorage.clear();
+		window.location = "https://" + AUTH0_DOMAIN + "/v2/logout";
+	},
+
+	evLoginClick: function(ev) {
+
+		var opts = {
+			signupLink: '/public/signup.html'
+			, authParams: { scope: 'openid email app_metadata' } 
+		};
+
+		this.lock.show(opts, function(err, profile, id_token) {
+			if (err) {
+				console.log("There was an error :/", err);
+				return;
+		  	}
+
+			Donkeylift.app.loadAccount(id_token);
+		});
+	}
 
 });
 

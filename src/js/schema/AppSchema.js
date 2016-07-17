@@ -1,10 +1,9 @@
 /*global Backbone, Donkeylift, $ */
 
-AppSchema.prototype = new Donkeylift.AppBase();
-AppSchema.prototype.constructor=AppSchema; 
-
 function AppSchema(opts) {
 	
+	AppBase.call(this, opts);
+
 	this.schemaEditView = new Donkeylift.SchemaEditView();
 	this.tableEditView = new Donkeylift.TableEditView();
 	this.fieldEditView = new Donkeylift.FieldEditView();
@@ -15,6 +14,10 @@ function AppSchema(opts) {
 	this.router = new Donkeylift.RouterSchema();
 	
 }
+
+AppSchema.prototype = Object.create(AppBase.prototype);
+AppSchema.prototype.constructor=AppSchema; 
+
 
 AppSchema.prototype.start = function() {
 	Donkeylift.AppBase.prototype.start.call(this);

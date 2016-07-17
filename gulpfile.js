@@ -99,9 +99,10 @@ gulp.task('build-3rdparty-js', function() {
 	return gulp.src([
 				src3rd + ver3rd.JQUERY + '/jquery.min.js' 
 				, src3rd + ver3rd.JQUERY_UI + '/jquery-ui.min.js' 
-				, './src/3rdparty/underscore/underscore.js' 
-				, './src/3rdparty/backbone/backbone.js' 
+				, src3rd + '/underscore/underscore.js' 
+				, src3rd + '/backbone/backbone.js' 
 				, src3rd + ver3rd.BOOTSTRAP + '/js/bootstrap.min.js' 
+				, src3rd + '/jwt-decode/jwt-decode.min.js' 
 		])
 
 		.pipe(concat('3rdparty.js'))
@@ -185,6 +186,8 @@ gulp.task('build-dl-schema-js', function() {
 					 , "./src/js/schema/AppSchema.js"
 			])
 		.pipe(replace("$DONKEYLIFT_API", process.env.DONKEYLIFT_API))
+		.pipe(replace("$AUTH0_CLIENT_ID", process.env.AUTH0_CLIENT_ID))
+		.pipe(replace("$AUTH0_DOMAIN", process.env.AUTH0_DOMAIN))
 		.pipe(concat('dl_schema.js'))
 		.pipe(gulp.dest('./public/js/'));
 			

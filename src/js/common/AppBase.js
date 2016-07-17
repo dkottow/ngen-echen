@@ -8,81 +8,54 @@ var DONKEYLIFT_API = "$DONKEYLIFT_API";
 var AUTH0_CLIENT_ID = "$AUTH0_CLIENT_ID";
 var AUTH0_DOMAIN = "$AUTH0_DOMAIN";
 
-var DEFAULT_ACCOUNT = 'demo';
 
 var Donkeylift = {};
 
 function AppBase(opts) {
-    console.log('AppBase ctor');
-	opts = opts || {};
-	this.auth = opts.auth || false;
-
-	$(document).ajaxStart(function() {
-		$('#ajax-progress-spinner').show();
-	});
-	$(document).ajaxStop(function() {
-		$('#ajax-progress-spinner').hide();
-	});
-	
-	Backbone.history.start();
-}
-
-AppBase.prototype.start = function() {
 	var me = this;
 
-	if ( ! this.auth) {
-		this.loadAccount({name: DEFAULT_ACCOUNT});
-		return;
-	}
+    console.log('AppBase ctor');
 
-	var lock = new Auth0Lock(AUTH0_CLIENT_ID, AUTH0_DOMAIN);
-	$('#nav-login').click(function(e) {
-		e.preventDefault();
-
-		var opts = {
-			signupLink: '/public/signup.html'
-			, authParams: { scope: 'openid email app_metadata' } 
-		};
-		lock.show(opts, function(err, profile, id_token) {
-			if (err) {
-				console.log("There was an error :/", err);
-				return;
-		  	}
-
-			$.ajaxSetup({
-				'beforeSend': function(xhr) {
-      				xhr.setRequestHeader('Authorization', 'Bearer ' + id_token);
-				}
-			});
-
-			console.log("user ", profile);
-
-			var account = profile.account;
-			if (account == '*') account = DEFAULT_ACCOUNT;
-
-			me.loadAccount({name: account, profile: profile});
+	$.ajaxPrefilter(function( options, _, jqXHR ) {
+		$('#ajax-progress-spinner').show();
+	    jqXHR.always(function() {
+			$('#ajax-progress-spinner').hide();
 		});
 	});
-}
-
-AppBase.prototype.loadAccount = function(attrs) {
-	var me = this;
-
-	this.account = new Donkeylift.Account(attrs);
-
-	this.navbarView = new Donkeylift.NavbarView({ model: this.account });
-
-	this.account.fetch({ success: function() {
-		me.navbarView.render();
-		me.menuView.render();
-	}});
-
-	$('#toggle-sidebar').hide();
 
 	$('#toggle-sidebar').click(function() {
 		me.toggleSidebar();
 	}); 
 
+	Backbone.history.start();
+}
+
+AppBase.prototype.start = function() {
+	var me = this;
+	this.navbarView = new Donkeylift.NavbarView();
+
+	this.loadAccount(sessionStorage.getItem('id_token'));
+}
+
+AppBase.prototype.loadAccount = function(id_token) {
+	var me = this;
+	console.log('loadAccount: ' + id_token);
+	if ( ! id_token) return;
+
+	this.account = new Donkeylift.Account({ id_token: id_token });
+	this.navbarView.model = this.account;
+
+	this.account.fetch({ success: function() {
+		me.navbarView.render();
+		me.menuView.render();
+		me.onAccountLoaded();
+	}});
+
+	$('#toggle-sidebar').hide();
+}
+
+AppBase.prototype.onAccountLoaded = function() {
+	//overwrite me
 }
 
 AppBase.prototype.toggleSidebar = function() {
