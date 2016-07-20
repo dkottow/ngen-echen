@@ -4,7 +4,13 @@ var inject = require('gulp-inject');
 var replace = require('gulp-replace');
 var gulpif = require('gulp-if');
 
-require('dotenv').config();
+var envPath = './.env';
+if (process.env.OPENSHIFT_DATA_DIR) {
+	envPath = process.env.OPENSHIFT_DATA_DIR + '/.env';
+}
+
+require('dotenv').config({path: envPath});
+
 
 //var gulp_data = require('./gulp-data.js');
 //var gulp_schema = require('./gulp-schema.js');
