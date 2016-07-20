@@ -126,8 +126,44 @@ Donkeylift.Table = Backbone.Model.extend({
 			return [fn, field.parse(val, opts)];
 		}, this));
 
-	}
+	},
 
+	dataCache: {},
+
+	fieldValues: function(fieldName, searchTerm, callback) {
+ 		var me = this;
+
+		var filterTerm = [
+			fieldName, 
+			Donkeylift.Filter.OPS.SEARCH, 
+			"'" + searchTerm + "'"
+		].join(' ');
+
+		var params = {
+			'$top': 10,
+			'$select': fieldName,
+			'$orderby': fieldName,
+			'$filter': filterTerm
+		};
+
+		var q = _.map(params, function(v,k) { return k + "=" + v; })
+				.join('&');
+
+		var url = this.fullUrl() + '?' + q;
+		console.log(url);
+		if (this.dataCache[url]) {
+			//console.log(this.dataCache[url]);
+			callback(this.dataCache[url]['rows']);
+
+		} else {
+			$.ajax(url, {
+			}).done(function(response) {
+				//console.dir(response.rows);
+				me.dataCache[url] = response;
+				callback(response.rows);
+			});
+		}
+	},
 });
 
 Donkeylift.Table.create = function(name) {

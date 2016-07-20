@@ -93,8 +93,9 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 		var me = this;
 		return function(query, callback, settings) {
 			console.log('api call get rows');
-			var orderField = me.get('fields')
-							.at(query.order[0].column);
+
+			var orderCol = query.columns[query.order[0].column].data;
+			var orderField = me.get('fields').getByName(orderCol);
 
 			var orderParam = '$orderby='
 							+ encodeURIComponent(orderField.vname()
@@ -235,6 +236,7 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 		}
 	},
 
+/*
 	fieldValues: function(field, searchTerm, callback) {
  		var me = this;
 
@@ -256,7 +258,7 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 				.join('&');
 
 		var url = this.fullUrl() + '?' + q;
-		//console.log(url);
+		console.log(url);
 		if (this.dataCache[url]) {
 			//console.log(this.dataCache[url]);
 			callback(this.dataCache[url]['rows']);
@@ -270,5 +272,6 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 			});
 		}
 	},
+*/
 
 });

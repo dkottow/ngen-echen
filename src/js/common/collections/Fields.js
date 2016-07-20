@@ -16,8 +16,8 @@ Donkeylift.Fields = Backbone.Collection.extend({
 	},
 
 	getByName: function(name) {
-		return this.find(function(f) { 
-			return f.vname() == name || f.get('name') == name; 
+		return this.find(function(field) { 
+			return field.vname() == name || field.get('name') == name; 
 		});
 	},
 	

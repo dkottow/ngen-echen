@@ -110,12 +110,16 @@ Donkeylift.DataTableView = Backbone.View.extend({
 				edField.type = 'textarea';
 
 			} else if (field.get('fk') == 1) {
-				var sourceFn = function(req, response) {
-					me.model.fieldValues(field, req.term, function(rows) {
+				var sourceFn = function(req, rsp) {
+
+					var fkTable = Donkeylift.app.schema
+						.get('tables').getByName(field.get('fk_table'));
+					
+					fkTable.fieldValues('ref', req.term, function(rows) {
 						var options = _.map(rows, function(row) {
-							return row[field.vname()];
+							return row.ref;
 						});
-						response(options);
+						rsp(options);
 					});
 				}
 				edField.type = 'autoComplete';
@@ -137,7 +141,6 @@ Donkeylift.DataTableView = Backbone.View.extend({
 		this.$el.html(this.tableTemplate());
 
 		var fields = this.model.get('fields').sortByOrder();
-
 		_.each(fields, function(field, idx) {
 			var align = idx < fields.length / 2 ? 
 				'dropdown-menu-left' : 'dropdown-menu-right';
