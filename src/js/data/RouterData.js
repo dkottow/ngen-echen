@@ -7,43 +7,19 @@ var pegParser = module.exports;
 	Donkeylift.RouterData = Backbone.Router.extend({
 
         routes: {
-/*
-            "data": "routeData",
-            "schema": "routeSchema",
-            "downloads": "routeDownloads",
-*/
-			"table/:table": "routeGotoTable",
-			"table/:table/:filter": "routeGotoRows",
-			"reset-filter": "routeResetFilter",
-			"reload-table": "routeReloadTable",
-			"data/:schema/:table(/*params)": "routeUrlTableData",
-			"schema/:schema/:table": "routeUrlTableSchema"
+			"table/:table": "routeGotoTable"
+			, "table/:table/:filter": "routeGotoRows"
+			, "reset-filter": "routeResetFilter"
+			, "reload-table": "routeReloadTable"
+			, "data/:schema/:table(/*params)": "routeUrlTableData"
+			, "schema/:schema/:table": "routeUrlTableSchema"
         },
-
-/*
-        routeDownloads: function() {
-			Donkeylift.app.unsetSchema();
-            Donkeylift.app.gotoModule("downloads");
-        },
-
-        routeData: function() {
-            Donkeylift.app.gotoModule("data");
-			Donkeylift.app.resetTable();
-        },
-
-        routeSchema: function() {
-            Donkeylift.app.gotoModule("schema");
-			Donkeylift.app.resetTable();
-        },
-*/
 
 		routeUrlTableData: function(schemaName, tableName, paramStr) {
 			console.log("routeUrlTableData " 
 						+ schemaName + " " + tableName + " " + paramStr);
 			/* 
-			 * hack to block executing router handlers twice in FF
-			 * if user interactively hits a route, 
-			 * block execution of this route. 
+			 * hack to block executing router handlers twice in a row in FF
 			 * isBlocked.. will be timeout reset after a short time (100ms). 
 			*/
 			if (this.isBlockedGotoUrl) return;

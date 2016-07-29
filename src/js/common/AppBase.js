@@ -33,7 +33,6 @@ function AppBase(opts) {
 AppBase.prototype.start = function() {
 	var me = this;
 	this.navbarView = new Donkeylift.NavbarView();
-
 	this.loadAccount(sessionStorage.getItem('id_token'));
 }
 

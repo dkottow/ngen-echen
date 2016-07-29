@@ -8,6 +8,7 @@ Donkeylift.MenuSchemaView = Backbone.View.extend({
 		, 'click #new-schema': 'evNewSchemaClick'
 		, 'click #save-schema': 'evUpdateSchemaClick'
 		, 'click #vis-tablegraph': 'evVisTableGraphClick'
+		, 'click #downloads': 'evDownloadsClick'
 	},
 
 	initialize: function() {
@@ -52,6 +53,15 @@ Donkeylift.MenuSchemaView = Backbone.View.extend({
 		}
 		this.graphView.model = Donkeylift.app.schema;
 		this.graphView.render();
+	},
+
+	evDownloadsClick: function() {
+		if ( ! this.downloadsView) {
+			this.downloadsView = new Donkeylift.DownloadsView({
+				model: Donkeylift.app.account
+			});
+		}
+		this.downloadsView.render();
 	},
 });
 

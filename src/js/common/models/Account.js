@@ -36,5 +36,9 @@ Donkeylift.Account = Backbone.Model.extend({
 		return response;
 	},
 
+	downloadDatabase : function(db) {
+		
+	}
+
 });
 
