@@ -7,6 +7,10 @@
 		<style>
 			body { padding: 2em;
 			}
+			#general-error-message {
+				font-color: red;
+				font-weight: bold;
+			}
 		</style>
   </head>
   <body>
@@ -29,6 +33,7 @@
 		<input name="account" type="text" class="form-control" id="account" aria-describedBy="help-account">
 		<span id="help-account" class="help-block"></span>
 	  </div>
+	  <span id="general-error-message" class="help-block"></span>
 	  <button type="submit" class="btn btn-primary">Sign up</button>
 	</form>
 
@@ -58,6 +63,8 @@
 						if (elem) {
 							$('#help-' + elem).text(err);
 							$('#' + elem).closest('div').addClass('has-error');
+						} else {
+							$('#general-error-message').text("Error: " + err);
 						}
 					})
 					e.preventDefault();
