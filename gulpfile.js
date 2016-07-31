@@ -29,7 +29,8 @@ var allTasks = [ 'copy-images'
 				, 'build-index-html'
 				, 'build-signup-html'
 				, 'build-swaggerui'
-				, 'build-apispec'
+				, 'build-api-json'
+				, 'build-docs'
 ];
 
 var src3rd = './src/3rdparty/';
@@ -277,12 +278,17 @@ gulp.task('build-swaggerui', function() {
 
 });
 
-gulp.task('build-apispec', ['build-swaggerui'], function() {
-	
+gulp.task('build-api-json', ['build-docs'], function() {
 	var host = process.env.DONKEYLIFT_API.replace(new RegExp('http://'), '');
 
-	return gulp.src(['./src/docs/*'])
+	return gulp.src(['./src/docs/swagger.json'])
 	.pipe(replace("$DONKEYLIFT_API", host))
+	.pipe(gulp.dest('./public/docs'));
+});
+
+gulp.task('build-docs', function() {
+	
+	return gulp.src(['./src/docs/*'])
 	.pipe(gulp.dest('./public/docs'));
 
 });
