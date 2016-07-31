@@ -26,7 +26,8 @@ var allTasks = [ 'copy-images'
 				, 'build-donkeylift-css'
 				, 'build-data-html'
 				, 'build-schema-html'
-				, 'build-signup'
+				, 'build-index-html'
+				, 'build-signup-html'
 				, 'build-swaggerui'
 				, 'build-apispec'
 ];
@@ -53,9 +54,6 @@ var ver3rd = {
 
 gulp.task('default', allTasks, function() {
 
-	return gulp.src(['./src/index.html'])
-		.pipe(gulp.dest('./public/'));
-	
 });
 
 //TODO
@@ -289,24 +287,55 @@ gulp.task('build-apispec', ['build-swaggerui'], function() {
 
 });
 
-gulp.task('build-signup', function() {
+gulp.task('build-index-html', function() {
+
+	return gulp.src(['./src/index.html'])
+
+		.pipe(inject(gulp.src('./src/html/common/nav-signup.html'), {
+		    starttag: '<!-- inject:nav:{{ext}} -->',
+		    transform: function (filePath, file) {
+		      return file.contents.toString('utf8')
+    		}
+  		}))
+
+		.pipe(gulp.dest('./public/'));
+	
+});
+
+gulp.task('build-signup-html', function() {
 
 	return gulp.src(['./src/signup.html'])
-	.pipe(replace("$DONKEYLIFT_API", process.env.DONKEYLIFT_API))
-	.pipe(gulp.dest('./public/'));
+
+		.pipe(inject(gulp.src('./src/html/common/nav-signup.html'), {
+		    starttag: '<!-- inject:nav:{{ext}} -->',
+		    transform: function (filePath, file) {
+		      return file.contents.toString('utf8')
+    		}
+  		}))
+
+		.pipe(replace("$DONKEYLIFT_API", process.env.DONKEYLIFT_API))
+
+		.pipe(gulp.dest('./public/'));
 	
 });
 
 // Watch Files For Changes
 gulp.task('watch', function() {
-    gulp.watch('./src/js/**/*.js', ['build-dl-data-js', 
-		'build-dl-schema-js']);
-    gulp.watch('./src/html/**/*.html', ['build-data-html', 
-		'build-schema-html']);
+    gulp.watch('./src/js/**/*.js', [
+		'build-dl-data-js'
+		, 'build-dl-schema-js'
+	]);
+    gulp.watch('./src/html/**/*.html', [
+		'build-data-html' 
+		, 'build-schema-html'
+		, 'build-signup-html'
+		, 'build-index-html'
+	]);
     gulp.watch('./src/data.html', ['build-data-html']);
     gulp.watch('./src/schema.html', ['build-schema-html']);
     gulp.watch('./src/css/*.css', ['build-donkeylift-css']);
     gulp.watch('./src/docs/*', ['build-apispec']);
-    gulp.watch('./src/signup.html', ['build-signup']);
+    gulp.watch('./src/signup.html', ['build-signup-html']);
+    gulp.watch('./src/index.html', ['build-index-html']);
 });
 

@@ -2,31 +2,33 @@
 <html>
   <head>
         <title>DonkeyLift</title>
-        <link href="/css/donkeylift.css" rel="stylesheet" type="text/css" />
-		<style></style>
+        <link href="css/3rdparty.css" rel="stylesheet" type="text/css" />
+        <link href="css/donkeylift.css" rel="stylesheet" type="text/css" />
+		<style>
+			body { 
+				padding: 2em;
+			}
+		</style>
   </head>
   <body>
 
+<!-- inject:nav:html -->
+<!-- endinject -->
 
-<div style="float: left;">
-	<ul>
-	  <li>
-		<a href="/public/signup.html">Signup</a>
-	  </li>
-	  <li>
-		<a href="/public/schema.html">Schema Editor</a>
-	  </li>
-	  <li>
-		<a href="/public/data.html">Data Browser</a>
-	  </li>
-	  <li>
-		<a href="/public/docs/index.html?url=/public/docs/swagger.json">API docs</a>
-	  </li>
-	</ul>
-</div>
-<div>
-	<img src="/public/images/arch.png" style="margin: 20px; width: 400px" />
-</div>
+	<div id="main" class="row">
+
+	<h4>Donkeylift</h4>
+	<h5><i>A Relational Data Store with the data owner in mind</i></h5>
+	<div>
+		Try the <a href="data.html">Data Browser</a>. Login as demo@donkeylift.com | demo
+		<br/><a href="signup.html">Sign Up</a> and create your own databases.
+		<br/>Check out a <a href="/public/docs/Donkeylift.pdf">presentation</a>.
+		<br/>Explore the <a href="/public/docs/index.html?url=/public/docs/swagger.json">Web API docs</a>
+	</div>
+
+	</div>
+
+	</div><!-- main -->
 
   </body>
 </html>
