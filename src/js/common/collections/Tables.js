@@ -22,10 +22,10 @@ Donkeylift.Tables = Backbone.Collection.extend({
 		var tables = [table];
 		while(tables.length > 0) {
 			var it = tables.shift();
-			var parents = it.get('parents');
-			_.each(parents, function(tn) {
-				var pt = this.getByName(tn);
-				if (pt != it) {
+			var fks = it.get('referencing');
+			_.each(fks, function(fk) {
+				var pt = this.getByName(fk.fk_table);
+				if ( ! _.contains(tables, pt)) {
 					result.push(pt);
 					tables.push(pt);
 				}
