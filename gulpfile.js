@@ -31,6 +31,7 @@ var allTasks = [ 'copy-images'
 				, 'build-swaggerui'
 				, 'build-api-json'
 				, 'build-docs'
+				, 'build-videos-html'
 ];
 
 var src3rd = './src/3rdparty/';
@@ -289,8 +290,21 @@ gulp.task('build-api-json', ['build-docs'], function() {
 gulp.task('build-docs', function() {
 	
 	return gulp.src(['./src/docs/*'])
-	.pipe(gulp.dest('./public/docs'));
+	.pipe(gulp.dest('./public/docs/'));
 
+});
+
+gulp.task('build-videos-html', ['build-docs'], function() {
+	return gulp.src(['./src/docs/videos.html'])
+
+		.pipe(inject(gulp.src('./src/html/common/nav-signup.html'), {
+		    starttag: '<!-- inject:nav:{{ext}} -->',
+		    transform: function (filePath, file) {
+		      return file.contents.toString('utf8')
+    		}
+  		}))
+
+		.pipe(gulp.dest('./public/docs/'));
 });
 
 gulp.task('build-index-html', function() {
