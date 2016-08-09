@@ -47,6 +47,7 @@ AppBase.prototype.loadAccount = function(id_token) {
 	this.account.fetch({ success: function() {
 		me.navbarView.render();
 		me.menuView.render();
+		$('#content').empty();
 		me.onAccountLoaded();
 	}});
 
