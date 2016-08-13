@@ -18,12 +18,11 @@ Donkeylift.Schema = Backbone.Model.extend({
 	},		
 
 	toJSON : function() {
-		var tables = this.get('tables').map(function(table) {
-			return table.toJSON();	
-		});
+
 		return {
 			name: this.get('name'),
-			tables: tables
+			tables: this.get('tables').toJSON(),
+			users: this.get('users').toJSON()
 		};
 	},	
 
@@ -41,6 +40,7 @@ Donkeylift.Schema = Backbone.Model.extend({
 			return new Donkeylift.Table(table);
 		});
 		response.tables = new Donkeylift.Tables(tables);
+		response.users = new Donkeylift.Users(_.values(response.users));
 		return response;
 	},
 

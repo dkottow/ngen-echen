@@ -25,14 +25,21 @@ Donkeylift.MenuDataView = Backbone.View.extend({
 		return this;
 	},
 
+	getShowFilter: function() {
+		if ( ! this.filterShowView) {
+			this.filterShowView = new Donkeylift.FilterShowView();
+		}
+		return this.filterShowView;
+	},
+
 	evResetAllFilters: function() {
 		Donkeylift.app.unsetFilters();
 		Donkeylift.app.resetTable();
 	},
 
 	evShowFilters: function() {
-		Donkeylift.app.filterShowView.collection = Donkeylift.app.filters;
-		Donkeylift.app.filterShowView.render();
+		this.getShowFilter().collection = Donkeylift.app.filters;
+		this.getShowFilter().render();
 	},
 
 });

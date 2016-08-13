@@ -6,6 +6,7 @@ Donkeylift.AliasView = Backbone.View.extend({
 
 	events: {
 		'click .edit-alias': 'evEditAliasClick',
+		'click #add-alias': 'evNewAliasClick'
 	},
 
 	initialize: function () {
@@ -28,20 +29,38 @@ Donkeylift.AliasView = Backbone.View.extend({
 		}, this);
 	},
 
+	getEditor: function() {
+		if ( ! this.aliasEditView) {
+			this.aliasEditView = new Donkeylift.AliasEditView();
+		}
+		return this.aliasEditView;
+	},
+
 	evEditAliasClick: function(ev) {				
-		console.log("evEditAliasView.click");
-		var table = $(ev.target).parents('tr').find('td:eq(0)').text();
-		var field = $(ev.target).parents('tr').find('td:eq(1)').text();
+		console.log("AliasView.evEditAliasClick");
+		var table = $(ev.target).parents('tr').find('td:eq(1)').text();
+		var field = $(ev.target).parents('tr').find('td:eq(2)').text();
 
 		var alias = _.find(this.model.get('row_alias'), function(a) {
 			return a.get('table').get('name') == table 
 				&& a.get('field').get('name') == field;
 		});
+		console.log("Edit alias " + table + "." + field + " = " + alias);
 
-		//console.log(fieldQName);
-		Donkeylift.app.aliasEditView.setModel(this.model, alias);
-		Donkeylift.app.aliasEditView.render();
+
+		this.getEditor().setModel(this.model, alias);
+		this.getEditor().render();
 	},
+
+	evNewAliasClick: function() {
+		console.log('AliasView.evNewAliasClick');
+
+		this.getEditor().setModel(this.model, null);
+		this.getEditor().render();
+
+//		Donkeylift.app.aliasEditView.setModel(this.model, null);
+//		Donkeylift.app.aliasEditView.render();
+	}
 
 });
 

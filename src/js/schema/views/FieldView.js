@@ -26,8 +26,9 @@ Donkeylift.FieldView = Backbone.View.extend({
 	},
 
 	editFieldClick: function(ev) {				
-		Donkeylift.app.fieldEditView.model = this.model;
-		Donkeylift.app.fieldEditView.render();
+		var editor = Donkeylift.app.tableView.getFieldEditor();
+		editor.model = this.model;
+		editor.render();
 	},
 
 

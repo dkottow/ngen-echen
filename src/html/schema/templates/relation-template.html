@@ -1,11 +1,11 @@
 <script type="text/template" id="relation-template">
-	<td><% if (related) print(related.attributes.name) %></td>
-	<td><%= type %></td>
-	<td><% if (field) print(field.attributes.name) %></td>
 	<td>
 		<button class="edit-relation btn btn-default">
 			<i class="fa fa-pencil"></i>
 		</button>
 	</td>
+	<td><% if (related) print(related.attributes.name) %></td>
+	<td><%= type %></td>
+	<td><% if (field) print(field.attributes.name) %></td>
 </script>
 

@@ -8,7 +8,6 @@ Donkeylift.SchemaTableView = Backbone.View.extend({
 		'click .edit-table': 'evEditTableClick',
 		'click #add-field': 'evNewFieldClick',
 		'click #add-relation': 'evNewRelationClick',
-		'click #add-alias': 'evNewAliasClick'
 	},
 
 	initialize: function () {
@@ -62,17 +61,31 @@ Donkeylift.SchemaTableView = Backbone.View.extend({
 		return this.$('#relations tbody');
 	},
 
+	getFieldEditor: function() {
+		if ( ! this.fieldEditView) {
+			this.fieldEditView = new Donkeylift.FieldEditView();
+		}
+		return this.fieldEditView;
+	},
+
+	getRelationEditor: function() {
+		if ( ! this.relationEditView) {
+			this.relationEditView = new Donkeylift.RelationEditView();
+		}
+		return this.relationEditView;
+	},
+
 	evEditTableClick: function(ev) {				
-		Donkeylift.app.tableEditView.model = this.model;
-		Donkeylift.app.tableEditView.render();
+		var editor = Donkeylift.app.menuView.getTableEditor();
+		editor.model = this.model;
+		editor.render();
 	},
 
 	evNewFieldClick: function() {
 		console.log('TableView.evNewFieldClick');
 		var field = Donkeylift.Field.create();
-		//var field = this.model.get('fields').addNew();
-		Donkeylift.app.fieldEditView.model = field;
-		Donkeylift.app.fieldEditView.render();
+		this.getFieldEditor().model = field;
+		this.getFieldEditor().render();
 	},
 
 	removeField: function(field) {
@@ -101,8 +114,11 @@ Donkeylift.SchemaTableView = Backbone.View.extend({
 		console.log('TableView.evNewRelationClick');
 		var relation = Donkeylift.Relation.create(this.model);
 		//console.log(relation.attributes);
-		Donkeylift.app.relationEditView.model = relation;
-		Donkeylift.app.relationEditView.render();
+		this.getRelationEditor().model = relation;
+		this.getRelationEditor().render();
+
+//		Donkeylift.app.relationEditView.model = relation;
+//		Donkeylift.app.relationEditView.render();
 	},
 
 	removeRelation: function(relation) {
@@ -121,14 +137,6 @@ Donkeylift.SchemaTableView = Backbone.View.extend({
 		this.elRelations().html('');
 		this.model.get('relations').each(this.addRelation, this);
 	},
-
-
-	evNewAliasClick: function() {
-		console.log('TableView.evNewAliasClick');
-		Donkeylift.app.aliasEditView.setModel(this.model, null);
-		Donkeylift.app.aliasEditView.render();
-	}
-
 
 });
 

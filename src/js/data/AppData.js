@@ -4,7 +4,6 @@ function AppData(opts) {
     console.log('AppData ctor');
 	AppBase.call(this, opts);
 	this.filters = new Donkeylift.Filters();
-	this.filterShowView = new Donkeylift.FilterShowView();
 	this.menuView = new Donkeylift.MenuDataView();
 	this.router = new Donkeylift.RouterData();
 }
