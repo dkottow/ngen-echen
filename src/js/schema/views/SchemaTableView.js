@@ -61,22 +61,8 @@ Donkeylift.SchemaTableView = Backbone.View.extend({
 		return this.$('#relations tbody');
 	},
 
-	getFieldEditor: function() {
-		if ( ! this.fieldEditView) {
-			this.fieldEditView = new Donkeylift.FieldEditView();
-		}
-		return this.fieldEditView;
-	},
-
-	getRelationEditor: function() {
-		if ( ! this.relationEditView) {
-			this.relationEditView = new Donkeylift.RelationEditView();
-		}
-		return this.relationEditView;
-	},
-
 	evEditTableClick: function(ev) {				
-		var editor = Donkeylift.app.menuView.getTableEditor();
+		var editor = Donkeylift.app.getTableEditor();
 		editor.model = this.model;
 		editor.render();
 	},
@@ -84,8 +70,9 @@ Donkeylift.SchemaTableView = Backbone.View.extend({
 	evNewFieldClick: function() {
 		console.log('TableView.evNewFieldClick');
 		var field = Donkeylift.Field.create();
-		this.getFieldEditor().model = field;
-		this.getFieldEditor().render();
+		var editor = Donkeylift.app.getFieldEditor();
+		editor.model = field;
+		editor.render();
 	},
 
 	removeField: function(field) {
@@ -113,12 +100,10 @@ Donkeylift.SchemaTableView = Backbone.View.extend({
 	evNewRelationClick: function() {
 		console.log('TableView.evNewRelationClick');
 		var relation = Donkeylift.Relation.create(this.model);
+		var editor = Donkeylift.app.getRelationEditor();
 		//console.log(relation.attributes);
-		this.getRelationEditor().model = relation;
-		this.getRelationEditor().render();
-
-//		Donkeylift.app.relationEditView.model = relation;
-//		Donkeylift.app.relationEditView.render();
+		editor.model = relation;
+		editor.render();
 	},
 
 	removeRelation: function(relation) {

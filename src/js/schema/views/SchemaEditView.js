@@ -37,7 +37,6 @@ Donkeylift.SchemaEditView = Backbone.View.extend({
 			$('#modalSchemaResultButton').removeClass('btn-danger');
 		}
 		$('#modalSchemaActionResult').show();
-		Donkeylift.app.schemaCurrentView.render();
 	},
 
 	evSaveClick: function() {

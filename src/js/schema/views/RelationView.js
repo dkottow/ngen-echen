@@ -32,7 +32,7 @@ Donkeylift.RelationView = Backbone.View.extend({
 	},
 
 	editRelationClick: function(ev) {				
-		var editor = Donkeylift.app.tableView.getRelationEditor();
+		var editor = Donkeylift.app.getRelationEditor();
 		editor.model = this.model;
 		editor.render();
 	},

@@ -29,43 +29,33 @@ Donkeylift.MenuSchemaView = Backbone.View.extend({
 		return this;
 	},
 
-	getSchemaEditor: function() {
-		if ( ! this.schemaEditView) {
-			this.schemaEditView = new Donkeylift.SchemaEditView();
-		}
-		return this.schemaEditView;
-	},
-
-	getTableEditor: function() {
-		if ( ! this.tableEditView) {
-			this.tableEditView = new Donkeylift.TableEditView();
-		}
-		return this.tableEditView;
-	},
-
 	evAddTableClick: function() {
 		var table = Donkeylift.Table.create();
-
-		this.getTableEditor().model = table;
-		this.getTableEditor().render();
+		var editor = Donkeylift.app.getTableEditor();
+		editor.model = table;
+		editor.render();
 	},
 
 	evUsersClick: function() {
-		var usersView = new Donkeylift.UsersView({
-			collection: Donkeylift.app.schema.get('users')
-		});
-		usersView.render();
+		if ( ! this.usersView) {
+			this.usersView = new Donkeylift.UsersView({
+				collection: Donkeylift.app.schema.get('users')
+			});
+		}
+		this.usersView.render();
 	},
 
 	evUpdateSchemaClick: function() {
-		this.getSchemaEditor().model = Donkeylift.app.schema;
-		this.getSchemaEditor().render();
+		var editor = Donkeylift.app.getSchemaEditor();
+		editor.model = Donkeylift.app.schema;
+		editor.render();
 	},
 
 
 	evNewSchemaClick: function() {
-		this.getSchemaEditor().model = new Donkeylift.Schema({});
-		this.getSchemaEditor().render();
+		var editor = Donkeylift.app.getSchemaEditor();
+		editor.model = new Donkeylift.Schema({});
+		editor.render();
 	},
 
 	evVisTableGraphClick: function() {

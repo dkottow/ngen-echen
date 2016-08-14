@@ -11,6 +11,9 @@ Donkeylift.UsersView = Backbone.View.extend({
 
 	initialize: function () {
 		console.log("UsersView.init " + this.collection);
+		this.listenTo(this.collection, 'add', this.render);
+		this.listenTo(this.collection, 'remove', this.render);
+		this.listenTo(this.collection, 'change', this.render);
 	},
 
 	template: _.template($('#users-template').html()),
@@ -39,14 +42,17 @@ Donkeylift.UsersView = Backbone.View.extend({
 		});
 		console.log("Edit user " + uname + " = " + user);
 
-		Donkeylift.app.userEditView.setModel(user);
-		Donkeylift.app.userEditView.render();
+		var editor = Donkeylift.app.getUserEditor();
+		editor.model = user;
+		editor.render();
 	},
 
 	evNewUserClick: function() {
-		console.log('AliasView.evNewUserClick');
-		Donkeylift.app.userEditView.setModel(null);
-		Donkeylift.app.userEditView.render();
+		console.log('UsersView.evNewUserClick');
+		var user = Donkeylift.User.create();
+		var editor = Donkeylift.app.getUserEditor();
+		editor.model = user;
+		editor.render();
 	}
 
 });

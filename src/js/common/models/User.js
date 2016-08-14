@@ -7,6 +7,13 @@ Donkeylift.User = Backbone.Model.extend({
 
 });
 
+Donkeylift.User.create = function(name) {
+	return new Donkeylift.User({ 
+		name: name, 
+		role: Donkeylift.User.ROLES.WRITER 
+	});
+}
+
 Donkeylift.User.ROLES = {
 	'OWNER': 'owner',
 	'WRITER': 'writer',

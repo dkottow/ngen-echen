@@ -29,13 +29,6 @@ Donkeylift.AliasView = Backbone.View.extend({
 		}, this);
 	},
 
-	getEditor: function() {
-		if ( ! this.aliasEditView) {
-			this.aliasEditView = new Donkeylift.AliasEditView();
-		}
-		return this.aliasEditView;
-	},
-
 	evEditAliasClick: function(ev) {				
 		console.log("AliasView.evEditAliasClick");
 		var table = $(ev.target).parents('tr').find('td:eq(1)').text();
@@ -47,19 +40,17 @@ Donkeylift.AliasView = Backbone.View.extend({
 		});
 		console.log("Edit alias " + table + "." + field + " = " + alias);
 
-
-		this.getEditor().setModel(this.model, alias);
-		this.getEditor().render();
+		var editor = Donkeylift.app.getAliasEditor();
+		editor.setModel(this.model, alias);
+		editor.render();
 	},
 
 	evNewAliasClick: function() {
 		console.log('AliasView.evNewAliasClick');
 
-		this.getEditor().setModel(this.model, null);
-		this.getEditor().render();
-
-//		Donkeylift.app.aliasEditView.setModel(this.model, null);
-//		Donkeylift.app.aliasEditView.render();
+		var editor = Donkeylift.app.getAliasEditor();
+		editor.setModel(this.model, null);
+		editor.render();
 	}
 
 });
