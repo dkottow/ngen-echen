@@ -167,6 +167,7 @@ gulp.task('build-dl-data-js', function() {
 					 "./src/js/data/AppData.js"
 			])
 		.pipe(replace("$DONKEYLIFT_API", process.env.DONKEYLIFT_API))
+		.pipe(replace("$DONKEYLIFT_DEMO", process.env.DONKEYLIFT_DEMO))
 		.pipe(replace("$AUTH0_CLIENT_ID", process.env.AUTH0_CLIENT_ID))
 		.pipe(replace("$AUTH0_DOMAIN", process.env.AUTH0_DOMAIN))
 		.pipe(concat('dl_data.js'))
@@ -192,6 +193,7 @@ gulp.task('build-dl-schema-js', function() {
 					 , "./src/js/schema/AppSchema.js"
 			])
 		.pipe(replace("$DONKEYLIFT_API", process.env.DONKEYLIFT_API))
+		.pipe(replace("$DONKEYLIFT_DEMO", process.env.DONKEYLIFT_DEMO))
 		.pipe(replace("$AUTH0_CLIENT_ID", process.env.AUTH0_CLIENT_ID))
 		.pipe(replace("$AUTH0_DOMAIN", process.env.AUTH0_DOMAIN))
 		.pipe(concat('dl_schema.js'))

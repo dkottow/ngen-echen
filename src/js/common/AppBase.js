@@ -9,6 +9,8 @@ var AUTH0_CLIENT_ID = "$AUTH0_CLIENT_ID";
 var AUTH0_DOMAIN = "$AUTH0_DOMAIN";
 
 
+var DONKEYLIFT_DEMO = $DONKEYLIFT_DEMO;
+
 var Donkeylift = {};
 
 function AppBase(opts) {
@@ -33,15 +35,24 @@ function AppBase(opts) {
 AppBase.prototype.start = function() {
 	var me = this;
 	this.navbarView = new Donkeylift.NavbarView();
-	this.loadAccount(sessionStorage.getItem('id_token'));
+
+	if (DONKEYLIFT_DEMO) {
+		this.loadAccount({ auth: false });
+		return;
+	}
+
+	this.loadAccount({ id_token: sessionStorage.getItem('id_token') });
 }
 
-AppBase.prototype.loadAccount = function(id_token) {
+AppBase.prototype.loadAccount = function(opts) {
 	var me = this;
-	console.log('loadAccount: ' + id_token);
-	if ( ! id_token) return;
+	console.log('loadAccount: ' + opts);
 
-	this.account = new Donkeylift.Account({ id_token: id_token });
+	//if ( ! id_token) return;
+	//this.account = new Donkeylift.Account({ id_token: id_token });
+
+	this.account = new Donkeylift.Account(opts);
+
 	this.navbarView.model = this.account;
 
 	this.account.fetch({ success: function() {

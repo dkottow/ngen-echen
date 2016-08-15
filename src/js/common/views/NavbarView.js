@@ -80,7 +80,7 @@ Donkeylift.NavbarView = Backbone.View.extend({
 				return;
 		  	}
 
-			Donkeylift.app.loadAccount(id_token);
+			Donkeylift.app.loadAccount({id_token: id_token});
 		});
 	}
 
