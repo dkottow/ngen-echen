@@ -5,7 +5,7 @@
         "description": "A data access layer to SQL databases (sqlite).",
         "version": "1.0.0-alpha"
     },
-    "host": "$DONKEYLIFT_API",
+    "host": "api.donkeylift.com",
     "schemes": [
         "http"
     ],
@@ -544,6 +544,100 @@
                 "responses": {
                     "200": {
                         "description": "A row result set"
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/{account}/{database}/{table}.objs": {
+            "get": {
+                "summary": "Get objects",
+                "operationId": "getObjs",
+                "description": "Get rows from a table or a set of related tables and return them as JSON objects. Method parameters are exactly the same as in getRows.\n",
+                "parameters": [
+                    {
+                        "name": "account",
+                        "in": "path",
+                        "description": "database account",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "database",
+                        "in": "path",
+                        "description": "table database",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "table",
+                        "in": "path",
+                        "description": "table with data rows",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "$filter",
+                        "in": "query",
+                        "description": "array of row filters.",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "tsv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "$select",
+                        "in": "query",
+                        "description": "array of table fields.",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "$orderby",
+                        "in": "query",
+                        "description": "array of order clauses.",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "$skip",
+                        "in": "query",
+                        "description": "skip this number of rows.",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "$top",
+                        "in": "query",
+                        "description": "number of rows to be returned.",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ],
+                "tags": [
+                    "table"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "An array of result objects.",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseRows"
+                        }
                     },
                     "default": {
                         "description": "Unexpected error",
