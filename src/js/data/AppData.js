@@ -1,4 +1,4 @@
-/*global Backbone, Donkeylift, $ */
+/*global AppBase, Backbone, Donkeylift, $ */
 
 function AppData(opts) {
     console.log('AppData ctor');
