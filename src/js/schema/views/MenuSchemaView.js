@@ -1,4 +1,4 @@
-/*global Donkeylift, Backbone, jQuery, _ */
+/*global Donkeylift, Backbone, jQuery, $, _ */
 
 Donkeylift.MenuSchemaView = Backbone.View.extend({
 	el:  '#menu',
@@ -37,12 +37,11 @@ Donkeylift.MenuSchemaView = Backbone.View.extend({
 	},
 
 	evUsersClick: function() {
-		if ( ! this.usersView) {
-			this.usersView = new Donkeylift.UsersView({
-				collection: Donkeylift.app.schema.get('users')
-			});
-		}
-		this.usersView.render();
+		if (this.usersView) this.usersView.remove();
+		this.usersView = new Donkeylift.UsersView({
+			collection: Donkeylift.app.schema.get('users')
+		});
+		$('#content').html(this.usersView.render().el);		
 	},
 
 	evUpdateSchemaClick: function() {

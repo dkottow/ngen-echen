@@ -2,7 +2,7 @@
 
 Donkeylift.UsersView = Backbone.View.extend({
 
-	el:  '#content',
+	//el:  '#content',
 
 	events: {
 		'click .edit-user': 'evEditUserClick',
@@ -31,6 +31,7 @@ Donkeylift.UsersView = Backbone.View.extend({
 				role: user.get('role'),
 			}));
 		}, this);
+		return this;
 	},
 
 	evEditUserClick: function(ev) {				

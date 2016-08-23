@@ -2,13 +2,13 @@
 
 function AppData(opts) {
     console.log('AppData ctor');
-	AppBase.call(this, opts);
+	Donkeylift.AppBase.call(this, opts);
 	this.filters = new Donkeylift.Filters();
 	this.menuView = new Donkeylift.MenuDataView();
 	this.router = new Donkeylift.RouterData();
 }
 
-AppData.prototype = Object.create(AppBase.prototype);
+AppData.prototype = Object.create(Donkeylift.AppBase.prototype);
 AppData.prototype.constructor = AppData; 
 
 AppData.prototype.start = function() {
@@ -52,7 +52,7 @@ AppData.prototype.setFilterView = function(filter, $parentElem) {
 	this.filterView.render();
 }
 
-AppBase.prototype.onAccountLoaded = function() {
+AppData.prototype.onAccountLoaded = function() {
 	//only data app
 	if (location.hash.length > 0) {
 		console.log("navigate " + location.hash);

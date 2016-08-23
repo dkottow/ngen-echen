@@ -2,13 +2,14 @@
 
 function AppSchema(opts) {
 	
-	AppBase.call(this, opts);
+	Donkeylift.AppBase.call(this, opts);
 
 	this.menuView = new Donkeylift.MenuSchemaView();
 	this.router = new Donkeylift.RouterSchema();
+	this.editorDialogs = {};
 }
 
-AppSchema.prototype = Object.create(AppBase.prototype);
+AppSchema.prototype = Object.create(Donkeylift.AppBase.prototype);
 AppSchema.prototype.constructor=AppSchema; 
 
 
@@ -26,48 +27,60 @@ AppSchema.prototype.createSchema = function(name) {
 }
 
 AppSchema.prototype.getSchemaEditor = function() {
-	if ( ! this.schemaEditView) {
-		this.schemaEditView = new Donkeylift.SchemaEditView();
+	var editor = this.editorDialogs['schema'];
+	if ( ! editor) {
+		editor = new Donkeylift.SchemaEditView();
+		this.editorDialogs['schema'] = editor;
 	}
-	return this.schemaEditView;
+	return editor;
 }
 
 AppSchema.prototype.getTableEditor = function() {
-	if ( ! this.tableEditView) {
-		this.tableEditView = new Donkeylift.TableEditView();
+	var editor = this.editorDialogs['table'];
+	if ( ! editor) {
+		editor = new Donkeylift.TableEditView();
+		this.editorDialogs['table'] = editor;
 	}
-	return this.tableEditView;
+	return editor;
 }
 
 AppSchema.prototype.getFieldEditor = function() {
-	if ( ! this.fieldEditView) {
-		this.fieldEditView = new Donkeylift.FieldEditView();
+	var editor = this.editorDialogs['field'];
+	if ( ! editor) {
+		editor = new Donkeylift.FieldEditView();
+		this.editorDialogs['field'] = editor;
 	}
-	return this.fieldEditView;
+	return editor;
 }
 
 AppSchema.prototype.getRelationEditor = function() {
-	if ( ! this.relationEditView) {
-		this.relationEditView = new Donkeylift.RelationEditView();
+	var editor = this.editorDialogs['relation'];
+	if ( ! editor) {
+		editor = new Donkeylift.RelationEditView();
+		this.editorDialogs['relation'] = editor;
 	}
-	this.relationEditView.schema = this.schema;
-	this.relationEditView.table = this.table;
-	return this.relationEditView;
+	editor.schema = this.schema;
+	editor.table = this.table;
+	return editor;
 }
 
 AppSchema.prototype.getAliasEditor = function() {
-	if ( ! this.aliasEditView) {
-		this.aliasEditView = new Donkeylift.AliasEditView();
+	var editor = this.editorDialogs['alias'];
+	if ( ! editor) {
+		editor = new Donkeylift.AliasEditView();
+		this.editorDialogs['alias'] = editor;
 	}
-	return this.aliasEditView;
+	return editor;
 }
 
 AppSchema.prototype.getUserEditor = function() {
-	if ( ! this.userEditView) {
-		this.userEditView = new Donkeylift.UserEditView();
+	var editor = this.editorDialogs['user'];
+	if ( ! editor) {
+		editor = new Donkeylift.UserEditView();
+		this.editorDialogs['user'] = editor;
 	}
-	this.userEditView.users = this.schema.get('users');
-	return this.userEditView;
+	editor.users = this.schema.get('users');
+	return editor;
 }
 
 
