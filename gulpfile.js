@@ -3,6 +3,9 @@ var concat = require('gulp-concat');
 var inject = require('gulp-inject');
 var replace = require('gulp-replace');
 var gulpif = require('gulp-if');
+var markdown = require('gulp-markdown');
+var insert = require('gulp-insert');
+var rename = require('gulp-rename');
 
 var envPath = './.env';
 if (process.env.OPENSHIFT_DATA_DIR) {
@@ -30,6 +33,7 @@ var allTasks = [ 'copy-images'
 				, 'build-signup-html'
 				, 'build-swaggerui'
 				, 'build-api-json'
+				, 'build-auth-md'
 				, 'build-docs'
 				, 'build-videos-html'
 ];
@@ -289,11 +293,30 @@ gulp.task('build-api-json', ['build-docs'], function() {
 	.pipe(gulp.dest('./public/docs'));
 });
 
+gulp.task('build-auth-md', ['build-docs'], function() {
+
+	var pre = '<html>'
+		+ '<head>'
+		+ '<link rel="stylesheet" href="github-markdown.css">'
+	    + '<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/styles/github.min.css">'
+		+ '<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/highlight.min.js"></script>'
+		+ '<script>hljs.initHighlightingOnLoad();</script>'
+		+ '</head>'
+		+ '<body><div class="markdown-body">';
+
+	var post = '</div></body></html>';
+
+	return gulp.src(['./src/docs/AccessControl.md'])
+	.pipe(markdown())
+	.pipe(insert.wrap(pre, post))
+	.pipe(rename('access_control.html'))
+	.pipe(gulp.dest('./public/docs/'));
+});
+
 gulp.task('build-docs', function() {
 	
 	return gulp.src(['./src/docs/*'])
 	.pipe(gulp.dest('./public/docs/'));
-
 });
 
 gulp.task('build-videos-html', ['build-docs'], function() {
@@ -356,7 +379,7 @@ gulp.task('watch', function() {
     gulp.watch('./src/data.html', ['build-data-html']);
     gulp.watch('./src/schema.html', ['build-schema-html']);
     gulp.watch('./src/css/*.css', ['build-donkeylift-css']);
-    gulp.watch('./src/docs/*', ['build-apispec']);
+    gulp.watch('./src/docs/*', ['build-api-json']);
     gulp.watch('./src/signup.html', ['build-signup-html']);
     gulp.watch('./src/index.html', ['build-index-html']);
 });

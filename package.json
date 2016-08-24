@@ -16,6 +16,9 @@
     , "gulp-inject": "~1.5.0"
     , "gulp-replace": "*"
     , "gulp-if": "*"
+    , "gulp-markdown": "*"
+    , "gulp-insert": "*"
+    , "gulp-rename": "*"
   }
   , "main": "server.js"
   , "scripts": {
