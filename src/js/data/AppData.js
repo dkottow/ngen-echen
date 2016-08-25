@@ -16,7 +16,18 @@ AppData.prototype.start = function() {
 	$('#nav-data').closest("li").addClass("active");
 }
 
+AppData.prototype.createTableView = function(table, params) {
+	return new Donkeylift.DataTableView({
+		model: table,
+		attributes: { params: params }
+	});
+}
 
+AppData.prototype.createSchema = function(name) {
+	return new Donkeylift.Database({name : name, id : name});
+}
+
+	
 	/**** schema stuff ****/
 
 AppData.prototype.unsetSchema = function() {
