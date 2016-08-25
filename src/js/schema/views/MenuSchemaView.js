@@ -53,7 +53,7 @@ Donkeylift.MenuSchemaView = Backbone.View.extend({
 
 	evNewSchemaClick: function() {
 		var editor = Donkeylift.app.getSchemaEditor();
-		editor.model = new Donkeylift.Schema({});
+		editor.model = new Donkeylift.Schema();
 		editor.render();
 	},
 

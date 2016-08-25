@@ -8,6 +8,9 @@ Donkeylift.Schema = Backbone.Model.extend({
 		if ( ! attrs.tables) {
 			this.set('tables', new Donkeylift.Tables());
 		}
+		if ( ! attrs.users) {
+			this.set('users', new Donkeylift.Users());
+		}
 
 		//this.set('id', attrs.name); //unset me when new
 		//this.orgJSON = this.toJSON();
