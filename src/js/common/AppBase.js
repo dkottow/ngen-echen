@@ -84,10 +84,6 @@ AppBase.prototype.toggleSidebar = function() {
 	}
 }
 
-AppBase.prototype.createTableView = function(table, params) {
-	//overwrite me
-}
-
 AppBase.prototype.setTable = function(table, params) {
 	console.log('app.setTable ' + params);
 	var $a = $("#table-list a[data-target='" + table.get('name') + "']");
@@ -121,10 +117,6 @@ AppBase.prototype.unsetSchema = function() {
 	this.unsetTable();
 	$('#content').empty();
 	this.navbarView.render();
-}
-
-AppBase.prototype.createSchema = function(name) {
-	//overwrite me
 }
 
 AppBase.prototype.setSchema = function(name, cbAfter) {

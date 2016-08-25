@@ -18,14 +18,6 @@ AppSchema.prototype.start = function() {
 	$('#nav-schema').closest("li").addClass("active");
 }
 
-AppSchema.prototype.createTableView = function(table, params) {
-	return new Donkeylift.SchemaTableView({model: table});
-}
-
-AppSchema.prototype.createSchema = function(name) {
-	return new Donkeylift.Schema({name : name, id : name});
-}
-
 AppSchema.prototype.getSchemaEditor = function() {
 	var editor = this.editorDialogs['schema'];
 	if ( ! editor) {
