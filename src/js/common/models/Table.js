@@ -168,9 +168,11 @@ Donkeylift.Table = Backbone.Model.extend({
 
 Donkeylift.Table.create = function(name) {
 	var fields = [ 
-		{ name: 'id', type: 'INTEGER', props: { order: 1} },
-		{ name : 'mod_by', type: 'VARCHAR', props: {order: 91} },
-		{ name : 'mod_on', type: 'DATETIME', props: {order: 92} }
+		{ name: 'id', type: 'INTEGER', props: { order: 1} }
+		, { name : 'mod_by', type: 'VARCHAR', props: {order: 91} }
+		, { name : 'mod_on', type: 'DATETIME', props: {order: 92} }
+		, { name : 'add_by', type: 'VARCHAR', props: {order: 93} }
+		, { name : 'add_on', type: 'DATETIME', props: {order: 94} }
 	];
 	var table = new Donkeylift.Table({
 		name: name,
@@ -179,3 +181,5 @@ Donkeylift.Table.create = function(name) {
 	table.initRefs();
 	return table;
 }
+
+Donkeylift.Table.NONEDITABLE_FIELDS = ['id', 'mod_by', 'mod_on', 'add_by', 'add_on'];

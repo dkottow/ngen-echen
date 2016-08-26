@@ -1,4 +1,4 @@
-/*global Donkeylift, Backbone */
+/*global Donkeylift, _, Backbone, $ */
 
 var ROWS_EXT = '.rows';
 var STATS_EXT = '.stats';
@@ -25,6 +25,7 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 		try {
 			var parseOpts = { validate: true, resolveRefs: true };
 			var rows = [];
+			var method;
 			switch(req.action) {
 				case 'create':
 					method = 'POST';
@@ -55,6 +56,7 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 		}
 
 		req.data = data;
+		req.method = method;
 	},
 
 	ajaxGetEditorFn: function() {
@@ -72,7 +74,7 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 			var url = me.fullUrl() + '?' + q;
 
 			$.ajax(url, {
-				method: method,
+				method: req.method,
 				data: req.data,
 				contentType: "application/json",
 				processData: false
@@ -235,43 +237,5 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 			});
 		}
 	},
-
-/*
-	fieldValues: function(field, searchTerm, callback) {
- 		var me = this;
-
-		var filter = new Donkeylift.Filter({
-			table: this,
-			field: field,
-			op: Donkeylift.Filter.OPS.SEARCH,
-			value: searchTerm
-		});
-		
-		var params = {
-			'$top': 10,
-			'$select': field.vname(),
-			'$orderby': field.vname(),
-			'$filter': filter.toParam()
-		};
-
-		var q = _.map(params, function(v,k) { return k + "=" + v; })
-				.join('&');
-
-		var url = this.fullUrl() + '?' + q;
-		console.log(url);
-		if (this.dataCache[url]) {
-			//console.log(this.dataCache[url]);
-			callback(this.dataCache[url]['rows']);
-
-		} else {
-			$.ajax(url, {
-			}).done(function(response) {
-				//console.dir(response.rows);
-				me.dataCache[url] = response;
-				callback(response.rows);
-			});
-		}
-	},
-*/
 
 });

@@ -91,10 +91,9 @@ Donkeylift.DataTableView = Backbone.View.extend({
 		var me = this;
 		var dtEditorOptions = {};
 
-		var excludeFields = ['id', 'mod_by', 'mod_on'];
 
 		var editFields = _.filter(fields, function(field) {
-			return ! _.contains(excludeFields, field.get('name'));
+			return ! _.contains(Donkeylift.Table.NONEDITABLE_FIELDS, field.get('name'));
 		});
 
 		dtEditorOptions.fields = _.map(editFields, function(field) {
