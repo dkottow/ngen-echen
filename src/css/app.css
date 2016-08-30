@@ -102,7 +102,7 @@ body {
 	color: grey;
 }
 
-.field-table, .relation-table, .alias-table {
+.tab-table {
 	float: left;
 	max-width: 60%;
 	margin-bottom: 1em;
