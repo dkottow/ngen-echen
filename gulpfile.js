@@ -116,7 +116,7 @@ gulp.task('build-3rdparty-js', function() {
 		])
 
 		.pipe(concat('3rdparty.js'))
-		.pipe(gulp.dest('./public/js/'));
+		.pipe(gulp.dest('./app/js/'));
 			
 });
 
@@ -130,7 +130,7 @@ gulp.task('copy-3rdparty-js', function() {
 				, extdir + ver3rd.DATATABLES_EDITOR + '/js/editor.autoComplete.js' 
 		])
 
-		.pipe(gulp.dest('./public/js/'));
+		.pipe(gulp.dest('./app/js/'));
 			
 });
 
@@ -175,7 +175,7 @@ gulp.task('build-dl-data-js', function() {
 		.pipe(replace("$AUTH0_CLIENT_ID", process.env.AUTH0_CLIENT_ID))
 		.pipe(replace("$AUTH0_DOMAIN", process.env.AUTH0_DOMAIN))
 		.pipe(concat('dl_data.js'))
-		.pipe(gulp.dest('./public/js/'));
+		.pipe(gulp.dest('./app/js/'));
 			
 });
 
@@ -201,7 +201,7 @@ gulp.task('build-dl-schema-js', function() {
 		.pipe(replace("$AUTH0_CLIENT_ID", process.env.AUTH0_CLIENT_ID))
 		.pipe(replace("$AUTH0_DOMAIN", process.env.AUTH0_DOMAIN))
 		.pipe(concat('dl_schema.js'))
-		.pipe(gulp.dest('./public/js/'));
+		.pipe(gulp.dest('./app/js/'));
 			
 });
 
@@ -240,7 +240,7 @@ gulp.task('build-data-html', function() {
     		}
   		}))
 
-		.pipe(gulp.dest('./public/'));
+		.pipe(gulp.dest('./app/'));
 });
 
 gulp.task('build-schema-html', function() {
@@ -276,35 +276,35 @@ gulp.task('build-schema-html', function() {
     		}
   		}))
 
-		.pipe(gulp.dest('./public/'));
+		.pipe(gulp.dest('./app/'));
 });
 
 gulp.task('build-swaggerui', function() {
 	return gulp.src([src3rd + ver3rd.SWAGGER_UI + '/dist/**'])
-	.pipe(gulp.dest('./public/docs'));
+	.pipe(gulp.dest('./app/api'));
 
 });
 
-gulp.task('build-api-json', ['build-docs'], function() {
+gulp.task('build-api-json', function() {
 	var host = process.env.DONKEYLIFT_API.replace(new RegExp('http://'), '');
 
-	return gulp.src(['./src/docs/swagger.json'])
+	return gulp.src(['./src/api/swagger.json'])
 	.pipe(replace("$DONKEYLIFT_API", host))
-	.pipe(gulp.dest('./public/docs'));
+	.pipe(gulp.dest('./app/api'));
 });
 
 gulp.task('build-auth-md', ['build-docs'], function() {
 
-	var pre = '<html>'
-		+ '<head>'
-		+ '<link rel="stylesheet" href="github-markdown.css">'
-	    + '<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/styles/github.min.css">'
-		+ '<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/highlight.min.js"></script>'
-		+ '<script>hljs.initHighlightingOnLoad();</script>'
-		+ '</head>'
-		+ '<body><div class="markdown-body">';
+	var pre = ['<html>'
+		, '<head>'
+		, '<link rel="stylesheet" href="github-markdown.css">'
+	    , '<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/styles/github.min.css">'
+		, '<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/highlight.min.js"></script>'
+		, '<script>hljs.initHighlightingOnLoad();</script>'
+		, '</head>'
+		, '<body><div class="markdown-body">'].join('\n');
 
-	var post = '</div></body></html>';
+	var post = ['</div>', '</body>', '</html>'].join('\n');
 
 	return gulp.src(['./src/docs/AccessControl.md'])
 	.pipe(markdown())

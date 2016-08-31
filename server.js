@@ -25,7 +25,10 @@ if (process.env.DONKEYLIFT_WWW) {
 	config.port = process.env.PORT;
 }
 
+app.use('/app', express.static('./app'));
 app.use('/public', express.static('./public')); 
+
+app.get('/', function(req, res) { res.redirect('/public/index.html') });
 
 app.listen(config.port, config.ip, function() {
 	console.log("Started server on " + config.ip + ":" + config.port);
