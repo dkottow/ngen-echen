@@ -31,8 +31,9 @@ var allTasks = [ 'copy-images'
 				, 'build-schema-html'
 				, 'build-index-html'
 				, 'build-signup-html'
-				, 'build-swaggerui'
-				, 'build-api-json'
+				, 'build-api-swagger'
+				, 'build-api-js'
+				, 'build-api-html'
 				, 'build-auth-md'
 				, 'build-docs'
 				, 'build-videos-html'
@@ -279,19 +280,37 @@ gulp.task('build-schema-html', function() {
 		.pipe(gulp.dest('./app/'));
 });
 
-gulp.task('build-swaggerui', function() {
+gulp.task('build-api-swagger', function() {
 	return gulp.src([src3rd + ver3rd.SWAGGER_UI + '/dist/**'])
 	.pipe(gulp.dest('./app/api'));
 
 });
 
-gulp.task('build-api-json', function() {
+
+gulp.task('build-api-js', ['build-api-swagger'], function() {
 	var host = process.env.DONKEYLIFT_API.replace(new RegExp('http://'), '');
 
-	return gulp.src(['./src/api/swagger.json'])
-	.pipe(replace("$DONKEYLIFT_API", host))
-	.pipe(gulp.dest('./app/api'));
+	return gulp.src(['./src/api/swagger.json', './src/api/dl_swagger.js'])
+
+		.pipe(replace("$DONKEYLIFT_API", host))
+		.pipe(replace("$AUTH0_CLIENT_ID", process.env.AUTH0_CLIENT_ID))
+		.pipe(replace("$AUTH0_DOMAIN", process.env.AUTH0_DOMAIN))
+
+		.pipe(gulp.dest('./app/api'));
 });
+
+gulp.task('build-api-html', ['build-api-swagger'], function() {
+	return gulp.src(['./src/api/index.html'])
+
+		.pipe(inject(gulp.src('./src/html/common/nav-login.html'), {
+		    starttag: '<!-- inject:nav:{{ext}} -->',
+		    transform: function (filePath, file) {
+		      return file.contents.toString('utf8')
+    		}
+  		}))
+		.pipe(gulp.dest('./app/api'));
+});	
+
 
 gulp.task('build-auth-md', ['build-docs'], function() {
 
@@ -360,7 +379,7 @@ gulp.task('build-signup-html', function() {
 
 		.pipe(replace("$DONKEYLIFT_API", process.env.DONKEYLIFT_API))
 
-		.pipe(gulp.dest('./public/'));
+		.pipe(gulp.dest('./app/'));
 	
 });
 
