@@ -20,6 +20,7 @@ require('dotenv').config({path: envPath});
 
 var allTasks = [ 'copy-images'
 				, 'copy-fonts'
+				, 'copy-excel' 
 				, 'copy-3rdparty-js' 
 				, 'copy-3rdparty-css' 
 				, 'build-3rdparty-js' 
@@ -88,6 +89,11 @@ gulp.task('copy-fonts', function() {
 		])	
 
 		.pipe(gulp.dest('./public/fonts/'));
+});
+
+gulp.task('copy-excel', function() {
+	return gulp.src([extdir + 'ngen-ko/DonkeyExcel.xlsm'])	
+		.pipe(gulp.dest('./public/'));
 });
 
 gulp.task('build-3rdparty-css', function() {
