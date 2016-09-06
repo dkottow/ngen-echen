@@ -25,6 +25,7 @@ var allTasks = [ 'copy-images'
 				, 'build-3rdparty-js' 
 				, 'build-dl-data-js' 
 				, 'build-dl-schema-js' 
+				, 'build-dl-signup-js' 
 				, 'build-3rdparty-css' 
 				, 'build-donkeylift-css'
 				, 'build-data-html'
@@ -207,6 +208,20 @@ gulp.task('build-dl-schema-js', function() {
 });
 
 
+gulp.task('build-dl-signup-js', function() {
+
+	if ( ! process.env.DONKEYLIFT_API) {
+		console.log("ERROR. Define env var DONKEYLIFT_API");
+		process.exit(1);
+	}
+
+	return gulp.src(["./src/js/dl_signup.js"
+			])
+		.pipe(replace("$DONKEYLIFT_API", process.env.DONKEYLIFT_API))
+		.pipe(gulp.dest('./app/js/'));
+			
+});
+
 
 gulp.task('build-data-html', function() {
 
@@ -377,8 +392,6 @@ gulp.task('build-signup-html', function() {
     		}
   		}))
 
-		.pipe(replace("$DONKEYLIFT_API", process.env.DONKEYLIFT_API))
-
 		.pipe(gulp.dest('./app/'));
 	
 });
@@ -388,6 +401,7 @@ gulp.task('watch', function() {
     gulp.watch('./src/js/**/*.js', [
 		'build-dl-data-js'
 		, 'build-dl-schema-js'
+		, 'build-dl-signup-js'
 	]);
     gulp.watch('./src/html/**/*.html', [
 		'build-data-html' 
