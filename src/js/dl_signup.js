@@ -1,12 +1,21 @@
-
+/*global $ */
 
 var signupAction = '$DONKEYLIFT_API/public/signup';
 
 function addEventHandlers() {
 
+	$.ajaxPrefilter(function( options, _, jqXHR ) {
+		$('#ajax-progress-spinner').show();
+	    jqXHR.always(function() {
+			$('#ajax-progress-spinner').hide();
+		});
+	});
+
 	$('#email').change(function() {
-		var at = $('#email').val().indexOf('@');
-		$('#account').val( $('#email').val().substr(0, at) );
+		var accountName = $('#email').val()
+			.substr(0, $('#email').val().indexOf('@'))
+			.replace(/[^a-zA-Z0-9]/g, '_');
+		$('#account').val(accountName);
 	});
 
 	$('form').attr('action', signupAction);
