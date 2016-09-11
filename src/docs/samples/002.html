@@ -5,10 +5,8 @@
 	<style>
 		th, td { padding: 0 0.5em; }
 		h1, h3 { margin: 20px; }
-		.panel-footer { font-weight: bold; color: red; }
+
 		.form-control { width: auto; }
-		#btn-login { margin-top: -5px; margin-left: 10px }
-		#ui-orders { margin-top: 1em; display: none }
 		.spread-label { 
 			float: left;
 			width: 2em;
@@ -22,6 +20,11 @@
 			margin: 5px; padding: 5px; 
 			text-align: right;
 		}
+		.panel-footer { font-weight: bold; color: red; }
+
+		#btn-login { margin-top: -5px; margin-left: 10px }
+		#ui-orders { margin-top: 1em; margin-left: 20px; display: none }
+		#progress { font-style: italic; color: red; }
 	</style>
 </head>
 
@@ -31,9 +34,9 @@
   </h1>	
     <div id="ui-orders" class="form-group form-inline">	
       <label for="txt-date-from">From</label>
-	  <input type="text" id="txt-date-from" class="input-lg"></input>
+	  <input type="text" id="txt-date-from" class="form-control"></input>
       <label for="txt-date-to">to</label>
-	  <input type="text" id="txt-date-to" class="input-lg"></input>
+	  <input type="text" id="txt-date-to" class="form-control"></input>
       <label for="sel-groupby">group by</label>
       <select id="sel-groupby" class="form-control">
 	    <option>Orders</option>
@@ -42,6 +45,7 @@
       </select>	
       <button id="btn-data" class="btn btn-default">Get Orders</button>	
   </div>	
+  <div><span id="progress"></span></div>
   <div id="data"></div>
 </body>
 
@@ -79,19 +83,9 @@ $(function() {
 			+ "'" + startDate.toISOString(0,10) + "', " 
 			+ "'" + endDate.toISOString(0,10) + "'";
 
-		var orderBy = 'orders.order_date';
-/*
-		if (groupTable == 'customers') {
-			orderBy = 'customers.name, orders.order_date';
-		} else if (groupTable == 'sandwiches') {
-			orderBy = 'sandwiches.name, orders.order_date';
-		}
-*/
-    	client.table.getObjs({
-			account: 'demo', 
-			database: 'sandwiches', 
-			table: groupTable, 
-			$select: [
+		var options = {
+			filter: filterStr,
+			select: [
 				'customers.id'
 				, 'customers.name'
 				, 'orders.id'
@@ -103,34 +97,115 @@ $(function() {
 				, 'sandwiches.id' 
 				, 'sandwiches.name' 
 			],
-
-			$filter: filterStr,
-			$orderby: orderBy	
-/*
-			$filter: [{
-				field: 'orders.date', 
-				op: 'btwn',
-				value: [startDate, endDate]
-			}]
-*/
 			
-		}, function(data) {
+		};
 
+		$('#data').empty();
+		$('#progress').text('Loading..');
 
-			console.log(data);
-			var tid = '#' + groupTable + '-template';
-			var template = Handlebars.compile($(tid).html());
-			var title = new Date($('#txt-date-from').val()).toDateString() 
+		allObjects = {};
+
+		loadOrders(groupTable, options, function(objs) {
+			console.log(objs);
+			$('#progress').text('Crunching..');
+
+			setTimeout(function() {
+
+				var tid = '#' + groupTable + '-template';
+				var template = Handlebars.compile($(tid).html());
+				var title = new Date($('#txt-date-from').val()).toDateString() 
 					+ ' - ' + new Date($('#txt-date-to').val()).toDateString();
-			var stats = summarize(data.obj.objs, groupTable);
-			var ctx = {
-				title: title,
-				stats: stats, 
-				items: data.obj.objs
-			};
 
-        	$('#data').html(template(ctx));
-    	});
+				var stats = summarize(objs, groupTable);
+
+				var ctx = {
+					title: title,
+					stats: stats, 
+					items: objs
+				};
+
+    	    	$('#data').html(template(ctx));
+				$('#progress').text('');
+			}, 20);
+		});
+	}
+
+	function login(user, pass) {
+		$.post("http://api.donkeylift.com/public/login", { 
+			email: user, 
+			password: pass
+
+		}, function(data) {
+			//console.log(data);
+
+			var auth = new SwaggerClient.ApiKeyAuthorization(
+				'Authorization',
+				'Bearer ' + data.id_token,
+				'header'
+			);
+
+  			window.client = new SwaggerClient({
+		    	url: "http://api.donkeylift.com/public/swagger.json",
+				authorizations: [ auth ],
+	    		success: function() {
+					console.log('swagger client init ok.');
+					getOrderStats();
+    			}
+			});
+
+		});
+	}
+
+	function loadOrders(groupTable, options, cbAfter) {
+		console.log('loadOrders ' + groupTable);
+
+		var orderBy = 'orders.order_date';
+
+    	client.table.getObjs({
+			account: 'demo', 
+			database: 'sandwiches', 
+			table: groupTable, 
+			$select: options.select || [],
+			$filter: options.filter || '',
+			$orderby: options.orderBy || orderBy,
+			$skip: options.skip || 0,
+			$top: 1000 //currently the limit on rows returned by DL 
+
+		}, function(data) {
+			console.log(data);
+
+			addObjects(groupTable, data.obj.objs);
+
+			if (data.obj.nextOffset) {
+				options.skip = data.obj.nextOffset;
+				loadOrders(groupTable, options, cbAfter);
+				
+				var i = 1 + data.obj.nextOffset / 1000;
+				var n = Math.ceil(data.obj.count / 1000);
+				$('#progress').text('Loading ' + i + ' of ' + n);
+
+			} else {
+				var objs = {};
+				objs[groupTable] = _.values(allObjects);
+				cbAfter(objs);
+			}
+		});
+
+	}
+
+	function getOrderStats() {
+
+    	client.table.getStats({
+			account: 'demo', 
+			database: 'sandwiches', 
+			table: 'orders', 
+
+		}, function(rsp) {
+			console.log(rsp);
+			$('#txt-date-from').val(rsp.obj.order_date.min);
+			$('#txt-date-to').val(rsp.obj.order_date.max);
+			$('#ui-orders').show();
+   		});
 	}
 
 	function summarize(items, groupTable)
@@ -166,7 +241,8 @@ $(function() {
 				}, 0);
 				var spread = { 
 					bin: Math.round(
-						(i + 0.5) * (range[1] - range[0]) / bins.length ), 
+						(i + 0.5) * (range[1] - range[0]) 
+						/ result.spread.length), 
 					sum: sum, 
 					width: Math.floor(800 * sum / result.counts[groupTable]) 
 				};
@@ -180,6 +256,13 @@ $(function() {
 						return total + order.total_amount;
 				}, 0);
 				customer.totalStr = customer.total.toFixed(2);
+
+				_.each(customer.orders, function(order) {
+					order.units = _.reduce(order.order_items, 
+						function(count, item) {
+							return count + item.quantity;
+					}, 0);
+				});
 			});
 
 			items.customers = _.sortBy(items.customers, function(customer) {
@@ -230,45 +313,48 @@ $(function() {
 		return result;
 	}
 
-	function login(user, pass) {
-		$.post("http://api.donkeylift.com/public/login", { 
-			email: user, 
-			password: pass
+	var allObjects;
 
-		}, function(data) {
-			//console.log(data);
+	function addObjects(groupTable, objs) {
+		_.each(objs[groupTable], function(obj) {
+			if ( ! allObjects[obj.id]) {
+				allObjects[obj.id] = obj;
 
-			var auth = new SwaggerClient.ApiKeyAuthorization(
-				'Authorization',
-				'Bearer ' + data.id_token,
-				'header'
-			);
+			} else { //augment existing object with child elements
 
-  			window.client = new SwaggerClient({
-		    	url: "http://api.donkeylift.com/public/swagger.json",
-				authorizations: [ auth ],
-	    		success: function() {
-					console.log('swagger client init ok.');
-					getOrderStats();
-    			}
-			});
+				if (groupTable == 'orders') {
+					var allItems = allObjects[obj.id].order_items.concat(
+						obj.order_items);
+					allObjects[obj.id].order_items = allItems;
 
+				} else if (groupTable == 'sandwiches') {
+console.log('merging ' + obj.id + ' ' + obj.name);
+					var allItems = allObjects[obj.id].order_items.concat(
+						obj.order_items);
+					allObjects[obj.id].order_items = allItems;
+
+				} else if (groupTable == 'customers') {
+					//need to merge at order_items level
+					var orders = _.zipObject(
+						_.map(allObjects[obj.id].orders, 'id'),
+						allObjects[obj.id].orders
+					);
+					_.each(obj.orders, function(order) {
+
+						if ( ! orders[order.id]) {
+							orders[order.id] = order;
+
+						} else {
+							var allItems = orders[order.id].order_items.concat(
+								order.order_items
+							);
+							orders[order.id].order_items = allItems;
+						}
+					});
+					allObjects[obj.id].orders = _.values(orders);
+				}
+			}
 		});
-	}
-
-	function getOrderStats() {
-
-    	client.table.getStats({
-			account: 'demo', 
-			database: 'sandwiches', 
-			table: 'orders', 
-
-		}, function(rsp) {
-			console.log(rsp);
-			$('#txt-date-from').val(rsp.obj.order_date.min);
-			$('#txt-date-to').val(rsp.obj.order_date.max);
-			$('#ui-orders').show();
-   		});
 	}
 
 });
@@ -357,11 +443,13 @@ $(function() {
 		<table>
 		<tr>
 			<th>Order Date</th>
+			<th>Units</th>
 			<th>Total</th>
 		</tr>
     	{{#each orders}}
 			<tr>
 				<td>{{order_date}}</td>
+				<td>{{units}}</td>
 				<td>${{total_amount}}</td>
 			</tr>
 		{{/each}}
@@ -401,13 +489,15 @@ $(function() {
 		<table>
 		<tr>
 			<th>Order Date</th>
+			<th>Customer</th>
 			<th>Units</th>
 			<th>Price</th>
 		</tr>
     	{{#each order_items}}
 			<tr>
 				<td>{{orders.order_date}}</td>
-				<td>{{quantity}}x</td>
+				<td>{{orders.customers.name}}</td>
+				<td>{{quantity}}</td>
 				<td>${{unit_price}}</td>
 			</tr>
 		{{/each}}
