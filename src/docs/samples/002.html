@@ -1,0 +1,424 @@
+<html>
+<head>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.css">
+	<style>
+		th, td { padding: 0 0.5em; }
+		h1, h3 { margin: 20px; }
+		.panel-footer { font-weight: bold; color: red; }
+		.form-control { width: auto; }
+		#btn-login { margin-top: -5px; margin-left: 10px }
+		#ui-orders { margin-top: 1em; display: none }
+		.spread-label { 
+			float: left;
+			width: 2em;
+			margin: 5px; 
+			padding: 5px 0 5px 0; 
+			text-align: right;
+		}
+		.spread-bar { 
+			float: left;
+			background-color: green; 
+			margin: 5px; padding: 5px; 
+			text-align: right;
+		}
+	</style>
+</head>
+
+<body>
+  <h1>Sales Report
+  <button id="btn-login" class="btn btn-primary">Login as demo</button>	
+  </h1>	
+    <div id="ui-orders" class="form-group form-inline">	
+      <label for="txt-date-from">From</label>
+	  <input type="text" id="txt-date-from" class="input-sm"></input>
+      <label for="txt-date-to">to</label>
+	  <input type="text" id="txt-date-to" class="input-sm"></input>
+      <label for="sel-groupby">group by</label>
+      <select id="sel-groupby" class="form-control">
+	    <option>Orders</option>
+	    <option>Customers</option>
+	    <option>Sandwiches</option>
+      </select>	
+      <button id="btn-data" class="btn btn-default">Get Orders</button>	
+  </div>	
+  <div id="data"></div>
+</body>
+
+<script src="//code.jquery.com/jquery-3.1.0.min.js" type="text/javascript"></script>
+<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.js" type="text/javascript"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.15.0/lodash.min.js" type="text/javascript"></script>
+<script src="swagger-client.js" type="text/javascript"></script>
+<script type="text/javascript">
+
+$(function() {
+
+	$('#btn-login').click(function() {
+		//console.log('btn login click');
+		login('demo@donkeylift.com', 'demo');
+	});
+
+	$('#btn-data').click(function() {
+		//console.log('btn data click');
+		getOrders($('#sel-groupby').val().toLowerCase(), 
+			new Date($('#txt-date-from').val()),
+			new Date($('#txt-date-to').val())
+		);
+	});
+
+	$("#txt-date-from").datepicker();
+	$("#txt-date-from").datepicker("option", "dateFormat", "yy-mm-dd");
+	$("#txt-date-to").datepicker();
+	$("#txt-date-to").datepicker("option", "dateFormat", "yy-mm-dd");
+
+	function getOrders(groupTable, startDate, endDate) {
+
+		var filterStr = "orders.order_date btwn " 
+			+ "'" + startDate.toISOString(0,10) + "', " 
+			+ "'" + endDate.toISOString(0,10) + "'";
+
+		var orderBy = 'orders.order_date';
+/*
+		if (groupTable == 'customers') {
+			orderBy = 'customers.name, orders.order_date';
+		} else if (groupTable == 'sandwiches') {
+			orderBy = 'sandwiches.name, orders.order_date';
+		}
+*/
+    	client.table.getObjs({
+			account: 'demo', 
+			database: 'sandwiches', 
+			table: groupTable, 
+			$select: [
+				'customers.id'
+				, 'customers.name'
+				, 'orders.id'
+				, 'orders.order_date'
+				, 'orders.total_amount'
+				, 'order_items.id'
+				, 'order_items.quantity'
+				, 'order_items.unit_price'
+				, 'sandwiches.id' 
+				, 'sandwiches.name' 
+			],
+
+			$filter: filterStr,
+			$orderby: orderBy	
+/*
+			$filter: [{
+				field: 'orders.date', 
+				op: 'btwn',
+				value: [startDate, endDate]
+			}]
+*/
+			
+		}, function(data) {
+
+
+			console.log(data);
+			var tid = '#' + groupTable + '-template';
+			var template = Handlebars.compile($(tid).html());
+			var title = new Date($('#txt-date-from').val()).toDateString() 
+					+ ' - ' + new Date($('#txt-date-to').val()).toDateString();
+			var stats = summarize(data.obj.objs, groupTable);
+			var ctx = {
+				title: title,
+				stats: stats, 
+				items: data.obj.objs
+			};
+
+        	$('#data').html(template(ctx));
+    	});
+	}
+
+	function summarize(items, groupTable)
+	{
+		var result = {
+			counts: { }
+		}
+		result.counts[groupTable] = items[groupTable].length;
+
+		if (groupTable == 'orders') {
+			result.total = _.reduce(items.orders, function(total, order) {
+				return total + order.total_amount;
+			}, 0);
+			
+			var range = [9999, 0];
+			_.each(items.orders, function(order) {
+				range[0] = Math.min(range[0], order.total_amount);
+				range[1] = Math.max(range[1], order.total_amount);
+			});
+
+			range[0] = 20 * Math.floor(range[0] / 20);
+			range[1] = 20 * Math.ceil(range[1] / 20);
+
+			var bins = [0, 0, 0, 0, 0];
+			result.spread = new Array(5);
+			for(var i = 0;i < result.spread.length; ++i) {
+				var sum =  _.reduce(items.orders, function(memo, order) {
+					var idx = Math.floor(
+						result.spread.length * (order.total_amount - range[0]) 
+						/ (range[1] - range[0] + 1e-6)
+					);
+					return memo + (idx == i ? 1 : 0);
+				}, 0);
+				var spread = { 
+					bin: Math.round(
+						(i + 0.5) * (range[1] - range[0]) / bins.length ), 
+					sum: sum, 
+					width: Math.floor(800 * sum / result.counts[groupTable]) 
+				};
+				result.spread[i] = spread;	
+			}
+		} else if (groupTable == 'customers') {
+
+			_.each(items.customers, function(customer) {
+				customer.total = _.reduce(customer.orders, 
+					function(total, order) {
+						return total + order.total_amount;
+				}, 0);
+				customer.totalStr = customer.total.toFixed(2);
+			});
+
+			items.customers = _.sortBy(items.customers, function(customer) {
+				return -customer.total;
+			});
+
+			result.total = _.reduce(items.customers, function(total, customer) {
+				return total + customer.total;
+			}, 0);
+
+			result.counts.orders = _.reduce(items.customers, 
+				function(total, customer) {
+					return total + customer.orders.length;
+			}, 0);
+			
+
+		} else if (groupTable == 'sandwiches') {
+
+			_.each(items.sandwiches, function(sandwich) {
+				sandwich.total = _.reduce(sandwich.order_items, 
+					function(total, item) {
+						return total + item.quantity*item.unit_price;
+				}, 0);
+				sandwich.totalStr = sandwich.total.toFixed(2);
+				sandwich.count = _.reduce(sandwich.order_items, 
+					function(count, item) { return count + item.quantity; },
+				0);	
+			});
+
+			items.sandwiches = _.sortBy(items.sandwiches, function(sandwich) {
+				return -sandwich.count;
+			});
+
+			result.total = _.reduce(items.sandwiches, 
+				function(total, sandwich) {
+					return total + sandwich.total;
+			}, 0);
+
+			result.counts.order_items = _.reduce(items.sandwiches, 
+				function(total, sandwich) {
+					return total + sandwich.order_items.length;
+			}, 0);
+		}
+
+		result.totalStr = result.total.toFixed(2);
+
+		console.log(result);
+		return result;
+	}
+
+	function login(user, pass) {
+		$.post("http://api.donkeylift.com/public/login", { 
+			email: user, 
+			password: pass
+
+		}, function(data) {
+			//console.log(data);
+
+			var auth = new SwaggerClient.ApiKeyAuthorization(
+				'Authorization',
+				'Bearer ' + data.id_token,
+				'header'
+			);
+
+  			window.client = new SwaggerClient({
+		    	url: "http://api.donkeylift.com/public/swagger.json",
+				authorizations: [ auth ],
+	    		success: function() {
+					console.log('swagger client init ok.');
+					getOrderStats();
+    			}
+			});
+
+		});
+	}
+
+	function getOrderStats() {
+
+    	client.table.getStats({
+			account: 'demo', 
+			database: 'sandwiches', 
+			table: 'orders', 
+
+		}, function(rsp) {
+			console.log(rsp);
+			$('#txt-date-from').val(rsp.obj.order_date.min);
+			$('#txt-date-to').val(rsp.obj.order_date.max);
+			$('#ui-orders').show();
+   		});
+	}
+
+});
+</script>
+
+<script id="orders-template" type="text/x-handlebars-template">
+  <div class="entry">
+    <h3>{{title}}</h3>
+	<h3>Order value spread</h3>
+    {{#each stats.spread}}
+		<div class="spread-label">${{bin}}</div>
+		<div class="spread-bar" style="width: {{width}}px">
+			{{sum}}
+		</div>
+		<div style="clear: both;"></div>
+	{{/each}}
+	<h3>
+		<div style="float: left">{{stats.counts.orders}} orders.</div> 
+		<div style="float: right">Total sales: ${{stats.totalStr}}</div>
+		<div style="clear: both"></div>
+	</h3>
+
+    {{#each items.orders}}
+
+<div class="panel-group">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" href="#collapse-{{id}}">
+			<div style="float: left">{{order_date}} {{customers.name}}</div>
+			<div style="float: right">${{total_amount}}</div>
+			<div style="clear: both"></div>
+		</a>
+        <a data-toggle="collapse" href="#collapse-{{id}}"></a>
+      </h4>
+    </div>
+    <div id="collapse-{{id}}" class="panel-collapse collapse">
+      <div class="panel-body">
+		<table>
+		<tr>
+			<th></th>
+			<th>Sandwich</th>
+			<th>Price</th>
+		</tr>
+    	{{#each order_items}}
+			<tr>
+				<td>{{quantity}}x</td>
+				<td>{{sandwiches.name}}</td>
+				<td>${{unit_price}}</td>
+			</tr>
+		{{/each}}
+		</table>
+	  </div>
+      <div class="panel-footer">Total ${{total_amount}}</div>
+    </div>
+  </div>
+</div>
+
+    {{/each}}
+  </div>
+</script>
+
+<script id="customers-template" type="text/x-handlebars-template">
+  <div class="entry">
+    <h3>{{title}}</h3>
+	<h3>
+		<div style="float: left">{{stats.counts.customers}} customers.</div> 
+		<div style="float: right">Total sales: ${{stats.totalStr}}</div>
+		<div style="clear: both"></div>
+	</h3>
+    {{#each items.customers}}
+
+<div class="panel-group">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" href="#collapse-{{id}}">
+			<div style="float: left">{{name}} - {{orders.length}} orders</div>
+			<div style="float: right">${{totalStr}}</div>
+			<div style="clear: both"></div>
+		</a>
+      </h4>
+    </div>
+    <div id="collapse-{{id}}" class="panel-collapse collapse">
+      <div class="panel-body">
+		<table>
+		<tr>
+			<th>Order Date</th>
+			<th>Total</th>
+		</tr>
+    	{{#each orders}}
+			<tr>
+				<td>{{order_date}}</td>
+				<td>${{total_amount}}</td>
+			</tr>
+		{{/each}}
+		</table>
+	  </div>
+    </div>
+  </div>
+</div>
+
+    {{/each}}
+  </div>
+</script>
+
+<script id="sandwiches-template" type="text/x-handlebars-template">
+  <div class="entry">
+    <h3>{{title}}</h3>
+	<h3>
+		<div style="float: left">{{stats.counts.sandwiches}} sandwiches. {{stats.counts.order_items}} units</div> 
+		<div style="float: right">Total sales: ${{stats.totalStr}}</div>
+		<div style="clear: both"></div>
+	</h3>
+    {{#each items.sandwiches}}
+
+<div class="panel-group">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" href="#collapse-{{id}}">
+			<div style="float: left">{{count}} units - {{name}}</div>
+			<div style="float: right">${{totalStr}}</div>
+			<div style="clear: both"></div>
+		</a>
+      </h4>
+    </div>
+    <div id="collapse-{{id}}" class="panel-collapse collapse">
+      <div class="panel-body">
+		<table>
+		<tr>
+			<th>Order Date</th>
+			<th>Units</th>
+			<th>Price</th>
+		</tr>
+    	{{#each order_items}}
+			<tr>
+				<td>{{orders.order_date}}</td>
+				<td>{{quantity}}x</td>
+				<td>${{unit_price}}</td>
+			</tr>
+		{{/each}}
+		</table>
+	  </div>
+    </div>
+  </div>
+</div>
+
+    {{/each}}
+  </div>
+</script>
+</html>
+

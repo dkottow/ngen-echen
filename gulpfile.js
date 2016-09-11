@@ -37,6 +37,7 @@ var allTasks = [ 'copy-images'
 				, 'build-api-html'
 				, 'build-auth-md'
 				, 'build-docs'
+				, 'build-samples'
 				, 'build-docs-html'
 ];
 
@@ -351,6 +352,12 @@ gulp.task('build-docs', function() {
 	
 	return gulp.src(['./src/docs/*'])
 	.pipe(gulp.dest('./public/docs/'));
+});
+
+gulp.task('build-samples', function() {
+	
+	return gulp.src(['./src/docs/samples/*'])
+	.pipe(gulp.dest('./public/docs/samples/'));
 });
 
 gulp.task('build-docs-html', ['build-docs'], function() {

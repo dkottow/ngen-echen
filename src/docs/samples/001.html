@@ -1,0 +1,65 @@
+<html>
+<head>
+	<style>
+		div { margin: 1em };
+	</style>
+</head>
+<body>
+  <button id="btn-login">Login as demo</button>	
+  <button id="btn-data" disabled="true" >Get Sandwiches</button>	
+  <div id="data"></div>
+</body>
+
+<script src='//code.jquery.com/jquery-3.1.0.min.js' type='text/javascript'></script>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+<script src='swagger-client.js' type='text/javascript'></script>
+<script type="text/javascript">
+
+	$('#btn-login').click(function() {
+
+		$.post( "http://api.donkeylift.com/public/login", { 
+			email: "demo@donkeylift.com", 
+			password: "demo" 
+
+		}, function(data) {
+			//console.log(data);
+
+			var auth = new SwaggerClient.ApiKeyAuthorization(
+				'Authorization',
+				'Bearer ' + data.id_token,
+				'header'
+			);
+
+  			window.client = new SwaggerClient({
+		    	url: "http://api.donkeylift.com/public/swagger.json",
+				authorizations: [ auth ],
+	    		success: function() {
+					$('#btn-data').prop('disabled', false);
+					console.log('swagger client init ok.');
+    			}
+			});
+
+		});
+	});
+
+	$('#btn-data').click(function() {
+
+    	client.table.getRows({
+			account: 'demo', 
+			database: 'sandwiches', 
+			table: 'sandwiches', 
+			$orderby: 'name',
+			$top: 20
+
+		}, function(data) {
+        	document.getElementById("data").innerHTML
+			= '<pre class="prettyprint">'
+			+ JSON.stringify(data.obj, null, 4);
+			+ '</pre>'
+			PR.prettyPrint();
+    	});
+	});
+
+</script>
+</html>
+
