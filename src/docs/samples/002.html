@@ -266,6 +266,15 @@ $(function() {
 				};
 				result.spread[i] = spread;	
 			}
+
+			/* we need to sort the orders by date, anyway. 
+			   the server forces ordering by id of the top-level object,
+			   otherwise getObjs wont be able to make sure it returns complete obj trees...
+			*/		
+			items.orders = _.sortBy(items.orders, function(order) {
+				return order.order_date;
+			});
+
 		} else if (groupTable == 'customers') {
 
 			_.each(items.customers, function(customer) {
@@ -369,7 +378,7 @@ $(function() {
     <div class="panel-heading">
       <h4 class="panel-title">
         <a data-toggle="collapse" href="#collapse-{{id}}">
-			<div style="float: left">{{order_date}} {{customers.name}}</div>
+			<div style="float: left">{{order_date}} {{customers.name}} - {{units}} units</div>
 			<div style="float: right">${{total_amount}}</div>
 			<div style="clear: both"></div>
 		</a>
