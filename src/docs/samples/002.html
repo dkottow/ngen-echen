@@ -77,6 +77,7 @@ $(function() {
 	$("#txt-date-to").datepicker();
 	$("#txt-date-to").datepicker("option", "dateFormat", "yy-mm-dd");
 
+
 	function getOrders(groupTable, startDate, endDate) {
 
 		var filterStr = "orders.order_date btwn " 
@@ -103,7 +104,8 @@ $(function() {
 		$('#data').empty();
 		$('#progress').text('Loading..');
 
-		allObjects = {};
+
+		accObjects = []; //reset global object acc
 
 		loadOrders(groupTable, options, function(objs) {
 			console.log(objs);
@@ -145,7 +147,8 @@ $(function() {
 			);
 
   			window.client = new SwaggerClient({
-		    	url: "http://api.donkeylift.com/public/swagger.json",
+		    	//url: "http://api.donkeylift.com/public/swagger.json",
+		    	url: "http://localhost:3000/public/swagger.json",
 				authorizations: [ auth ],
 	    		success: function() {
 					console.log('swagger client init ok.');
@@ -155,6 +158,8 @@ $(function() {
 
 		});
 	}
+
+	var accObjects = []; //accumulates objs from multiple req
 
 	function loadOrders(groupTable, options, cbAfter) {
 		console.log('loadOrders ' + groupTable);
@@ -169,24 +174,25 @@ $(function() {
 			$filter: options.filter || '',
 			$orderby: options.orderBy || orderBy,
 			$skip: options.skip || 0,
-			$top: 1000 //currently the limit on rows returned by DL 
+			$top: 1000 //redundant since this is internally also the limit 
 
 		}, function(data) {
 			console.log(data);
 
-			addObjects(groupTable, data.obj.objs);
+			accObjects = accObjects.concat(data.obj.objs[groupTable]);
 
 			if (data.obj.nextOffset) {
 				options.skip = data.obj.nextOffset;
 				loadOrders(groupTable, options, cbAfter);
 				
-				var i = 1 + data.obj.nextOffset / 1000;
+				var i = Math.ceil(1 + data.obj.nextOffset / 1000);
 				var n = Math.ceil(data.obj.count / 1000);
 				$('#progress').text('Loading ' + i + ' of ' + n);
 
 			} else {
+				cbAfter();
 				var objs = {};
-				objs[groupTable] = _.values(allObjects);
+				objs[groupTable] = accObjects;
 				cbAfter(objs);
 			}
 		});
@@ -218,6 +224,18 @@ $(function() {
 		if (groupTable == 'orders') {
 			result.total = _.reduce(items.orders, function(total, order) {
 				return total + order.total_amount;
+			}, 0);
+
+			_.each(items.orders, function(order) {
+				order.units = _.reduce(order.order_items, 
+					function(count, item) {
+						return count + item.quantity;
+				}, 0);
+			});
+			
+			result.counts.units = _.reduce(items.orders, 
+				function(count, order) {
+					return count + order.units;
 			}, 0);
 			
 			var range = [9999, 0];
@@ -263,10 +281,11 @@ $(function() {
 							return count + item.quantity;
 					}, 0);
 				});
-			});
 
-			items.customers = _.sortBy(items.customers, function(customer) {
-				return -customer.total;
+				customer.units = _.reduce(customer.orders, 
+					function(count, order) {
+						return count + order.units;
+				}, 0);
 			});
 
 			result.total = _.reduce(items.customers, function(total, customer) {
@@ -278,6 +297,14 @@ $(function() {
 					return total + customer.orders.length;
 			}, 0);
 			
+			result.counts.units = _.reduce(items.customers, 
+				function(total, customer) {
+					return total + customer.units;
+			}, 0);
+
+			items.customers = _.sortBy(items.customers, function(customer) {
+				return -customer.total;
+			});
 
 		} else if (groupTable == 'sandwiches') {
 
@@ -292,69 +319,27 @@ $(function() {
 				0);	
 			});
 
-			items.sandwiches = _.sortBy(items.sandwiches, function(sandwich) {
-				return -sandwich.count;
-			});
-
 			result.total = _.reduce(items.sandwiches, 
 				function(total, sandwich) {
 					return total + sandwich.total;
 			}, 0);
 
-			result.counts.order_items = _.reduce(items.sandwiches, 
+			result.counts.units = _.reduce(items.sandwiches, 
 				function(total, sandwich) {
-					return total + sandwich.order_items.length;
+					return total + sandwich.count;
 			}, 0);
+
+			items.sandwiches = _.sortBy(items.sandwiches, function(sandwich) {
+				return -sandwich.count;
+			});
+
+
 		}
 
 		result.totalStr = result.total.toFixed(2);
 
 		console.log(result);
 		return result;
-	}
-
-	var allObjects;
-
-	function addObjects(groupTable, objs) {
-		_.each(objs[groupTable], function(obj) {
-			if ( ! allObjects[obj.id]) {
-				allObjects[obj.id] = obj;
-
-			} else { //augment existing object with child elements
-
-				if (groupTable == 'orders') {
-					var allItems = allObjects[obj.id].order_items.concat(
-						obj.order_items);
-					allObjects[obj.id].order_items = allItems;
-
-				} else if (groupTable == 'sandwiches') {
-console.log('merging ' + obj.id + ' ' + obj.name);
-					var allItems = allObjects[obj.id].order_items.concat(
-						obj.order_items);
-					allObjects[obj.id].order_items = allItems;
-
-				} else if (groupTable == 'customers') {
-					//need to merge at order_items level
-					var orders = _.zipObject(
-						_.map(allObjects[obj.id].orders, 'id'),
-						allObjects[obj.id].orders
-					);
-					_.each(obj.orders, function(order) {
-
-						if ( ! orders[order.id]) {
-							orders[order.id] = order;
-
-						} else {
-							var allItems = orders[order.id].order_items.concat(
-								order.order_items
-							);
-							orders[order.id].order_items = allItems;
-						}
-					});
-					allObjects[obj.id].orders = _.values(orders);
-				}
-			}
-		});
 	}
 
 });
@@ -373,7 +358,7 @@ console.log('merging ' + obj.id + ' ' + obj.name);
 	{{/each}}
 	<h3>
 		<div style="float: left">{{stats.counts.orders}} orders.</div> 
-		<div style="float: right">Total sales: ${{stats.totalStr}}</div>
+		<div style="float: right">Units sold: {{stats.counts.units}}. Total sales: ${{stats.totalStr}}</div>
 		<div style="clear: both"></div>
 	</h3>
 
@@ -422,7 +407,7 @@ console.log('merging ' + obj.id + ' ' + obj.name);
     <h3>{{title}}</h3>
 	<h3>
 		<div style="float: left">{{stats.counts.customers}} customers.</div> 
-		<div style="float: right">Total sales: ${{stats.totalStr}}</div>
+		<div style="float: right">Units sold: {{stats.counts.units}}. Total sales: ${{stats.totalStr}}</div>
 		<div style="clear: both"></div>
 	</h3>
     {{#each items.customers}}
@@ -432,7 +417,7 @@ console.log('merging ' + obj.id + ' ' + obj.name);
     <div class="panel-heading">
       <h4 class="panel-title">
         <a data-toggle="collapse" href="#collapse-{{id}}">
-			<div style="float: left">{{name}} - {{orders.length}} orders</div>
+			<div style="float: left">{{name}} - {{units}} units</div>
 			<div style="float: right">${{totalStr}}</div>
 			<div style="clear: both"></div>
 		</a>
@@ -467,8 +452,8 @@ console.log('merging ' + obj.id + ' ' + obj.name);
   <div class="entry">
     <h3>{{title}}</h3>
 	<h3>
-		<div style="float: left">{{stats.counts.sandwiches}} sandwiches. {{stats.counts.order_items}} units</div> 
-		<div style="float: right">Total sales: ${{stats.totalStr}}</div>
+		<div style="float: left">{{stats.counts.sandwiches}} sandwiches.</div> 
+		<div style="float: right">Units sold: {{stats.counts.units}}. Total sales: ${{stats.totalStr}}</div>
 		<div style="clear: both"></div>
 	</h3>
     {{#each items.sandwiches}}
