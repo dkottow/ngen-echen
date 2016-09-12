@@ -357,8 +357,8 @@ $(function() {
 		<div style="clear: both;"></div>
 	{{/each}}
 	<h3>
-		<div style="float: left">{{stats.counts.orders}} orders.</div> 
-		<div style="float: right">Units sold: {{stats.counts.units}}. Total sales: ${{stats.totalStr}}</div>
+		<div style="float: left">{{stats.counts.orders}} orders. {{stats.counts.units}} units.</div> 
+		<div style="float: right">Total sales: ${{stats.totalStr}}</div>
 		<div style="clear: both"></div>
 	</h3>
 
@@ -406,8 +406,8 @@ $(function() {
   <div class="entry">
     <h3>{{title}}</h3>
 	<h3>
-		<div style="float: left">{{stats.counts.customers}} customers.</div> 
-		<div style="float: right">Units sold: {{stats.counts.units}}. Total sales: ${{stats.totalStr}}</div>
+		<div style="float: left">{{stats.counts.customers}} customers. {{stats.counts.units}} units.</div> 
+		<div style="float: right">Total sales: ${{stats.totalStr}}</div>
 		<div style="clear: both"></div>
 	</h3>
     {{#each items.customers}}
@@ -452,8 +452,8 @@ $(function() {
   <div class="entry">
     <h3>{{title}}</h3>
 	<h3>
-		<div style="float: left">{{stats.counts.sandwiches}} sandwiches.</div> 
-		<div style="float: right">Units sold: {{stats.counts.units}}. Total sales: ${{stats.totalStr}}</div>
+		<div style="float: left">{{stats.counts.sandwiches}} sandwiches. {{stats.counts.units}} units.</div> 
+		<div style="float: right">Total sales: ${{stats.totalStr}}</div>
 		<div style="clear: both"></div>
 	</h3>
     {{#each items.sandwiches}}
