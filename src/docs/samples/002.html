@@ -59,6 +59,8 @@
 
 $(function() {
 
+	var ZH = " 0:00"; //date fiddling
+
 	$('#btn-login').click(function() {
 		//console.log('btn login click');
 		login('demo@donkeylift.com', 'demo');
@@ -67,8 +69,8 @@ $(function() {
 	$('#btn-data').click(function() {
 		//console.log('btn data click');
 		getOrders($('#sel-groupby').val().toLowerCase(), 
-			new Date($('#txt-date-from').val()),
-			new Date($('#txt-date-to').val())
+			new Date($('#txt-date-from').val() + ZH),
+			new Date($('#txt-date-to').val() + ZH)
 		);
 	});
 
@@ -115,8 +117,8 @@ $(function() {
 
 				var tid = '#' + groupTable + '-template';
 				var template = Handlebars.compile($(tid).html());
-				var title = new Date($('#txt-date-from').val()).toDateString() 
-					+ ' - ' + new Date($('#txt-date-to').val()).toDateString();
+				var title = new Date($('#txt-date-from').val() + ZH).toDateString() 
+					+ ' - ' + new Date($('#txt-date-to').val() + ZH).toDateString();
 
 				var stats = summarize(objs, groupTable);
 

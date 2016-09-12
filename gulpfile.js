@@ -367,7 +367,7 @@ gulp.task('build-samples', function() {
 });
 
 gulp.task('build-docs-html', ['build-docs'], function() {
-	return gulp.src(['./src/docs/index.html', './src/docs/guides.html', './src/docs/betty.html'])
+	return gulp.src(['./src/docs/index.html', './src/docs/guides.html', './src/docs/betty.html', './src/docs/samples.html'])
 
 		.pipe(inject(gulp.src('./src/html/common/nav-signup.html'), {
 		    starttag: '<!-- inject:nav:{{ext}} -->',
