@@ -81,8 +81,8 @@ $(function() {
 	function getOrders(groupTable, startDate, endDate) {
 
 		var filterStr = "orders.order_date btwn " 
-			+ "'" + startDate.toISOString(0,10) + "', " 
-			+ "'" + endDate.toISOString(0,10) + "'";
+			+ "'" + startDate.toISOString().substr(0,10) + "', " 
+			+ "'" + endDate.toISOString().substr(0,10) + "'";
 
 		var options = {
 			filter: filterStr,
@@ -214,6 +214,12 @@ $(function() {
    		});
 	}
 
+	/*
+	 * The following function is just number crunching to get some statistics.
+	 * it serves the sole purpose to show how you access the object trees 
+	 * (it also show off quite a deal on lodash); in prod, you probably would optimize 
+	 * this code or use server-side stats - which Donkeylift should provide soon for you.
+	 */
 	function summarize(items, groupTable)
 	{
 		var result = {
