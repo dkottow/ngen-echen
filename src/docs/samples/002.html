@@ -26,6 +26,8 @@
 		#ui-orders { margin-top: 1em; margin-left: 20px; display: none }
 		#progress { font-style: italic; color: red; }
 	</style>
+<!-- inject:google_analytics:html -->
+<!-- endinject -->
 </head>
 
 <body>
@@ -247,7 +249,6 @@ $(function() {
 			range[0] = 20 * Math.floor(range[0] / 20);
 			range[1] = 20 * Math.ceil(range[1] / 20);
 
-			var bins = [0, 0, 0, 0, 0];
 			result.spread = new Array(5);
 			for(var i = 0;i < result.spread.length; ++i) {
 				var sum =  _.reduce(items.orders, function(memo, order) {

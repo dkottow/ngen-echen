@@ -38,8 +38,9 @@ var allTasks = [ 'copy-images'
 				, 'build-api-html'
 				, 'build-auth-md'
 				, 'build-docs'
-				, 'build-samples'
 				, 'build-docs-html'
+				, 'build-samples'
+				, 'build-samples-html'
 ];
 
 var src3rd = './src/3rdparty/';
@@ -263,6 +264,13 @@ gulp.task('build-data-html', function() {
     		}
   		}))
 
+		.pipe(inject(gulp.src('./src/html/common/google_analytics.html'), {
+		    starttag: '<!-- inject:google_analytics:{{ext}} -->',
+		    transform: function (filePath, file) {
+		      return file.contents.toString('utf8')
+    		}
+  		}))
+
 		.pipe(gulp.dest('./app/'));
 });
 
@@ -299,6 +307,13 @@ gulp.task('build-schema-html', function() {
     		}
   		}))
 
+		.pipe(inject(gulp.src('./src/html/common/google_analytics.html'), {
+		    starttag: '<!-- inject:google_analytics:{{ext}} -->',
+		    transform: function (filePath, file) {
+		      return file.contents.toString('utf8')
+    		}
+  		}))
+
 		.pipe(gulp.dest('./app/'));
 });
 
@@ -330,6 +345,14 @@ gulp.task('build-api-html', ['build-api-swagger'], function() {
 		      return file.contents.toString('utf8')
     		}
   		}))
+
+		.pipe(inject(gulp.src('./src/html/common/google_analytics.html'), {
+		    starttag: '<!-- inject:google_analytics:{{ext}} -->',
+		    transform: function (filePath, file) {
+		      return file.contents.toString('utf8')
+    		}
+  		}))
+
 		.pipe(gulp.dest('./app/api'));
 });	
 
@@ -360,23 +383,44 @@ gulp.task('build-docs', function() {
 	.pipe(gulp.dest('./public/docs/'));
 });
 
+gulp.task('build-docs-html', ['build-docs'], function() {
+	return gulp.src(['./src/docs/index.html', './src/docs/guides.html', './src/docs/betty.html'])
+
+	.pipe(inject(gulp.src('./src/html/common/nav-signup.html'), {
+	    starttag: '<!-- inject:nav:{{ext}} -->',
+	    transform: function (filePath, file) {
+	      return file.contents.toString('utf8')
+   		}
+  	}))
+
+	.pipe(inject(gulp.src('./src/html/common/google_analytics.html'), {
+	    starttag: '<!-- inject:google_analytics:{{ext}} -->',
+	    transform: function (filePath, file) {
+	      return file.contents.toString('utf8')
+   		}
+  	}))
+
+	.pipe(gulp.dest('./public/docs/'));
+});
+
 gulp.task('build-samples', function() {
 	
 	return gulp.src(['./src/docs/samples/*'])
 	.pipe(gulp.dest('./public/docs/samples/'));
 });
 
-gulp.task('build-docs-html', ['build-docs'], function() {
-	return gulp.src(['./src/docs/index.html', './src/docs/guides.html', './src/docs/betty.html'])
+gulp.task('build-samples-html', ['build-samples'], function() {
+	
+	return gulp.src(['./src/docs/samples/*'])
 
-		.pipe(inject(gulp.src('./src/html/common/nav-signup.html'), {
-		    starttag: '<!-- inject:nav:{{ext}} -->',
-		    transform: function (filePath, file) {
-		      return file.contents.toString('utf8')
-    		}
-  		}))
+	.pipe(inject(gulp.src('./src/html/common/google_analytics.html'), {
+	    starttag: '<!-- inject:google_analytics:{{ext}} -->',
+	    transform: function (filePath, file) {
+	      return file.contents.toString('utf8')
+   		}
+  	}))
 
-		.pipe(gulp.dest('./public/docs/'));
+	.pipe(gulp.dest('./public/docs/samples/'));
 });
 
 gulp.task('build-index-html', function() {
@@ -385,6 +429,13 @@ gulp.task('build-index-html', function() {
 
 		.pipe(inject(gulp.src('./src/html/common/nav-signup.html'), {
 		    starttag: '<!-- inject:nav:{{ext}} -->',
+		    transform: function (filePath, file) {
+		      return file.contents.toString('utf8')
+    		}
+  		}))
+
+		.pipe(inject(gulp.src('./src/html/common/google_analytics.html'), {
+		    starttag: '<!-- inject:google_analytics:{{ext}} -->',
 		    transform: function (filePath, file) {
 		      return file.contents.toString('utf8')
     		}
@@ -400,6 +451,13 @@ gulp.task('build-signup-html', function() {
 
 		.pipe(inject(gulp.src('./src/html/common/nav-signup.html'), {
 		    starttag: '<!-- inject:nav:{{ext}} -->',
+		    transform: function (filePath, file) {
+		      return file.contents.toString('utf8')
+    		}
+  		}))
+
+		.pipe(inject(gulp.src('./src/html/common/google_analytics.html'), {
+		    starttag: '<!-- inject:google_analytics:{{ext}} -->',
 		    transform: function (filePath, file) {
 		      return file.contents.toString('utf8')
     		}
