@@ -1,4 +1,23 @@
 <script type="text/template" id="schema-menu-template">
+
+	<span class="schema-menu">
+		<button id="add-table" type="button" class="btn btn-default navbar-btn">Add Table</button>
+		<div class="btn-group">
+			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				View <span class="caret"></span>
+			</button>
+			<ul class="dropdown-menu">
+	    		<li><a id="edit-users" href="#">Users</a></li>
+	    		<li><a id="vis-tablegraph" href="#">Diagram</a></li>		
+	    	</ul>
+		</div>	    	
+		<button id="save-schema" type="button" class="btn btn-info navbar-btn">Save</button>
+	</span>
+	<span>
+		<button id="new-schema" type="button" class="btn btn-default navbar-btn">New Database</button>
+	</span>
+	
+<!--
 	<div class="btn-group" role="group">
 		<button id="add-table" type="button" class="btn btn-default navbar-btn">Add Table</button>
 		<button id="edit-users" type="button" class="btn btn-default navbar-btn">Users</button>
@@ -9,5 +28,6 @@
 	<div class="btn-group" role="group">
 		<button id="downloads" type="button" class="btn btn-default navbar-btn">Downloads</button>
 	</div>
+-->	
 </script>
 

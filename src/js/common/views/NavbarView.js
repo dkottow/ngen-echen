@@ -42,6 +42,10 @@ Donkeylift.NavbarView = Backbone.View.extend({
 		});
 		$el.append(html);
 		
+		this.$('#nav-downloads').click(function(ev) { 
+			me.evDownloadsClick(ev); 
+		});
+
 		this.$('#nav-logout').click(function(ev) { 
 			me.evLogoutClick(ev); 
 		});
@@ -60,6 +64,15 @@ Donkeylift.NavbarView = Backbone.View.extend({
 		var name = $(ev.target).attr('data-target');
 		console.log('NavbarView.evSchemaClick ' + name);
 		Donkeylift.app.setSchema(name);
+	},
+
+	evDownloadsClick: function() {
+		if ( ! this.downloadsView) {
+			this.downloadsView = new Donkeylift.DownloadsView({
+				model: Donkeylift.app.account
+			});
+		}
+		this.downloadsView.render();
 	},
 
 	evLogoutClick: function(ev) {

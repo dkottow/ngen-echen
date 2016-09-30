@@ -1,8 +1,8 @@
-/*global Donkeylift, Backbone, jQuery, _ */
+/*global Donkeylift, Backbone, jQuery, _, $ */
 
 Donkeylift.DownloadsView = Backbone.View.extend({
 
-	el:  '#content',
+	el:  '#main',
 	events: {
 		'click .download-database': 'evDownloadDatabaseClick'
 	},

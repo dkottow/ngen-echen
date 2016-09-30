@@ -23,6 +23,9 @@ Donkeylift.MenuSchemaView = Backbone.View.extend({
 		console.log('MenuSchemaView.render ' + Donkeylift.app.schema);			
 		this.$el.show();
 		this.$el.html(this.template());
+		if (Donkeylift.app.schema == null) {
+			this.$('.schema-menu button').addClass('disabled');
+		}
 		//this.$('#add-table').prop('disabled', Donkeylift.app.schema == null);
 		//this.$('#save-schema').prop('disabled', Donkeylift.app.schema == null);
 
@@ -30,6 +33,7 @@ Donkeylift.MenuSchemaView = Backbone.View.extend({
 	},
 
 	evAddTableClick: function() {
+		if ( ! Donkeylift.app.schema) return;
 		var table = Donkeylift.Table.create();
 		var editor = Donkeylift.app.getTableEditor();
 		editor.model = table;
@@ -37,6 +41,7 @@ Donkeylift.MenuSchemaView = Backbone.View.extend({
 	},
 
 	evUsersClick: function() {
+		if ( ! Donkeylift.app.schema) return;
 		if (this.usersView) this.usersView.remove();
 		this.usersView = new Donkeylift.UsersView({
 			collection: Donkeylift.app.schema.get('users')
@@ -45,6 +50,7 @@ Donkeylift.MenuSchemaView = Backbone.View.extend({
 	},
 
 	evUpdateSchemaClick: function() {
+		if ( ! Donkeylift.app.schema) return;
 		var editor = Donkeylift.app.getSchemaEditor();
 		editor.model = Donkeylift.app.schema;
 		editor.render();
@@ -58,6 +64,7 @@ Donkeylift.MenuSchemaView = Backbone.View.extend({
 	},
 
 	evVisTableGraphClick: function() {
+		if ( ! Donkeylift.app.schema) return;
 		if ( ! this.graphView) {
 			this.graphView = new Donkeylift.SchemaGraphView();
 		}
@@ -65,13 +72,5 @@ Donkeylift.MenuSchemaView = Backbone.View.extend({
 		this.graphView.render();
 	},
 
-	evDownloadsClick: function() {
-		if ( ! this.downloadsView) {
-			this.downloadsView = new Donkeylift.DownloadsView({
-				model: Donkeylift.app.account
-			});
-		}
-		this.downloadsView.render();
-	},
 });
 
