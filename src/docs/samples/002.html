@@ -369,6 +369,11 @@ $(function() {
 <script id="orders-template" type="text/x-handlebars-template">
   <div class="entry">
     <h3>{{title}}</h3>
+	<h3>
+		<div style="float: left">{{stats.counts.orders}} orders. {{stats.counts.units}} units.</div> 
+		<div style="float: right">Total sales: ${{stats.totalStr}}</div>
+		<div style="clear: both"></div>
+	</h3>
 	<h3>Order value spread</h3>
     {{#each stats.spread}}
 		<div class="spread-label">${{bin}}</div>
@@ -377,11 +382,6 @@ $(function() {
 		</div>
 		<div style="clear: both;"></div>
 	{{/each}}
-	<h3>
-		<div style="float: left">{{stats.counts.orders}} orders. {{stats.counts.units}} units.</div> 
-		<div style="float: right">Total sales: ${{stats.totalStr}}</div>
-		<div style="clear: both"></div>
-	</h3>
 
     {{#each items.orders}}
 
