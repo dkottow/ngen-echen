@@ -25,7 +25,7 @@ if (process.env.DONKEYLIFT_WWW) {
 	config.port = process.env.PORT;
 }
 
-app.get('/public/docs/videotour', function(req, res) { res.redirect('https://www.wevideo.com/view/747605616') });
+app.get('/public/docs/videotour', function(req, res) { res.redirect('https://www.wevideo.com/view/748892801') });
 
 app.use('/app', express.static('./app'));
 app.use('/public', express.static('./public')); 
