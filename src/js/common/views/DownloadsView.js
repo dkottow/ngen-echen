@@ -12,7 +12,8 @@ Donkeylift.DownloadsView = Backbone.View.extend({
 	},
 
 	template: _.template($('#downloads-template').html()),
-	db_template: _.template('<li class="list-group-item"><a href="#" download="<%= filename%>" class="download-database"><%= name%></a></li>'),
+	//TODO db_template: _.template('<li class="list-group-item"><a href="#" download="<%= filename%>" class="download-database"><%= name%></a></li>'),
+	db_template: _.template('<li class="list-group-item"><a href="/public/tmp/<%= filename%>"><%= name%></a></li>'),
 
 	render: function() {
 		console.log("DownloadsView.render ");
