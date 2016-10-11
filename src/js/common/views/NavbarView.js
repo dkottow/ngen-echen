@@ -1,11 +1,12 @@
-/*global Donkeylift, Backbone, jQuery, _ */
+/*global Donkeylift, Backbone, jQuery, _, $ */
 
 Donkeylift.NavbarView = Backbone.View.extend({
 	el:  'nav',
 
 	events: {
 		'click .schema-option': 'evSchemaClick',
-		'click #nav-login': 'evLoginClick'
+		'click #nav-login': 'evLoginClick',
+		'click #nav-profile': 'evProfileClick'
 	},
 
 	initialize: function() {
@@ -73,6 +74,15 @@ Donkeylift.NavbarView = Backbone.View.extend({
 			});
 		}
 		this.downloadsView.render();
+	},
+
+	evProfileClick: function() {
+		if ( ! this.profileView) {
+			this.profileView = new Donkeylift.ProfileView({
+				model: Donkeylift.app.account
+			});
+		}
+		this.profileView.render();
 	},
 
 	evLogoutClick: function(ev) {

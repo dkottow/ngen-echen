@@ -1,0 +1,25 @@
+<script type="text/template" id="profile-template">
+	<div>
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3 class="panel-title">
+				Profile
+			</h3>			
+		</div>
+		<div class="panel-body">
+			<dl class="dl-horizontal">
+				<dt>Username</dt><dd><%= user %></dd>
+			</dl>
+			<dl class="dl-horizontal">
+				<dt>Account</dt><dd><%= account %></dd>
+			</dl>
+<% if (app_metadata.admin) { %>
+			<dl class="dl-horizontal">
+				<dt>Admin</dt><dd><%= app_metadata.admin %></dd>
+			</dl>
+<% } %>
+		</div>
+	</div>
+	</div>
+</script>
+

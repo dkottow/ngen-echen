@@ -1,4 +1,4 @@
-/*global Backbone, Donkeylift */
+/*global Backbone, Donkeylift, $ */
 
 Donkeylift.Account = Backbone.Model.extend({
 
@@ -22,6 +22,7 @@ Donkeylift.Account = Backbone.Model.extend({
 
 		this.set('name', account);
 		this.set('user', token_attrs.email);
+		this.set('app_metadata', token_attrs.app_metadata);
 
 		$.ajaxSetup({
 			'beforeSend': function(xhr) {					

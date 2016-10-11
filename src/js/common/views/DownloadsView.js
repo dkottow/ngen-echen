@@ -2,7 +2,7 @@
 
 Donkeylift.DownloadsView = Backbone.View.extend({
 
-	el:  '#main',
+	el:  '#content',
 	events: {
 		'click .download-database': 'evDownloadDatabaseClick'
 	},
@@ -18,6 +18,7 @@ Donkeylift.DownloadsView = Backbone.View.extend({
 	render: function() {
 		console.log("DownloadsView.render ");
 		this.$el.html(this.template());
+		$('#menu').empty(); //clear module menu
 		var dbLinks = this.model.get('databases').map(function(db) {
 			return this.db_template({
 				name: db.get('name'),
