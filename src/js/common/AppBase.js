@@ -48,9 +48,6 @@ AppBase.prototype.loadAccount = function(opts) {
 	var me = this;
 	console.log('loadAccount: ' + opts);
 
-	//if ( ! id_token) return;
-	//this.account = new Donkeylift.Account({ id_token: id_token });
-
 	this.account = new Donkeylift.Account(opts);
 
 	this.navbarView.model = this.account;
@@ -64,6 +61,15 @@ AppBase.prototype.loadAccount = function(opts) {
 
 	$('#toggle-sidebar').hide();
 }
+
+AppBase.prototype.switchAccount = function(account) {
+	this.unsetSchema();
+	this.loadAccount({ 
+		id_token: sessionStorage.getItem('id_token'), 
+		account: account
+	})
+}
+
 
 AppBase.prototype.onAccountLoaded = function() {
 	//overwrite me

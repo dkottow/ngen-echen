@@ -17,8 +17,8 @@ Donkeylift.Account = Backbone.Model.extend({
 
 		var token_attrs = jwt_decode(attrs.id_token);
 		
-		var account = token_attrs.app_metadata.account;
-		if (account == '*') account = this.DEMO_ACCOUNT;		
+		//root users have access to any account.
+		var account = attrs.account || token_attrs.app_metadata.account;
 
 		this.set('name', account);
 		this.set('user', token_attrs.email);

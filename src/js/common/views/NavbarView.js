@@ -27,11 +27,13 @@ Donkeylift.NavbarView = Backbone.View.extend({
 
 	renderSchemaDropDown: function() {
 		var $ul = this.$('#schema-list ul');
-		$ul.empty();	
-		this.model.get('databases').each(function(schema) {
-			var html = this.navSchemaTemplate({name: schema.get('name')});
-			$ul.append(html);
-		}, this);
+		$ul.empty();
+		if (this.model.get('databases')) {
+			this.model.get('databases').each(function(schema) {
+				var html = this.navSchemaTemplate({name: schema.get('name')});
+				$ul.append(html);
+			}, this);
+		}
 	},
 
 	renderProfileDropDown: function() {
@@ -69,19 +71,17 @@ Donkeylift.NavbarView = Backbone.View.extend({
 
 	evDownloadsClick: function() {
 		if ( ! this.downloadsView) {
-			this.downloadsView = new Donkeylift.DownloadsView({
-				model: Donkeylift.app.account
-			});
+			this.downloadsView = new Donkeylift.DownloadsView();
 		}
+		this.downloadsView.model = Donkeylift.app.account;
 		this.downloadsView.render();
 	},
 
 	evProfileClick: function() {
 		if ( ! this.profileView) {
-			this.profileView = new Donkeylift.ProfileView({
-				model: Donkeylift.app.account
-			});
-		}
+			this.profileView = new Donkeylift.ProfileView();
+		} 
+		this.profileView.model = Donkeylift.app.account;
 		this.profileView.render();
 	},
 
