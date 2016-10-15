@@ -484,6 +484,7 @@ gulp.task('watch', function() {
     gulp.watch('./src/schema.html', ['build-schema-html']);
     gulp.watch('./src/css/*.css', ['build-donkeylift-css']);
     gulp.watch('./src/docs/*', ['build-api-json']);
+    gulp.watch('./src/docs/samples/*', ['build-samples']);
     gulp.watch('./src/signup.html', ['build-signup-html']);
     gulp.watch('./src/index.html', ['build-index-html']);
 });
