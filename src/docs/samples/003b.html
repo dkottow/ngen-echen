@@ -57,7 +57,7 @@
 
 <!-- Modal -->
 <div class="modal fade" id="editQuoteModal" tabindex="-1" role="dialog" aria-labelledby="editQuoteModalLabel">
-  <div class="modal-dialog" role="document">
+  <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -65,40 +65,52 @@
       </div>
       <div class="modal-body">
 
-	  <form id="request-quote">
+	  <form class="form-horizontal" id="editQuoteForm">
 		<div class="form-group">
-		  <label for="name">Name</label>
-		  <input type="text" class="form-control" id="name" placeholder="Name">
+		  <label class="col-sm-2" for="name">Name</label>
+		  <div class="col-sm-10">
+		  	<input type="text" class="form-control" name="name" placeholder="Name">
+		  </div>	
 		</div>
 
 		<div class="form-group">
-		  <label for="email">Email address</label>
-		  <input type="email" class="form-control" id="email" placeholder="Email">
+		  <label class="col-sm-2" for="email">Email address</label>
+		  <div class="col-sm-10">
+		  	<input type="email" class="form-control" name="email" placeholder="Email">
+		  </div>	
 		</div>
 
 		<div class="form-group">
-		  <label for="start-date">Start Date</label>
-		  <input type="date" class="form-control" id="start_date" placeholder="Start Date">
+		  <label class="col-sm-2" for="start-date">Start Date</label>
+		  <div class="col-sm-4">
+		  	<input type="date" class="form-control" name="start_date" placeholder="Start Date">
+		  </div>	
+
+		  <label class="col-sm-2" for="end-date">End Date</label>
+		  <div class="col-sm-4">
+			<input type="date" class="form-control" name="end_date" placeholder="End Date">
+		  </div>	
 		</div>
 
 		<div class="form-group">
-		  <label for="end-date">End Date</label>
-		  <input type="date" class="form-control" id="end_date" placeholder="End Date">
+		  <label class="col-sm-2" for="guest-count">Number of Guests</label>
+		  <div class="col-sm-10">
+		    <input type="number" class="form-control" name="guest_count" placeholder="Guest Count" min="4" max="16">
+		  </div>	
 		</div>
 
 		<div class="form-group">
-		  <label for="guest-count">Number of Guests</label>
-		  <input type="number" class="form-control" id="guest_count" placeholder="Guest Count" min="4" max="16">
+		  <label class="col-sm-2" for="quote">Quote / Price</label>
+		  <div class="col-sm-10">
+		    <input type="number" class="form-control" name="quote" placeholder="Quote">
+		  </div>	
 		</div>
 
 		<div class="form-group">
-		  <label for="quote">Quote / Price</label>
-		  <input type="number" class="form-control" id="quote" placeholder="Quote">
-		</div>
-
-		<div class="form-group">
-		  <label for="payment">First Payment</label>
-		  <input type="number" class="form-control" id="payment" placeholder="First Payment">
+		  <label class="col-sm-2" for="payment">First Payment</label>
+		  <div class="col-sm-10">
+		    <input type="number" step="0.01" class="form-control" name="payment" placeholder="First Payment">
+		  </div>	
 		</div>
 
 	    <div class="modal-footer">
@@ -133,10 +145,10 @@
 	var TABLE_QUOTES = "quotes";
 	var TABLE_RENTALS = "rentals";
 
+	var STATUS_CLOSED = 0;
 	var STATUS_NEW = 1;
 	var STATUS_QUOTE_CONFIRMED = 11;
 	var STATUS_RENTAL_RESERVED = 21;
-	var STATUS_CLOSED = 91;
 
 
 	$(function() {
@@ -161,17 +173,22 @@
 
 
 		$("#editQuoteModal").on('show.bs.modal', function () {
+
 			var quote = $("#editQuoteModal").data();
-			_.each(quote, function(v, k) {
-				//console.log(k + ' = ' + v);
-				var $el = $('#' + k);
-				if ($el) {
-					$el.val(v);
-				}
+			$('#editQuoteForm input').each(function() {
+				var k = $(this).attr('name');
+				$(this).val(quote[k]);
 			});
-			$("#payment").parent().toggle(quote.status_id == STATUS_QUOTE_CONFIRMED);
+			
+			$("#editQuoteForm input[name=payment]")
+				.parents('.form-group')
+				.toggle(quote.status_id == STATUS_QUOTE_CONFIRMED);
 		});
     
+		$("#editQuoteForm").submit(function (e) {
+			console.log( $( this ).serializeArray() );
+			e.preventDefault();			
+		});
 	}
 
 	function login(user, pass) {
