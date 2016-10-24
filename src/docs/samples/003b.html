@@ -135,6 +135,10 @@
 <script src="https://use.fontawesome.com/e675b36da2.js"></script>
 
 <script src="swagger-client.js"></script>
+
+<script src='tablesort.min.js'></script>
+<script src='tablesort.number.js'></script>
+
 <script type="text/javascript">
 	/* global $, _, moment, SwaggerClient */
 
@@ -165,29 +169,68 @@
 		});
 
 
+		//on show tab load data from server
 		$('a[data-toggle="tab"]').click( function (e) {
 			e.preventDefault();
 			$(this).tab('show');
-			show($(e.target).attr('aria-controls'));
+			load($(e.target).attr('aria-controls'));
 		});
 
-
+		//on show quote modal form populate it with data
 		$("#editQuoteModal").on('show.bs.modal', function () {
 
-			var quote = $("#editQuoteModal").data();
+			var quote = $("#editQuoteModal").data().quote;
 			$('#editQuoteForm input').each(function() {
 				var k = $(this).attr('name');
 				$(this).val(quote[k]);
 			});
 			
-			$("#editQuoteForm input[name=payment]")
-				.parents('.form-group')
-				.toggle(quote.status_id == STATUS_QUOTE_CONFIRMED);
+			switch(quote.status_id) { 
+				case STATUS_NEW:
+					$('#editQuoteModalLabel').text('Confirm Quote');
+					$('#editQuoteForm label[for="quote"').text('Quote');
+					$("#editQuoteForm input[name=payment]")
+						.parents('.form-group')
+						.hide();		
+				break;
+				case STATUS_QUOTE_CONFIRMED:
+//TODO? 
+/* replace name text box with 
+  autocompletion to find existing customer 
+  or flag to create new customer on submit
+*/
+					$('#editQuoteModalLabel').text('Commit Rent');
+					$('#editQuoteForm label[for="quote"').text('Price');
+					$("#editQuoteForm input[name=payment]")
+						.parents('.form-group')
+						.show();		
+				break;
+			}				
+			
 		});
     
+    	//save changes  
 		$("#editQuoteForm").submit(function (e) {
-			console.log( $( this ).serializeArray() );
+			
 			e.preventDefault();			
+			var quote = $("#editQuoteModal").data().quote;
+			var formValues = $( this ).serializeArray();
+			_.each(formValues, function(fv) {
+				quote[fv.name] = fv.value;
+			});
+			
+			switch(quote.status_id) { 
+				case STATUS_NEW:
+					quote.status_id = STATUS_QUOTE_CONFIRMED;
+				break;	
+			
+				case STATUS_QUOTE_CONFIRMED: 
+					quote.status_id = STATUS_CLOSED;
+				break;
+			}
+	
+			saveQuote(quote);
+			console.log( quote );
 		});
 	}
 
@@ -211,7 +254,7 @@
 				authorizations: [ auth ],
 	    		success: function() {
 					console.log('swagger client init ok.');
-					show('quotes');
+					load('quotes');
 					//
     			}
 			});
@@ -220,7 +263,7 @@
 		
 	}
 
-	function show(table) {
+	function load(table) {
 		
 		console.log('loading ' + table);
 
@@ -244,8 +287,28 @@
 		});
 	}
 
+	function saveQuote(quote) {
+		
+	
+    	window.client.table.modRows({
+			account: ACCOUNT, 
+			database: DATABASE, 
+			table: TABLE_QUOTES, 
+			rows: [ quote ]
+
+		}, function(result) {
+			console.log(result);
+			if (quote.status_id == STATUS_CLOSED) {
+				//TODO create rental / first payment
+				
+			}
+			window.location.reload(); 
+		});
+
+	}
+
 	function renderQuotes(data) {
-		$('#quotes').append(
+		$('#quotes').html(
 			'<table id="quotes" class="table table-striped">'
 			  + '<thead><tr>'
 				+ '<th>Name</th>'
@@ -277,12 +340,14 @@
 				+ '</tr>'
 			);
 
+			//on row button click make quote data available to form
 			$('#quotes tbody tr:last button').click(function() {
-				$('#editQuoteModal').data(row);
+				$('#editQuoteModal').data({ quote: row});
 			});
 			
 		});
 
+		new Tablesort($('#quotes table')[0]);
 	}
 	
 	function renderRentals(data) {
