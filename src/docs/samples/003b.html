@@ -148,6 +148,7 @@
 	var DATABASE = "rentals";
 	var TABLE_QUOTES = "quotes";
 	var TABLE_RENTALS = "rentals";
+	var TABLE_CUSTOMERS = "customers";
 
 	var STATUS_CLOSED = 0;
 	var STATUS_NEW = 1;
@@ -161,6 +162,8 @@
 	});
 
 	function setup() {
+
+		window.data = {}; //a global data placeholder
 
 		$(document).ajaxStart(function() {
 		    $(document.body).css({'cursor' : 'wait'});
@@ -255,6 +258,7 @@
 	    		success: function() {
 					console.log('swagger client init ok.');
 					load('quotes');
+					loadCustomers();
 					//
     			}
 			});
@@ -284,6 +288,20 @@
 			} else if (table == TABLE_RENTALS) {
 				renderRentals(data);
 			}
+		});
+
+	function loadCustomers() {
+		
+		console.log('loading customers');
+
+    	window.client.table.getRows({
+			account: ACCOUNT, 
+			database: DATABASE, 
+			table: TABLE_CUSTOMERS
+
+		}, function(data) {
+			console.log(data);
+			window.data[TABLE_CUSTOMERS] = data.obj.rows;
 		});
 	}
 
