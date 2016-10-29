@@ -110,6 +110,7 @@
 	var TABLE_QUOTES = "quotes";
 	var TABLE_RENTALS = "rentals";
 
+	var STATUS_CLOSED = 0;
 	var STATUS_NEW = 1;
 
 	$(function() {
@@ -132,12 +133,15 @@
 			var endDate = moment($("#end-date").val());
 
 			var days = endDate.diff(startDate, 'days');
-			var price = 100 * days * parseInt($("#guest-count").val())
+			var guests = parseInt($("#guest-count").val());
+			var price = 100 * days * guests;
 
 			var quote = {
 				name: $("#name").val()
+				, email: $("#email").val() 
 				, start_date: startDate.format('YYYY-MM-DD') 
 				, end_date: endDate.format('YYYY-MM-DD')
+				, guest_count: guests
 				, quote: price 
 				, status_id: STATUS_NEW
 			};
@@ -199,6 +203,10 @@
 					"start_date le '" + end.format('YYYY-MM-DD') + "'",
 					"end_date ge '" + start.format('YYYY-MM-DD') + "'"
 				];
+
+				if (sourceTable == TABLE_QUOTES) {
+					filters.push("status_id ne " + STATUS_CLOSED);
+				}
 
 		    	window.client.table.getRows({
 					account: ACCOUNT, 
