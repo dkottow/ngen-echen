@@ -134,7 +134,7 @@
 		<div class="form-group">
 		  <label class="col-sm-2" for="payment">First Payment</label>
 		  <div class="col-sm-10">
-		    <input type="number" required step="0.01" class="form-control" name="payment" placeholder="First Payment">
+		    <input type="number" step="0.01" class="form-control" name="payment" placeholder="First Payment">
 		  </div>	
 		</div>
 
@@ -143,6 +143,49 @@
 	      <button type="submit" class="btn btn-primary">Send</button>
 	    </div>
 	  </form>
+	  
+  	  </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="addPaymentModal" tabindex="-1" role="dialog" aria-labelledby="">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Add payment</h4>
+      </div>
+      <div class="modal-body">
+
+		  <form class="form-horizontal" id="editPaymentForm">
+	
+			<div class="form-group">
+			  <label class="col-sm-2" for="pay_date">Paid Date</label>
+			  <div class="col-sm-4">
+			  	<input type="date" lass="form-control" name="pay_date" placeholder="Paid Date">
+			  </div>	
+			</div>
+	
+			<div class="form-group">
+			  <label class="col-sm-2" for="amount">Amount</label>
+			  <div class="col-sm-10">
+			    <input type="number" required step="0.01" class="form-control" name="amount" placeholder="Amount">
+			  </div>	
+			</div>
+	
+			<div class="form-group">
+			  <label class="col-sm-2" for="quote">Outstanding</label>
+			  <div class="col-sm-10">
+			    <input type="number" disabled="true" class="form-control" name="outstanding" placeholder="Outstanding">
+			  </div>	
+			</div>
+	
+		    <div class="modal-footer">
+		      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		      <button type="submit" class="btn btn-primary">Send</button>
+		    </div>
+		  </form>
 	  
   	  </div>
     </div>
@@ -233,6 +276,23 @@
 				});
 				$("#editQuoteModal").modal('hide');
 			});
+		});
+
+		//on show quote modal form populate it with data|
+		$("#addPaymentModal").on('show.bs.modal', function () {
+			renderAddPaymentForm();
+		});
+
+		$("#addPaymentModal").submit(function (e) {
+			e.preventDefault();
+
+			var payment = formToPayment();
+			addPayment(payment, function() {
+				loadRentals(function() { 
+					renderRentals();
+				});
+				$("#addPaymentModal").modal('hide');
+			});	
 		});
 	}
 
@@ -494,6 +554,19 @@
 		return quote;
 	}
 
+	function formToPayment() {
+		var payment = {
+			rental_id: $("#addPaymentModal").data().rental.id
+		};
+		var formValues = $("#editPaymentForm").serializeArray();
+		_.each(formValues, function(fv) {
+			payment[fv.name] = fv.value;
+		});
+
+		//console.log( formValues, payment );
+		return payment;
+	}
+
 	function renderQuotes() {
 		var quotes = $('#quotes').data().quotes;
 
@@ -590,12 +663,16 @@
 
 			var html = htmlTemplate({rental: rental});
 			$('#rentals').append(html);
+
+			//on row button click make quote data available to form
+			$('#rentals div.panel-body:last button').click(function() {
+				$('#addPaymentModal').data({ rental: rental});
+			});
 		});
 
 	}
 	
-	function renderEditQuoteForm()
-	{
+	function renderEditQuoteForm() {
 		//restore some defaults
 		$('#editQuoteForm').find('div').removeClass('has-warning');
 		$('#editQuoteForm').find('div').show();
@@ -631,6 +708,8 @@
 					$('#editQuoteForm input[name=name]').parents('.form-group').addClass('has-warning');
 				}
 
+				$("#editQuoteForm input[name=payment]").prop('required', true);		
+
 				$('#editQuoteModalLabel').text('Commit Rent');
 				$('#editQuoteForm label[for=quote]').text('Price');
 			break;
@@ -638,6 +717,16 @@
 	
 	}
 
+	function renderAddPaymentForm() {
+		//console.log();
+		var rental = $("#addPaymentModal").data().rental;
+		var paid = _.reduce(rental.payments, function(s, p) {
+			return s + p.amount;
+		}, 0);
+		$("#addPaymentModal input[name=outstanding]").val(rental.price - paid);
+		$("#addPaymentModal input[name=pay_date]").val(today());
+	}
+	
 
 </script>
 </html>
