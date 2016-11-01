@@ -411,8 +411,9 @@ gulp.task('build-samples', function() {
 
 gulp.task('build-samples-html', ['build-samples'], function() {
 	
-	return gulp.src(['./src/docs/samples/*'])
+	return gulp.src(['./src/docs/samples/*.html'])
 
+	.pipe(replace("$DONKEYLIFT_API", process.env.DONKEYLIFT_API))
 	.pipe(inject(gulp.src('./src/html/common/google_analytics.html'), {
 	    starttag: '<!-- inject:google_analytics:{{ext}} -->',
 	    transform: function (filePath, file) {

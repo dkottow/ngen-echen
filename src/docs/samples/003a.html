@@ -52,27 +52,27 @@
 	  <form id="request-quote">
 		<div class="form-group">
 		  <label for="name">Name</label>
-		  <input type="text" class="form-control" id="name" placeholder="Name">
+		  <input type="text" required class="form-control" id="name" placeholder="Name">
 		</div>
 
 		<div class="form-group">
 		  <label for="email">Email address</label>
-		  <input type="email" class="form-control" id="email" placeholder="Email">
+		  <input type="email" required class="form-control" id="email" placeholder="Email">
 		</div>
 
 		<div class="form-group">
 		  <label for="start-date">Start Date</label>
-		  <input type="date" class="form-control" id="start-date" placeholder="Start Date">
+		  <input type="date" required class="form-control" id="start-date" placeholder="Start Date">
 		</div>
 
 		<div class="form-group">
 		  <label for="end-date">End Date</label>
-		  <input type="date" class="form-control" id="end-date" placeholder="End Date">
+		  <input type="date" required class="form-control" id="end-date" placeholder="End Date">
 		</div>
 
 		<div class="form-group">
 		  <label for="guest-count">Number of Guests</label>
-		  <input type="number" class="form-control" id="guest-count" placeholder="Guest Count" min="4" max="16">
+		  <input type="number" required class="form-control" id="guest-count" placeholder="Guest Count" min="4" max="16">
 		</div>
 
 	    <div class="modal-footer">
@@ -103,8 +103,8 @@
 <script type="text/javascript">
 	/* global $, _, moment, SwaggerClient */
 
-	var HOST = "https://api-donkeylift-dkottow.c9.io";
-	//var HOST = "http://api.donkeylift.com";
+	//var HOST = "https://api-donkeylift-dkottow.c9.io";
+	var HOST = "$DONKEYLIFT_API";
 	var ACCOUNT = "demo";
 	var DATABASE = "rentals";
 	var TABLE_QUOTES = "quotes";
