@@ -676,6 +676,7 @@
 		//restore some defaults
 		$('#editQuoteForm').find('div').removeClass('has-warning');
 		$('#editQuoteForm').find('div').show();
+		$("#editQuoteForm input[name=payment]").removeAttr('required');		
 		
 		var quote = $("#editQuoteModal").data().quote;
 
