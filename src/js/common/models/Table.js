@@ -164,6 +164,35 @@ Donkeylift.Table = Backbone.Model.extend({
 			});
 		}
 	},
+
+
+	addFieldsByExample: function(data) {
+		var rows = data.trim().split('\n');
+		if (rows.length < 2)  return;
+
+		var fieldNames = _.map(rows[0].trim().split('\t'), function(fn) {
+			var match = fn.match(/[a-zA-Z]\w*/);
+			return match[0];
+		});
+console.log(fieldNames);
+		var values = _.map(rows[1].trim().split('\t'), function(val) {
+			return val.trim();
+		});
+console.log(values);
+
+		var fields = [];
+		for(var i = 0; i < fieldNames.length; ++i) {
+			var field = Donkeylift.Field.create(fieldNames[i]);
+			fields.push(field);
+
+			if (values.length <= i) continue;
+
+			field.setTypeByExample(values[i]);
+		}
+
+		this.get('fields').add(fields);
+	},
+
 });
 
 Donkeylift.Table.create = function(name) {

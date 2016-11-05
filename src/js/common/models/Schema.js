@@ -63,7 +63,7 @@ Donkeylift.Schema = Backbone.Model.extend({
 	},
 
 	update : function() {
-		console.log("Schema.update...");
+		console.log("Schema.update...TODO persist as json");
 return;
 		//TODO
 		var me = this;			

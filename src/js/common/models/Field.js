@@ -137,6 +137,18 @@ Donkeylift.Field = Backbone.Model.extend({
 		} else {
 			return "'" + escapeStr(val) + "'";
 		}
+	},
+
+	setTypeByExample: function(val) {
+		if (String(parseInt(val)) == val) {
+			this.set('type', Donkeylift.Field.TYPES.INTEGER);
+		} else if ( ! isNaN(val)) {
+			this.set('type', Donkeylift.Field.TYPES.NUMERIC);
+		} else if ( ! isNaN(Date.parse(val))) {
+			this.set('type', Donkeylift.Field.TYPES.DATE);
+		} else {
+			this.set('type', Donkeylift.Field.TYPES.VARCHAR);
+		}
 	}
 
 });

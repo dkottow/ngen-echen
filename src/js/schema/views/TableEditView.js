@@ -26,6 +26,8 @@ Donkeylift.TableEditView = Backbone.View.extend({
 			Donkeylift.app.schema.get('tables').add(this.model);
 			Donkeylift.app.setTable(this.model);
 		}
+		var tableExample = $('#modalInputTableByExample').val();
+		this.model.addFieldsByExample(tableExample);
 		Donkeylift.app.schema.update();
 	},
 
