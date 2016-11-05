@@ -411,8 +411,9 @@ gulp.task('build-samples', function() {
 
 gulp.task('build-samples-html', ['build-samples'], function() {
 	
-	return gulp.src(['./src/docs/samples/*'])
+	return gulp.src(['./src/docs/samples/*.html'])
 
+	.pipe(replace("$DONKEYLIFT_API", process.env.DONKEYLIFT_API))
 	.pipe(inject(gulp.src('./src/html/common/google_analytics.html'), {
 	    starttag: '<!-- inject:google_analytics:{{ext}} -->',
 	    transform: function (filePath, file) {
@@ -484,7 +485,7 @@ gulp.task('watch', function() {
     gulp.watch('./src/schema.html', ['build-schema-html']);
     gulp.watch('./src/css/*.css', ['build-donkeylift-css']);
     gulp.watch('./src/docs/*', ['build-api-json']);
-    gulp.watch('./src/docs/samples/*', ['build-samples']);
+    gulp.watch('./src/docs/samples/*', ['build-samples', 'build-samples-html']);
     gulp.watch('./src/signup.html', ['build-signup-html']);
     gulp.watch('./src/index.html', ['build-index-html']);
 });

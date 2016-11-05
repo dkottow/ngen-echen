@@ -18,14 +18,26 @@
 			max-width: 600px;
 		}
 	
-		td {
+		.table>tbody>tr>td {
 			text-align: left;
+			vertical-align: middle;
 		}
 	
+		.has-warning .form-control {
+			background-color: AntiqueWhite;
+		}
+		
 		.tab-pane {
 			padding: 1em;
 		}
 		
+		.panel-default>.rental-active {
+			background-color: #85C1E9;
+		}
+		
+		.panel-default>.rental-pending {
+			background-color: #FFC300;
+		}
 	</style>
 	
 
@@ -66,29 +78,42 @@
       <div class="modal-body">
 
 	  <form class="form-horizontal" id="editQuoteForm">
+
 		<div class="form-group">
 		  <label class="col-sm-2" for="name">Name</label>
-		  <div class="col-sm-10">
-		  	<input type="text" class="form-control" name="name" placeholder="Name">
+		  <div class="col-sm-8">
+		  	<input type="text" required class="form-control" name="name" placeholder="Name">
 		  </div>	
+
+		  <div class="col-sm-2 dropdown">
+			<button id="btn-select-customer" class="btn btn-default" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			  Select
+			  <span class="caret"></span>
+			</button>
+			<ul id="list-customers" class="dropdown-menu" aria-labelledby="btn-select-customer">
+			    <li><a href="#">Customer 1</a></li>
+			    <li><a href="#">Customer 2</a></li>
+			</ul>
+		  </div>	
+
 		</div>
 
 		<div class="form-group">
 		  <label class="col-sm-2" for="email">Email address</label>
 		  <div class="col-sm-10">
-		  	<input type="email" class="form-control" name="email" placeholder="Email">
+		  	<input type="email" required class="form-control" name="email" placeholder="Email">
 		  </div>	
 		</div>
 
 		<div class="form-group">
 		  <label class="col-sm-2" for="start-date">Start Date</label>
 		  <div class="col-sm-4">
-		  	<input type="date" class="form-control" name="start_date" placeholder="Start Date">
+		  	<input type="date" required class="form-control" name="start_date" placeholder="Start Date">
 		  </div>	
 
 		  <label class="col-sm-2" for="end-date">End Date</label>
 		  <div class="col-sm-4">
-			<input type="date" class="form-control" name="end_date" placeholder="End Date">
+			<input type="date" required class="form-control" name="end_date" placeholder="End Date">
 		  </div>	
 		</div>
 
@@ -102,7 +127,7 @@
 		<div class="form-group">
 		  <label class="col-sm-2" for="quote">Quote / Price</label>
 		  <div class="col-sm-10">
-		    <input type="number" class="form-control" name="quote" placeholder="Quote">
+		    <input type="number" required step="0.01" class="form-control" name="quote" placeholder="Quote">
 		  </div>	
 		</div>
 
@@ -118,6 +143,49 @@
 	      <button type="submit" class="btn btn-primary">Send</button>
 	    </div>
 	  </form>
+	  
+  	  </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="addPaymentModal" tabindex="-1" role="dialog" aria-labelledby="">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Add payment</h4>
+      </div>
+      <div class="modal-body">
+
+		  <form class="form-horizontal" id="editPaymentForm">
+	
+			<div class="form-group">
+			  <label class="col-sm-2" for="pay_date">Paid Date</label>
+			  <div class="col-sm-4">
+			  	<input type="date" lass="form-control" name="pay_date" placeholder="Paid Date">
+			  </div>	
+			</div>
+	
+			<div class="form-group">
+			  <label class="col-sm-2" for="amount">Amount</label>
+			  <div class="col-sm-10">
+			    <input type="number" required step="0.01" class="form-control" name="amount" placeholder="Amount">
+			  </div>	
+			</div>
+	
+			<div class="form-group">
+			  <label class="col-sm-2" for="quote">Outstanding</label>
+			  <div class="col-sm-10">
+			    <input type="number" disabled="true" class="form-control" name="outstanding" placeholder="Outstanding">
+			  </div>	
+			</div>
+	
+		    <div class="modal-footer">
+		      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		      <button type="submit" class="btn btn-primary">Send</button>
+		    </div>
+		  </form>
 	  
   	  </div>
     </div>
@@ -140,15 +208,16 @@
 <script src='tablesort.number.js'></script>
 
 <script type="text/javascript">
-	/* global $, _, moment, SwaggerClient */
+	/* global $, _, moment, SwaggerClient, Tablesort */
 
-	var HOST = "https://api-donkeylift-dkottow.c9.io";
-	//var HOST = "http://api.donkeylift.com";
+	//var HOST = "https://api-donkeylift-dkottow.c9.io";
+	var HOST = "$DONKEYLIFT_API";
 	var ACCOUNT = "demo";
 	var DATABASE = "rentals";
 	var TABLE_QUOTES = "quotes";
 	var TABLE_RENTALS = "rentals";
-	var TABLE_CUSTOMERS = "customers";
+	var TABLE_CUSTOMERS = "guests";
+	var TABLE_PAYMENTS = "payments";
 
 	var STATUS_CLOSED = 0;
 	var STATUS_NEW = 1;
@@ -163,8 +232,6 @@
 
 	function setup() {
 
-		window.data = {}; //a global data placeholder
-
 		$(document).ajaxStart(function() {
 		    $(document.body).css({'cursor' : 'wait'});
 		}).ajaxStop(function() {
@@ -172,72 +239,65 @@
 		});
 
 
-		//on show tab load data from server
+		//on click tab load data from server
 		$('a[data-toggle="tab"]').click( function (e) {
 			e.preventDefault();
 			$(this).tab('show');
-			load($(e.target).attr('aria-controls'));
+			var table = $(e.target).attr('aria-controls');
+			switch(table) {
+				case TABLE_QUOTES:
+					loadQuotes(function(data) {
+						renderQuotes();
+					});
+					break;
+				case TABLE_RENTALS:
+					loadRentals(function(data) {
+						renderRentals();
+					});
+					break;
+			}
 		});
 
-		//on show quote modal form populate it with data
+		//on show quote modal form populate it with data|
 		$("#editQuoteModal").on('show.bs.modal', function () {
-
-			var quote = $("#editQuoteModal").data().quote;
-			$('#editQuoteForm input').each(function() {
-				var k = $(this).attr('name');
-				$(this).val(quote[k]);
-			});
-			
-			switch(quote.status_id) { 
-				case STATUS_NEW:
-					$('#editQuoteModalLabel').text('Confirm Quote');
-					$('#editQuoteForm label[for="quote"').text('Quote');
-					$("#editQuoteForm input[name=payment]")
-						.parents('.form-group')
-						.hide();		
-				break;
-				case STATUS_QUOTE_CONFIRMED:
-//TODO? 
-/* replace name text box with 
-  autocompletion to find existing customer 
-  or flag to create new customer on submit
-*/
-					$('#editQuoteModalLabel').text('Commit Rent');
-					$('#editQuoteForm label[for="quote"').text('Price');
-					$("#editQuoteForm input[name=payment]")
-						.parents('.form-group')
-						.show();		
-				break;
-			}				
-			
+			renderEditQuoteForm();
 		});
-    
+  
     	//save changes  
 		$("#editQuoteForm").submit(function (e) {
-			
-			e.preventDefault();			
-			var quote = $("#editQuoteModal").data().quote;
-			var formValues = $( this ).serializeArray();
-			_.each(formValues, function(fv) {
-				quote[fv.name] = fv.value;
+			e.preventDefault();	
+			var quote = formToQuote();
+			updateQuote(quote, function() {
+				if (quote.status_id == STATUS_CLOSED) {
+					createRental(quote);
+				}
+				loadQuotes(function() { 
+					renderQuotes();
+				});
+				$("#editQuoteModal").modal('hide');
 			});
-			
-			switch(quote.status_id) { 
-				case STATUS_NEW:
-					quote.status_id = STATUS_QUOTE_CONFIRMED;
-				break;	
-			
-				case STATUS_QUOTE_CONFIRMED: 
-					quote.status_id = STATUS_CLOSED;
-				break;
-			}
-	
-			saveQuote(quote);
-			console.log(quote);
+		});
+
+		//on show quote modal form populate it with data|
+		$("#addPaymentModal").on('show.bs.modal', function () {
+			renderAddPaymentForm();
+		});
+
+		$("#addPaymentModal").submit(function (e) {
+			e.preventDefault();
+
+			var payment = formToPayment();
+			addPayment(payment, function() {
+				loadRentals(function() { 
+					renderRentals();
+				});
+				$("#addPaymentModal").modal('hide');
+			});	
 		});
 	}
 
 	function login(user, pass) {
+		console.log('login', user);
 
 		$.post( HOST + "/public/login", { 
 			email: user, 
@@ -257,8 +317,12 @@
 				authorizations: [ auth ],
 	    		success: function() {
 					console.log('swagger client init ok.');
-					load('quotes');
-					loadCustomers();
+					loadQuotes(function(data) {
+						renderQuotes();
+					});
+					loadCustomers(function(data) {
+						renderCustomers();
+					});
 					//
     			}
 			});
@@ -267,10 +331,8 @@
 		
 	}
 
-	function load(table) {
-		
-		console.log('loading ' + table);
-
+	function loadQuotes(cbAfter) {
+		console.log('loadQuotes');
 		var filters = [
 			"status_id ne " + STATUS_CLOSED,
 		];
@@ -278,36 +340,71 @@
     	window.client.table.getRows({
 			account: ACCOUNT, 
 			database: DATABASE, 
-			table: table, 
+			table: TABLE_QUOTES, 
 			$filter: filters.join('\t')
 
 		}, function(data) {
-			console.log(data);
-			if (table == TABLE_QUOTES) {
-				renderQuotes(data);
-			} else if (table == TABLE_RENTALS) {
-				renderRentals(data);
-			}
+			//console.log(data);
+			var tableRows = {};
+			tableRows[TABLE_QUOTES] = data.obj.rows;
+			$('#quotes').data(tableRows);
+			if (cbAfter) cbAfter(data);
 		});
+	}
 
-	function loadCustomers() {
+	function loadRentals(cbAfter) {
+		console.log('loadRentals');
+		var filters = [
+			"status_id ne " + STATUS_CLOSED,
+		];
+
+    	window.client.table.getObjs({
+			account: ACCOUNT 
+			, database: DATABASE
+			, table: TABLE_RENTALS 
+			, $select: [
+				'id', 'guest_ref', 'start_date', 'end_date', 'price'
+				, 'payments.id', 'payments.amount', 'payments.pay_date'
+				, 'guests.name'
+			]
+			, $filter: filters.join('\t')
+
+		}, function(data) {
+			//console.log(data);
+			var rentals = _.map(data.obj.objs.rentals, function(rental) {
+				if (rental.end_date < today()) rental.status_style="rental-pending";
+				else if (rental.start_date < today()) rental.status_style="rental-active";
+				else rental.status_style="";
+				return rental;
+			});
+			rentals =  _.sortBy(rentals, function(rental) {
+				return rental.start_date;
+			});  
+			var tableRows = {};
+			tableRows[TABLE_RENTALS] = rentals;
+			$('#rentals').data(tableRows);
+			if (cbAfter) cbAfter(data);
+		});
+	}
+	
+	function loadCustomers(cbAfter) {
+		console.log('loadCustomers');
 		
-		console.log('loading customers');
-
     	window.client.table.getRows({
 			account: ACCOUNT, 
 			database: DATABASE, 
 			table: TABLE_CUSTOMERS
 
 		}, function(data) {
-			console.log(data);
-			window.data[TABLE_CUSTOMERS] = data.obj.rows;
+			//console.log(data);
+			$('#list-customers').data({ customers: data.obj.rows });
+			if (cbAfter) cbAfter(data);
 		});
 	}
 
-	function saveQuote(quote) {
+	function updateQuote(quote, cbAfter) {
+		console.log('updateQuote', quote);
 		
-	
     	window.client.table.modRows({
 			account: ACCOUNT, 
 			database: DATABASE, 
@@ -316,22 +413,169 @@
 
 		}, function(result) {
 			console.log(result);
-			if (quote.status_id == STATUS_CLOSED) {
-				//TODO create rental / first payment
-				
+			//TODO handle error
+			if (cbAfter) cbAfter(result);
+		});
+	}
+
+	function createRental(quote, cbAfter) {
+		console.log('createRental', quote);
+		
+		var addRental = function(quote, customer_id) {
+
+			var rental = _.clone(quote);
+
+			delete(rental.id);
+			rental.status_id = STATUS_RENTAL_RESERVED;
+			rental.guest_id = customer_id;
+			rental.price = quote.quote;
+
+			//console.log(rental);
+			
+	    	window.client.table.addRows({
+				account: ACCOUNT, 
+				database: DATABASE, 
+				table: TABLE_RENTALS, 
+				rows: [ rental ]
+	
+			}, function(result) {
+				//console.log(result);
+				//TODO handle error
+				var payment = {
+					rental_id: result.obj.rows[0].id,
+					amount: quote.payment,
+				};
+				addPayment(payment);
+					
+				if (cbAfter) cbAfter(result);
+			});
+		}
+
+		var customer_id = getIdFromRef(quote.name);
+		if ( ! customer_id) {
+			
+			var customer = {
+				name: quote.name,
+				email: quote.email
 			}
-			window.location.reload(); 
+			createCustomer(customer, function(result) { 
+				addRental(quote, result.obj.rows[0].id);
+			});
+
+		} else {
+			addRental(quote, customer_id);
+		}
+
+	}
+
+	function createCustomer(customer, cbAfter) {
+			console.log('createCustomer', customer);
+		
+	    	window.client.table.addRows({
+				account: ACCOUNT, 
+				database: DATABASE, 
+				table: TABLE_CUSTOMERS, 
+				rows: [ customer ]
+	
+			}, function(result) {
+				console.log(result);
+				//TODO handle error
+				if (cbAfter) cbAfter(result);
+			});
+	}
+
+	function today() {
+		return (new Date()).toISOString().substring(0,10);
+	}
+
+	function addPayment(payment, cbAfter) {
+		console.log('addPayment', payment);
+		if ( ! payment.pay_date) {
+			//today
+			payment.pay_date = today();
+		}
+
+    	window.client.table.addRows({
+			account: ACCOUNT, 
+			database: DATABASE, 
+			table: TABLE_PAYMENTS, 
+			rows: [ payment ]
+
+		}, function(result) {
+			//console.log(result);
+			//TODO handle error
+			if (cbAfter) cbAfter(result);
+		});
+	}
+
+	function getIdFromRef(val) {
+		//extract fk from ref such as 'Book [12]'
+		var m = val.match(/^(.*)\[([0-9]+)\]$/);
+		//console.log(val + " matches " + m);
+		if (m && m.length == 3) return parseInt(m[2]);
+		else return undefined;
+	}
+
+	function renderCustomers() {
+		
+		var customers = $('#list-customers').data().customers;
+		$('#list-customers').empty();
+		
+		_.each(customers, function(customer) {
+			$('#list-customers').append('<li><a href="#">' + customer.ref + '</a></li>');
+		});
+
+		//on click tab load data from server
+		$('#list-customers a').click( function (e) {
+			$("#editQuoteForm input[name=name]").val($(this).text());
+			$('#editQuoteForm input[name=name]').parents('.form-group').removeClass('has-warning');
 		});
 
 	}
 
-	function renderQuotes(data) {
+	function formToQuote() {
+		var quote = $("#editQuoteModal").data().quote;
+		var formValues = $("#editQuoteForm").serializeArray();
+		_.each(formValues, function(fv) {
+			quote[fv.name] = fv.value;
+		});
+		
+		switch(quote.status_id) { 
+			case STATUS_NEW:
+				quote.status_id = STATUS_QUOTE_CONFIRMED;
+			break;	
+		
+			case STATUS_QUOTE_CONFIRMED: 
+				quote.status_id = STATUS_CLOSED;
+			break;
+		}
+		
+		//console.log( quote );
+		return quote;
+	}
+
+	function formToPayment() {
+		var payment = {
+			rental_id: $("#addPaymentModal").data().rental.id
+		};
+		var formValues = $("#editPaymentForm").serializeArray();
+		_.each(formValues, function(fv) {
+			payment[fv.name] = fv.value;
+		});
+
+		//console.log( formValues, payment );
+		return payment;
+	}
+
+	function renderQuotes() {
+		var quotes = $('#quotes').data().quotes;
+
 		$('#quotes').html(
-			'<table id="quotes" class="table table-striped">'
+			'<table class="table table-striped">'
 			  + '<thead><tr>'
-				+ '<th>Name</th>'
 				+ '<th>Start Date</th>'
 				+ '<th>End Date</th>'
+				+ '<th>Name</th>'
 				+ '<th>Quote</th>'
 				+ '<th>Action</th>'
 			  + '</tr></thead>'
@@ -339,16 +583,16 @@
 			+ '</table>'
 		);
 		
-		_.each(data.obj.rows, function(row) {
+		_.each(quotes, function(row) {
 
 			var btnText = row.status_id == STATUS_QUOTE_CONFIRMED 
 						? 'Rent' : 'Confirm';
 
 			$('#quotes tbody').append(
 				'<tr>'
-					+ '<td>' + row.name + '</td>'
 					+ '<td>' + row.start_date + '</td>'
 					+ '<td>' + row.end_date + '</td>'
+					+ '<td>' + row.name + '</td>'
 					+ '<td>' + row.quote + '</td>'
 					+ '<td>' 
 					  + '<button type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#editQuoteModal">'
@@ -368,8 +612,120 @@
 		new Tablesort($('#quotes table')[0]);
 	}
 	
-	function renderRentals(data) {
-		$('#rentals').html('');
+	function renderRentals(rentals) {
+
+		var htmlTemplate = _.template(
+			  '<div class="panel-group">'
+			+ '  <div class="panel panel-default">'
+			+ '    <div class="panel-heading  <%= rental.status_style %>">'
+			+ '      <h4 class="panel-title">'
+			+ '        <a data-toggle="collapse" href="#collapse-<%= rental.id %>">'
+			+ '			<div style="float: left"><%= rental.start_date %> <%= rental.end_date %> <%= rental.guests.name %></div>'
+			+ '			<div style="float: right">$<%= rental.payments_total %> of $<%= rental.price %></div>'
+			+ '			<div style="clear: both"></div>'
+			+ '		   </a>'
+			+ '      </h4>'
+			+ '    </div>'
+			+ '    <div id="collapse-<%= rental.id %>" class="panel-collapse collapse">'
+			+ '     <div class="panel-body">'
+			+ '		  <table class="table" style="max-width: 400px">'
+			+ '		  <thead><tr>'
+			+ '			<th>Pay Date</th>'
+			+ '			<th>Amount</th>'
+			+ '		  </tr></thead>'
+			+ '    	  <tbody>'
+			+ '       <% _.each(rental.payments, function(pay) { %>'
+			+ '			<tr>'
+			+ '				<td><%= pay.pay_date %></td>'
+			+ '				<td>$<%= pay.amount %></td>'
+			+ '			</tr>'
+			+ '       <% }); %>'
+			+ '		  </tbody>'
+			+ '		  </table>'
+			+ '		  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addPaymentModal">'
+			+ '			Add payment'
+			+ '		  </button>'
+			+ '	    </div>'
+			+ '	  </div>'
+			+ '  </div>'
+			+ '</div>'
+		);
+
+		var rentals = $('#rentals').data().rentals;
+
+		$('#rentals').empty();
+
+		_.each(rentals, function(rental) {
+
+			rental.payments_total = _.reduce(rental.payments, function(s, p) {
+				return s + p.amount;
+			}, 0);
+
+			var html = htmlTemplate({rental: rental});
+			$('#rentals').append(html);
+
+			//on row button click make quote data available to form
+			$('#rentals div.panel-body:last button').click(function() {
+				$('#addPaymentModal').data({ rental: rental});
+			});
+		});
+
+	}
+	
+	function renderEditQuoteForm() {
+		//restore some defaults
+		$('#editQuoteForm').find('div').removeClass('has-warning');
+		$('#editQuoteForm').find('div').show();
+		$("#editQuoteForm input[name=payment]").removeAttr('required');		
+		
+		var quote = $("#editQuoteModal").data().quote;
+
+		$('#editQuoteForm input').each(function() {
+			var k = $(this).attr('name');
+			$(this).val(quote[k]);
+		});
+		
+		switch(quote.status_id) { 
+			case STATUS_NEW:
+				$('#editQuoteModalLabel').text('Confirm Quote');
+				$('#editQuoteForm label[for=quote]').text('Quote');
+
+				//hide some rent specific stuff
+				$("#editQuoteForm input[name=payment]")
+					.parents('.form-group')
+					.hide();		
+				$("#btn-select-customer").parents('.dropdown').hide();
+				
+			break;
+			case STATUS_QUOTE_CONFIRMED:
+				var customers = $('#list-customers').data().customers;
+				var guest = _.find(customers, function(customer) {
+					return customer.email == $('#editQuoteForm input[name=email').val();
+				});
+				
+				if (guest) {
+					$('#editQuoteForm input[name=name]').val(guest.ref);
+				} else {
+					$('#editQuoteForm input[name=name]').parents('.form-group').addClass('has-warning');
+				}
+
+				$("#editQuoteForm input[name=payment]").prop('required', true);		
+
+				$('#editQuoteModalLabel').text('Commit Rent');
+				$('#editQuoteForm label[for=quote]').text('Price');
+			break;
+		}				
+	
+	}
+
+	function renderAddPaymentForm() {
+		//console.log();
+		var rental = $("#addPaymentModal").data().rental;
+		var paid = _.reduce(rental.payments, function(s, p) {
+			return s + p.amount;
+		}, 0);
+		$("#addPaymentModal input[name=outstanding]").val(rental.price - paid);
+		$("#addPaymentModal input[name=pay_date]").val(today());
 	}
 	
 
