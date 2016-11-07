@@ -8,7 +8,8 @@
 </head>
 <body>
   <button id="btn-login">Login as demo</button>	
-  <button id="btn-data" disabled="true" >Get Sandwiches</button>	
+  <button id="btn-sandwiches" disabled="true" >Get Sandwiches</button>	
+  <button id="btn-customers-orders" disabled="true" >Get Customers' Orders</button>	
   <div id="data"></div>
 </body>
 
@@ -17,9 +18,11 @@
 <script src='swagger-client.js' type='text/javascript'></script>
 <script type="text/javascript">
 
+	var HOST="$DONKEYLIFT_API";
+
 	$('#btn-login').click(function() {
 
-		$.post( "http://api.donkeylift.com/public/login", { 
+		$.post( HOST + "/public/login", { 
 			email: "demo@donkeylift.com", 
 			password: "demo" 
 
@@ -33,10 +36,10 @@
 			);
 
   			window.client = new SwaggerClient({
-		    	url: "http://api.donkeylift.com/public/swagger.json",
+		    	url: HOST + "/public/swagger.json",
 				authorizations: [ auth ],
 	    		success: function() {
-					$('#btn-data').prop('disabled', false);
+					$('button').prop('disabled', false);
 					console.log('swagger client init ok.');
     			}
 			});
@@ -44,7 +47,7 @@
 		});
 	});
 
-	$('#btn-data').click(function() {
+	$('#btn-sandwiches').click(function() {
 
     	client.table.getRows({
 			account: 'demo', 
@@ -52,6 +55,25 @@
 			table: 'sandwiches', 
 			$orderby: 'name',
 			$top: 20
+
+		}, function(data) {
+        	document.getElementById("data").innerHTML
+			= '<pre class="prettyprint">'
+			+ JSON.stringify(data.obj, null, 4);
+			+ '</pre>'
+			PR.prettyPrint();
+    	});
+	});
+
+	$('#btn-customers-orders').click(function() {
+
+    	client.table.getObjs({
+			account: 'demo', 
+			database: 'sandwiches', 
+			table: 'customers', 
+			$select: 'id, name, orders.id, orders.order_date, orders.total_amount, sandwiches.name, order_items.unit_price, order_items.quantity',
+			$filter: "orders.order_date ge '2015-01-01'",
+			$top: 50
 
 		}, function(data) {
         	document.getElementById("data").innerHTML
