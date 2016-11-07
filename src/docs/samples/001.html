@@ -17,6 +17,7 @@
 <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
 <script src='swagger-client.js' type='text/javascript'></script>
 <script type="text/javascript">
+	/* global $, SwaggerClient, PR */
 
 	var HOST="$DONKEYLIFT_API";
 
@@ -49,7 +50,7 @@
 
 	$('#btn-sandwiches').click(function() {
 
-    	client.table.getRows({
+    	window.client.table.getRows({
 			account: 'demo', 
 			database: 'sandwiches', 
 			table: 'sandwiches', 
@@ -67,7 +68,7 @@
 
 	$('#btn-customers-orders').click(function() {
 
-    	client.table.getObjs({
+    	window.client.table.getObjs({
 			account: 'demo', 
 			database: 'sandwiches', 
 			table: 'customers', 
