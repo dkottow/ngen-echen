@@ -142,13 +142,20 @@ Donkeylift.Field = Backbone.Model.extend({
 	setTypeByExample: function(val) {
 		if (String(parseInt(val)) == val) {
 			this.set('type', Donkeylift.Field.TYPES.INTEGER);
-		} else if ( ! isNaN(val)) {
+			return;
+		} 
+		var num = val.replace(/[^0-9-.]/g, '');
+		console.log(num);
+		if (num.length > 0 && ! isNaN(num)) {
 			this.set('type', Donkeylift.Field.TYPES.NUMERIC);
-		} else if ( ! isNaN(Date.parse(val))) {
+			//TODO set precision
+			return;
+		} 
+		if ( ! isNaN(Date.parse(val))) {
 			this.set('type', Donkeylift.Field.TYPES.DATE);
-		} else {
-			this.set('type', Donkeylift.Field.TYPES.VARCHAR);
-		}
+			return;
+		} 
+		this.set('type', Donkeylift.Field.TYPES.VARCHAR);
 	}
 
 });

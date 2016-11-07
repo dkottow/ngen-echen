@@ -170,15 +170,18 @@ Donkeylift.Table = Backbone.Model.extend({
 		var rows = data.trim().split('\n');
 		if (rows.length < 2)  return;
 
-		var fieldNames = _.map(rows[0].trim().split('\t'), function(fn) {
+		var fieldNames = _.map(rows[0].trim().split('\t'), function(fn, idx) {
+			fn = Donkeylift.util.removeDiacritics(fn.trim());
+			fn = fn.replace(/\s+/g, '_').replace(/\W/g, '');
 			var match = fn.match(/[a-zA-Z]\w*/);
-			return match[0];
+			return match ? match[0] : 'NA' + idx;
 		});
-console.log(fieldNames);
+		console.log(fieldNames);
+		
 		var values = _.map(rows[1].trim().split('\t'), function(val) {
 			return val.trim();
 		});
-console.log(values);
+		console.log(values);
 
 		var fields = [];
 		for(var i = 0; i < fieldNames.length; ++i) {
