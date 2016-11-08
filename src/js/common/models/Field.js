@@ -108,14 +108,12 @@ Donkeylift.Field = Backbone.Model.extend({
 
 	//to formatted string (pretty-print)
 	toFS: function(val) {
-		if (this.get('type') == Donkeylift.Field.TYPES.NUMERIC) {
-			return this.getProp('scale') 
-				? val.toFixed(this.getProp('scale')) 
-				: String(val);
-
-		} else {
-			return String(val);
+		if (_.isNumber(val) && this.getProp('scale')) {
+			return val.toFixed(this.getProp('scale'));
 		}
+		if ( ! _.isString(val)) return String(val);
+
+		return _.escape(String(val));
 	},
 
 	//to query string

@@ -203,6 +203,7 @@ Donkeylift.DataTableView = Backbone.View.extend({
 		}
 
 		this.renderTextWrapCheck();
+		//TODO render column visible toggle combo
 
 		this.addEvents();
 		return this;
@@ -301,7 +302,8 @@ Donkeylift.DataTableView = Backbone.View.extend({
 		var abbrFn = function (data) {
 			var s = field.toFS(data);
 	   		return s.length > w
-				?  '<span title="' + s.replace(/"/g, '&quot;') + '">'
+				//?  '<span title="' + s.replace(/"/g, '&quot;') + '">'
+				?  '<span title="' + s + '">'
 					+ s.substr( 0, w)
 					+ ' ' + btnExpand
 				: s;
