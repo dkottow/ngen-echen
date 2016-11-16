@@ -1,10 +1,23 @@
-/* global $, Auth0Lock */
+/* global jQuery, $, Auth0Lock */
 window.doCustomInit = function() {
     console.log("DL - add example values to path params.");
-    $('input[name="account"]').attr('value','demo');
-    $('input[name="database"]').attr('value','sandwiches');
-    $('input[name="table"]').attr('value','customers');
+    $('input[name="account"]').val('demo');
+    $('input[name="database"]').val('sandwiches');
+    $('input[name="table"]').val('customers');
 
+	var example_fields = ['orders.order_date', 'orders.total_amount', 'customers.name', 'sandwiches.name', 'sandwiches.price'];
+	var example_filters = ["orders.order_date btwn '2015-01-01', '2015-12-31'", "sandwiches.origin eq 'Chile'"];
+
+	jQuery.each(['#table_getRows_content', '#table_getObjs_content'], function(i, div_id) {
+		
+		$(div_id + ' textarea[name="$filter"]').val(example_filters.join('\n'));
+		$(div_id + ' textarea[name="$select"]').val(example_fields.join('\n'));
+	})
+
+	$('#table_getRows_content input[name="table"]').val('orders');
+	$('#table_getRows_content textarea[name="$orderby"]').val(['orders.order_date', 'sandwiches.name'].join('\n'));
+
+	$('#table_getObjs_content input[name="table"]').val('sandwiches');
 
     $('#login').click(function() {
     	

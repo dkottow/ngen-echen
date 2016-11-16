@@ -4860,7 +4860,7 @@ Operation.prototype.encodePathCollection = function (type, name, value) {
   if (type === 'ssv') {
     separator = '%20';
   } else if (type === 'tsv') {
-    separator = '\\t';
+    separator = '%09'; //dkottow
   } else if (type === 'pipes') {
     separator = '|';
   } else {
@@ -4896,7 +4896,7 @@ Operation.prototype.encodeQueryCollection = function (type, name, value) {
     } else if (type === 'ssv') {
       separator = '%20';
     } else if (type === 'tsv') {
-      separator = '\\t';
+      separator = '%09'; //dkottow
     } else if (type === 'pipes') {
       separator = '|';
     } else if (type === 'brackets') {

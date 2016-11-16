@@ -327,7 +327,7 @@ gulp.task('build-api-swagger', function() {
 gulp.task('build-api-js', ['build-api-swagger'], function() {
 	var host = process.env.DONKEYLIFT_API.replace(new RegExp('http://'), '');
 
-	return gulp.src(['./src/api/swagger.json', './src/api/dl_swagger.js'])
+	return gulp.src(['./src/api/dl_swagger.js'])
 
 		.pipe(replace("$DONKEYLIFT_API", host))
 		.pipe(replace("$AUTH0_CLIENT_ID", process.env.AUTH0_CLIENT_ID))
@@ -336,7 +336,7 @@ gulp.task('build-api-js', ['build-api-swagger'], function() {
 		.pipe(gulp.dest('./app/api'));
 });
 
-gulp.task('build-api-html', ['build-api-swagger'], function() {
+gulp.task('build-api-html', ['build-api-js'], function() {
 	return gulp.src(['./src/api/index.html'])
 
 		.pipe(inject(gulp.src('./src/html/common/nav-login.html'), {
@@ -484,7 +484,7 @@ gulp.task('watch', function() {
     gulp.watch('./src/data.html', ['build-data-html']);
     gulp.watch('./src/schema.html', ['build-schema-html']);
     gulp.watch('./src/css/*.css', ['build-donkeylift-css']);
-    gulp.watch('./src/docs/*', ['build-api-json']);
+    gulp.watch('./src/api/*', ['build-api-html']);
     gulp.watch('./src/docs/samples/*', ['build-samples', 'build-samples-html']);
     gulp.watch('./src/signup.html', ['build-signup-html']);
     gulp.watch('./src/index.html', ['build-index-html']);
