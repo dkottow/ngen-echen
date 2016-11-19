@@ -9,7 +9,6 @@ window.doCustomInit = function() {
 	var example_filters = ["orders.order_date btwn '2015-01-01', '2015-12-31'", "sandwiches.origin eq 'Chile'"];
 
 	jQuery.each(['#table_getRows_content', '#table_getObjs_content'], function(i, div_id) {
-		
 		$(div_id + ' textarea[name="$filter"]').val(example_filters.join('\n'));
 		$(div_id + ' textarea[name="$select"]').val(example_fields.join('\n'));
 	})

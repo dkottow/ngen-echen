@@ -51,8 +51,25 @@ Donkeylift.Account = Backbone.Model.extend({
 		return response;
 	},
 
-	downloadDatabase : function(db) {
+	getDownloadLink : function(dbName, cbResult) {
+		var me = this;
+		var db = this.get('databases').find(function(db) { 
+			return db.get('name') == dbName; 
+		});
 		
+		var path = '/' + this.get('name') + '/' + db.get('name') + '.sqlite';
+		var url = this.url() + '/' + db.get('name') + '.nonce';
+
+		$.ajax(url, {
+			type: 'POST',
+			data: JSON.stringify({ path: path }),
+			contentType:'application/json; charset=utf-8',
+			dataType: 'json'
+		}).done(function(response) {
+			var link = DONKEYLIFT_API + path + '?nonce=' + response.nonce;
+			cbResult(null, link);
+			//console.dir(response);
+		});
 	}
 
 });

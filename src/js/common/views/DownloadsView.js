@@ -12,8 +12,8 @@ Donkeylift.DownloadsView = Backbone.View.extend({
 	},
 
 	template: _.template($('#downloads-template').html()),
-	//TODO db_template: _.template('<li class="list-group-item"><a href="#" download="<%= filename%>" class="download-database"><%= name%></a></li>'),
-	db_template: _.template('<li class="list-group-item"><a href="/public/tmp/<%= filename%>"><%= name%></a></li>'),
+	db_template: _.template('<li class="list-group-item"><a href="#" data-db="<%= name%>" class="download-database">Get <%= name%></a></li>'),
+	//db_template: _.template('<li class="list-group-item"><a href="<%= link%>">Get link for <%= name%></a></li>'),
 
 	render: function() {
 		console.log("DownloadsView.render ");
@@ -22,16 +22,25 @@ Donkeylift.DownloadsView = Backbone.View.extend({
 		var dbLinks = this.model.get('databases').map(function(db) {
 			return this.db_template({
 				name: db.get('name'),
-				filename: db.get('name') + '.sqlite'
 			});
 		}, this);
 		this.$('#database-list').html(dbLinks);
 	},
 
 	evDownloadDatabaseClick: function(ev) {
-		var db = $(ev.target).attr('download');
+
+		if ($(ev.target).attr('href') != '#') return true;
+		
+		var db = $(ev.target).attr('data-db');
 		console.log('evDownloadDatabaseClick ' + db);
-		//TODO call api w/ id_token to get a use-once, expire-soon download link
+		this.model.getDownloadLink(db, function(err, link) {
+			if (err) {
+				console.log(err);
+			} else {
+				$(ev.target).attr('href', link);
+				$(ev.target).text('Download ' + db);
+			}
+		});
 		return false;
 	},
 
