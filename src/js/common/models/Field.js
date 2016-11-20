@@ -11,6 +11,12 @@ Donkeylift.Field = Backbone.Model.extend({
 		var rxp = /(\w+)(\([0-9,]+\))?/
 		var match = field.type.match(rxp)
 		this.set('type', Donkeylift.Field.TypeAlias(match[1]));
+		
+		if (field.props.visible === undefined) {
+			field.props.visible = _.contains(Donkeylift.Table.INITHIDE_FIELDS, field.name) 
+								? false : true;  
+		}
+		
 		this.set('props', field.props || {});
 	},
 

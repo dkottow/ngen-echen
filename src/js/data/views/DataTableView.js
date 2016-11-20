@@ -76,7 +76,7 @@ Donkeylift.DataTableView = Backbone.View.extend({
 
 			var width = (100 * field.getProp('width')) / totalWidth;
 			col.width = String(Math.floor(width)) + '%';
-
+			col.visible = field.getProp('visible');
 			col.render = this.columnDataFn(field);
 
 			return col;
@@ -185,8 +185,10 @@ Donkeylift.DataTableView = Backbone.View.extend({
 			pageLength: dtOptions.pageLength, 
 			order: dtOptions.order,
 			select: true,
+			colReorder: true,
 			//dom: "lfrtip",
 			buttons: [
+				'colvis',
 				{ extend: "create", editor: this.dataEditor },
 				{ extend: "edit", editor: this.dataEditor },
 				{ extend: "remove", editor: this.dataEditor }
@@ -203,8 +205,7 @@ Donkeylift.DataTableView = Backbone.View.extend({
 		}
 
 		this.renderTextWrapCheck();
-		//TODO render column visible toggle combo
-
+		
 		this.addEvents();
 		return this;
 	},
@@ -263,9 +264,22 @@ Donkeylift.DataTableView = Backbone.View.extend({
 				.addClass('btn btn-default navbar-btn')
 
 			$('#menu').append(me.dataTable.buttons().container());
+
+			//customize to our bootstrap grid model which has 16, not 12 columns
+			me.$('#grid_filter').parent()
+				.removeClass('col-sm-6')
+				.addClass('col-sm-10'); 
+			me.$('#grid').parent()
+				.removeClass('col-sm-12')
+				.addClass('col-sm-16'); 
+			me.$('#grid_paginate').parent()
+				.removeClass('col-sm-7')
+				.addClass('col-sm-11'); 
+	
 		});
 
 		//using order.dt event won't work because its fired otherwise, too
+
 		this.$('th.sorting').click(function() {
 			console.log("order.dt");
 			Donkeylift.app.router.navigate("reload-table", {trigger: false});			

@@ -119,9 +119,13 @@ table.dataTable {
 
 .dataTable th {
 	white-space: nowrap; 
+	padding: 5px;
+	border-bottom: 1px solid black;
 }
 
 .dataTable td {
+	padding: 5px;
+	border-bottom: 1px solid #ddd;
 }
 
 #grid_length label, #grid_filter label {

@@ -215,3 +215,4 @@ Donkeylift.Table.create = function(name) {
 }
 
 Donkeylift.Table.NONEDITABLE_FIELDS = ['id', 'mod_by', 'mod_on', 'add_by', 'add_on'];
+Donkeylift.Table.INITHIDE_FIELDS = ['mod_by', 'mod_on', 'add_by', 'add_on'];
