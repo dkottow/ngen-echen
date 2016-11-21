@@ -184,7 +184,7 @@ Donkeylift.DataTableView = Backbone.View.extend({
 			pageLength: dtOptions.pageLength, 
 			order: dtOptions.order,
 			select: true,
-			colReorder: true,
+			//colReorder: true,
 			//dom: "lfrtip",
 			buttons: [
 				'colvis',
