@@ -53,13 +53,13 @@ Donkeylift.DataTableView = Backbone.View.extend({
 		dtOptions.displayStart = params.$skip || 0;
 		dtOptions.pageLength = params.$top || 10;
 
-		dtOptions.order = [0, 'asc'];
+		dtOptions.order = [[0, 'asc']];
 		if (params.$orderby) {
 			var order = _.pairs(params.$orderby[0]) [0];
 			for(var i = 0; i < fields.length; ++i) {
 				if (fields[i].vname() == order[0]) {
-					dtOptions.order[0] = i;
-					dtOptions.order[1] = order[1];
+					dtOptions.order[0][0] = i;
+					dtOptions.order[0][1] = order[1];
 					break;
 				}
 			}
@@ -144,15 +144,15 @@ Donkeylift.DataTableView = Backbone.View.extend({
 			var align = idx < fields.length / 2 ? 
 				'dropdown-menu-left' : 'dropdown-menu-right';
 			
+			//this.$('thead > tr').append('<th>' + field.vname() + '</th>');
 			this.$('thead > tr').append(this.columnTemplate({
 				name: field.vname(),
 				dropalign: align	
-			}));					
-
+			}));
+			
 		}, this);
 
 		this.renderFilterButtons();
-
 
 		var filter = Donkeylift.app.filters.getFilter(this.model);			
 		var initSearch = {};
@@ -174,8 +174,7 @@ Donkeylift.DataTableView = Backbone.View.extend({
 			ajax: this.model.ajaxGetEditorFn(),
 		});
 
-
-		this.dataTable = this.$('#grid').DataTable({
+		var dtSettings = {
 			serverSide: true,
 			columns: dtOptions.columns,				
 			ajax: this.model.ajaxGetRowsFn(),
@@ -193,12 +192,17 @@ Donkeylift.DataTableView = Backbone.View.extend({
 				{ extend: "edit", editor: this.dataEditor },
 				{ extend: "remove", editor: this.dataEditor }
 			]
-		});
+		};
 
-/* make select row on click work calling select()
-   see comment in datatables source about 'Initialisation'
+
+		this.dataTable = this.$('#grid').DataTable(dtSettings);
+
+/* trigger preInit.dt event since the table was added dynamically
+   and this event seems to be triggered by DT on dom load.
+   see comment in datatables source about 'Initialisation' in select plugin
 */
-		this.dataTable.select(); 
+		$(document).trigger('preInit.dt', this.dataTable.settings() );
+		//this.dataTable.select(); 
 
 		if (filter) {
 			this.$('#grid_filter input').val(filter.get('value'));
