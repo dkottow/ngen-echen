@@ -184,7 +184,7 @@ Donkeylift.DataTableView = Backbone.View.extend({
 			pageLength: dtOptions.pageLength, 
 			order: dtOptions.order,
 			select: true,
-			//colReorder: true,
+			colReorder: true,
 			//dom: "lfrtip",
 			buttons: [
 				'colvis',
@@ -220,23 +220,16 @@ Donkeylift.DataTableView = Backbone.View.extend({
 		this.$('.field-filter').click(function(ev) {
 			ev.stopPropagation();
 
-			if ( ! $(this).data('bs.dropdown')) {
-				//workaround for first click to show dropdown
-				$(this).dropdown('toggle');
-			} else {
-				$(this).dropdown();
-			}
-
 			var colName = $(this).data('column');
-			var field = me.model.get('fields').getByName(colName);
-			var el = me.$('#col-' + colName + ' div.dropdown-menu');
 
 			var filter = new Donkeylift.Filter({
 				table: me.model,
-				field: field
+				field: me.model.get('fields').getByName(colName)
 			});
 
-			Donkeylift.app.setFilterView(filter, el);
+			var th = me.$('#col-' + colName);
+			Donkeylift.app.setFilterView(filter, th);
+
 		});
 
 		this.$('#grid').on('draw.dt', function() {

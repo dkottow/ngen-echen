@@ -45,10 +45,9 @@ AppData.prototype.unsetFilters = function() {
 	this.filters = new Donkeylift.Filters();
 }
 
-AppData.prototype.setFilterView = function(filter, $parentElem) {
+AppData.prototype.setFilterView = function(filter, thElement) {
 	if (this.filterView) this.filterView.remove();
-	this.filterView = new Donkeylift.FilterView({ model: filter });
-	$parentElem.append(this.filterView.el);
+	this.filterView = new Donkeylift.FilterView({ model: filter, th: thElement });
 	this.filterView.render();
 }
 

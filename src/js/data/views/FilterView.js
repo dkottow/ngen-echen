@@ -7,16 +7,37 @@ Donkeylift.FilterView = Backbone.View.extend({
 		'click .nav-tabs a': 'evFilterTabClick'
 	},
 
-	initialize: function () {
+	initialize: function (options) {
 		console.log("FilterView.init " + this.model.get('table'));
+
 		this.rangeView = new Donkeylift.FilterRangeView({
-									model: this.model,
-									el: this.el
-		});
+							model: this.model,el: this.el });
 		this.itemsView = new Donkeylift.FilterItemsView({
-									model: this.model,
-									el: this.el
+							model: this.model, el: this.el });
+
+		var th = options.th;
+		th.find('.dropdown-menu').append(this.el);
+		
+		/*
+		 * turn off DT ColReorder mouse events while filter dropdown is shown
+		 */
+		th.find('.dropdown').on('show.bs.dropdown', function() {
+			th.off('mousedown.ColReorder');
 		});
+		th.find('.dropdown').on('hide.bs.dropdown', function() {
+			//TODO? slightly hacky way of re-insantiating the event handler for ColReorder 
+			$.fn.dataTable.ColReorder('#grid')._fnMouseListener(0, th);
+		});
+
+		//on filter btn click toggle dropdown 
+		var btn = th.find('.field-filter');
+		if ( ! btn.data('bs.dropdown')) {
+			//workaround for first click to show dropdown
+			btn.dropdown('toggle');
+		} else {
+			btn.dropdown();
+		}
+		
 	},
 
 	template: _.template($('#filter-template').html()),
