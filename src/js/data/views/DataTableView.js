@@ -7,14 +7,14 @@ Donkeylift.DataTableView = Backbone.View.extend({
 
 	initialize: function() {
 		console.log("DataTableView.init " + this.model);			
-		this.listenTo(Donkeylift.app.filters, 'update', this.renderFilterButtons);
+		this.listenTo(Donkeylift.app.filters, 'update', this.renderStateFilterButtons);
 	},
 
 	tableTemplate: _.template($('#grid-table-template').html()),
 	columnTemplate: _.template($('#grid-column-template').html()),
 	buttonWrapTextTemplate: _.template($('#grid-button-wrap-text-template').html()),
 
-	renderFilterButtons: function() {
+	renderStateFilterButtons: function() {
 		var fields = this.model.get('fields').sortByOrder();
 		_.each(fields, function(field, idx) {
 			
@@ -136,6 +136,8 @@ Donkeylift.DataTableView = Backbone.View.extend({
 	},
 
 	render: function() {
+		var me = this;
+		
 		console.log('DataTableView.render ');			
 		this.$el.html(this.tableTemplate());
 
@@ -145,14 +147,19 @@ Donkeylift.DataTableView = Backbone.View.extend({
 				'dropdown-menu-left' : 'dropdown-menu-right';
 			
 			//this.$('thead > tr').append('<th>' + field.vname() + '</th>');
-			this.$('thead > tr').append(this.columnTemplate({
+			var colHtml = this.columnTemplate({
 				name: field.vname(),
 				dropalign: align	
-			}));
-			
+			});
+			this.$('thead > tr').append(colHtml);
+			this.$('#col-' + field.vname() + ' .field-filter').click( function(ev) {
+				me.evFilterButtonClick(ev);
+			});
+
 		}, this);
 
-		this.renderFilterButtons();
+		
+		this.renderStateFilterButtons();
 
 		var filter = Donkeylift.app.filters.getFilter(this.model);			
 		var initSearch = {};
@@ -197,40 +204,40 @@ Donkeylift.DataTableView = Backbone.View.extend({
 
 		this.dataTable = this.$('#grid').DataTable(dtSettings);
 
-/* trigger preInit.dt event since the table was added dynamically
-   and this event seems to be triggered by DT on dom load.
-   see comment in datatables source about 'Initialisation' in select plugin
-*/
-		$(document).trigger('preInit.dt', this.dataTable.settings() );
-		//this.dataTable.select(); 
-
 		if (filter) {
 			this.$('#grid_filter input').val(filter.get('value'));
 		}
 
 		this.renderTextWrapCheck();
-		
+	
 		this.addEvents();
+
+		/* trigger preInit.dt event since the table was added dynamically
+		   and this event seems to be triggered by DT on dom load.
+		   see comment in datatables source about 'Initialisation' in select plugin */
+		$(document).trigger('preInit.dt', this.dataTable.settings() );
+		//this.dataTable.select(); 
+
 		return this;
+	},
+
+	evFilterButtonClick: function(ev) {
+		ev.stopPropagation();
+
+		var colName = $(ev.target).closest('button').data('column');
+
+		var filter = new Donkeylift.Filter({
+			table: this.model,
+			field: this.model.get('fields').getByName(colName)
+		});
+
+		var th = this.$('#col-' + colName);
+		Donkeylift.app.setFilterView(filter, th);
+
 	},
 
 	addEvents: function() {
 		var me = this;
-
-		this.$('.field-filter').click(function(ev) {
-			ev.stopPropagation();
-
-			var colName = $(this).data('column');
-
-			var filter = new Donkeylift.Filter({
-				table: me.model,
-				field: me.model.get('fields').getByName(colName)
-			});
-
-			var th = me.$('#col-' + colName);
-			Donkeylift.app.setFilterView(filter, th);
-
-		});
 
 		this.$('#grid').on('draw.dt', function() {
 
