@@ -48,6 +48,17 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 		//console.log('el ' + this.$el.html());
 
 		if (this.canSlide()) {
+/*
+			this.$("#inputFilterMin").parent()
+				.attr('data-role', 'rangeslider');
+
+			this.$("#inputFilterMin").attr('type', 'range');
+			this.$("#inputFilterMax").attr('type', 'range');
+			this.$("#inputFilterMin").attr('min', stats.min);
+			this.$("#inputFilterMin").attr('max', stats.max);
+			this.$("#inputFilterMax").attr('min', stats.min);
+			this.$("#inputFilterMax").attr('max', stats.max);
+*/
 			this.$("#sliderRange").slider({
 				range: true,
 				min: stats.min,
@@ -75,19 +86,8 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 		if (this.model.get('field').get('type') 
 			== Donkeylift.Field.TYPES['DATE']) {
 
-			var opts = { minDate: Donkeylift.Field.toDate(stats.min), 
-						 maxDate: Donkeylift.Field.toDate(stats.max),
-						dateFormat: 'yy-mm-dd' };
-			var minVal = Donkeylift.Field.toDate($("#inputFilterMin").val());
-			var maxVal = Donkeylift.Field.toDate($("#inputFilterMax").val());
-			$("#inputFilterMin").datepicker(opts);
-			$("#inputFilterMin").datepicker("setDate", minVal);
-			$("#inputFilterMax").datepicker(opts);
-			$("#inputFilterMax").datepicker("setDate", maxVal);
-
-			$('#ui-datepicker-div').click(function(e) {
-				e.stopPropagation();
-			});
+			$("#inputFilterMin").attr('type', 'date');
+			$("#inputFilterMax").attr('type', 'date');
 		}
 
 	},
