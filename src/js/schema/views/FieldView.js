@@ -1,11 +1,13 @@
-/*global Donkeylift, Backbone, jQuery, _ */
+/*global Donkeylift, Backbone, jQuery, _, $ */
 
 Donkeylift.FieldView = Backbone.View.extend({
 
 	tagName: 'tr',
 
 	events: {
-		'click .edit-field': 'editFieldClick',
+		'click .btn-field-edit': 'editFieldClick',
+		'click .btn-field-up': 'moveUpFieldClick',
+		'click .btn-field-down': 'moveDownFieldClick',
 	},
 
 	initialize: function () {
@@ -31,6 +33,32 @@ Donkeylift.FieldView = Backbone.View.extend({
 		editor.render();
 	},
 
+	getFieldFromRow: function(tr) {
+		var name = tr.find('td:eq(2)').text();
+		return Donkeylift.app.table.get('fields').getByName(name);
+	},
+
+	swapFieldsOrder: function(f1, f2) {
+		var o1 = f1.getProp('order');
+		f1.setProp('order', f2.getProp('order'));
+		f2.setProp('order', o1);
+	},
+
+    moveUpFieldClick: function(ev) {
+        var row = $(ev.target).closest("tr");
+		var prevField = this.getFieldFromRow(row.prev());
+		this.swapFieldsOrder(this.model, prevField);
+		Donkeylift.app.tableView.render();
+        //row.insertBefore(row.prev());
+    },
+    
+    moveDownFieldClick: function(ev) {
+        var row = $(ev.target).closest("tr");
+		var nextField = this.getFieldFromRow(row.next());
+		this.swapFieldsOrder(this.model, nextField);
+		Donkeylift.app.tableView.render();
+        //row.insertAfter(row.next());
+    },
 
 });
 

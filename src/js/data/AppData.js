@@ -16,6 +16,8 @@ AppData.prototype.start = function() {
 	$('#nav-data').closest("li").addClass("active");
 }
 
+/*** override AppBase methods ***/ 
+
 AppData.prototype.createTableView = function(table, params) {
 	return new Donkeylift.DataTableView({
 		model: table,
@@ -28,14 +30,12 @@ AppData.prototype.createSchema = function(name) {
 }
 
 	
-	/**** schema stuff ****/
-
 AppData.prototype.unsetSchema = function() {
 	Donkeylift.AppBase.prototype.unsetSchema.call(this);
 	this.unsetFilters();
 }
 
-/**** data stuff ****/
+/**** AppData stuff ****/
 
 AppData.prototype.setFilters = function(filters) {
 	this.filters = new Donkeylift.Filters(filters);

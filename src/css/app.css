@@ -200,6 +200,10 @@ table.dataTable {
 
 /***** schema.css *****/
 
+.btn-field-up, .btn-field-down {
+	padding: 6px 8px;
+}
+
 #vis-graph {
 	height: 600px;
 } 

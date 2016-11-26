@@ -28,19 +28,6 @@ Donkeylift.SchemaTableView = Backbone.View.extend({
 		console.log("TableView.render " + this.model.get("name"));
 		this.$el.html(this.template(this.model.attrJSON()));
 
-		var me = this;
-		this.elFields().sortable({
-			stop: function() {
-				$('tr', me.elFields()).each(function(index) {
-					var name = $('td:eq(2)', this).text();
-					//console.log(name + ' = ' + (index + 1));
-					var field = me.model.get('fields').getByName(name);
-					field.setProp('order', index + 1);
-				});
-				me.render();
-			}
-		});
-
 		this.setFields();
 		this.setRelations();
 

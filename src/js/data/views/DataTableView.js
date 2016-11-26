@@ -41,7 +41,7 @@ Donkeylift.DataTableView = Backbone.View.extend({
 			$('#grid_wrap_text span')
 				.toggleClass("glyphicon-text-height glyphicon-text-width");
 		});
-		
+
 	},
 
 	getOptions: function(params, fields) {
@@ -199,10 +199,10 @@ Donkeylift.DataTableView = Backbone.View.extend({
 			colReorder: true,
 			//dom: "lfrtip",
 			buttons: [
-				'colvis',
-				{ extend: "create", editor: this.dataEditor },
-				{ extend: "edit", editor: this.dataEditor },
-				{ extend: "remove", editor: this.dataEditor }
+				{ extend: 'colvis', text: 'Show Columns' },
+				{ extend: 'create', editor: this.dataEditor },
+				{ extend: 'edit', editor: this.dataEditor },
+				{ extend: 'remove', editor: this.dataEditor }
 			]
 		};
 

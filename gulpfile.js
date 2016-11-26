@@ -53,7 +53,6 @@ if (process.env.OPENSHIFT_DATA_DIR) {
 var ver3rd = {
 	BOOTSTRAP : 'bootstrap-custom',
 	JQUERY : 'jquery-2.1.4',
-	JQUERY_UI : 'jquery-ui-1.11.4.custom',
 	FONT_AWESOME : 'font-awesome-4.3.0',
 	DATATABLES : 'DataTables-custom',
 	DATATABLES_EDITOR : 'Editor-1.5.6',
@@ -99,14 +98,8 @@ gulp.task('copy-excel', function() {
 
 gulp.task('build-3rdparty-css', function() {
 
-	gulp.src([
-				src3rd + ver3rd.JQUERY_UI + '/images/*' 
-		])
-		.pipe(gulp.dest('./public/css/images/'));
-
 	return gulp.src([
 				src3rd + ver3rd.BOOTSTRAP + '/css/bootstrap.min.css' 
-				, src3rd + ver3rd.JQUERY_UI + '/jquery-ui.min.css' 
 				, src3rd + ver3rd.FONT_AWESOME + '/css/font-awesome.min.css'
 				, src3rd + ver3rd.NOUISLIDER + '/nouislider.min.css' 
 		])
@@ -118,7 +111,6 @@ gulp.task('build-3rdparty-css', function() {
 gulp.task('build-3rdparty-js', function() {
 	return gulp.src([
 				src3rd + ver3rd.JQUERY + '/jquery.min.js' 
-				, src3rd + ver3rd.JQUERY_UI + '/jquery-ui.min.js' 
 				, src3rd + '/underscore/underscore.js' 
 				, src3rd + '/backbone/backbone.js' 
 				, src3rd + ver3rd.BOOTSTRAP + '/js/bootstrap.min.js' 
@@ -149,7 +141,6 @@ gulp.task('copy-3rdparty-js', function() {
 
 gulp.task('copy-3rdparty-css', function() {
 	return gulp.src([
-				//src3rd + ver3rd.DATATABLES + '/media/css/jquery.dataTables.min.css'
 				src3rd + ver3rd.DATATABLES + '/datatables.min.css'
 				, src3rd + ver3rd.VIS + '/vis.min.css'
 				, extdir + ver3rd.DATATABLES_EDITOR + '/css/editor.dataTables.min.css' 
