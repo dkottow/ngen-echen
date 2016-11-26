@@ -1,4 +1,4 @@
-/*global Donkeylift, Backbone, jQuery, _ */
+/*global Donkeylift, Backbone, jQuery, _, $ */
 
 Donkeylift.DataTableView = Backbone.View.extend({
 
@@ -109,21 +109,25 @@ Donkeylift.DataTableView = Backbone.View.extend({
 				edField.type = 'textarea';
 
 			} else if (field.get('fk') == 1) {
-				var sourceFn = function(req, rsp) {
-
+				var sourceFn = function(q, syncCb, asyncCb) {
+					syncCb([]);
 					var fkTable = Donkeylift.app.schema
 						.get('tables').getByName(field.get('fk_table'));
 					
-					fkTable.fieldValues('ref', req.term, function(rows) {
+					fkTable.fieldValues('ref', q, function(rows) {
 						var options = _.map(rows, function(row) {
 							return row.ref;
 						});
-						rsp(options);
+						//console.log(options);
+						asyncCb(options);
 					});
 				}
-				edField.type = 'autoComplete';
+				edField.type = 'typeahead';
 				edField.opts = {
-					source: sourceFn
+						options: {
+							hint: false
+						}
+						, source: sourceFn 
 				};
 
 			} else {
@@ -170,9 +174,10 @@ Donkeylift.DataTableView = Backbone.View.extend({
 		//console.log(dtEditorOptions);
 
 		this.dataEditor = new $.fn.dataTable.Editor({
-			table: "#grid",
-			idSrc: "id",
+			table: '#grid',
+			idSrc: 'id',
 			fields: dtEditorOptions.fields,
+			display: 'bootstrap',
 			formOptions: {
 				main: { 
 					focus: -1 

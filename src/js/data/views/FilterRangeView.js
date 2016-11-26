@@ -1,4 +1,4 @@
-/*global Donkeylift, Backbone, jQuery, _ */
+/*global Donkeylift, Backbone, jQuery, _, $, noUiSlider */
 
 Donkeylift.FilterRangeView = Backbone.View.extend({
 
@@ -48,41 +48,46 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 		//console.log('el ' + this.$el.html());
 
 		if (this.canSlide()) {
-/*
-			this.$("#inputFilterMin").parent()
-				.attr('data-role', 'rangeslider');
 
-			this.$("#inputFilterMin").attr('type', 'range');
-			this.$("#inputFilterMax").attr('type', 'range');
-			this.$("#inputFilterMin").attr('min', stats.min);
-			this.$("#inputFilterMin").attr('max', stats.max);
-			this.$("#inputFilterMax").attr('min', stats.min);
-			this.$("#inputFilterMax").attr('max', stats.max);
-*/
-			this.$("#sliderRange").slider({
-				range: true,
-				min: stats.min,
-				max: stats.max,
-				values: [
+			var step = undefined;
+			if (this.model.get('field').get('type') == Donkeylift.Field.TYPES.INTEGER) {
+				step = 1;
+			}
+
+			var slider = this.$("#sliderRange")[0]; 
+			if ( ! slider.noUiSlider) {
+				noUiSlider.create(slider, {
+						start: [ this.$("#inputFilterMin").val(),
+								 this.$("#inputFilterMax").val() 
+						]
+						, range: {
+							min: stats.min,
+							max: stats.max
+						}
+						, connect: true
+						, step: step
+					}
+				);
+				
+				slider.noUiSlider.on('slide', function() {
+					var v = slider.noUiSlider.get();
+					$("#inputFilterMin").val(v[0]);
+					$("#inputFilterMax").val(v[1]);
+				});
+	
+				slider.noUiSlider.on('change', function() {
+					$("#inputFilterMin").change();
+					$("#inputFilterMax").change();
+				});
+			} else {
+				slider.noUiSlider.set([ 
 					this.$("#inputFilterMin").val(),
-					this.$("#inputFilterMax").val()
-				],	
-				slide: function(ev, ui) {
-					if ($(ui.handle).index() == 1) {
-						$("#inputFilterMin").val(ui.values[0]);
-					} else {
-						$("#inputFilterMax").val(ui.values[1]);
-					}
-			  	},
-				stop: function(ev, ui) {
-					if ($(ui.handle).index() == 1) {
-						$("#inputFilterMin").change();
-					} else {
-						$("#inputFilterMax").change();
-					}
-				}
-			});
+					this.$("#inputFilterMax").val() 
+				]);
+				
+			}			
 		}
+
 		if (this.model.get('field').get('type') 
 			== Donkeylift.Field.TYPES['DATE']) {
 
@@ -106,8 +111,11 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 		$(el).val(val);
 
 		if (this.canSlide()) {
-			var idx = /Min$/.test(el.id) ? 0 : 1;	
-			this.$("#sliderRange").slider("values", idx, val);
+			if (/Min$/.test(el.id)) {
+				this.$("#sliderRange")[0].noUiSlider.set([val, null]);
+			} else {
+				this.$("#sliderRange")[0].noUiSlider.set([null, val]);
+			}
 		}
 	},
 

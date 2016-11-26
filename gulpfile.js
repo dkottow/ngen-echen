@@ -56,11 +56,10 @@ var ver3rd = {
 	JQUERY_UI : 'jquery-ui-1.11.4.custom',
 	FONT_AWESOME : 'font-awesome-4.3.0',
 	DATATABLES : 'DataTables-custom',
-	//DATATABLES : 'DataTables-1.10.7',
 	DATATABLES_EDITOR : 'Editor-1.5.6',
 	VIS : 'vis',
 	SWAGGER_UI : 'swagger-ui-2.1.4',
-
+	NOUISLIDER : 'nouislider-9.0.0',
 };
 
 gulp.task('default', allTasks, function() {
@@ -109,6 +108,7 @@ gulp.task('build-3rdparty-css', function() {
 				src3rd + ver3rd.BOOTSTRAP + '/css/bootstrap.min.css' 
 				, src3rd + ver3rd.JQUERY_UI + '/jquery-ui.min.css' 
 				, src3rd + ver3rd.FONT_AWESOME + '/css/font-awesome.min.css'
+				, src3rd + ver3rd.NOUISLIDER + '/nouislider.min.css' 
 		])
 
 		.pipe(concat('3rdparty.css'))
@@ -123,6 +123,8 @@ gulp.task('build-3rdparty-js', function() {
 				, src3rd + '/backbone/backbone.js' 
 				, src3rd + ver3rd.BOOTSTRAP + '/js/bootstrap.min.js' 
 				, src3rd + '/jwt-decode/jwt-decode.min.js' 
+				, src3rd + ver3rd.NOUISLIDER + '/nouislider.min.js'
+				, src3rd + '/typeahead/typeahead.bundle.js' 
 		])
 
 		.pipe(concat('3rdparty.js'))
@@ -137,7 +139,8 @@ gulp.task('copy-3rdparty-js', function() {
 				, src3rd + ver3rd.DATATABLES + '/datatables.min.js' 
 				, src3rd + ver3rd.VIS + '/vis.min.js' 
 				, extdir + ver3rd.DATATABLES_EDITOR + '/js/dataTables.editor.min.js' 
-				, extdir + ver3rd.DATATABLES_EDITOR + '/js/editor.autoComplete.js' 
+				, extdir + ver3rd.DATATABLES_EDITOR + '/js/editor.bootstrap.js' 
+				, extdir + ver3rd.DATATABLES_EDITOR + '/js/editor.typeahead.js' 
 		])
 
 		.pipe(gulp.dest('./app/js/'));
@@ -150,6 +153,7 @@ gulp.task('copy-3rdparty-css', function() {
 				src3rd + ver3rd.DATATABLES + '/datatables.min.css'
 				, src3rd + ver3rd.VIS + '/vis.min.css'
 				, extdir + ver3rd.DATATABLES_EDITOR + '/css/editor.dataTables.min.css' 
+				, extdir + ver3rd.DATATABLES_EDITOR + '/css/editor.bootstrap.min.css' 
 		])
 
 		.pipe(gulp.dest('./public/css/'));

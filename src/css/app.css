@@ -183,9 +183,25 @@ table.dataTable {
     min-height: 1px;
 }
 
+/* typeahead */
+
+.tt-menu {
+  background-color: white;
+  cursor: pointer;
+}
+
+.tt-suggestion {
+	padding: 3px;
+}
+
+.tt-suggestion:hover {
+	background-color: #ddd;
+}
+
 /***** schema.css *****/
 
 #vis-graph {
 	height: 600px;
 } 
+
 
