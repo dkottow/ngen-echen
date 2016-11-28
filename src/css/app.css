@@ -104,7 +104,7 @@ body {
 
 .tab-table {
 	float: left;
-	max-width: 60%;
+	max-width: 80%;
 	margin-bottom: 1em;
 	margin-right: 2em;
 }
@@ -199,6 +199,10 @@ table.dataTable {
 }
 
 /***** schema.css *****/
+
+#modalToggleProps {
+	
+}
 
 .btn-field-up, .btn-field-down {
 	padding: 6px 8px;

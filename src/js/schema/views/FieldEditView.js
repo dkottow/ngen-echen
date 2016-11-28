@@ -5,7 +5,8 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 
 	events: {
 		'click #modalFieldUpdate': 'updateClick',
-		'click #modalFieldRemove': 'removeClick'
+		'click #modalFieldRemove': 'removeClick',
+		'click #modalToggleProps': 'togglePropsClick'
 	},
 
 	initialize: function() {
@@ -18,6 +19,8 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 		$('#modalInputFieldType').val(this.model.get('type'));
 		$('#modalInputFieldLength').val(this.model.get('length'));
 		$('#modalEditField').modal();
+		this.showDefinition(true);
+
 		return this;
 	},
 
@@ -37,6 +40,24 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 			this.model.collection.remove(this.model);
 			Donkeylift.app.schema.update();
 		}
+	},
+
+	showDefinition: function(show) {
+		if (show) {
+			$('#modalTabDefs').show();
+			$('#modalTabProps').hide();
+			$('#modalToggleProps').text('Properties');
+		} else {
+			$('#modalTabProps').show();
+			$('#modalTabDefs').hide();
+			$('#modalToggleProps').text('Definition');
+		}
+	},
+
+	togglePropsClick: function() {	
+		console.log("FieldEditView.togglePropsClick " + this.model.collection);
+		var show = $('#modalTabDefs:visible').length == 0;
+		this.showDefinition(show);
 	}
 
 });

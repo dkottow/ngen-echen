@@ -6,6 +6,15 @@
 		<h4 class="modal-title">Edit Field</h4>
 	  </div>
 	  <div class="modal-body">
+
+
+		<div class="text-right">
+		<button id="modalToggleProps" type="button" class="btn btn-default">Properties</button>
+		</div>
+
+		<div id="modalTabDefs">
+
+
 		<form>
 		  <div class="form-group">
 			<label for="modalInputFieldName" class="control-label">Name:</label>
@@ -21,12 +30,23 @@
 				<option value="Timestamp">Timestamp</option>
 			</select>
 		  </div>
-		  <div class="form-group">
-			<label for="modalInputFieldLength" class="control-label">Length:</label>
-			<input type="text" class="form-control" id="modalInputFieldLength">
-		  </div>
 		</form>
-	  </div>
+
+		</div>	
+		<div id="modalTabProps">
+			Props
+		</div>	
+
+
+
+		<ul class="nav">
+<!--
+			<li role="presentation" class="active"><a href="#defs" data-toggle="tab">Definition</a></li>
+			<li role="presentation"><a id="#modalToggleProps" href="#props" data-toggle="tab">Properties</a></li>
+-->
+		</ul>
+
+	  </div><!-- modal-body -->
 	  <div class="modal-footer">
 		<button id="modalFieldRemove" type="button" class="btn btn-danger" data-dismiss="modal">Delete</button>
 		<button id="modalFieldUpdate" type="button" data-dismiss="modal" class="btn btn-primary">Update</button>
