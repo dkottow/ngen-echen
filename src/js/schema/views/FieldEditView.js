@@ -1,4 +1,4 @@
-/*global Donkeylift, Backbone, jQuery, _ */
+/*global Donkeylift, Backbone, jQuery, _, $ */
 
 Donkeylift.FieldEditView = Backbone.View.extend({
 	el:  '#modalEditField',
@@ -17,7 +17,13 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 		console.log("FieldEditView.render " + this.model.get('type'));
 		$('#modalInputFieldName').val(this.model.get('name'));
 		$('#modalInputFieldType').val(this.model.get('type'));
-		$('#modalInputFieldLength').val(this.model.get('length'));
+
+		$('#modalTabProps').empty();
+		_.each(this.model.get('props'), function(val, name) {
+			var propDef = this.model.getPropDefinition(name);
+			$('#modalTabProps').append('<p>' + propDef.name + '[' + propDef.type + '] = ' + val + '</p>');
+		}, this);
+		
 		$('#modalEditField').modal();
 		this.showDefinition(true);
 
@@ -28,7 +34,6 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 		console.log("FieldEditView.updateClick ");
 		this.model.set('name', $('#modalInputFieldName').val());
 		this.model.set('type', $('#modalInputFieldType').val());
-		this.model.set('length', $('#modalInputFieldLength').val());
 
 		Donkeylift.app.table.get('fields').addNew(this.model);
 		Donkeylift.app.schema.update();
@@ -46,11 +51,11 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 		if (show) {
 			$('#modalTabDefs').show();
 			$('#modalTabProps').hide();
-			$('#modalToggleProps').text('Properties');
+			$('#modalToggleProps').text('View Properties');
 		} else {
 			$('#modalTabProps').show();
 			$('#modalTabDefs').hide();
-			$('#modalToggleProps').text('Definition');
+			$('#modalToggleProps').text('View Definition');
 		}
 	},
 

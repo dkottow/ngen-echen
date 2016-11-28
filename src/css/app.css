@@ -200,12 +200,25 @@ table.dataTable {
 
 /***** schema.css *****/
 
+.table > tbody > tr > td {
+	vertical-align: middle;
+}
+
+
 #modalToggleProps {
 	
 }
 
 .btn-field-up, .btn-field-down {
-	padding: 6px 8px;
+	padding: 6px 6px;
+}
+
+#fields td:nth-child(1) {
+	width: 80px;
+}
+
+#fields td:nth-child(2) {
+	width: 64px;
 }
 
 #vis-graph {

@@ -13,11 +13,11 @@ Donkeylift.Field = Backbone.Model.extend({
 		this.set('type', Donkeylift.Field.TypeAlias(match[1]));
 		this.set('props', field.props || {});
 		
-		if (this.getProp('visible') === undefined) {
-			var v = _.contains(Donkeylift.Table.INITHIDE_FIELDS, field.name)
-					? false : true;
-			this.setProp('visible', v);
-		}
+		_.each(Donkeylift.Field.PROPERTIES, function(p) {
+			if (this.getPropDefinition(p.name) && this.getProp(p.name) === undefined) {
+				this.setPropDefault(p);
+			}
+		}, this);
 	},
 
 	vname: function(opts) {
@@ -40,7 +40,34 @@ Donkeylift.Field = Backbone.Model.extend({
 	},
 
 	setProp: function(name, value) {
-		this.get('props')[name] = value;
+		if (this.getPropDefinition(name)) {
+			this.get('props')[name] = value;
+		} else {
+			throw new Error("setProp failed. Unknown propery '" + name + "' ");			
+		}
+	},
+
+	getPropDefinition: function(name) {
+		var prop = _.find(Donkeylift.Field.PROPERTIES, function(p) { return p.name == name; });
+		if (! prop) return undefined;
+		prop.scope = prop.scope || _.values(Donkeylift.Field.TYPES);
+		if ( ! _.contains(prop.scope, this.get('type'))) return undefined;
+		return prop;
+	},
+
+	setPropDefault: function(propDef) {
+		if (propDef.name == 'disabled') {
+			this.setProp(propDef.name, false);
+			
+		} else if (propDef.name == 'visible') {
+			var v = _.contains(Donkeylift.Table.INITHIDE_FIELDS, this.get('name'))
+					? false : true;
+			this.setProp(propDef.name, v);
+
+		} else {
+			//default set to empty string
+			this.setProp(propDef.name, '');			
+		}
 	},
 
 	attrJSON: function() {
@@ -181,6 +208,37 @@ Donkeylift.Field.TYPES = {
 }
 
 Donkeylift.Field.ALIAS = _.invert(Donkeylift.Field.TYPES);
+
+Donkeylift.Field.PROPERTIES = [
+	{ 
+		'name': 'order', 
+		'type': 'Integer' 
+	}
+	, { 
+		'name': 'width',
+		'type': 'Integer'
+	}
+	, { 
+		'name': 'scale',
+		'type': 'Integer',
+		'scope': [ 'Decimal' ]
+	}
+	, { 
+		'name': 'visible',
+		'type': 'Boolean'
+	}
+	, { 
+		'name': 'disabled',
+		'type': 'Boolean'
+	}
+/*	
+	, { 
+		'name': 'label',
+		'type': 'Text'
+	}
+*/	
+];	
+
 
 Donkeylift.Field.TypeAlias = function(type) {
 	return Donkeylift.Field.TYPES[type];
