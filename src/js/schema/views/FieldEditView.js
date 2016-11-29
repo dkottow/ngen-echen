@@ -6,24 +6,47 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 	events: {
 		'click #modalFieldUpdate': 'updateClick',
 		'click #modalFieldRemove': 'removeClick',
-		'click #modalToggleProps': 'togglePropsClick'
+		'click #modalToggleProps': 'togglePropsClick',
+		'click input[name="disabled"]': 'toggleDisableFieldClick',
 	},
 
 	initialize: function() {
 		console.log("FieldEditView.init");
 	},
 
+	propTemplate: function(type) {
+		return _.template($('#edit-prop-' + type.toLowerCase() + '-template').html());
+	},
+	
 	render: function() {
-		console.log("FieldEditView.render " + this.model.get('type'));
+		//console.log("FieldEditView.render " + this.model.get('type'));
 		$('#modalInputFieldName').val(this.model.get('name'));
 		$('#modalInputFieldType').val(this.model.get('type'));
 
-		$('#modalTabProps').empty();
-		_.each(this.model.get('props'), function(val, name) {
-			var propDef = this.model.getPropDefinition(name);
-			$('#modalTabProps').append('<p>' + propDef.name + '[' + propDef.type + '] = ' + val + '</p>');
+
+		$('#modalTabProps form').empty();
+	
+		var disabled = this.model.getProp('disabled');
+		var htmlDisabled = disabled 
+				? '<input type="checkbox" check name="disabled"> Disable Field'
+				: '<input type="checkbox" name="disabled"> Disable Field'
+
+		$('#modalTabProps form').append(htmlDisabled);
+
+		$('#modalTabProps form').append('<div class="well inject-props"></div>');
+
+		var props = _.reject(this.model.getPropObjects(), function(p) {
+			return p.name == 'disabled';
+		});
+		_.each(props, function(prop) {
+			//console.log(prop);
+			var template = this.propTemplate(prop.type);
+			$('#modalTabProps .inject-props').append(template({ 
+				name: prop.name, 
+				value: prop.value 
+			}));
 		}, this);
-		
+
 		$('#modalEditField').modal();
 		this.showDefinition(true);
 
@@ -60,9 +83,13 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 	},
 
 	togglePropsClick: function() {	
-		console.log("FieldEditView.togglePropsClick " + this.model.collection);
 		var show = $('#modalTabDefs:visible').length == 0;
 		this.showDefinition(show);
+	},
+	
+	toggleDisableFieldClick: function(ev) {
+		var disabled = $(ev.target).is(':checked');
+		$('#modalTabProps .inject-props input').prop('disabled', disabled);
 	}
 
 });

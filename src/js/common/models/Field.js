@@ -55,6 +55,18 @@ Donkeylift.Field = Backbone.Model.extend({
 		return prop;
 	},
 
+	getPropObjects: function() {
+		var props = [];
+		for(var i=0; i<Donkeylift.Field.PROPERTIES.length; ++i) {
+			var prop = this.getPropDefinition(Donkeylift.Field.PROPERTIES[i].name);
+			if (prop) {
+				prop.value = this.getProp(prop.name);
+				props.push(prop);
+			}
+		}
+		return props;
+	},
+
 	setPropDefault: function(propDef) {
 		if (propDef.name == 'disabled') {
 			this.setProp(propDef.name, false);
@@ -211,25 +223,21 @@ Donkeylift.Field.ALIAS = _.invert(Donkeylift.Field.TYPES);
 
 Donkeylift.Field.PROPERTIES = [
 	{ 
-		'name': 'order', 
-		'type': 'Integer' 
+		'name': 'disabled'
+		, 'type': 'Boolean'
 	}
 	, { 
-		'name': 'width',
-		'type': 'Integer'
+		'name': 'order'
+		, 'type': 'Integer' 
 	}
 	, { 
-		'name': 'scale',
-		'type': 'Integer',
-		'scope': [ 'Decimal' ]
+		'name': 'width'
+		, 'type': 'Integer'
 	}
 	, { 
-		'name': 'visible',
-		'type': 'Boolean'
-	}
-	, { 
-		'name': 'disabled',
-		'type': 'Boolean'
+		'name': 'scale'
+		, 'type': 'Integer'
+		, 'scope': [ 'Decimal' ]
 	}
 /*	
 	, { 
@@ -237,6 +245,10 @@ Donkeylift.Field.PROPERTIES = [
 		'type': 'Text'
 	}
 */	
+	, { 
+		'name': 'visible'
+		, 'type': 'Boolean'
+	}
 ];	
 
 
