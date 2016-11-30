@@ -10,7 +10,7 @@ Donkeylift.Fields = Backbone.Collection.extend({
 
 	addNew: function(field) {
 		field = field || Donkeylift.Field.create('field' + this.length);
-		field.setProp('order', this.length + 1);
+		//field.setProp('order', this.length + 1);
 		this.add(field);
 		return field;
 	},

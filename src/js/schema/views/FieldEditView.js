@@ -55,10 +55,23 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 
 	updateClick: function() {
 		console.log("FieldEditView.updateClick ");
+
 		this.model.set('name', $('#modalInputFieldName').val());
 		this.model.set('type', $('#modalInputFieldType').val());
 
+		var propValues = $("#modalTabProps form").serializeArray();
+		propValues = _.object(_.pluck(propValues, 'name'), 
+							_.pluck(propValues, 'value'));
+		_.each(this.model.getPropObjects(), function(p) {
+			if (p.type == 'Boolean') {
+				this.model.setProp(p.name, propValues[p.name] == "on");
+			} else {
+				this.model.setProp(p.name, propValues[p.name]);
+			}
+		}, this);
+
 		Donkeylift.app.table.get('fields').addNew(this.model);
+
 		Donkeylift.app.schema.update();
 	},
 
