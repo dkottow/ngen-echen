@@ -7,8 +7,8 @@ Donkeylift.Database = Donkeylift.Schema.extend({
 		Donkeylift.Schema.prototype.initialize.call(this, attrs);
 	},
 
-	parse : function(response) {
-		console.log("Database.parse " + response);
+	parseTables : function(response) {
+		console.log("Database.parseTables " + response);
 
 		var tables = _.map(response.tables, function(table) {
 			return new Donkeylift.DataTable(table);
