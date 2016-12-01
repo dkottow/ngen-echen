@@ -11,13 +11,12 @@ Donkeylift.Field = Backbone.Model.extend({
 		var rxp = /(\w+)(\([0-9,]+\))?/
 		var match = field.type.match(rxp)
 		this.set('type', Donkeylift.Field.TypeAlias(match[1]));
-		this.set('props', field.props || {});
 		
-		_.each(Donkeylift.Field.PROPERTIES, function(p) {
-			if (this.getPropDefinition(p.name) && this.getProp(p.name) === undefined) {
-				this.setPropDefault(p);
-			}
-		}, this);
+		var props = new Donkeylift.Properties(field.props || {}, {
+								parent: this,
+								propDefs: Donkeylift.Field.PROPERTIES
+		});
+		this.set('props', props);
 	},
 
 	vname: function(opts) {
@@ -36,54 +35,26 @@ Donkeylift.Field = Backbone.Model.extend({
 	},
 
 	getProp: function(name) {
-		return this.get('props')[name];
+		return this.get('props').get(name);
 	},
 
 	setProp: function(name, value) {
-		if (this.getPropDefinition(name)) {
-			this.get('props')[name] = value;
+		if (this.get('props').getDefinition(name)) {
+			this.get('props').set(name, value);
 		} else {
 			throw new Error("setProp failed. Unknown propery '" + name + "' ");			
 		}
 	},
 
-	getPropDefinition: function(name) {
-		var prop = _.find(Donkeylift.Field.PROPERTIES, function(p) { return p.name == name; });
-		if (! prop) return undefined;
-		prop.scope = prop.scope || _.values(Donkeylift.Field.TYPES);
-		if ( ! _.contains(prop.scope, this.get('type'))) return undefined;
-		return prop;
-	},
-
-	getPropObjects: function() {
-		var props = [];
-		for(var i=0; i<Donkeylift.Field.PROPERTIES.length; ++i) {
-			var prop = this.getPropDefinition(Donkeylift.Field.PROPERTIES[i].name);
-			if (prop) {
-				prop.value = this.getProp(prop.name);
-				props.push(prop);
-			}
-		}
-		return props;
-	},
-
-	setPropDefault: function(propDef) {
-		if (propDef.name == 'disabled') {
-			this.setProp(propDef.name, false);
-			
-		} else if (propDef.name == 'visible') {
-			var v = _.contains(Donkeylift.Table.INITHIDE_FIELDS, this.get('name'))
-					? false : true;
-			this.setProp(propDef.name, v);
-
-		} else {
-			//default set to empty string
-			this.setProp(propDef.name, '');			
-		}
+	setPropArray: function(inputArray) {
+		this.get('props').setFromArray(inputArray);
+		this.trigger('change', this);
 	},
 
 	attrJSON: function() {
-		return _.clone(this.attributes);
+		var attrs = _.clone(_.omit(this.attributes, 'props'));
+		attrs.props = this.get('props').attributes;
+		return attrs;
 	},
 
 	toJSON: function() {
@@ -92,7 +63,7 @@ Donkeylift.Field = Backbone.Model.extend({
 		return {
 			name: this.get('name'),
 			type: type,
-			props: this.get('props')
+			props: this.get('props').attributes
 		};
 	},
 
