@@ -17,11 +17,6 @@ Donkeylift.Table = Backbone.Model.extend({
 	initRefs: function(tables) {
 		this.initRelations(tables);
 		this.initAlias(tables);
-		this.initJSON = this.toJSON();
-	},
-
-	isDirty: function() {
-		return ! _.isEqual(this.initJSON, this.toJSON());
 	},
 
 	initRelations : function(tables) {
@@ -89,13 +84,16 @@ Donkeylift.Table = Backbone.Model.extend({
 	},		
 
 	toJSON: function() {
+
 		var fields = this.get('fields').map(function(field) {
 			return field.toJSON();
 		}); 
-		fields = _.object(_.pluck(fields, 'name'), fields);
+		//fields = _.object(_.pluck(fields, 'name'), fields);
 
 		this.get('relations').each(function(relation) {
-			var field = fields[relation.get('field').get('name')];
+			var field = _.find(fields, function(f) {
+				return f.name == relation.get('field').get('name');				
+			});
 			field.fk_table = relation.get('related').get('name');
 		});
 

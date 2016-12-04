@@ -41,12 +41,21 @@ Donkeylift.Properties = Backbone.Model.extend({
 							 _.pluck(inputValues, 'value'));
 		_.each(this.getAll(), function(p) {
 
+			var val;
 			if (p.type == 'Boolean') {
-				//if props is undefined for p, set to false
 				this.set(p.name, props[p.name] == "on");
-				
-			} else if (props[p.name] !== undefined) {
-				this.set(p.name, props[p.name]);
+
+			} else if (p.type == 'Integer') {
+				var val = parseInt(props[p.name]);
+				if ( ! isNaN(val)) this.set(p.name, val);
+
+			} else if (p.type == 'Decimal') {
+				var val = parseFloat(props[p.name]);
+				if ( ! isNaN(val)) this.set(p.name, val);
+
+			} else {
+				var val = props[p.name];
+				if (val) this.set(p.name, val);
 			}
 
 		}, this);
@@ -56,17 +65,13 @@ Donkeylift.Properties = Backbone.Model.extend({
 	setDefault: function(propDef) {
 
         if (this.parent instanceof Donkeylift.Field) {
-			if (propDef.name == 'disabled') {
-				this.set(propDef.name, false);
-				
-			} else if (propDef.name == 'visible') {
+			if (propDef.name == 'visible') {
 				var v = _.contains(Donkeylift.Table.INITHIDE_FIELDS, this.parent.get('name'))
 						? false : true;
 				this.set(propDef.name, v);
 	
 			} else {
-				//default set to empty string
-				this.set(propDef.name, '');			
+				this.set(propDef.name, propDef.default);			
 			}
         }
 	},

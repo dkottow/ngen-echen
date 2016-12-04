@@ -17,6 +17,7 @@ Donkeylift.Field = Backbone.Model.extend({
 								propDefs: Donkeylift.Field.PROPERTIES
 		});
 		this.set('props', props);
+		this.set('disabled', field.disabled == true);
 	},
 
 	vname: function(opts) {
@@ -63,6 +64,7 @@ Donkeylift.Field = Backbone.Model.extend({
 		return {
 			name: this.get('name'),
 			type: type,
+			disabled: this.get('disabled'),
 			props: this.get('props').attributes
 		};
 	},
@@ -194,21 +196,20 @@ Donkeylift.Field.ALIAS = _.invert(Donkeylift.Field.TYPES);
 
 Donkeylift.Field.PROPERTIES = [
 	{ 
-		'name': 'disabled'
-		, 'type': 'Boolean'
-	}
-	, { 
 		'name': 'order'
 		, 'type': 'Integer' 
+		, 'default': 100
 	}
 	, { 
 		'name': 'width'
 		, 'type': 'Integer'
+		, 'default': 16
 	}
 	, { 
 		'name': 'scale'
 		, 'type': 'Integer'
 		, 'scope': [ 'Decimal' ]
+		, 'default': 2
 	}
 /*	
 	, { 
@@ -219,6 +220,7 @@ Donkeylift.Field.PROPERTIES = [
 	, { 
 		'name': 'visible'
 		, 'type': 'Boolean'
+		, 'default': true
 	}
 ];	
 

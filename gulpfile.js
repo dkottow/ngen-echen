@@ -117,6 +117,7 @@ gulp.task('build-3rdparty-js', function() {
 				, src3rd + '/jwt-decode/jwt-decode.min.js' 
 				, src3rd + ver3rd.NOUISLIDER + '/nouislider.min.js'
 				, src3rd + '/typeahead/typeahead.bundle.js' 
+				, src3rd + '/JSON-Patch-master/dist/json-patch-duplex.min.js' 
 		])
 
 		.pipe(concat('3rdparty.js'))

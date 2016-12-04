@@ -1,4 +1,4 @@
-/*global _, Donkeylift, Backbone */
+/*global _, $, Donkeylift, Backbone, jsonpatch */
 
 Donkeylift.Schema = Backbone.Model.extend({
 
@@ -13,7 +13,6 @@ Donkeylift.Schema = Backbone.Model.extend({
 		}
 
 		//this.set('id', attrs.name); //unset me when new
-		//this.orgJSON = this.toJSON();
 	},
 
 	attrJSON: function() {
@@ -69,6 +68,7 @@ Donkeylift.Schema = Backbone.Model.extend({
 		console.log("Schema.fetch...");
 		Backbone.Model.prototype.fetch.call(this, {
 			success: function() {
+				me.orgJSON = JSON.parse(JSON.stringify(me.toJSON())); //copy
 				console.log("Schema.fetch OK");
 				cbAfter();
 			}
@@ -76,20 +76,48 @@ Donkeylift.Schema = Backbone.Model.extend({
 	},
 
 	update : function() {
-		console.log("Schema.update...TODO persist as json");
-return;
-		//TODO
 		var me = this;			
-		this.save(function(err) {
-			if (err) {
-				//TODO
-				console.log(err);
-				alert('ERROR on update ' + me.get('name') + '. ' 
-					+ err.status + " " + err.responseText);
-			}
-		});
+		var diff = jsonpatch.compare(this.orgJSON, this.toJSON());
+		console.log(diff);		
+		if (diff.length > 0) {
+			this.patch(diff, function(err, result) {
+				if (err) {
+					//TODO
+					console.log(err);
+					me.parse(this.orgJSON);
+					alert('ERROR on patch ' + me.get('name') + '. ' 
+						+ err.status + " " + err.responseText);
+				} else {
+					me.parse(result);
+					me.orgJSON = JSON.parse(JSON.stringify(me.toJSON())); //copy
+					console.log(result);
+					//reset schema in browser
+				}
+				
+			});
+		}
 	},
 
+	patch : function(diff, cbResult) {
+		console.log("Schema.patch...");
+		var url = this.url();
+		$.ajax(url, {
+			method: 'PATCH'
+			, data: JSON.stringify(diff)
+			, contentType: "application/json"
+			, processData: false
+
+		}).done(function(response) {
+			console.log(response);
+			cbResult(null, response);
+
+		}).fail(function(jqXHR, textStatus, errThrown) {
+			cbResult(errThrown, textStatus);
+			console.log("Error requesting " + url);
+			console.log(textStatus + " " + errThrown);
+		});
+		
+	},
 
 	save : function(cbResult) {
 		console.log("Schema.save...");

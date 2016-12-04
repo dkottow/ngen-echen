@@ -26,7 +26,7 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 
 		$('#modalTabProps form').empty();
 	
-		var disabled = this.model.getProp('disabled');
+		var disabled = this.model.get('disabled');
 		var htmlDisabled = disabled 
 				? '<input type="checkbox" checked name="disabled"> Disable Field'
 				: '<input type="checkbox" name="disabled"> Disable Field'
@@ -35,10 +35,7 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 
 		$('#modalTabProps form').append('<div class="well inject-props"></div>');
 
-		var props = _.reject(this.model.get('props').getAll(), function(p) {
-			return p.name == 'disabled';
-		});
-		_.each(props, function(prop) {
+		_.each(this.model.get('props').getAll(), function(prop) {
 			//console.log(prop);
 			var template = this.propTemplate(prop.type);
 			$('#modalTabProps .inject-props').append(template({ 
@@ -58,6 +55,8 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 
 		this.model.set('name', $('#modalInputFieldName').val());
 		this.model.set('type', $('#modalInputFieldType').val());
+
+		this.model.set('disabled', $('#modalTabProps input[name=disabled]:checked').val() == "on");
 
 		var propValues = $("#modalTabProps form").serializeArray();
 		this.model.setPropArray(propValues);
