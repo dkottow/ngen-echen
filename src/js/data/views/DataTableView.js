@@ -241,19 +241,26 @@ Donkeylift.DataTableView = Backbone.View.extend({
 
 	},
 
+	addButtonEllipsisEvent: function() {
+		
+		//expand ellipsis on click
+		this.$('button.ellipsis-init').click(function(ev) {				
+			//wrap text before expaning
+			$(ev.target).parents('span').css('white-space', 'normal');	
+
+			var fullText = $(ev.target).parents('span').attr('title');
+			$(ev.target).parents('span').html(fullText);
+			console.log('ellipsis click ' + $(ev.target).text());
+		});
+		//dont add click handler again
+		this.$('button.ellipsis-init').removeClass('ellipsis-init');
+	},
+
 	addEvents: function() {
 		var me = this;
 
 		this.$('#grid').on('draw.dt', function() {
-
-			//expand ellipsis on click
-			me.$('button.ellipsis').click(function(ev) {				
-				//wrap text before expaning
-				$(ev.target).parents('span').css('white-space', 'normal');	
-
-				var fullText = $(ev.target).parents('span').attr('title');
-				$(ev.target).parents('span').html(fullText);
-			});
+			me.addButtonEllipsisEvent();
 		});
 
 		this.$('#grid').on('page.dt', function() {
@@ -285,6 +292,10 @@ Donkeylift.DataTableView = Backbone.View.extend({
 				.removeClass('col-sm-7')
 				.addClass('col-sm-11'); 
 	
+		});
+
+		this.$('#grid').on('buttons-action.dt', function (e, buttonApi, dataTable, node, config) {
+			me.addButtonEllipsisEvent();
 		});
 
 		//using order.dt event won't work because its fired otherwise, too
@@ -320,7 +331,7 @@ Donkeylift.DataTableView = Backbone.View.extend({
 
 		var me = this;
 
-		var btnExpand = '<button class="ellipsis btn btn-default btn-xs"><span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span></button>'
+		var btnExpand = '<button class="ellipsis ellipsis-init btn btn-default btn-xs"><span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span></button>'
 		var w = field.getProp('width');
 		var abbrFn = function (data) {
 			var s = field.toFS(data);

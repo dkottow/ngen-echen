@@ -49,7 +49,7 @@ Donkeylift.FieldView = Backbone.View.extend({
 		var prevField = this.getFieldFromRow(row.prev());
 		this.swapFieldsOrder(this.model, prevField);
 		Donkeylift.app.tableView.render();
-        //row.insertBefore(row.prev());
+		Donkeylift.app.schema.update();
     },
     
     moveDownFieldClick: function(ev) {
@@ -57,7 +57,7 @@ Donkeylift.FieldView = Backbone.View.extend({
 		var nextField = this.getFieldFromRow(row.next());
 		this.swapFieldsOrder(this.model, nextField);
 		Donkeylift.app.tableView.render();
-        //row.insertAfter(row.next());
+		Donkeylift.app.schema.update();
     },
 
 });
