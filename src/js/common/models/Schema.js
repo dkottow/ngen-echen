@@ -13,6 +13,7 @@ Donkeylift.Schema = Backbone.Model.extend({
 		}
 
 		//this.set('id', attrs.name); //unset me when new
+
 	},
 
 	attrJSON: function() {
@@ -76,26 +77,32 @@ Donkeylift.Schema = Backbone.Model.extend({
 	},
 
 	update : function() {
-		var me = this;			
-		var diff = jsonpatch.compare(this.orgJSON, this.toJSON());
-		console.log(diff);		
-		if (diff.length > 0) {
-			this.patch(diff, function(err, result) {
-				if (err) {
-					//TODO
-					console.log(err);
-					me.parse(this.orgJSON);
-					alert('ERROR on patch ' + me.get('name') + '. ' 
-						+ err.status + " " + err.responseText);
-				} else {
-					me.parse(result);
-					me.orgJSON = JSON.parse(JSON.stringify(me.toJSON())); //copy
-					console.log(result);
-					//reset schema in browser
+		if ( ! this.updateDebounced) {
+			var me = this;
+			this.updateDebounced = _.debounce(function() {
+				var diff = jsonpatch.compare(me.orgJSON, me.toJSON());
+				console.log('Schema.update');		
+				console.log(diff);		
+				if (diff.length > 0) {
+					me.patch(diff, function(err, result) {
+						if (err) {
+							//TODO
+							console.log(err);
+							me.parse(me.orgJSON);
+							alert('ERROR on patch ' + me.get('name') + '. ' 
+								+ err.status + " " + err.responseText);
+						} else {
+							me.parse(result);
+							me.orgJSON = JSON.parse(JSON.stringify(me.toJSON())); //copy
+							console.log(result);
+							//reset schema in browser
+						}
+						
+					});
 				}
-				
-			});
+			}, 1000);
 		}
+		this.updateDebounced();
 	},
 
 	patch : function(diff, cbResult) {
