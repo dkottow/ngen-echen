@@ -1,4 +1,4 @@
-/*global Donkeylift, Backbone, jQuery, _ */
+/*global Donkeylift, vis, Backbone, jQuery, _ */
 
 Donkeylift.SchemaGraphView = Backbone.View.extend({
 
@@ -102,6 +102,9 @@ Donkeylift.SchemaGraphView = Backbone.View.extend({
 	    		barnesHut: {
 	    			springConstant: 0.03
 	    		}
+	    	}
+	    	, interaction: {
+	    		multiselect: true
 	    	}
 	    };
 	
