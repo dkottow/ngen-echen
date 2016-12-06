@@ -59,6 +59,22 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 		req.method = method;
 	},
 
+	getEditorFields: function() {
+		var loggedUser = Donkeylift.app.schema.get('users').getByName(Donkeylift.app.account.get('user'));
+		
+		var editFields = _.filter(this.get('fields').sortByOrder(), function(field) {
+			return ! _.contains(Donkeylift.Table.NONEDITABLE_FIELDS, field.get('name'));
+		});
+		
+		if (_.contains(['reader', 'writer'], loggedUser.get('role'))) {
+			editFields = _.reject(editFields, function(field) {
+				return field.get('name') == 'own_by'; 
+			});
+		}
+		
+		return editFields;
+	},
+
 	ajaxGetEditorFn: function() {
 		var me = this;
 		return function(U1, U2, req, success, error) {

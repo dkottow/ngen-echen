@@ -87,14 +87,12 @@ Donkeylift.DataTableView = Backbone.View.extend({
 		return dtOptions;
 	},
 
-	getEditorOptions: function(fields) {
+	getEditorOptions: function() {
 		var me = this;
 		var dtEditorOptions = {};
 
+		var editFields = this.model.getEditorFields();
 
-		var editFields = _.filter(fields, function(field) {
-			return ! _.contains(Donkeylift.Table.NONEDITABLE_FIELDS, field.get('name'));
-		});
 
 		dtEditorOptions.fields = _.map(editFields, function(field) {
 			var edField = {};
@@ -102,7 +100,15 @@ Donkeylift.DataTableView = Backbone.View.extend({
 			edField.name = field.vname(); 
 			edField.label = field.vname(); 
 
-			if (field.get('type') == Donkeylift.Field.TYPES.DATE) {
+			if (field.get('name') == 'own_by') {
+				edField.type = 'select';
+				var users = Donkeylift.app.schema.get('users')
+					.map(function(user) {
+						return user.get('name'); 
+				});
+				edField.options = users;
+
+			} else if (field.get('type') == Donkeylift.Field.TYPES.DATE) {
 				edField.type = 'datetime';
 
 			} else if (field.getProp('width') > 60) {
@@ -170,7 +176,7 @@ Donkeylift.DataTableView = Backbone.View.extend({
 		if (filter) initSearch.search = filter.get('value');
 
 		var dtOptions = this.getOptions(this.attributes.params, fields);
-		var dtEditorOptions = this.getEditorOptions(fields);
+		var dtEditorOptions = this.getEditorOptions();
 		//console.log(dtEditorOptions);
 
 		this.dataEditor = new $.fn.dataTable.Editor({
