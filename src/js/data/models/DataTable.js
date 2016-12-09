@@ -60,12 +60,17 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 	},
 
 	getEditorFields: function() {
-		var loggedUser = Donkeylift.app.schema.get('users').getByName(Donkeylift.app.account.get('user'));
 		
 		var editFields = _.filter(this.get('fields').sortByOrder(), function(field) {
 			return ! _.contains(Donkeylift.Table.NONEDITABLE_FIELDS, field.get('name'));
 		});
 		
+		if (Donkeylift.app.account.get('app_metadata').admin === true) {
+			return editFields;
+		}
+		
+		var loggedUser = Donkeylift.app.schema.get('users').getByName(Donkeylift.app.account.get('user'));
+
 		if (_.contains(['reader', 'writer'], loggedUser.get('role'))) {
 			editFields = _.reject(editFields, function(field) {
 				return field.get('name') == 'own_by'; 

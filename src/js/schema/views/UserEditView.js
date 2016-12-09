@@ -21,19 +21,20 @@ Donkeylift.UserEditView = Backbone.View.extend({
 	},
 
 	evUpdateClick: function() {
-console.log('evUpdateClick');
 		this.model.set('name', $('#modalInputUserName').val());
 		this.model.set('role', $('#modalInputUserRole').val());
 
 		if ( ! this.users.contains(this.model)) {
 			this.users.add(this.model);
 		}
+		Donkeylift.app.schema.update();
 	},
 
 	evRemoveClick: function() {	
 		if (this.users.contains(this.model)) {
 			this.users.remove(this.model);
 		}
+		Donkeylift.app.schema.update();
 	},
 
 

@@ -1,16 +1,17 @@
-/*global Donkeylift, Backbone, jQuery, _ */
+/*global Donkeylift, Backbone, $, _ */
 
 Donkeylift.AccessView = Backbone.View.extend({
 
 	//el: '#alias',
 
 	events: {
-		'click .edit-access': 'evEditAliasClick',
+		'click .edit-access': 'evEditClick',
 	},
 
 	initialize: function () {
 		console.log("AccessView.init ");
 		console.log(this.model.get('access_control'));
+		this.listenTo(this.model, 'change:access_control', this.render);
 	},
 
 	template: _.template($('#access-role-template').html()),
@@ -30,19 +31,14 @@ Donkeylift.AccessView = Backbone.View.extend({
 
 	},
 
-	evEditAliasClick: function(ev) {				
-		console.log("AccessView.evEditAliasClick");
-		var table = $(ev.target).parents('tr').find('td:eq(1)').text();
-		var field = $(ev.target).parents('tr').find('td:eq(2)').text();
+	evEditClick: function(ev) {				
+		console.log("AccessView.evEditClick");
+		var role = $(ev.target).parents('tr').find('td:eq(1)').text();
 
-		var alias = _.find(this.model.get('row_alias'), function(a) {
-			return a.get('table').get('name') == table 
-				&& a.get('field').get('name') == field;
-		});
-		console.log("Edit alias " + table + "." + field + " = " + alias);
+		console.log("Edit access " + role);
 
-		var editor = Donkeylift.app.getAliasEditor();
-		editor.setModel(this.model, alias);
+		var editor = Donkeylift.app.getAccessEditor();
+		editor.setModel(this.model, role);
 		editor.render();
 	},
 

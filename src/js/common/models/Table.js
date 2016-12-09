@@ -100,17 +100,13 @@ Donkeylift.Table = Backbone.Model.extend({
 		var row_alias = _.map(this.get('row_alias'), function(a) {
 			if (a.get('table') == this) return a.get('field').get('name');
 			else return a.toString();	
-/*
-			var parts = fieldQName.split('.');
-			if (parts[0] == this.get('name')) return parts[1];
-			else return fieldQName;
-*/
 		}, this);
 
 		return {
-			name: this.get('name'),
-			row_alias: row_alias,
-			fields: fields
+			name: this.get('name')
+			, row_alias: row_alias
+			, access_control: this.get('access_control')
+			, fields: fields
 		};
 	},
 

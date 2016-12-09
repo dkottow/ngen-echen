@@ -1,0 +1,38 @@
+<div class="modal fade" id="modalEditAccess" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+	<div class="modal-content">
+	  <div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+		<h4 class="modal-title">Edit Access</h4>
+	  </div>
+	  <div class="modal-body">
+		<form>
+		  <div class="form-group">
+			<label for="modalInputRole" class="control-label">Role:</label>
+			<input type="text" disabled class="form-control" id="modalInputRole">
+		  </div>
+		  <div class="form-group">
+			<label for="modalInputReadAccess" class="control-label">Read:</label>
+			<select class="form-control" id="modalInputReadAccess">
+				<option value="all">all</option>
+				<option value="own">own</option>
+				<option value="none">none</option>
+			</select>
+		  </div>
+		  <div class="form-group">
+			<label for="modalInputWriteAccess" class="control-label">Write:</label>
+			<select class="form-control" id="modalInputWriteAccess">
+				<option value="all">all</option>
+				<option value="own">own</option>
+				<option value="none">none</option>
+			</select>
+		  </div>
+		</form>
+	  </div>
+	  <div class="modal-footer">
+		<button id="modalAccessUpdate" type="button" data-dismiss="modal" class="btn btn-primary">Update</button>
+	  </div>
+	</div>
+  </div>
+</div>
+

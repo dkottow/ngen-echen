@@ -17,8 +17,6 @@ Donkeylift.AliasEditView = Backbone.View.extend({
 		this.alias = alias;
 	},
 
-	
-
 	render: function() {
 		console.log("AliasEditView.render ");
 
@@ -50,14 +48,13 @@ Donkeylift.AliasEditView = Backbone.View.extend({
 
 	evUpdateClick: function() {
 		var newFieldQName = $('#modalInputAliasField').val();
-//console.log(this.model.get('row_alias'));
+		//console.log(this.model.get('row_alias'));
 		var alias = Donkeylift.Alias.parse(
 						newFieldQName.split('.')[0],
 						newFieldQName.split('.')[1]
 		);	
 
 		var i = this.model.get('row_alias').indexOf(this.alias);
-console.log(i);
 		if (i >= 0) {
 			this.model.get('row_alias').splice(i, 1, alias);
 		} else {
@@ -65,7 +62,7 @@ console.log(i);
 		}
 
 		this.model.trigger('change:row_alias'); //trigger change
-//console.log(this.model.get('row_alias'));
+		//console.log(this.model.get('row_alias'));
 	},
 
 	evRemoveClick: function() {	
@@ -74,7 +71,7 @@ console.log(i);
 			this.model.get('row_alias').splice(i, 1);
 			this.model.trigger('change:row_alias'); //trigger change
 		}
-//console.log(this.model.get('row_alias'));
+		//console.log(this.model.get('row_alias'));
 	},
 
 

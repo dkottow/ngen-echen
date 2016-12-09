@@ -18,6 +18,7 @@ Donkeylift.SchemaTableView = Backbone.View.extend({
 		this.listenTo(this.model.get('fields'), 'remove', this.removeField);
 		this.listenTo(this.model.get('relations'), 'add', this.addRelation);
 		this.listenTo(this.model.get('relations'), 'remove', this.removeRelation);
+
 		this.fieldViews = {};
 		this.relationViews = {};
 	},
