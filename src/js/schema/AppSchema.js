@@ -70,7 +70,7 @@ AppSchema.prototype.getFieldEditor = function() {
 }
 
 AppSchema.prototype.getRelationEditor = function() {
-	var editor = this.getEditorModal('relations');
+	var editor = this.getEditorModal('relation');
 	editor.schema = this.schema;
 	editor.table = this.table;
 	return editor;
