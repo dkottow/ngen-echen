@@ -117,12 +117,15 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 		return function(query, callback, settings) {
 			console.log('api call get rows');
 
-			var orderCol = query.columns[query.order[0].column].data;
-			var orderField = me.get('fields').getByName(orderCol);
-
-			var orderParam = '$orderby='
-							+ encodeURIComponent(orderField.vname()
-							+ ' ' + query.order[0].dir);
+			var orderClauses = [];
+			for(var i = 0; i < query.order.length; ++i) {
+				var orderCol = query.columns[query.order[i].column].data;
+				var orderField = me.get('fields').getByName(orderCol);
+				orderClauses.push(encodeURIComponent(
+						orderField.vname() + ' ' + query.order[i].dir));
+			}
+			
+			var orderParam = '$orderby=' + orderClauses.join(',');
 
 			var skipParam = '$skip=' + query.start;
 			var topParam = '$top=' + query.length;
