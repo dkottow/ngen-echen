@@ -106,7 +106,7 @@ Donkeylift.Table = Backbone.Model.extend({
 			name: this.get('name')
 			, row_alias: row_alias
 			, access_control: this.get('access_control')
-			, fields: fields
+			, fields: _.object(_.pluck(fields, 'name'), fields)
 		};
 	},
 

@@ -22,9 +22,12 @@ Donkeylift.Schema = Backbone.Model.extend({
 
 	toJSON : function() {
 
+		var tables = this.get('tables').toJSON();
+		tables =  _.object(_.pluck(tables, 'name'), tables);
+
 		return {
 			name: this.get('name'),
-			tables: this.get('tables').toJSON(),
+			tables: tables,
 			users: this.get('users').toJSON()
 		};
 	},	
@@ -39,6 +42,7 @@ Donkeylift.Schema = Backbone.Model.extend({
 
 	parse : function(response) {
 		console.log("Schema.parse " + response);
+		this.set('name', response.name);
 		this.parseTables(response);
 		this.parseUsers(response);
 		return response;
@@ -77,8 +81,8 @@ Donkeylift.Schema = Backbone.Model.extend({
 	},
 
 	update : function() {
+		var me = this;
 		if ( ! this.updateDebounced) {
-			var me = this;
 			this.updateDebounced = _.debounce(function() {
 				var diff = jsonpatch.compare(me.orgJSON, me.toJSON());
 				console.log('Schema.update');		
