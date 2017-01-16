@@ -30,6 +30,10 @@ Donkeylift.Field = Backbone.Model.extend({
 			} else {
 				return this.get('name') + "_ref";
 			}
+/* TODO			
+		} else if (this.get('name') == 'id' && resolveRefs) {
+			return 'ref'; 
+*/
 		} else {
 			return this.get('name');
 		}

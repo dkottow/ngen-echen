@@ -61,8 +61,11 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 		var propValues = $("#modalTabProps form").serializeArray();
 		this.model.setPropArray(propValues);
 		
-		Donkeylift.app.table.get('fields').addNew(this.model);
-
+		if ( ! this.model.collection) {
+			Donkeylift.app.table.get('fields').addNew(this.model);
+		}
+		
+		Donkeylift.app.tableView.render();
 		Donkeylift.app.schema.update();
 	},
 
@@ -72,6 +75,7 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 			this.model.collection.remove(this.model);
 			Donkeylift.app.schema.update();
 		}
+		Donkeylift.app.tableView.render();
 	},
 
 	showDefinition: function(show) {

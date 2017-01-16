@@ -203,7 +203,7 @@ Donkeylift.Table.create = function(name) {
 	];
 	var table = new Donkeylift.Table({
 		name: name,
-		fields: fields
+		//fields: fields
 	});
 	table.initRefs();
 	return table;

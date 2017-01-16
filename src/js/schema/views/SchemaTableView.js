@@ -64,6 +64,10 @@ Donkeylift.SchemaTableView = Backbone.View.extend({
 	evNewFieldClick: function() {
 		console.log('TableView.evNewFieldClick');
 		var field = Donkeylift.Field.create();
+		var order = this.model.get('fields').filter(function(f) { 
+			return f.getProp('visible'); 
+		}).length + 1;
+		field.setProp('order', order);
 		var editor = Donkeylift.app.getFieldEditor();
 		editor.model = field;
 		editor.render();

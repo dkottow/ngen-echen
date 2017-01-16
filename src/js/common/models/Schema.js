@@ -42,9 +42,8 @@ Donkeylift.Schema = Backbone.Model.extend({
 
 	parse : function(response) {
 		console.log("Schema.parse " + response);
-		this.set('name', response.name);
-		this.parseTables(response);
-		this.parseUsers(response);
+		response = this.parseTables(response);
+		response = this.parseUsers(response);
 		return response;
 	},
 
@@ -80,25 +79,26 @@ Donkeylift.Schema = Backbone.Model.extend({
 		});
 	},
 
-	update : function() {
+	update : function(cbAfter) {
 		var me = this;
 		if ( ! this.updateDebounced) {
-			this.updateDebounced = _.debounce(function() {
+			this.updateDebounced = _.debounce(function(cbAfter) {
 				var diff = jsonpatch.compare(me.orgJSON, me.toJSON());
 				console.log('Schema.update');		
 				console.log(diff);		
 				if (diff.length > 0) {
 					me.patch(diff, function(err, result) {
 						if (err) {
-							//TODO
-							console.log(err);
-							me.parse(me.orgJSON);
-							alert('ERROR on patch ' + me.get('name') + '. ' 
-								+ err.status + " " + err.responseText);
+							console.log('ERROR on patch ' + err.status + " " + err.responseText);
+							var attrs = me.parse(me.orgJSON);
+							me.set(attrs);
+							if (cbAfter) cbAfter(err);
 						} else {
-							me.parse(result);
-							me.orgJSON = JSON.parse(JSON.stringify(me.toJSON())); //copy
 							console.log(result);
+							var attrs = me.parse(result);
+							me.set(attrs);
+							me.orgJSON = JSON.parse(JSON.stringify(me.toJSON())); //copy
+							if (cbAfter) cbAfter();
 							//reset schema in browser
 						}
 						
@@ -106,7 +106,10 @@ Donkeylift.Schema = Backbone.Model.extend({
 				}
 			}, 1000);
 		}
-		this.updateDebounced();
+//TODO re-enable and fix
+if (cbAfter) cbAfter();
+return;
+		this.updateDebounced(cbAfter);
 	},
 
 	patch : function(diff, cbResult) {

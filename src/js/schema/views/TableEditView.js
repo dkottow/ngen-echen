@@ -1,4 +1,4 @@
-/*global Donkeylift, Backbone, jQuery, _ */
+/*global Donkeylift, Backbone, $, _ */
 
 Donkeylift.TableEditView = Backbone.View.extend({
 	el:  '#modalEditTable',
@@ -24,11 +24,14 @@ Donkeylift.TableEditView = Backbone.View.extend({
 		this.model.set('name', newName);
 		if ( ! Donkeylift.app.schema.get('tables').contains(this.model)) {
 			Donkeylift.app.schema.get('tables').add(this.model);
-			Donkeylift.app.setTable(this.model);
 		}
 		var tableExample = $('#modalInputTableByExample').val();
 		this.model.addFieldsByExample(tableExample);
-		Donkeylift.app.schema.update();
+
+		Donkeylift.app.schema.update(function() {
+			var table = Donkeylift.app.schema.get('tables').getByName(newName);
+			Donkeylift.app.setTable(table);
+		});
 	},
 
 	removeClick: function() {	

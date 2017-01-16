@@ -42,7 +42,7 @@ Donkeylift.Account = Backbone.Model.extend({
 	},
 
 	url	: function() { 
-		return DONKEYLIFT_API + '/' + this.get('name'); 
+		return Donkeylift.env.API_BASE + '/' + this.get('name'); 
 	},
 
 	parse : function(response) {
@@ -66,7 +66,7 @@ Donkeylift.Account = Backbone.Model.extend({
 			contentType:'application/json; charset=utf-8',
 			dataType: 'json'
 		}).done(function(response) {
-			var link = DONKEYLIFT_API + path + '?nonce=' + response.nonce;
+			var link = Donkeylift.env.API_BASE + path + '?nonce=' + response.nonce;
 			cbResult(null, link);
 			//console.dir(response);
 		});

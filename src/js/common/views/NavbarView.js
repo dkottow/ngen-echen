@@ -10,7 +10,7 @@ Donkeylift.NavbarView = Backbone.View.extend({
 	},
 
 	initialize: function() {
-		this.lock = new Auth0Lock(AUTH0_CLIENT_ID, AUTH0_DOMAIN);
+		this.lock = new Auth0Lock(Donkeylift.env.AUTH0_CLIENT_ID, Donkeylift.env.AUTH0_DOMAIN);
 	},
 
 	navSchemaTemplate: _.template($('#nav-schema-template').html()),
@@ -87,7 +87,7 @@ Donkeylift.NavbarView = Backbone.View.extend({
 
 	evLogoutClick: function(ev) {
 		sessionStorage.clear();
-		window.location = "https://" + AUTH0_DOMAIN + "/v2/logout";
+		window.location = "https://" + Donkeylift.env.AUTH0_DOMAIN + "/v2/logout";
 	},
 
 	evLoginClick: function(ev) {

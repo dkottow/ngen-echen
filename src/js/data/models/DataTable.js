@@ -11,7 +11,7 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 
 	fullUrl: function(ext) {
 		ext = ext || ROWS_EXT;
-		return DONKEYLIFT_API + this.get('url') + ext;
+		return Donkeylift.env.API_BASE + this.get('url') + ext;
 	},
 
 	getAllRowsUrl: function() {

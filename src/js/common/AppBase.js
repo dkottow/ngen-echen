@@ -1,18 +1,17 @@
 /*global Backbone, $ */
 
+
+var Donkeylift = {
+	
 //set by gulp according to env vars
 // e.g. DONKEYLIFT_API. "http://api.donkeylift.com";
 
-var DONKEYLIFT_API = "$DONKEYLIFT_API";  
-
-var AUTH0_CLIENT_ID = "$AUTH0_CLIENT_ID";
-var AUTH0_DOMAIN = "$AUTH0_DOMAIN";
-
-
-var DONKEYLIFT_DEMO = $DONKEYLIFT_DEMO;
-
-
-var Donkeylift = {
+	env: {
+	    API_BASE: "$DONKEYLIFT_API"
+	    , AUTH0_CLIENT_ID: "$AUTH0_CLIENT_ID"
+	    , AUTH0_DOMAIN: "$AUTH0_DOMAIN"
+	    , DEMO_FLAG: + "$DONKEYLIFT_DEMO"
+	},
 	
 	util: {
 		/*** implementation details at eof ***/
@@ -48,7 +47,7 @@ AppBase.prototype.start = function() {
 	var me = this;
 	this.navbarView = new Donkeylift.NavbarView();
 
-	if (DONKEYLIFT_DEMO) {
+	if (Donkeylift.env.DEMO_FLAG) {
 		this.loadAccount({ auth: false });
 		return;
 	}
