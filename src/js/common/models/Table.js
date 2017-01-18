@@ -180,6 +180,7 @@ Donkeylift.Table = Backbone.Model.extend({
 		var fields = [];
 		for(var i = 0; i < fieldNames.length; ++i) {
 			var field = Donkeylift.Field.create(fieldNames[i]);
+			field.setProp('order', i + 1);
 			fields.push(field);
 
 			if (values.length <= i) continue;

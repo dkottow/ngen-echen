@@ -79,6 +79,9 @@ Donkeylift.Field = Backbone.Model.extend({
 		var resolveRefs = opts.resolveRefs || false;
 		var result = null;
 		var resultError = true;
+
+		if ( ! val || val.length == 0) return result;
+
 		var t = this.get('type');
 
 		if (this.get('fk') == 1 && resolveRefs) {
