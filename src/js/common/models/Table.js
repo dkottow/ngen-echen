@@ -140,7 +140,7 @@ Donkeylift.Table = Backbone.Model.extend({
 			'$filter': filterTerm
 		};
 
-		var q = _.map(params, function(v,k) { return k + "=" + v; })
+		var q = _.map(params, function(v,k) { return k + "=" + encodeURIComponent(v); })
 				.join('&');
 
 		var url = this.fullUrl() + '?' + q;

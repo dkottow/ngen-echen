@@ -107,8 +107,10 @@ Donkeylift.Schema = Backbone.Model.extend({
 			}, 1000);
 		}
 //TODO re-enable and fix
+/*
 if (cbAfter) cbAfter();
 return;
+*/
 		this.updateDebounced(cbAfter);
 	},
 

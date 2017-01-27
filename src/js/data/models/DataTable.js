@@ -237,7 +237,7 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 			'$orderby': fieldName
 		};
 
-		var q = _.map(params, function(v,k) { return k + "=" + v; })
+		var q = _.map(params, function(v,k) { return k + "=" + encodeURIComponent(v); })
 				.join('&');
 
 		var filters = Donkeylift.app.filters.apply(filter, searchTerm);
