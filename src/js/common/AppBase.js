@@ -107,14 +107,14 @@ AppBase.prototype.createTableView = function(table, params) {
 
 AppBase.prototype.setTable = function(table, params) {
 	console.log('app.setTable ' + params);
+
 	var $a = $("#table-list a[data-target='" + table.get('name') + "']");
 	$('#table-list a').removeClass('active');
 	$a.addClass('active');
 
+  this.unsetTable();
+
 	this.table = table;
-
-	if (this.tableView) this.tableView.remove();
-
 	this.tableView = this.createTableView(table, params);
 
 	$('#content').html(this.tableView.render().el);			

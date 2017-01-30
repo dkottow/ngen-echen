@@ -1,16 +1,18 @@
-/*global Donkeylift, Backbone, jQuery, _ */
+/*global Donkeylift, Backbone, $, _ */
 
 Donkeylift.MenuDataView = Backbone.View.extend({
 	el:  '#menu',
 
 	events: {
-		'click #show-filters': 'evShowFilters',
-		//'click #reset-all-filters': 'evResetAllFilters'
+		'click #filter-show': 'evFilterShow',
+		'click #selection-filter': 'evSelectionFilter',
+		'click #selection-add': 'evSelectionAdd',
 	},
 
-	initialize: function() {
+	initialize: function(opts) {
 		console.log("MenuView.init");
-		//this.listenTo(Donkeylift.app.table, 'change', this.render);
+		this.listenTo(opts.app.selectedRows, 'update', this.updateSelectionLabel);
+		this.listenTo(opts.app.selectedRows, 'reset', this.updateSelectionLabel);
 	},
 
 	template: _.template($('#data-menu-template').html()),
@@ -25,6 +27,13 @@ Donkeylift.MenuDataView = Backbone.View.extend({
 		return this;
 	},
 
+	updateSelectionLabel: function() {
+		var selCount = Donkeylift.app.getSelection().length;
+		var label = 'Selection';
+		if (selCount > 0) label = label + ' (' + selCount + ')';
+		$('#selection-dropdown span:first').text(label);
+	},
+
 	getShowFilter: function() {
 		if ( ! this.filterShowView) {
 			this.filterShowView = new Donkeylift.FilterShowView();
@@ -32,16 +41,46 @@ Donkeylift.MenuDataView = Backbone.View.extend({
 		return this.filterShowView;
 	},
 
-	evResetAllFilters: function() {
-		Donkeylift.app.unsetFilters();
-		Donkeylift.app.resetTable();
-	},
-
-	evShowFilters: function() {
+	evFilterShow: function() {
 		this.getShowFilter().collection = Donkeylift.app.filters;
 		this.getShowFilter().render();
 	},
 
+	addSelection: function() {
+		var table = Donkeylift.app.table;
+		var rows = $('#grid').DataTable().rows({selected: true}).data().toArray();
+		Donkeylift.app.addSelection(table.get('name'), rows);
+	},
+
+	evSelectionAdd: function(ev) {
+		this.addSelection();
+	
+		$('#selection-dropdown').dropdown('toggle');	
+		return false;
+	},
+
+	evSelectionFilter: function(ev) {
+		this.addSelection();
+
+		var table = Donkeylift.app.table;
+		var rows = Donkeylift.app.getSelection({ table: table.get('name') });
+
+		if (rows.length == 0) {
+			$('#selection-dropdown').dropdown('toggle');	
+			return false;
+		}
+		
+		var filter = {
+			table: table,
+			field: 'id',
+			op: Donkeylift.Filter.OPS.IN,
+			value: _.pluck(rows, 'id')
+		};
+
+		Donkeylift.app.setFilters([ filter ]);
+		Donkeylift.app.resetTable();
+
+	},
 });
 
 

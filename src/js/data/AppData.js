@@ -3,8 +3,11 @@
 function AppData(opts) {
     console.log('AppData ctor');
 	Donkeylift.AppBase.call(this, opts);
+	
 	this.filters = new Donkeylift.Filters();
-	this.menuView = new Donkeylift.MenuDataView();
+	this.selectedRows = new Donkeylift.Rows();
+	
+	this.menuView = new Donkeylift.MenuDataView({ app: this });
 	this.router = new Donkeylift.RouterData();
 }
 
@@ -35,14 +38,32 @@ AppData.prototype.unsetSchema = function() {
 	this.unsetFilters();
 }
 
+AppData.prototype.unsetTable = function() {
+	Donkeylift.AppBase.prototype.unsetTable.call(this);
+	this.unsetSelection();
+}
+
 /**** AppData stuff ****/
 
 AppData.prototype.setFilters = function(filters) {
-	this.filters = new Donkeylift.Filters(filters);
+	this.filters.reset(filters); // = new Donkeylift.Filters(filters);
 }
 
 AppData.prototype.unsetFilters = function() {
-	this.filters = new Donkeylift.Filters();
+	this.filters.reset(); // = new Donkeylift.Filters();
+}
+
+
+AppData.prototype.addSelection = function(table, rows) {
+	this.selectedRows.add(rows);
+}
+
+AppData.prototype.getSelection = function() {
+	return this.selectedRows.toJSON();
+}
+
+AppData.prototype.unsetSelection = function() {
+	this.selectedRows.reset();
 }
 
 AppData.prototype.setFilterView = function(filter, thElement) {
