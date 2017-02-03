@@ -312,6 +312,7 @@ Donkeylift.DataTableView = Backbone.View.extend({
 		});
 
 		//using search.dt event won't work because its fired otherwise, too
+/*
 		this.$('input[type="search"]').blur(function() {
 			console.log("search.dt");
 			Donkeylift.app.router.navigate("reload-table", {trigger: false});			
@@ -320,7 +321,7 @@ Donkeylift.DataTableView = Backbone.View.extend({
 			console.log("search.dt");
 			Donkeylift.app.router.navigate("reload-table", {trigger: false});			
 		});
-
+*/
 		this.dataEditor.on('preSubmit', function(ev, req, action) {
 			me.model.sanitizeEditorData(req);
 			if (req.error) {
