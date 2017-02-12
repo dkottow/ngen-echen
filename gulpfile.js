@@ -21,8 +21,6 @@ require('dotenv').config({path: envPath});
 var allTasks = [ 'copy-images'
 				, 'copy-fonts'
 				, 'copy-excel' 
-				, 'copy-3rdparty-js' 
-				, 'copy-3rdparty-css' 
 				, 'build-3rdparty-js' 
 				, 'build-dl-data-js' 
 				, 'build-dl-schema-js' 
@@ -56,7 +54,6 @@ var ver3rd = {
 	FONT_AWESOME : 'font-awesome-4.3.0',
 	DATATABLES : 'DataTables-custom',
 	DATATABLES_EDITOR : 'Editor-1.5.6',
-	VIS : 'vis',
 	SWAGGER_UI : 'swagger-ui-2.1.4',
 	NOUISLIDER : 'nouislider-9.0.0',
 };
@@ -102,6 +99,11 @@ gulp.task('build-3rdparty-css', function() {
 				src3rd + ver3rd.BOOTSTRAP + '/css/bootstrap.min.css' 
 				, src3rd + ver3rd.FONT_AWESOME + '/css/font-awesome.min.css'
 				, src3rd + ver3rd.NOUISLIDER + '/nouislider.min.css' 
+				, src3rd + '/vis/vis.min.css'
+				, src3rd + ver3rd.DATATABLES + '/datatables.min.css'
+
+//				, extdir + ver3rd.DATATABLES_EDITOR + '/css/editor.dataTables.min.css' 
+				, extdir + ver3rd.DATATABLES_EDITOR + '/css/editor.bootstrap.min.css' 
 		])
 
 		.pipe(concat('3rdparty.css'))
@@ -118,37 +120,16 @@ gulp.task('build-3rdparty-js', function() {
 				, src3rd + ver3rd.NOUISLIDER + '/nouislider.min.js'
 				, src3rd + '/typeahead/typeahead.bundle.js' 
 				, src3rd + '/JSON-Patch-master/dist/json-patch-duplex.min.js' 
-		])
-
-		.pipe(concat('3rdparty.js'))
-		.pipe(gulp.dest('./app/js/'));
-			
-});
-
-gulp.task('copy-3rdparty-js', function() {
-	return gulp.src([
-				//src3rd + ver3rd.DATATABLES + '/media/js/jquery.dataTables.min.js' 
-				src3rd + ver3rd.DATATABLES + '/datatables.js' 
+				, src3rd + '/vis/vis.min.js' 
 				, src3rd + ver3rd.DATATABLES + '/datatables.min.js' 
-				, src3rd + ver3rd.VIS + '/vis.min.js' 
+
 				, extdir + ver3rd.DATATABLES_EDITOR + '/js/dataTables.editor.min.js' 
 				, extdir + ver3rd.DATATABLES_EDITOR + '/js/editor.bootstrap.js' 
 				, extdir + ver3rd.DATATABLES_EDITOR + '/js/editor.typeahead.js' 
 		])
 
+		.pipe(concat('3rdparty.js'))
 		.pipe(gulp.dest('./app/js/'));
-			
-});
-
-gulp.task('copy-3rdparty-css', function() {
-	return gulp.src([
-				src3rd + ver3rd.DATATABLES + '/datatables.min.css'
-				, src3rd + ver3rd.VIS + '/vis.min.css'
-				, extdir + ver3rd.DATATABLES_EDITOR + '/css/editor.dataTables.min.css' 
-				, extdir + ver3rd.DATATABLES_EDITOR + '/css/editor.bootstrap.min.css' 
-		])
-
-		.pipe(gulp.dest('./public/css/'));
 			
 });
 
