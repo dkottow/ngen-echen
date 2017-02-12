@@ -225,4 +225,12 @@ table.dataTable {
 	height: 600px;
 } 
 
+/******* compat SP *******/
 
+.btn {
+	min-width: 0;
+}
+
+.col-sm-3 {
+	max-width: 16em;
+}
