@@ -14,8 +14,8 @@ function AppData(opts) {
 AppData.prototype = Object.create(Donkeylift.AppBase.prototype);
 AppData.prototype.constructor = AppData; 
 
-AppData.prototype.start = function() {
-	Donkeylift.AppBase.prototype.start.call(this);
+AppData.prototype.start = function(cbAfter) {
+	Donkeylift.AppBase.prototype.start.call(this, cbAfter);
 	$('#nav-data').closest("li").addClass("active");
 }
 
@@ -72,7 +72,7 @@ AppData.prototype.setFilterView = function(filter, thElement) {
 	this.filterView.render();
 }
 
-AppData.prototype.onAccountLoaded = function() {
+AppData.prototype.onAccountLoaded = function(cbAfter) {
 	//only data app
 	if (location.hash.length > 0) {
 		console.log("navigate " + location.hash);
@@ -82,6 +82,7 @@ AppData.prototype.onAccountLoaded = function() {
 				.routeUrlTableData(parts[1], parts[2], parts[3]);
 		}
 	}
+	else if (cbAfter) cbAfter();
 }
 
 Donkeylift.AppData = AppData;

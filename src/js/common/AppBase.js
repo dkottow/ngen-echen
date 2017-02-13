@@ -43,19 +43,19 @@ function AppBase(opts) {
 	Backbone.history.start();
 }
 
-AppBase.prototype.start = function() {
+AppBase.prototype.start = function(cbAfter) {
 	var me = this;
 	this.navbarView = new Donkeylift.NavbarView();
 
 	if (Donkeylift.env.DEMO_FLAG) {
-		this.loadAccount({ auth: false });
+		this.loadAccount({ auth: false }, cbAfter);
 		return;
 	}
 
-	this.loadAccount({ id_token: sessionStorage.getItem('id_token') });
+	this.loadAccount({ id_token: sessionStorage.getItem('id_token') }, cbAfter);
 }
 
-AppBase.prototype.loadAccount = function(opts) {
+AppBase.prototype.loadAccount = function(opts, cbAfter) {
 	var me = this;
 	console.log('loadAccount: ' + opts);
 
@@ -67,7 +67,7 @@ AppBase.prototype.loadAccount = function(opts) {
 		me.navbarView.render();
 		me.menuView.render();
 		$('#content').empty();
-		me.onAccountLoaded();
+		me.onAccountLoaded(cbAfter);
 	}});
 
 	$('#toggle-sidebar').hide();
@@ -82,8 +82,9 @@ AppBase.prototype.switchAccount = function(account) {
 }
 
 
-AppBase.prototype.onAccountLoaded = function() {
-	//overwrite me
+AppBase.prototype.onAccountLoaded = function(cbAfter) {
+  if (cbAfter) cbAfter();
+  //overwrite me
 }
 
 AppBase.prototype.toggleSidebar = function() {
