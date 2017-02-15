@@ -14,7 +14,7 @@
 	  <!-- Tab panes -->
 	  <div class="tab-content">
 		<div class="tab-pane active" id="filterRange">
-			<form class="form-inline filter-form">				
+			<div class="form-inline filter-form">				
 				<div class="form-group">
 					<label for="inputFilterMin" class="control-label">From</label>
 					<input type="text" class="form-control input-sm" id="inputFilterMin">
@@ -27,30 +27,30 @@
 				<div class="filter-reset">
 					<button id="rangeReset" type="button" class="btn btn-primary">Reset</button>
 				</div>
-			</form>
+			</div>
 		</div>
 		<div class="tab-pane" id="filterSelect">
-			<form class="form-inline filter-form">				
-			<div class="pull-left" style="width: 45%">
-				<div class="form-group">
-					<label for="inputFilterItemsSearch" class="control-label">Search </label>						
-					<input type="text" class="form-control input-sm" id="inputFilterItemsSearch">
+			<div class="form-inline filter-form">				
+				<div class="pull-left" style="width: 45%">
+					<div class="form-group">
+						<label for="inputFilterItemsSearch" class="control-label">Search </label>						
+						<input type="text" class="form-control input-sm" id="inputFilterItemsSearch">
+					</div>
+					<div id="filterOptions" class="list-group scrollable-menu">
+					</div>						
 				</div>
-				<div id="filterOptions" class="list-group scrollable-menu">
-				</div>						
-			</div>
-			<div class="pull-right" style="width: 45%">
-				<div class="form-group">
-					<label class="control-label">Selected </label>
-					<input style="visibility: hidden;"><!-- force equal heights -->
+				<div class="pull-right" style="width: 45%">
+					<div class="form-group">
+						<label class="control-label">Selected </label>
+						<input style="visibility: hidden;"><!-- force equal heights -->
+					</div>
+					<div id="filterSelection" class="list-group scrollable-menu">
+					</div>
 				</div>
-				<div id="filterSelection" class="list-group scrollable-menu">
+				<div style="clear: both" class="filter-reset">
+					<button id="selectReset" type="button" class="btn btn-primary">Reset</button>
 				</div>
 			</div>
-			<div style="clear: both" class="filter-reset">
-				<button id="selectReset" type="button" class="btn btn-primary">Reset</button>
-			</div>
-			</form>
 		</div>
 	  </div>
 	</div>

@@ -27,7 +27,12 @@ var Donkeylift = {
 function AppBase(opts) {
 	var me = this;
 
-    console.log('AppBase ctor');
+  console.log('AppBase ctor');
+	
+	this.navbarView = new Donkeylift.NavbarView();
+	if (Donkeylift.env.AUTH0_DOMAIN) {
+    this.lock = new Auth0Lock(Donkeylift.env.AUTH0_CLIENT_ID, Donkeylift.env.AUTH0_DOMAIN);
+	}
 
 	$.ajaxPrefilter(function( options, _, jqXHR ) {
 		$('#ajax-progress-spinner').show();
@@ -45,7 +50,6 @@ function AppBase(opts) {
 
 AppBase.prototype.start = function(cbAfter) {
 	var me = this;
-	this.navbarView = new Donkeylift.NavbarView();
 
 	if (Donkeylift.env.DEMO_FLAG) {
 		this.loadAccount({ auth: false }, cbAfter);

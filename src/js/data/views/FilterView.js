@@ -61,11 +61,13 @@ Donkeylift.FilterView = Backbone.View.extend({
 	},
 
 	evFilterColumnClick: function(ev) {
+		ev.preventDefault();
 		ev.stopPropagation();
 	},
 
 	evFilterTabClick: function(ev) {
-		//ev.preventDefault();
+		ev.preventDefault();
+		ev.stopPropagation();
 
 //console.log('evFilterTab ' + ev.target);
 		if (/filterSelect$/.test(ev.target.href)) {

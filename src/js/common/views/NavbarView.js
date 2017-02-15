@@ -10,7 +10,7 @@ Donkeylift.NavbarView = Backbone.View.extend({
 	},
 
 	initialize: function() {
-		this.lock = new Auth0Lock(Donkeylift.env.AUTH0_CLIENT_ID, Donkeylift.env.AUTH0_DOMAIN);
+		//this.lock = new Auth0Lock(Donkeylift.env.AUTH0_CLIENT_ID, Donkeylift.env.AUTH0_DOMAIN);
 	},
 
 	navSchemaTemplate: _.template($('#nav-schema-template').html()),
@@ -97,7 +97,7 @@ Donkeylift.NavbarView = Backbone.View.extend({
 			, authParams: { scope: 'openid email app_metadata' } 
 		};
 
-		this.lock.show(opts, function(err, profile, id_token) {
+		Donkeylift.app.lock.show(opts, function(err, profile, id_token) {
 			if (err) {
 				console.log("There was an error :/", err);
 				return;
