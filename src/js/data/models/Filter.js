@@ -72,10 +72,12 @@ Donkeylift.Filter = Backbone.Model.extend({
 		});
 	},
 
-	loadSelect: function(searchTerm, cbAfter) {
+	loadOptions: function(searchTerm, cbAfter) {
 		var field = this.get('field');
 		this.get('table').options(this, searchTerm, function(opts) {
-			field.set('options', opts);
+			var notNulls = _.reject(opts, function(opt) { return opt[field.get('name')] === null; });
+			field.set('options', notNulls);
+			field.set('option_null', notNulls.length < opts.length);
 			cbAfter();
 		});
 	},
@@ -97,10 +99,15 @@ Donkeylift.Filter = Backbone.Model.extend({
 			result.field = this.get('field').get('name');
 			result.value = this.get('value').join(', '); 
 
+		} else if (this.get('op') == Donkeylift.Filter.OPS.GREATER) {
+			result.op = 'greater';
+			result.field = this.get('field').get('name');
+			result.value = this.get('value'); 
+		
 		} else if (this.get('op') == Donkeylift.Filter.OPS.EQUAL) {
 			result.op = 'equal';
 			result.field = this.get('field').get('name');
-			result.value = this.get('value'); 
+			result.value = this.get('value') === null ? 'null' : this.get('value'); 
 		}
 		return result;
 	}

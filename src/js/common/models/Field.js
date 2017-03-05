@@ -146,6 +146,8 @@ Donkeylift.Field = Backbone.Model.extend({
 		opts = opts || {};
 		var resolveRefs = opts.resolveRefs || false;
 
+		if (val === null) return "null";
+
 		if (this.get('fk') == 1 && resolveRefs) {
 			return Donkeylift.Field.getIdFromRef(val);
 		} else if (this.get('fk') == 1 && ! resolveRefs) {

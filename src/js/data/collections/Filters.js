@@ -45,8 +45,8 @@ Donkeylift.Filters = Backbone.Collection.extend({
 		var current = this.get(filter.id);
 		if (current) this.remove(current);
 		if (attrs.value.length > 0) {
-			this.add(filter);
-		}
+ 			this.add(filter);
+ 		}
 	},
 
 	getFilter: function(table, field) {

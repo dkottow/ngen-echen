@@ -1,8 +1,10 @@
-/*global Donkeylift, Backbone, jQuery, _ */
+/*global Donkeylift, Backbone, $, _ */
 
 Donkeylift.FilterItemsView = Backbone.View.extend({
 
 	events: {
+		'click #selectNulls': 'evFilterItemsNulls',
+		'click #selectAll': 'evFilterItemsAll',
 		'click #selectReset': 'evFilterItemsReset',
 		'click .filter-option': 'evFilterOptionClick',
 		'click .filter-selected': 'evFilterSelectedClick',
@@ -18,7 +20,7 @@ Donkeylift.FilterItemsView = Backbone.View.extend({
 	loadRender: function() {
 		var me = this;
 		var s = this.$('#inputFilterItemsSearch').val();
-		this.model.loadSelect(s, function() {
+		this.model.loadOptions(s, function() {
 			me.render();
 		});
 	},
@@ -72,6 +74,11 @@ Donkeylift.FilterItemsView = Backbone.View.extend({
 		//window.location.hash = "#reload-table";
 	},
 
+	clearFilter: function() {
+		Donkeylift.app.filters.clearFilter(this.model.get('table'), this.model.get('field'));
+		Donkeylift.app.router.navigate("reload-table", {trigger: true});			
+	},
+
 	evFilterOptionClick: function(ev) {
 		ev.stopPropagation();
 		//console.log(ev.target);
@@ -93,7 +100,11 @@ Donkeylift.FilterItemsView = Backbone.View.extend({
 		ev.stopPropagation();
 		//console.log(ev.target);
 		$(ev.target).remove();
-		this.setFilter();
+		if (this.$('#filterSelection').length > 0) {
+			this.setFilter();
+		} else {
+			this.clearFilter();
+		}
 	},
 
 	evInputFilterSearchChange: function(ev) {
@@ -103,11 +114,41 @@ Donkeylift.FilterItemsView = Backbone.View.extend({
 
 	evFilterItemsReset: function() {
 		this.$('#filterSelection').empty();			
-		this.setFilter(); //actually clears filter
 		this.$('#inputFilterItemsSearch').val('');
+
+		this.clearFilter();
+		
 		this.loadRender();
 	},
 
+	evFilterItemsAll: function() {
+		this.$('#filterSelection').empty();			
+
+		Donkeylift.app.filters.setFilter({
+			table: this.model.get('table'),
+			field: this.model.get('field'),
+			op: Donkeylift.Filter.OPS.GREATER,
+			value: 0
+		});
+		Donkeylift.app.router.navigate("reload-table", {trigger: true});			
+
+		this.loadRender();
+	},
+
+	evFilterItemsNulls: function() {
+		this.$('#filterSelection').empty();			
+
+		Donkeylift.app.filters.setFilter({
+			table: this.model.get('table'),
+			field: this.model.get('field'),
+			op: Donkeylift.Filter.OPS.EQUAL,
+			value: null
+		});
+		Donkeylift.app.router.navigate("reload-table", {trigger: true});			
+
+		this.loadRender();
+	},
+	
 });
 
 
