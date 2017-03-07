@@ -111,9 +111,13 @@ var pegParser = module.exports;
 				if (options.params) {
 					//set filters
 					var filters = _.map(options.params.$filter, function(f) {
-						return new Donkeylift.Filter(f);
+						return Donkeylift.Filter.Create(f);
 					});
-					Donkeylift.app.setFilters(filters);
+					if (_.contains(filters, null)) {
+						console.log('error parsing $filter param. no filters added');
+					} else {
+						Donkeylift.app.setFilters(filters);
+					}
 				}
 				
 				//load data			

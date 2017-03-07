@@ -74,9 +74,9 @@ AppData.prototype.setFilterView = function(filter, thElement) {
 
 AppData.prototype.onAccountLoaded = function(cbAfter) {
 	//only data app
-	if (location.hash.length > 0) {
-		console.log("navigate " + location.hash);
-		var parts = location.hash.split('/');
+	if (window.location.hash.length > 0) {
+		console.log("navigate " + window.location.hash);
+		var parts = window.location.hash.split('/');
 		if (parts.length == 4 && parts[0] == '#data') {
 			Donkeylift.app.router
 				.routeUrlTableData(parts[1], parts[2], parts[3]);

@@ -4,18 +4,6 @@ Donkeylift.Filter = Backbone.Model.extend({
 
 	initialize: function(attrs) {
 		console.log("Filter.initialize ");			
-
-		
-		if (_.isString(attrs.table)) {
-			this.set('table', 
-				Donkeylift.app.schema.get('tables').getByName(attrs.table));
-		}
-
-		if (attrs.field && _.isString(attrs.field)) {
-			this.set('field', 
-				this.get('table').get('fields').getByName(attrs.field));
-		}
-
 		this.set('id', Donkeylift.Filter.Key(attrs.table, attrs.field));
 
 	},
@@ -113,6 +101,38 @@ Donkeylift.Filter = Backbone.Model.extend({
 	}
 
 });
+
+
+Donkeylift.Filter.Create = function(attrs) {
+
+	var opts = {};
+
+	if (  (_.isArray(attrs.value) && attrs.value.length > 0)
+		|| _.isString(attrs.value)
+		|| attrs.value === null) 
+	{
+		opts.value = attrs.value;  	
+	}
+
+	if (_.isObject(attrs.table)) {
+		opts.table = attrs.table; //trust it
+	} else if (_.isString(attrs.table)) {
+		opts.table = Donkeylift.app.schema.get('tables').getByName(attrs.table);
+	}
+
+	if (_.isObject(attrs.field)) {
+		opts.field = attrs.field; //trust it
+	} else if (_.isString(attrs.field)) {
+		opts.field = opts.table.get('fields').getByName(attrs.field);
+	}
+
+	opts.op = attrs.op; //trust it
+
+	if (opts.table && opts.field && opts.op && opts.value !== undefined) {
+		return new Donkeylift.Filter(opts);
+	} 
+	return null;
+}
 
 Donkeylift.Filter.Key = function(table, field) {		
 	if (_.isObject(table)) table = table.get('name');

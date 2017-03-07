@@ -240,7 +240,7 @@ Donkeylift.DataTableView = Backbone.View.extend({
 		var filter = new Donkeylift.Filter({
 			table: this.model,
 			field: this.model.get('fields').getByName(colName)
-		});
+		}); //TODO - avoid using ctor directly
 
 		var th = this.$('#col-' + colName);
 		Donkeylift.app.setFilterView(filter, th);

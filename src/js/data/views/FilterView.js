@@ -11,7 +11,7 @@ Donkeylift.FilterView = Backbone.View.extend({
 		console.log("FilterView.init " + this.model.get('table'));
 
 		this.rangeView = new Donkeylift.FilterRangeView({
-							model: this.model,el: this.el });
+							model: this.model, el: this.el });
 		this.itemsView = new Donkeylift.FilterItemsView({
 							model: this.model, el: this.el });
 

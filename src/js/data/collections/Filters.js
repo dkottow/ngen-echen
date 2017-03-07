@@ -28,25 +28,24 @@ Donkeylift.Filters = Backbone.Collection.extend({
 		
 		//add search term
 		if (searchTerm && searchTerm.length > 0) {
-			var searchFilter = new Donkeylift.Filter({
+			var searchFilter = Donkeylift.Filter.Create({
 					table: exFilter.get('table'),
 					field: exFilter.get('field'),
 					op: Donkeylift.Filter.OPS.SEARCH,
 					value: searchTerm
 			});
-			filters.push(searchFilter);
+			if (searchFilter) filters.push(searchFilter);
+			else console.log('error creating searchFilter');
 		}
 		
 		return filters;
 	},
 
 	setFilter: function(attrs) {
-		var filter = new Donkeylift.Filter(attrs);		
-		var current = this.get(filter.id);
+		var current = this.getFilter(attrs.table, attrs.field);
 		if (current) this.remove(current);
-		if (attrs.value.length > 0) {
- 			this.add(filter);
- 		}
+		var filter = Donkeylift.Filter.Create(attrs);	
+		if (filter) this.add(filter);
 	},
 
 	getFilter: function(table, field) {
