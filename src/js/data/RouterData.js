@@ -64,6 +64,18 @@ var pegParser = module.exports;
 			Donkeylift.app.table.reload();
 		},
 
+
+		gotoHash: function(hash, cbAfter) {
+			var parts = hash.split('/');
+			if (parts.length == 4 && parts[0] == '#data') {
+				var opts = 	{ 
+						schema: parts[1],
+						params: this.parseParams(parts[3])
+				}; 
+				this.gotoTable(parts[2], opts, cbAfter);
+			}
+		},
+
 		parseParams: function(paramStr) {
 			var params = {};
 			_.each(paramStr.split('&'), function(p) {
@@ -99,7 +111,7 @@ var pegParser = module.exports;
 			this.navigate(fragment, {replace: options.replace});
 		},	
 
-		gotoTable: function(tableName, options) {
+		gotoTable: function(tableName, options, cbAfter) {
 			options = options || {};
 
 			var setOthers = function() {
@@ -122,6 +134,7 @@ var pegParser = module.exports;
 				
 				//load data			
 				Donkeylift.app.setTable(table, options.params);
+				if (cbAfter) cbAfter();
 			}
 
 			if (options.schema) {
@@ -130,7 +143,6 @@ var pegParser = module.exports;
 			} else {
 				setOthers();
 			}
-
 
 		}
 

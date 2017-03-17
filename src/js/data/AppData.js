@@ -76,11 +76,7 @@ AppData.prototype.onAccountLoaded = function(cbAfter) {
 	//only data app
 	if (window.location.hash.length > 0) {
 		console.log("navigate " + window.location.hash);
-		var parts = window.location.hash.split('/');
-		if (parts.length == 4 && parts[0] == '#data') {
-			Donkeylift.app.router
-				.routeUrlTableData(parts[1], parts[2], parts[3]);
-		}
+		Donkeylift.app.router.gotoHash(window.location.hash, cbAfter);
 	}
 	else if (cbAfter) cbAfter();
 }

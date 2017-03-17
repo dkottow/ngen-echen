@@ -1,14 +1,10 @@
 <script type="text/template" id="edit-prop-boolean-template">
 
   <div class="form-group">
-	  <label for="<%= name %>" class="col-sm-2 control-label"><%= name %>:</label>
+	  <label for="{{ name }}" class="col-sm-2 control-label">{{ name }}:</label>
 	  <div class="checkbox col-sm-14">
 		<label>
-		<% if (value) { %>
-			<input checked type="checkbox" name="<%= name %>">
-		<% } else { %>
-			<input type="checkbox" name="<%= name %>">
-		<% } %>
+			<input {{ checked }} type="checkbox" name="{{ name }}">
 		</label>		
 	  </div>
 	</div>	  

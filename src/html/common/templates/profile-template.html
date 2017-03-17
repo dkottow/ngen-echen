@@ -8,16 +8,14 @@
 		</div>
 		<div class="panel-body">
 			<dl class="dl-horizontal">
-				<dt>Username</dt><dd><%= user %></dd>
+				<dt>Username</dt><dd>{{ user }}</dd>
 			</dl>
 			<dl class="dl-horizontal">
-				<dt>Account</dt><dd><%= account %></dd>
+				<dt>Account</dt><dd>{{ account }}</dd>
 			</dl>
-<% if (app_metadata.admin) { %>
 			<dl class="dl-horizontal">
-				<dt>Admin</dt><dd><%= app_metadata.admin %></dd>
+				<dt>Admin</dt><dd>{{ isAdmin }}</dd>
 			</dl>
-<% } %>
 		</div>
 	</div>
 	</div>

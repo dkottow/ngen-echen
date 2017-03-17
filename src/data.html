@@ -60,7 +60,7 @@
 	<script type="text/javascript"> 
 			$(function() { 
 				Donkeylift.app = new Donkeylift.AppData(); 
-				Donkeylift.app.start();
+				Donkeylift.app.start(function() { console.log('done.'); } );
 			});
 
 	</script>

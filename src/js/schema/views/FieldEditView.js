@@ -38,10 +38,14 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 		_.each(this.model.get('props').getAll(), function(prop) {
 			//console.log(prop);
 			var template = this.propTemplate(prop.type);
-			$('#modalTabProps .inject-props').append(template({ 
+			var params = { 
 				name: prop.name, 
 				value: prop.value 
-			}));
+			};
+			if (prop.type == 'Boolean') {
+				params.checked = prop.value === true ? 'checked' : ''; 
+			}
+			$('#modalTabProps .inject-props').append(template(params));
 		}, this);
 
 		$('#modalEditField').modal();

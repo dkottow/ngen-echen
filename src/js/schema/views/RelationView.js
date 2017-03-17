@@ -1,4 +1,4 @@
-/*global Donkeylift, Backbone, jQuery, _ */
+/*global Donkeylift, Backbone, $, _ */
 
 Donkeylift.RelationView = Backbone.View.extend({
 
@@ -27,7 +27,10 @@ Donkeylift.RelationView = Backbone.View.extend({
 
 	render: function() {
 		console.log("RelationView.render ");
-		this.$el.html(this.template(this.model.toJSON()));
+		var params = this.model.toJSON();
+		if (this.model.get('related')) params.related = this.model.get('related').get('name');
+		if (this.model.get('field')) params.field = this.model.get('field').get('name');
+		this.$el.html(this.template(params));
 		return this;
 	},
 

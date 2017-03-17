@@ -18,7 +18,7 @@ Donkeylift.ProfileView = Backbone.View.extend({
 		this.$el.html(this.template({
 			user: this.model.get("user"),
 			account: this.model.get("name"),
-			app_metadata: this.model.get("app_metadata"),
+			isAdmin: this.model.get("app_metadata").admin === true,
 		}));
 		$('#menu').empty(); //clear module menu
 	},

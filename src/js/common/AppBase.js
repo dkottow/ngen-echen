@@ -1,4 +1,4 @@
-/*global Backbone, $ */
+/*global Backbone, $, _ */
 
 
 var Donkeylift = {
@@ -184,6 +184,13 @@ AppBase.prototype.setSchema = function(name, cbAfter) {
 		if (cbAfter) cbAfter();
 	}
 }
+
+/******* init on script load ******/
+
+_.templateSettings = {
+    //evaluate: /\{\[([\s\S]+?)\}\}/g,   //dont use evaluate. 
+    interpolate: /\{\{([\s\S]+?)\}\}/g,  //use handlebar syntax. 
+};
 
 /******* util stuff ********/
 
