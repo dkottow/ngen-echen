@@ -12,7 +12,7 @@ Donkeylift.DownloadsView = Backbone.View.extend({
 	},
 
 	template: _.template($('#downloads-template').html()),
-	db_template: _.template('<li class="list-group-item"><a href="#" data-db="<%= name%>" class="download-database">Get <%= name%></a></li>'),
+	db_template: _.template('<li class="list-group-item"><a href="#" data-db="{{ name }}" class="download-database">Get {{ name }}</a></li>'),
 	//db_template: _.template('<li class="list-group-item"><a href="<%= link%>">Get link for <%= name%></a></li>'),
 
 	render: function() {

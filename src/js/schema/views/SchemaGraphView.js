@@ -1,4 +1,4 @@
-/*global Donkeylift, vis, Backbone, jQuery, _ */
+/*global Donkeylift, vis, Backbone, $, _ */
 
 Donkeylift.SchemaGraphView = Backbone.View.extend({
 
@@ -12,7 +12,7 @@ Donkeylift.SchemaGraphView = Backbone.View.extend({
 	},
 
 	template: _.template($('#schema-graph-template').html()),
-	drop_template: _.template('<li><a href="#" class="join-tree-item">Tree #<%= id%></a></li>'),
+	drop_template: _.template('<li><a href="#" class="join-tree-item">Tree #{{ id }}</a></li>'),
 
 	render: function() {
 		console.log("SchemaGraphView.render " + this.model.get("name"));

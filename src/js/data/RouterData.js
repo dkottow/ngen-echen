@@ -1,5 +1,5 @@
 /*global Donkeylift, Backbone, _ */
-var pegParser = module.exports;
+//var pegParser = module.exports;
 
 (function () {
 	'use strict';

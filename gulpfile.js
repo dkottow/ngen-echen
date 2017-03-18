@@ -161,6 +161,7 @@ gulp.task('build-dl-data-js', function() {
 		.pipe(replace("$DONKEYLIFT_DEMO", process.env.DONKEYLIFT_DEMO))
 		.pipe(replace("$AUTH0_CLIENT_ID", process.env.AUTH0_CLIENT_ID))
 		.pipe(replace("$AUTH0_DOMAIN", process.env.AUTH0_DOMAIN))
+		.pipe(replace("module.exports =", "var pegParser =")) //Applies only to QueryParser
 		.pipe(concat('dl_data.js'))
 		.pipe(gulp.dest('./app/js/'));
 			

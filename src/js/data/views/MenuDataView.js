@@ -70,12 +70,12 @@ Donkeylift.MenuDataView = Backbone.View.extend({
 			return false;
 		}
 		
-		var filter = {
+		var filter = Donkeylift.Filter.Create({
 			table: table,
 			field: 'id',
 			op: Donkeylift.Filter.OPS.IN,
 			value: _.pluck(rows, 'id')
-		};
+		});
 
 		Donkeylift.app.setFilters([ filter ]);
 		Donkeylift.app.resetTable();
