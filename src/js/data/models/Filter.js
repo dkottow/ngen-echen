@@ -87,6 +87,11 @@ Donkeylift.Filter = Backbone.Model.extend({
 			result.field = this.get('field').get('name');
 			result.value = this.get('value').join(', '); 
 
+		} else if (this.get('op') == Donkeylift.Filter.OPS.LESSER) {
+			result.op = 'lesser';
+			result.field = this.get('field').get('name');
+			result.value = this.get('value'); 
+
 		} else if (this.get('op') == Donkeylift.Filter.OPS.GREATER) {
 			result.op = 'greater';
 			result.field = this.get('field').get('name');
@@ -94,6 +99,11 @@ Donkeylift.Filter = Backbone.Model.extend({
 		
 		} else if (this.get('op') == Donkeylift.Filter.OPS.EQUAL) {
 			result.op = 'equal';
+			result.field = this.get('field').get('name');
+			result.value = this.get('value') === null ? 'null' : this.get('value'); 
+
+		} else if (this.get('op') == Donkeylift.Filter.OPS.NOTEQUAL) {
+			result.op = 'not equal';
 			result.field = this.get('field').get('name');
 			result.value = this.get('value') === null ? 'null' : this.get('value'); 
 		}
@@ -107,11 +117,10 @@ Donkeylift.Filter.Create = function(attrs) {
 
 	var opts = {};
 
-	if (  (_.isArray(attrs.value) && attrs.value.length > 0)
-		|| _.isString(attrs.value)
-		|| attrs.value === null) 
-	{
-		opts.value = attrs.value;  	
+	if (attrs.op != Donkeylift.Filter.OPS.IN) {
+		opts.value = attrs.value; //any value permitted
+	} else if (attrs.value.length > 0) {
+		opts.value = attrs.value; //IN filter requires non-empty arrays 
 	}
 
 	if (_.isObject(attrs.table)) {
@@ -120,15 +129,20 @@ Donkeylift.Filter.Create = function(attrs) {
 		opts.table = Donkeylift.app.schema.get('tables').getByName(attrs.table);
 	}
 
+	if (_.contains(_.values(Donkeylift.Filter.OPS), attrs.op)) {
+		opts.op = attrs.op; 
+	}
+
 	if (_.isObject(attrs.field)) {
 		opts.field = attrs.field; //trust it
 	} else if (_.isString(attrs.field)) {
 		opts.field = opts.table.get('fields').getByName(attrs.field);
+	} else if (attrs.op == Donkeylift.Filter.OPS.SEARCH) {
+		opts.field = null;
 	}
+	
 
-	opts.op = attrs.op; //trust it
-
-	if (opts.table && opts.field && opts.op && opts.value !== undefined) {
+	if (opts.table && (opts.field !== undefined) && opts.op && (opts.value !== undefined)) {
 		return new Donkeylift.Filter(opts);
 	} 
 	return null;
@@ -146,6 +160,7 @@ Donkeylift.Filter.OPS = {
 	'BETWEEN': 'btwn',
 	'IN': 'in',
 	'EQUAL': 'eq',
+	'NOTEQUAL': 'ne',
 	'LESSER': 'le',
 	'GREATER': 'ge'
 }

@@ -127,8 +127,8 @@ Donkeylift.FilterItemsView = Backbone.View.extend({
 		Donkeylift.app.filters.setFilter({
 			table: this.model.get('table'),
 			field: this.model.get('field'),
-			op: Donkeylift.Filter.OPS.GREATER,
-			value: 0
+			op: Donkeylift.Filter.OPS.NOTEQUAL,
+			value: null
 		});
 		Donkeylift.app.router.navigate("reload-table", {trigger: true});			
 
