@@ -4,36 +4,19 @@ Donkeylift.NavbarView = Backbone.View.extend({
 	el:  'nav',
 
 	events: {
-		'click .schema-option': 'evSchemaClick',
 		'click #nav-login': 'evLoginClick',
 		'click #nav-profile': 'evProfileClick'
 	},
 
 	initialize: function() {
-		//this.lock = new Auth0Lock(Donkeylift.env.AUTH0_CLIENT_ID, Donkeylift.env.AUTH0_DOMAIN);
 	},
 
 	navSchemaTemplate: _.template($('#nav-schema-template').html()),
 	navProfileTemplate: _.template($('#nav-profile-template').html()),
 
 	render: function() {
-
-		this.renderSchemaDropDown();
-		this.renderCurrentSchemaName();
 		this.renderProfileDropDown();
-
 		return this;
-	},
-
-	renderSchemaDropDown: function() {
-		var $ul = this.$('#schema-list ul');
-		$ul.empty();
-		if (this.model.get('databases')) {
-			this.model.get('databases').each(function(schema) {
-				var html = this.navSchemaTemplate({name: schema.get('name')});
-				$ul.append(html);
-			}, this);
-		}
 	},
 
 	renderProfileDropDown: function() {
@@ -52,21 +35,6 @@ Donkeylift.NavbarView = Backbone.View.extend({
 		this.$('#nav-logout').click(function(ev) { 
 			me.evLogoutClick(ev); 
 		});
-	},
-
-	renderCurrentSchemaName: function() {
-		var $span = this.$('#schema-list a:first span');
-		if (Donkeylift.app.schema) {
-			$span.html(' DB ' + Donkeylift.app.schema.get('name'));
-		} else {
-			$span.html(' Choose DB ');
-		}		
-	},
-
-	evSchemaClick: function(ev) {
-		var name = $(ev.target).attr('data-target');
-		console.log('NavbarView.evSchemaClick ' + name);
-		Donkeylift.app.setSchema(name);
 	},
 
 	evDownloadsClick: function() {

@@ -66,9 +66,11 @@ AppBase.prototype.loadAccount = function(opts, cbAfter) {
 	this.account = new Donkeylift.Account(opts);
 
 	this.navbarView.model = this.account;
+  this.schemaListView = new Donkeylift.SchemaListView({ model: this.account });
 
 	this.account.fetch({ success: function() {
 		me.navbarView.render();
+		me.schemaListView.render();
 		me.menuView.render();
 		$('#content').empty();
 		me.onAccountLoaded(cbAfter);
@@ -101,8 +103,8 @@ AppBase.prototype.toggleSidebar = function() {
 	} else {
 		$('#module').toggleClass('col-sm-16 col-sm-13');             
 		$('#sidebar').toggleClass('col-sm-3 col-sm-0');
-    	$('#table-list').show('slide');
-        $('#menu').show('slide');
+    $('#table-list').show('slide');
+    $('#menu').show('slide');
 	}
 }
 
