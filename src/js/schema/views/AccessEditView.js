@@ -31,7 +31,7 @@ Donkeylift.AccessEditView = Backbone.View.extend({
 		this.access.write =  $('#modalInputWriteAccess').val();
 		this.model.trigger('change:access_control'); //trigger change
 
-		Donkeylift.app.schema.update();
+		Donkeylift.app.updateSchema();
 	},
 
 });

@@ -1,7 +1,7 @@
 /*global Donkeylift, Backbone, jQuery, _, $ */
 
 Donkeylift.SchemaListView = Backbone.View.extend({
-	el:  '#schema-list ul',
+	el:  '#schema-list',
 
 	events: {
 		'click .schema-option': 'evSchemaClick',
@@ -10,7 +10,7 @@ Donkeylift.SchemaListView = Backbone.View.extend({
 	initialize: function() {
 	},
 
-	navSchemaTemplate: _.template($('#nav-schema-template').html()),
+	schemaListTemplate: _.template($('#nav-schema-template').html()),
 
 	render: function() {
 
@@ -21,11 +21,11 @@ Donkeylift.SchemaListView = Backbone.View.extend({
 	},
 
 	renderSchemaDropDown: function() {
-		var $ul = this.$el;
+		var $ul = this.$('ul');
 		$ul.empty();
 		if (this.model.get('databases')) {
 			this.model.get('databases').each(function(schema) {
-				var html = this.navSchemaTemplate({name: schema.get('name')});
+				var html = this.schemaListTemplate({name: schema.get('name')});
 				$ul.append(html);
 			}, this);
 		}

@@ -26,6 +26,17 @@ AppSchema.prototype.createSchema = function(name) {
 	return new Donkeylift.Schema({name : name, id : name});
 }
 
+AppSchema.prototype.updateSchema = function(cbAfter) {
+	Donkeylift.app.schema.update(function() {
+		if (Donkeylift.app.table) {
+			var name = Donkeylift.app.table.get('name');
+			var table = Donkeylift.app.schema.get('tables').getByName(name);
+			Donkeylift.app.setTable(table);
+			if (cbAfter) cbAfter();
+		}
+	});
+}
+
 AppSchema.prototype.getEditorModal = function(name) {
 	var editor = this.editorDialogs[name];
 	if ( ! editor) {

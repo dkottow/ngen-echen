@@ -165,6 +165,7 @@ AppBase.prototype.setSchema = function(name, cbAfter) {
 		$('#sidebar').append(me.tableListView.render().el);
 		$('#toggle-sidebar').show();
 
+		me.schemaListView.render();
 		me.navbarView.render();
 		me.menuView.render();
 	}

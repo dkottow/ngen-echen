@@ -27,14 +27,14 @@ Donkeylift.UserEditView = Backbone.View.extend({
 		if ( ! this.users.contains(this.model)) {
 			this.users.add(this.model);
 		}
-		Donkeylift.app.schema.update();
+		Donkeylift.app.updateSchema();
 	},
 
 	evRemoveClick: function() {	
 		if (this.users.contains(this.model)) {
 			this.users.remove(this.model);
 		}
-		Donkeylift.app.schema.update();
+		Donkeylift.app.updateSchema();
 	},
 
 
