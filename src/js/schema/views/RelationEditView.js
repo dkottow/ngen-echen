@@ -75,15 +75,15 @@ Donkeylift.RelationEditView = Backbone.View.extend({
 		if ( ! this.table.get('relations').contains(this.model)) {
 			this.table.get('relations').add(this.model);
 		}
-		this.schema.update();
+		Donkeylift.app.updateSchema();
 	},
 
 	removeClick: function() {	
 		console.log("RelationEditView.removeClick " + this.model.collection);
 		if (this.model.collection) {
 			this.model.collection.remove(this.model);
-			this.schema.update();
 		}
+		Donkeylift.app.updateSchema();
 	},
 
 	typeChange: function() {

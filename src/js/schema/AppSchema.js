@@ -13,8 +13,8 @@ AppSchema.prototype = Object.create(Donkeylift.AppBase.prototype);
 AppSchema.prototype.constructor=AppSchema; 
 
 
-AppSchema.prototype.start = function() {
-	Donkeylift.AppBase.prototype.start.call(this);
+AppSchema.prototype.start = function(cbAfter) {
+	Donkeylift.AppBase.prototype.start.call(this, cbAfter);
 	$('#nav-schema').closest("li").addClass("active");
 }
 

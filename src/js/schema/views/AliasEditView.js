@@ -62,6 +62,7 @@ Donkeylift.AliasEditView = Backbone.View.extend({
 		}
 
 		this.model.trigger('change:row_alias'); //trigger change
+		Donkeylift.app.updateSchema();
 		//console.log(this.model.get('row_alias'));
 	},
 
@@ -71,6 +72,7 @@ Donkeylift.AliasEditView = Backbone.View.extend({
 			this.model.get('row_alias').splice(i, 1);
 			this.model.trigger('change:row_alias'); //trigger change
 		}
+		Donkeylift.app.updateSchema();
 		//console.log(this.model.get('row_alias'));
 	},
 

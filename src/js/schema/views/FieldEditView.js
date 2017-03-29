@@ -69,17 +69,17 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 			Donkeylift.app.table.get('fields').addNew(this.model);
 		}
 		Donkeylift.app.table.sanitizeFieldOrdering();
+		Donkeylift.app.updateSchema();
 
 		Donkeylift.app.tableView.render();
-		Donkeylift.app.updateSchema();
 	},
 
 	removeClick: function() {	
 		console.log("FieldEditView.removeClick " + this.model.collection);
 		if (this.model.collection) {
 			this.model.collection.remove(this.model);
-			Donkeylift.app.updateSchema();
 		}
+		Donkeylift.app.updateSchema();
 		Donkeylift.app.tableView.render();
 	},
 
