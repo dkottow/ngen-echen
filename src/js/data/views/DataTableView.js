@@ -116,16 +116,16 @@ Donkeylift.DataTableView = Backbone.View.extend({
 
 			} else if (field.get('fk') == 1) {
 				var sourceFn = function(q, syncCb, asyncCb) {
-					syncCb([]);
 					var fkTable = Donkeylift.app.schema
 						.get('tables').getByName(field.get('fk_table'));
 					
-					fkTable.fieldValues('ref', q, function(rows) {
+					fkTable.fieldValues('ref', q, function(rows, info) {
 						var options = _.map(rows, function(row) {
 							return row.ref;
 						});
 						//console.log(options);
-						asyncCb(options);
+						if (info && info.cached) syncCb(options);
+						else asyncCb(options);
 					});
 				}
 				edField.type = 'typeahead';

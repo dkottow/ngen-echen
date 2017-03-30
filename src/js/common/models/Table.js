@@ -147,7 +147,7 @@ Donkeylift.Table = Backbone.Model.extend({
 		console.log(url);
 		if (this.dataCache[url]) {
 			//console.log(this.dataCache[url]);
-			callback(this.dataCache[url]['rows']);
+			callback(this.dataCache[url]['rows'], { cached: true });
 
 		} else {
 			$.ajax(url, {
