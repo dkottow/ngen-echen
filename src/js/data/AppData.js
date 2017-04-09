@@ -54,12 +54,12 @@ AppData.prototype.unsetFilters = function() {
 }
 
 
-AppData.prototype.addSelection = function(table, rows) {
+AppData.prototype.addSelection = function(rows) {
 	this.selectedRows.add(rows);
 }
 
-AppData.prototype.getSelection = function() {
-	return this.selectedRows.toJSON();
+AppData.prototype.getSelection = function(opts) {
+	return this.selectedRows;
 }
 
 AppData.prototype.unsetSelection = function() {

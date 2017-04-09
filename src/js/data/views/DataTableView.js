@@ -383,6 +383,10 @@ Donkeylift.DataTableView = Backbone.View.extend({
 		}								
 
 		return dataFn;	
+	},
+	
+	getSelection: function() {
+		return this.$('#grid').DataTable().rows({selected: true}).data().toArray();
 	}
 
 });

@@ -2,6 +2,7 @@
 
 var ROWS_EXT = '.rows';
 var STATS_EXT = '.stats';
+var CHOWN_EXT = '.chown';
 
 Donkeylift.DataTable = Donkeylift.Table.extend({
 
@@ -261,6 +262,27 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 				callback(response.rows);
 			});
 		}
+	},
+
+	changeOwner: function(rowIds, owner) {
+		var me = this;
+		var q = 'owner=' + encodeURIComponent(owner);
+		var url = this.fullUrl(CHOWN_EXT) + '?' + q;
+
+		$.ajax(url, {
+			method: 'PUT',
+			data: JSON.stringify(rowIds),
+			contentType: "application/json",
+			processData: false
+
+		}).done(function(response) {
+			console.log(response);
+			me.reload();
+
+		}).fail(function(jqXHR, textStatus, errThrown) {
+			console.log("Error requesting " + url);
+			console.log(textStatus + " " + errThrown);
+		});
 	},
 
 });

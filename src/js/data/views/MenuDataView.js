@@ -5,8 +5,9 @@ Donkeylift.MenuDataView = Backbone.View.extend({
 
 	events: {
 		'click #filter-show': 'evFilterShow',
-		'click #selection-filter': 'evSelectionFilter',
 		'click #selection-add': 'evSelectionAdd',
+		'click #selection-filter': 'evSelectionFilter',
+		'click #selection-chown': 'evSelectionChangeOwner',
 	},
 
 	initialize: function(opts) {
@@ -34,36 +35,37 @@ Donkeylift.MenuDataView = Backbone.View.extend({
 		$('#selection-dropdown span:first').text(label);
 	},
 
-	getShowFilter: function() {
+	getShowFilterView: function() {
 		if ( ! this.filterShowView) {
 			this.filterShowView = new Donkeylift.FilterShowView();
 		}
 		return this.filterShowView;
 	},
 
-	evFilterShow: function() {
-		this.getShowFilter().collection = Donkeylift.app.filters;
-		this.getShowFilter().render();
+	getAllSelectedRows: function() {
+		var highlightedRows = Donkeylift.app.tableView.getSelection();
+		var allRows = Donkeylift.app.getSelection().clone();
+		allRows.add(highlightedRows)
+		return allRows.toJSON();
 	},
 
-	addSelection: function() {
-		var table = Donkeylift.app.table;
-		var rows = $('#grid').DataTable().rows({selected: true}).data().toArray();
-		Donkeylift.app.addSelection(table.get('name'), rows);
+	evFilterShow: function() {
+		this.getShowFilterView().collection = Donkeylift.app.filters;
+		this.getShowFilterView().render();
 	},
 
 	evSelectionAdd: function(ev) {
-		this.addSelection();
+		var rows = Donkeylift.app.tableView.getSelection();
+		Donkeylift.app.addSelection(rows);
 	
 		$('#selection-dropdown').dropdown('toggle');	
 		return false;
 	},
 
 	evSelectionFilter: function(ev) {
-		this.addSelection();
 
 		var table = Donkeylift.app.table;
-		var rows = Donkeylift.app.getSelection({ table: table.get('name') });
+		var rows = this.getAllSelectedRows();
 
 		if (rows.length == 0) {
 			$('#selection-dropdown').dropdown('toggle');	
@@ -81,6 +83,30 @@ Donkeylift.MenuDataView = Backbone.View.extend({
 		Donkeylift.app.resetTable();
 
 	},
+
+	getChangeOwnerView: function() {
+		if ( ! this.changeOwnerView) {
+			this.changeOwnerView = new Donkeylift.ChangeOwnerView();
+		}
+		return this.changeOwnerView;
+	},
+
+	evSelectionChangeOwner: function() {
+		var rows = this.getAllSelectedRows();
+
+		if (rows.length == 0) {
+			$('#selection-dropdown').dropdown('toggle');	
+			return false;
+		}
+		
+		this.getChangeOwnerView().model = new Backbone.Model({ 
+			rowIds: _.pluck(rows, 'id'), 
+			users: Donkeylift.app.schema.get('users') 
+		});
+		
+		this.getChangeOwnerView().render();
+	},
+	
 });
 
 
