@@ -218,7 +218,19 @@ table.dataTable {
 }
 
 #fields td:nth-child(2) {
-	width: 64px;
+	width: 8px;
+}
+
+.field-primary-key {
+	color: #d80;
+}
+
+.field-foreign-key {
+	color: #888;
+}
+
+.field-no-key {
+	visibility: hidden;
 }
 
 #vis-graph {

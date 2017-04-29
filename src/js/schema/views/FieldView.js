@@ -6,8 +6,6 @@ Donkeylift.FieldView = Backbone.View.extend({
 
 	events: {
 		'click .btn-field-edit': 'editFieldClick',
-		'click .btn-field-up': 'moveUpFieldClick',
-		'click .btn-field-down': 'moveDownFieldClick',
 	},
 
 	initialize: function () {
@@ -23,6 +21,14 @@ Donkeylift.FieldView = Backbone.View.extend({
 		attrs.props = _.map(attrs.props, function(v, k) {
 			return k + ": " + v;
 		}).join(' | ');
+		
+		if (this.model.get('name') == 'id') {
+			attrs.pkfk = 'field-primary-key';
+		} else if (this.model.get('fk')) {
+			attrs.pkfk = 'field-foreign-key';
+		}
+		attrs.pkfk = attrs.pkfk || 'field-no-key';
+		
 		this.$el.html(this.template(attrs));
 		return this;
 	},
@@ -43,22 +49,6 @@ Donkeylift.FieldView = Backbone.View.extend({
 		f1.setProp('order', f2.getProp('order'));
 		f2.setProp('order', o1);
 	},
-
-    moveUpFieldClick: function(ev) {
-        var row = $(ev.target).closest("tr");
-		var prevField = this.getFieldFromRow(row.prev());
-		this.swapFieldsOrder(this.model, prevField);
-		Donkeylift.app.tableView.render();
-		Donkeylift.app.updateSchema();
-    },
-    
-    moveDownFieldClick: function(ev) {
-        var row = $(ev.target).closest("tr");
-		var nextField = this.getFieldFromRow(row.next());
-		this.swapFieldsOrder(this.model, nextField);
-		Donkeylift.app.tableView.render();
-		Donkeylift.app.updateSchema();
-    },
 
 });
 
