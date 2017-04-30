@@ -84,6 +84,8 @@ $(function() {
 	$("#txt-date-to").datepicker("option", "dateFormat", "yy-mm-dd");
 
 
+	var accObjects = []; //accumulates objs from multiple req
+
 	function getOrders(groupTable, startDate, endDate) {
 
 		var filterStr = "orders.order_date btwn " 
@@ -113,8 +115,7 @@ $(function() {
 
 		accObjects = []; //reset global object acc
 
-		loadOrders(groupTable, options, function(objs) {
-			console.log(objs);
+		loadOrders(groupTable, options, function() {
 			$('#progress').text('Crunching..');
 
 			setTimeout(function() {
@@ -123,7 +124,8 @@ $(function() {
 				var template = Handlebars.compile($(tid).html());
 				var title = toDate($('#txt-date-from').val()).toDateString() 
 					+ ' - ' + toDate($('#txt-date-to').val()).toDateString();
-
+				var objs = { [groupTable] : accObjects };
+				
 				var stats = summarize(objs, groupTable);
 
 				var ctx = {
@@ -165,8 +167,6 @@ $(function() {
 		});
 	}
 
-	var accObjects = []; //accumulates objs from multiple req
-
 	function loadOrders(groupTable, options, cbAfter) {
 		console.log('loadOrders ' + groupTable);
 
@@ -197,9 +197,6 @@ $(function() {
 
 			} else {
 				cbAfter();
-				var objs = {};
-				objs[groupTable] = accObjects;
-				cbAfter(objs);
 			}
 		});
 
