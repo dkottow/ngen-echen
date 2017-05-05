@@ -10,6 +10,12 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 		return new Donkeylift.DataTableView(options);
 	},
 
+	getEnabledFields: function() {
+		return new Donkeylift.Fields(this.get('fields').filter(function(field) {
+			return ! field.get('disabled');
+		}));
+	},
+
 	fullUrl: function(ext) {
 		ext = ext || ROWS_EXT;
 		return Donkeylift.env.API_BASE + this.get('url') + ext;
@@ -62,7 +68,7 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 
 	getEditorFields: function() {
 		
-		var editFields = _.filter(this.get('fields').sortByOrder(), function(field) {
+		var editFields = _.filter(this.getEnabledFields().sortByOrder(), function(field) {
 			return ! _.contains(Donkeylift.Table.NONEDITABLE_FIELDS, field.get('name'));
 		});
 		

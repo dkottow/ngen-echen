@@ -19,11 +19,11 @@ Donkeylift.Fields = Backbone.Collection.extend({
 			return field.vname() == name || field.get('name') == name; 
 		});
 	},
-	
+
 	sortByOrder: function() {
 		return this.sortBy(function(field) {
 				return field.getProp('order');
-		}, this);
+		});
 	}
 });
 

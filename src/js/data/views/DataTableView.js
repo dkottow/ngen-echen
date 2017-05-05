@@ -15,7 +15,7 @@ Donkeylift.DataTableView = Backbone.View.extend({
 	buttonWrapTextTemplate: _.template($('#grid-button-wrap-text-template').html()),
 
 	renderStateFilterButtons: function() {
-		var fields = this.model.get('fields').sortByOrder();
+		var fields = this.model.getEnabledFields().sortByOrder();
 		_.each(fields, function(field, idx) {
 			
 			var filter = Donkeylift.app.filters.getFilter(
@@ -151,7 +151,7 @@ Donkeylift.DataTableView = Backbone.View.extend({
 		console.log('DataTableView.render ');			
 		this.$el.html(this.tableTemplate());
 
-		var fields = this.model.get('fields').sortByOrder();
+		var fields = this.model.getEnabledFields().sortByOrder();
 		_.each(fields, function(field, idx) {
 			var align = idx < fields.length / 2 ? 
 				'dropdown-menu-left' : 'dropdown-menu-right';
