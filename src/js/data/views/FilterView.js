@@ -51,7 +51,7 @@ Donkeylift.FilterView = Backbone.View.extend({
 			specialAction: field.get('name') == 'id' ? 'All' : 'Nulls'  
 		}));
 
-		if (field.get('type') == Donkeylift.Field.TYPES.VARCHAR
+		if (field.get('type').startsWith(Donkeylift.Field.TYPES.text)
 		 || field.get('fk') == 1) {
 			this.itemsView.loadRender();
 		} else {

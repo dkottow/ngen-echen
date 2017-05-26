@@ -7,11 +7,13 @@ function escapeStr(str) {
 Donkeylift.Field = Backbone.Model.extend({
 	initialize: function(field) {
 
+/*
 		//strip type from e.g. VARCHAR(256) and NUMERIC(8,2) 
 		var rxp = /(\w+)(\([0-9,]+\))?/
 		var match = field.type.match(rxp)
 		this.set('type', Donkeylift.Field.TypeAlias(match[1]));
-		
+*/
+console.log(field);
 		var props = new Donkeylift.Properties(field.props || {}, {
 								parent: this,
 								propDefs: Donkeylift.Field.PROPERTIES
@@ -63,11 +65,11 @@ Donkeylift.Field = Backbone.Model.extend({
 	},
 
 	toJSON: function() {
-		var type = Donkeylift.Field.ALIAS[this.get('type')];
+		//var type = Donkeylift.Field.ALIAS[this.get('type')];
 
 		return {
 			name: this.get('name'),
-			type: type,
+			type: this.get('type'),
 			disabled: this.get('disabled'),
 			props: this.get('props').attributes
 		};
@@ -82,7 +84,7 @@ Donkeylift.Field = Backbone.Model.extend({
 
 		if ( ! val || val.length == 0) return result;
 
-		var t = this.get('type');
+		var t = Donkeylift.Field.typeName(this.get('type'));
 
 		if (this.get('fk') == 1 && resolveRefs) {
 			result = Donkeylift.Field.getIdFromRef(val);
@@ -92,25 +94,25 @@ Donkeylift.Field = Backbone.Model.extend({
 			result = val.toString();
 			resultError = false;
 
-		} else if (t == Donkeylift.Field.TYPES.VARCHAR) {
+		} else if (t == Donkeylift.Field.TYPES.text) {
 			result = val.toString();
 			resultError = false;
 
-		} else if (t == Donkeylift.Field.TYPES.INTEGER) {
+		} else if (t == Donkeylift.Field.TYPES.integer) {
 			result = parseInt(val);
 			resultError = isNaN(result); 
 
-		} else if(t == Donkeylift.Field.TYPES.NUMERIC) {
+		} else if(t == Donkeylift.Field.TYPES.decimal) {
 			result = parseFloat(val);
 			resultError = isNaN(result); 
 
-		} else if(t == Donkeylift.Field.TYPES.DATE) {
+		} else if(t == Donkeylift.Field.TYPES.date) {
 			//return new Date(val);
 			result = new Date(val);
 			resultError = isNaN(Date.parse(val)); 
 			if ( ! resultError) result = result.toISOString().substr(0,10);
 
-		} else if (t == Donkeylift.Field.TYPES.DATETIME) {
+		} else if (t == Donkeylift.Field.TYPES.timestamp) {
 			//return new Date(val);
 			result = new Date(val);
 			resultError = isNaN(Date.parse(val)); 
@@ -154,9 +156,9 @@ Donkeylift.Field = Backbone.Model.extend({
 			return "'" + escapeStr(val) + "'";
 		}
 
-		var t = this.get('type');
-		if (t == Donkeylift.Field.TYPES.INTEGER
-			|| t == Donkeylift.Field.TYPES.NUMERIC) {
+		var t = Donkeylift.Field.typeName(this.get('type'));
+
+		if (t == Donkeylift.Field.TYPES.integer || t == Donkeylift.Field.TYPES.decimal) {
 			return val;
 
 		} else {
@@ -166,21 +168,21 @@ Donkeylift.Field = Backbone.Model.extend({
 
 	setTypeByExample: function(val) {
 		if (String(parseInt(val)) == val) {
-			this.set('type', Donkeylift.Field.TYPES.INTEGER);
+			this.set('type', Donkeylift.Field.TYPES.integer);
 			return;
 		} 
 		var num = val.replace(/[^0-9-.]/g, '');
 		console.log(num);
 		if (num.length > 0 && ! isNaN(num)) {
-			this.set('type', Donkeylift.Field.TYPES.NUMERIC);
+			this.set('type', Donkeylift.Field.TYPES.decimal);
 			//TODO set precision
 			return;
 		} 
 		if ( ! isNaN(Date.parse(val))) {
-			this.set('type', Donkeylift.Field.TYPES.DATE);
+			this.set('type', Donkeylift.Field.TYPES.date);
 			return;
 		} 
-		this.set('type', Donkeylift.Field.TYPES.VARCHAR);
+		this.set('type', Donkeylift.Field.TYPES.text);
 	}
 
 });
@@ -188,20 +190,19 @@ Donkeylift.Field = Backbone.Model.extend({
 Donkeylift.Field.create = function(name) {
 	return new Donkeylift.Field({
 		name: name,
-		type: 'VARCHAR',
+		type: Donkeylift.Field.TYPES.text,
 	});
 }
 
 
 Donkeylift.Field.TYPES = {
-	'INTEGER': 'Integer',
-	'NUMERIC': 'Decimal',
-	'VARCHAR': 'Text',
-	'DATE': 'Date',
-	'DATETIME': 'Timestamp'
-}
-
-Donkeylift.Field.ALIAS = _.invert(Donkeylift.Field.TYPES);
+	text: 'text', 
+	integer: 'integer', 
+	decimal: 'decimal', 
+	date: 'date', 
+	timestamp: 'timestamp', 
+	float: 'float'
+};
 
 Donkeylift.Field.PROPERTIES = [
 	{ 
@@ -233,9 +234,11 @@ Donkeylift.Field.PROPERTIES = [
 	}
 ];	
 
-
-Donkeylift.Field.TypeAlias = function(type) {
-	return Donkeylift.Field.TYPES[type];
+Donkeylift.Field.typeName = function(fieldType) 
+{
+    var m = fieldType.match(/^[a-z]+/);
+    if (m && m.length > 0) return m[0];
+    return null;
 }
 
 Donkeylift.Field.toDate = function(dateISOString) {

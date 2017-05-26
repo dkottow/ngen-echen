@@ -108,7 +108,7 @@ Donkeylift.DataTableView = Backbone.View.extend({
 				});
 				edField.options = users;
 
-			} else if (field.get('type') == Donkeylift.Field.TYPES.DATE) {
+			} else if (field.get('type') == Donkeylift.Field.TYPES.date) {
 				edField.type = 'datetime';
 
 			} else if (field.getProp('width') > 60) {

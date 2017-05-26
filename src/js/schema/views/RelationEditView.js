@@ -59,7 +59,7 @@ Donkeylift.RelationEditView = Backbone.View.extend({
 			newField = newTable + "_id";
 			var f = this.model.get('table').get('fields').addNew();
 			f.set('name', newField);
-			f.set('type', Donkeylift.Field.TYPES.INTEGER);
+			f.set('type', Donkeylift.Field.TYPES.integer);
 		}
 
 		newField = this.model.get('table').get('fields').getByName(newField);

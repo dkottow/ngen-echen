@@ -15,10 +15,10 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 
 	canSlide: function() {
 		var field = this.model.get('field');
-		var slideTypes = [Donkeylift.Field.TYPES.INTEGER,
-							Donkeylift.Field.TYPES.NUMERIC];
+		var slideTypes = [Donkeylift.Field.TYPES.integer,
+							Donkeylift.Field.TYPES.decimal];
 		return ( ! field.get('fk')) &&
-				_.contains(slideTypes, field.get('type'));
+				_.contains(slideTypes, Donkeylift.Field.typeName(field.get('type')));
 	},
 
 	loadRender: function() {
@@ -50,7 +50,7 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 		if (this.canSlide()) {
 
 			var step = undefined;
-			if (this.model.get('field').get('type') == Donkeylift.Field.TYPES.INTEGER) {
+			if (this.model.get('field').get('type') == Donkeylift.Field.TYPES.integer) {
 				step = 1;
 			}
 
@@ -89,7 +89,7 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 		}
 
 		if (this.model.get('field').get('type') 
-			== Donkeylift.Field.TYPES['DATE']) {
+			== Donkeylift.Field.TYPES.date) {
 
 			$("#inputFilterMin").attr('type', 'date');
 			$("#inputFilterMax").attr('type', 'date');
