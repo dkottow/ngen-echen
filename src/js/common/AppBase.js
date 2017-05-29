@@ -66,11 +66,15 @@ AppBase.prototype.loadAccount = function(opts, cbAfter) {
 	this.account = new Donkeylift.Account(opts);
 
 	this.navbarView.model = this.account;
+
+  if (this.schemaListView) this.schemaListView.remove();
   this.schemaListView = new Donkeylift.SchemaListView({ model: this.account });
 
 	this.account.fetch({ success: function() {
 		me.navbarView.render();
-		me.schemaListView.render();
+
+		$('#schema-dropdown').append(me.schemaListView.render().el);
+		//me.schemaListView.render();
 		me.menuView.render();
 		$('#content').empty();
 		me.onAccountLoaded(cbAfter);

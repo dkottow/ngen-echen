@@ -1,7 +1,9 @@
 /*global Donkeylift, Backbone, jQuery, _, $ */
 
 Donkeylift.SchemaListView = Backbone.View.extend({
-	el:  '#schema-list',
+	id:  'schema-list',
+	tagName: 'ul',
+	className: 'dropdown-menu',
 
 	events: {
 		'click .schema-option': 'evSchemaClick',
@@ -14,14 +16,14 @@ Donkeylift.SchemaListView = Backbone.View.extend({
 
 	render: function() {
 
-		this.renderSchemaDropDown();
+		this.renderSchemaList();
 		this.renderCurrentSchemaName();
 
 		return this;
 	},
 
-	renderSchemaDropDown: function() {
-		var $ul = this.$('ul');
+	renderSchemaList: function() {
+		var $ul = this.$el;
 		$ul.empty();
 		if (this.model.get('databases')) {
 			this.model.get('databases').each(function(schema) {

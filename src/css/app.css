@@ -38,7 +38,7 @@ body {
   margin-left: 1em;	
 }
 
-#schema-list span {
+#schema-dropdown span {
 	color: black;
 	font-weight: bold;
 }
