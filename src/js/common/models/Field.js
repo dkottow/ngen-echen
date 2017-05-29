@@ -13,7 +13,6 @@ Donkeylift.Field = Backbone.Model.extend({
 		var match = field.type.match(rxp)
 		this.set('type', Donkeylift.Field.TypeAlias(match[1]));
 */
-console.log(field);
 		var props = new Donkeylift.Properties(field.props || {}, {
 								parent: this,
 								propDefs: Donkeylift.Field.PROPERTIES
@@ -41,6 +40,29 @@ console.log(field);
 		}
 	},
 
+	typeName: function() {
+		return Donkeylift.Field.typeName(this.get('type'));
+	},
+
+	setType: function(typeName, typeSuffix) {
+		if ( ! Donkeylift.Field.TYPES[typeName]) {
+			throw new Error("setType failed. Unknown type '" + typeName + "'");
+		}	
+		if (typeName == 'text' && typeSuffix.length > 0) {
+			var length = parseInt(typeSuffix);
+			this.set('type', typeName + '(' + length + ')');
+		} else if (typeName == 'decimal' && typeSuffix.length > 0) {
+			var parts = typeSuffix.split(',');
+			this.set('type', typeName + '(' + parseInt(parts[0]) + ',' + parseInt(parts[1]) + ')');
+		} else {
+			this.set('type', typeName);
+		}
+	},
+
+	typeSuffix: function() {
+		return Donkeylift.Field.typeSuffix(this.get('type'));
+	},
+
 	getProp: function(name) {
 		return this.get('props').get(name);
 	},
@@ -49,7 +71,7 @@ console.log(field);
 		if (this.get('props').getDefinition(name)) {
 			this.get('props').set(name, value);
 		} else {
-			throw new Error("setProp failed. Unknown propery '" + name + "' ");			
+			throw new Error("setProp failed. Unknown property '" + name + "'");			
 		}
 	},
 
@@ -84,7 +106,7 @@ console.log(field);
 
 		if ( ! val || val.length == 0) return result;
 
-		var t = Donkeylift.Field.typeName(this.get('type'));
+		var t = this.typeName();
 
 		if (this.get('fk') == 1 && resolveRefs) {
 			result = Donkeylift.Field.getIdFromRef(val);
@@ -156,7 +178,7 @@ console.log(field);
 			return "'" + escapeStr(val) + "'";
 		}
 
-		var t = Donkeylift.Field.typeName(this.get('type'));
+		var t = this.typeName();
 
 		if (t == Donkeylift.Field.TYPES.integer || t == Donkeylift.Field.TYPES.decimal) {
 			return val;
@@ -239,6 +261,13 @@ Donkeylift.Field.typeName = function(fieldType)
     var m = fieldType.match(/^[a-z]+/);
     if (m && m.length > 0) return m[0];
     return null;
+}
+
+Donkeylift.Field.typeSuffix = function(fieldType) 
+{
+    var m = fieldType.match(/\(([0-9]+,?[0-9]*)\)$/);
+    if (m && m.length > 1) return m[1];
+    return '';
 }
 
 Donkeylift.Field.toDate = function(dateISOString) {

@@ -20,9 +20,10 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 	
 	render: function() {
 		//console.log("FieldEditView.render " + this.model.get('type'));
-		$('#modalInputFieldName').val(this.model.get('name'));
-		$('#modalInputFieldType').val(this.model.get('type'));
 
+		$('#modalInputFieldName').val(this.model.get('name'));
+		$('#modalInputFieldType').val(this.model.typeName());
+		$('#modalInputFieldTypeSuffix').val(this.model.typeSuffix());						
 
 		$('#modalTabProps form').empty();
 	
@@ -58,7 +59,8 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 		console.log("FieldEditView.updateClick ");
 
 		this.model.set('name', $('#modalInputFieldName').val());
-		this.model.set('type', $('#modalInputFieldType').val());
+		this.model.setType($('#modalInputFieldType').val(), $('#modalInputFieldTypeSuffix').val());
+		//this.model.set('type', $('#modalInputFieldType').val());
 
 		this.model.set('disabled', $('#modalTabProps input[name=disabled]:checked').val() == "on");
 
