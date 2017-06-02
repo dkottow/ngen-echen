@@ -188,7 +188,9 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 				callback(data);
 			}).fail(function(jqXHR, textStatus, errThrown) {
 				console.log("Error requesting " + url);
-				console.log(textStatus + " " + errThrown);
+				var err = new Error(errThrown + " " + textStatus);
+				console.log(err);
+				alert(err.message);
 			});
 		}
 	},
@@ -226,10 +228,17 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 
 		} else {
 			$.ajax(url, {
+				
 			}).done(function(response) {
 				//console.dir(response);
 				me.dataCache[url] = response;
 				callback(response[fieldName]);
+
+			}).fail(function(jqXHR, textStatus, errThrown) {
+				console.log("Error requesting " + url);
+				var err = new Error(errThrown + " " + textStatus);
+				console.log(err);
+				alert(err.message);
 			});
 		}
 	},
@@ -262,10 +271,17 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 
 		} else {
 			$.ajax(url, {
+
 			}).done(function(response) {
 				//console.dir(response.rows);
 				me.dataCache[url] = response;
 				callback(response.rows);
+
+			}).fail(function(jqXHR, textStatus, errThrown) {
+				console.log("Error requesting " + url);
+				var err = new Error(errThrown + " " + textStatus);
+				console.log(err);
+				alert(err.message);
 			});
 		}
 	},
@@ -287,7 +303,9 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 
 		}).fail(function(jqXHR, textStatus, errThrown) {
 			console.log("Error requesting " + url);
-			console.log(textStatus + " " + errThrown);
+			var err = new Error(errThrown + " " + textStatus);
+			console.log(err);
+			alert(err.message);
 		});
 	},
 

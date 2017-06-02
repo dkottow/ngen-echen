@@ -88,20 +88,18 @@ Donkeylift.Schema = Backbone.Model.extend({
 				console.log(diff);		
 				if (diff.length > 0) {
 					me.patch(diff, function(err, result) {
-						if (err) {
-							console.log('ERROR on patch ' + err.status + " " + err.responseText);
-							var attrs = me.parse(me.orgJSON);
-							me.set(attrs);
-							if (cbAfter) cbAfter(err);
-						} else {
-							console.log(result);
-							var attrs = me.parse(result);
-							me.set(attrs);
-							me.orgJSON = JSON.parse(JSON.stringify(me.toJSON())); //copy
-							if (cbAfter) cbAfter();
-							//reset schema in browser
-						}
 						
+						if (err) {
+							alert(err.message); //TODO make me nicer.
+						} 
+
+						console.log(result);
+						var attrs = me.parse(result);
+						me.set(attrs);
+						me.orgJSON = JSON.parse(JSON.stringify(me.toJSON())); //copy
+						if (cbAfter) cbAfter();
+						//reset schema in browser
+
 					});
 				}
 			}, 1000);
@@ -128,9 +126,9 @@ return;
 			cbResult(null, response);
 
 		}).fail(function(jqXHR, textStatus, errThrown) {
-			cbResult(errThrown, textStatus);
 			console.log("Error requesting " + url);
-			console.log(textStatus + " " + errThrown);
+			console.log(errThrown + " " + textStatus);
+			cbResult(new Error(errThrown + " " + jqXHR.responseJSON.error), jqXHR.responseJSON.schema);
 		});
 		
 	},

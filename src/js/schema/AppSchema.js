@@ -27,13 +27,15 @@ AppSchema.prototype.createSchema = function(name) {
 }
 
 AppSchema.prototype.updateSchema = function(cbAfter) {
+	var currentTable = Donkeylift.app.table ? Donkeylift.app.table.get('name') : undefined;
 	Donkeylift.app.schema.update(function() {
-		if (Donkeylift.app.table) {
-			var name = Donkeylift.app.table.get('name');
-			var table = Donkeylift.app.schema.get('tables').getByName(name);
-			Donkeylift.app.setTable(table);
+		Donkeylift.app.resetSchema(function() {
+			if (currentTable) {
+				var table = Donkeylift.app.schema.get('tables').getByName(currentTable);
+				Donkeylift.app.setTable(table);
+			}
 			if (cbAfter) cbAfter();
-		}
+		});
 	});
 }
 

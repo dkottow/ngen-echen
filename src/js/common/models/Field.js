@@ -49,11 +49,13 @@ Donkeylift.Field = Backbone.Model.extend({
 			throw new Error("setType failed. Unknown type '" + typeName + "'");
 		}	
 		if (typeName == 'text' && typeSuffix.length > 0) {
-			var length = parseInt(typeSuffix);
+			var length = typeSuffix.toUpperCase() == 'MAX' ? 'MAX' : parseInt(typeSuffix);
 			this.set('type', typeName + '(' + length + ')');
+
 		} else if (typeName == 'decimal' && typeSuffix.length > 0) {
 			var parts = typeSuffix.split(',');
 			this.set('type', typeName + '(' + parseInt(parts[0]) + ',' + parseInt(parts[1]) + ')');
+
 		} else {
 			this.set('type', typeName);
 		}

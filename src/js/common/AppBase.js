@@ -155,6 +155,10 @@ AppBase.prototype.createSchema = function(name) {
 	//overwrite me
 }
 
+AppBase.prototype.resetSchema = function(cbAfter) {
+	if (this.schema) this.setSchema(this.schema.get('name'), cbAfter);
+}
+
 AppBase.prototype.setSchema = function(name, cbAfter) {
 	console.log('AppBase.setSchema ' + name);
 	var me = this;
