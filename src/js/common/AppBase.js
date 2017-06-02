@@ -12,6 +12,9 @@ var Donkeylift = {
 	    , AUTH0_DOMAIN: "$AUTH0_DOMAIN"
 	    , DEMO_FLAG: + "$DONKEYLIFT_DEMO"
 	},
+
+	DEMO_ACCOUNT: 'demo',
+	DEMO_USER: 'demo@donkeylift.com',
 	
 	util: {
 		/*** implementation details at eof ***/
@@ -52,11 +55,21 @@ AppBase.prototype.start = function(cbAfter) {
 	var me = this;
 
 	if (Donkeylift.env.DEMO_FLAG) {
-		this.loadAccount({ auth: false }, cbAfter);
+	  sessionStorage.setItem('dl_user', Donkeylift.DEMO_USER);
+	  sessionStorage.setItem('dl_account', Donkeylift.DEMO_ACCOUNT);
+		this.loadAccountNoAuth(cbAfter);
 		return;
 	}
 
 	this.loadAccount({ id_token: sessionStorage.getItem('id_token') }, cbAfter);
+}
+
+AppBase.prototype.loadAccountNoAuth = function(cbAfter) {
+  this.loadAccount({ 
+    account: sessionStorage.getItem('dl_account'), 
+    user: sessionStorage.getItem('dl_user'),
+    auth: false
+  }, cbAfter);
 }
 
 AppBase.prototype.loadAccount = function(opts, cbAfter) {

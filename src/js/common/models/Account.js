@@ -2,14 +2,12 @@
 
 Donkeylift.Account = Backbone.Model.extend({
 
-	DEMO_ACCOUNT: 'demo',
-	DEMO_EMAIL: 'demo@donkeylift.com',
-
 	initialize: function(attrs) {		
 		
 		
 		if (attrs.auth === false) {
-			this.init_demo();
+			this.set('name', attrs.account);
+			this.set('user', attrs.user);
 			return;
 		}
 
@@ -33,12 +31,6 @@ Donkeylift.Account = Backbone.Model.extend({
 
 		sessionStorage.setItem('id_token', attrs.id_token);
 
-	},
-
-	init_demo : function() {
-		console.log("Account.init_demo");
-		this.set('name', this.DEMO_ACCOUNT);
-		this.set('user', this.DEMO_EMAIL);
 	},
 
 	url	: function() { 
