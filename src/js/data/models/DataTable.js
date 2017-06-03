@@ -99,8 +99,12 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 				return;
 			}
 
-			var q = 'retmod=true';
-			var url = me.fullUrl() + '?' + q;
+			var q = ['retmod=true'];
+			if (Donkeylift.env.DEMO_FLAG) {
+				var user = Donkeylift.app.account.get('user');
+				q.push('user=' + user); 
+			}
+			var url = me.fullUrl() + '?' + q.join('&');
 
 			$.ajax(url, {
 				method: req.method,

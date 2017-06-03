@@ -122,6 +122,7 @@ gulp.task('build-3rdparty-js', function() {
 				, src3rd + '/JSON-Patch-master/dist/json-patch-duplex.min.js' 
 				, src3rd + '/vis/vis.min.js' 
 				, src3rd + ver3rd.DATATABLES + '/datatables.min.js' 
+				, src3rd + '/jquery-sortable/jquery-sortable-min.js' 
 
 				, extdir + ver3rd.DATATABLES_EDITOR + '/js/dataTables.editor.min.js' 
 				, extdir + ver3rd.DATATABLES_EDITOR + '/js/editor.bootstrap.js' 

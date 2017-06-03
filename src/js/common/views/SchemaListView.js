@@ -34,7 +34,7 @@ Donkeylift.SchemaListView = Backbone.View.extend({
 	},
 
 	renderCurrentSchemaName: function() {
-		var $span = this.$('a:first span');
+		var $span = this.$el.closest('li').find('a:first span');
 		if (Donkeylift.app.schema) {
 			$span.html(' DB ' + Donkeylift.app.schema.get('name'));
 		} else {

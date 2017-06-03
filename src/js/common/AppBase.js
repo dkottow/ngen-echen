@@ -55,8 +55,8 @@ AppBase.prototype.start = function(cbAfter) {
 	var me = this;
 
 	if (Donkeylift.env.DEMO_FLAG) {
-	  sessionStorage.setItem('dl_user', Donkeylift.DEMO_USER);
-	  sessionStorage.setItem('dl_account', Donkeylift.DEMO_ACCOUNT);
+	  sessionStorage.setItem('dl_user', sessionStorage.getItem('dl_user') || Donkeylift.DEMO_USER);
+	  sessionStorage.setItem('dl_account', sessionStorage.getItem('dl_account') || Donkeylift.DEMO_ACCOUNT);
 		this.loadAccountNoAuth(cbAfter);
 		return;
 	}
@@ -141,7 +141,9 @@ AppBase.prototype.setTable = function(table, params) {
 	this.table = table;
 	this.tableView = this.createTableView(table, params);
 
-	$('#content').html(this.tableView.render().el);			
+	$('#content').html(this.tableView.el);
+	this.tableView.render();
+	
 	this.menuView.render();
 }
 

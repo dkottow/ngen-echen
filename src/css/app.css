@@ -109,6 +109,31 @@ body {
 	margin-right: 2em;
 }
 
+
+/* line 94, /Users/jonasvonandrian/jquery-sortable/source/css/application.css.sass */
+.sortable-table tr {
+  cursor: pointer; }
+/* line 96, /Users/jonasvonandrian/jquery-sortable/source/css/application.css.sass */
+.sortable-table tr.placeholder {
+  display: block;
+  background: red;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  border: none; }
+  /* line 103, /Users/jonasvonandrian/jquery-sortable/source/css/application.css.sass */
+  .sortable-table tr.placeholder:before {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    border: 5px solid transparent;
+    border-left-color: red;
+    margin-top: -5px;
+    left: -5px;
+    border-right: none; }
+
+
 .field-table>tbody>tr>td, .relation-table>tbody>tr>td {
 	vertical-align: middle;
 }

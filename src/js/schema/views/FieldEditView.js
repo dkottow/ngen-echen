@@ -73,7 +73,7 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 		Donkeylift.app.table.sanitizeFieldOrdering();
 		Donkeylift.app.updateSchema();
 
-		Donkeylift.app.tableView.render();
+		//Donkeylift.app.tableView.render();
 	},
 
 	removeClick: function() {	

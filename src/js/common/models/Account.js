@@ -8,6 +8,7 @@ Donkeylift.Account = Backbone.Model.extend({
 		if (attrs.auth === false) {
 			this.set('name', attrs.account);
 			this.set('user', attrs.user);
+			this.set('auth', false);
 			return;
 		}
 
@@ -19,7 +20,7 @@ Donkeylift.Account = Backbone.Model.extend({
 		var account = attrs.account || token_attrs.app_metadata.account;
 
 		this.set('name', account);
-		this.set('user', token_attrs.email);
+		this.set('user', attrs.user || token_attrs.email);
 		this.set('app_metadata', token_attrs.app_metadata);
 
 		$.ajaxSetup({
@@ -65,7 +66,8 @@ Donkeylift.Account = Backbone.Model.extend({
 	},
 	
 	isAdmin : function() {
-		return this.get('app_metadata') && this.get('app_metadata').admin;		
+		return this.get('auth') === false || 
+			(this.get('app_metadata') && this.get('app_metadata').admin);		
 	}
 
 });
