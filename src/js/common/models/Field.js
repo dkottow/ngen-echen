@@ -159,12 +159,18 @@ Donkeylift.Field = Backbone.Model.extend({
 
 	//to formatted string (pretty-print)
 	toFS: function(val) {
+		console.log(val);
+		var t = this.typeName();
 		if (_.isNumber(val) && this.getProp('scale')) {
 			return val.toFixed(this.getProp('scale'));
+		} else if (t == 'date') {
+			//JSON - Date ISO string
+			return val.substr(0,10);
+		} else if (t == 'text') {
+			return _.escape(String(val));
+		} else {
+			return String(val);
 		}
-		if ( ! _.isString(val)) return String(val);
-
-		return _.escape(String(val));
 	},
 
 	//to query string
