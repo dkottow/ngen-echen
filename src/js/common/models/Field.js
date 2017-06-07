@@ -7,15 +7,9 @@ function escapeStr(str) {
 Donkeylift.Field = Backbone.Model.extend({
 	initialize: function(field) {
 
-/*
-		//strip type from e.g. VARCHAR(256) and NUMERIC(8,2) 
-		var rxp = /(\w+)(\([0-9,]+\))?/
-		var match = field.type.match(rxp)
-		this.set('type', Donkeylift.Field.TypeAlias(match[1]));
-*/
 		var props = new Donkeylift.Properties(field.props || {}, {
-								parent: this,
-								propDefs: Donkeylift.Field.PROPERTIES
+				parent: this,
+				propDefs: Donkeylift.Field.PROPERTIES
 		});
 		this.set('props', props);
 		this.set('disabled', field.disabled == true);

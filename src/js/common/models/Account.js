@@ -9,6 +9,8 @@ Donkeylift.Account = Backbone.Model.extend({
 			this.set('name', attrs.account);
 			this.set('user', attrs.user);
 			this.set('auth', false);
+
+			$.ajaxSetup( { data: { user: this.get('user') }} );
 			return;
 		}
 
