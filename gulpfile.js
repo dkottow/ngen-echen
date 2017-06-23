@@ -62,6 +62,17 @@ gulp.task('default', allTasks, function() {
 
 });
 
+var o365Tasks = [
+	'build-data-dialog-snippets',
+	'build-data-template-snippets',
+	'build-schema-dialog-snippets',
+	'build-schema-template-snippets',
+];
+
+gulp.task('o365', o365Tasks, function() {
+	
+});
+
 //TODO
 gulp.task('copy-images', function() {
 	gulp.src([
@@ -210,6 +221,24 @@ gulp.task('build-dl-signup-js', function() {
 });
 
 
+gulp.task('build-data-dialog-snippets', function() {
+	var snippets = ['./src/html/common/dialogs/*.html', './src/html/data/dialogs/*.html'];
+
+	return gulp.src(snippets)
+		.pipe(concat('data-dialog-snippets.html'))
+		.pipe(gulp.dest('./tmp/'));
+	
+});
+
+gulp.task('build-data-template-snippets', function() {
+	var snippets = ['./src/html/common/templates/*.html', './src/html/data/templates/*.html'];
+
+	return gulp.src(snippets)
+		.pipe(concat('data-template-snippets.html'))
+		.pipe(gulp.dest('./tmp/'));
+});
+
+
 gulp.task('build-data-html', function() {
 
 	var snippets = { dialogs: 
@@ -251,6 +280,24 @@ gulp.task('build-data-html', function() {
   		}))
 
 		.pipe(gulp.dest('./app/'));
+});
+
+
+gulp.task('build-schema-dialog-snippets', function() {
+	var snippets = ['./src/html/common/dialogs/*.html', './src/html/schema/dialogs/*.html'];
+
+	return gulp.src(snippets)
+		.pipe(concat('schema-dialog-snippets.html'))
+		.pipe(gulp.dest('./tmp/'));
+	
+});
+
+gulp.task('build-schema-template-snippets', function() {
+	var snippets = ['./src/html/common/templates/*.html', './src/html/schema/templates/*.html'];
+
+	return gulp.src(snippets)
+		.pipe(concat('schema-template-snippets.html'))
+		.pipe(gulp.dest('./tmp/'));
 });
 
 gulp.task('build-schema-html', function() {
