@@ -15,10 +15,12 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 
 	canSlide: function() {
 		var field = this.model.get('field');
+		if (field.get('fk')) return false;
+		
 		var slideTypes = [Donkeylift.Field.TYPES.integer,
 							Donkeylift.Field.TYPES.decimal];
-		return ( ! field.get('fk')) &&
-				_.contains(slideTypes, Donkeylift.Field.typeName(field.get('type')));
+
+		return _.contains(slideTypes, Donkeylift.Field.typeName(field.get('type')));
 	},
 
 	loadRender: function() {
@@ -49,50 +51,58 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 
 		if (this.canSlide()) {
 
-			var step = undefined;
-			if (this.model.get('field').get('type') == Donkeylift.Field.TYPES.integer) {
-				step = 1;
-			}
+			$('#sliderRange').show();
+			$('#inputSliderRange').css('width', '100%');
+			var sliderValues = '[' + this.$("#inputFilterMin").val() 
+				+ ',' + this.$("#inputFilterMax").val() + ']';
 
-			var slider = this.$("#sliderRange")[0]; 
-			if ( ! slider.noUiSlider) {
-				noUiSlider.create(slider, {
-						start: [ this.$("#inputFilterMin").val(),
-								 this.$("#inputFilterMax").val() 
-						]
-						, range: {
-							min: stats.min,
-							max: stats.max
-						}
-						, connect: true
-						, step: step
-					}
-				);
-				
-				slider.noUiSlider.on('slide', function() {
-					var v = slider.noUiSlider.get();
-					$("#inputFilterMin").val(v[0]);
-					$("#inputFilterMax").val(v[1]);
-				});
+			if ($('#inputSliderRange').attr('data-slider-value').length == 0) {
+				//instantiate slider
+
+				if (this.model.get('field').get('type') == Donkeylift.Field.TYPES.integer) {
+					$('#inputSliderRange').attr('data-slider-step', 1);
+				} else {
+					$('#inputSliderRange').attr('data-slider-step', Math.max((stats.max - stats.min) / 100), 1e3);
+				}
 	
-				slider.noUiSlider.on('change', function() {
+				$('#inputSliderRange').attr('data-slider-value', sliderValues);
+				$('#inputSliderRange').attr('data-slider-min', stats.min);
+				$('#inputSliderRange').attr('data-slider-max', stats.max);
+				
+				$('#inputSliderRange').slider({});
+				
+				$('#inputSliderRange').on("slide", function(slideEvt) {
+					$("#inputFilterMin").val(slideEvt.value[0]);
+					$("#inputFilterMax").val(slideEvt.value[1]);
+				});			
+
+				$('#inputSliderRange').on('slideStop', function() {
 					$("#inputFilterMin").change();
 					$("#inputFilterMax").change();
 				});
 			} else {
-				slider.noUiSlider.set([ 
-					this.$("#inputFilterMin").val(),
-					this.$("#inputFilterMax").val() 
-				]);
-				
+				//just set the value
+				$('#inputSliderRange').attr('data-slider-value', sliderValues);
 			}			
+		} else {
+			$('#sliderRange').hide();
 		}
 
-		if (this.model.get('field').get('type') 
-			== Donkeylift.Field.TYPES.date) {
+		var dateTypes = [
+			Donkeylift.Field.TYPES.date
+		];
+		if (_.contains(dateTypes, this.model.get('field').get('type'))) {
 
-			$("#inputFilterMin").attr('type', 'date');
-			$("#inputFilterMax").attr('type', 'date');
+			//$("#inputFilterMin").attr('type', 'date');
+			//$("#inputFilterMax").attr('type', 'date');
+
+			var opts = {
+				format: 'yyyy-mm-dd',
+				orientation: 'bottom'
+			}
+
+			$("#inputFilterMin").datepicker(opts);
+			$("#inputFilterMax").datepicker(opts);
 		}
 
 	},
@@ -100,9 +110,9 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 	sanitizeInputFilterValue: function(el, bounds) {
 
 		if (/Min$/.test(el.id)) {
-			bounds = [bounds[0], this.$("#inputFilterMax").val()];
+			bounds = [bounds[0], parseFloat($("#inputFilterMax").val()) ];
 		} else {
-			bounds = [this.$("#inputFilterMin").val(), bounds[1]];
+			bounds = [ parseFloat($("#inputFilterMin").val()), bounds[1]];
 		}
 
 		var val = this.model.get('field').parse(el.value);
@@ -110,13 +120,6 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 		if (val > bounds[1]) val = bounds[1];
 		$(el).val(val);
 
-		if (this.canSlide()) {
-			if (/Min$/.test(el.id)) {
-				this.$("#sliderRange")[0].noUiSlider.set([val, null]);
-			} else {
-				this.$("#sliderRange")[0].noUiSlider.set([null, val]);
-			}
-		}
 	},
 
 	evInputFilterChange: function(ev) {
@@ -124,8 +127,12 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 
 		this.sanitizeInputFilterValue(ev.target, [stats.min, stats.max]);
 
-		var filterValues = [this.$("#inputFilterMin").val(),
-							this.$("#inputFilterMax").val()];
+		var filterValues = [parseFloat($("#inputFilterMin").val()),
+							parseFloat($("#inputFilterMax").val()) ];
+
+		if (this.canSlide()) {
+			//$('#inputSliderRange').slider('setValue', filterValues, false, false);
+		}
 
 		if (filterValues[0] != stats.min || filterValues[1] != stats.max) {
 			Donkeylift.app.filters.setFilter({
