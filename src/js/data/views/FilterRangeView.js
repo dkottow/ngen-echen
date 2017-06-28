@@ -127,10 +127,12 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 
 		this.sanitizeInputFilterValue(ev.target, [stats.min, stats.max]);
 
-		var filterValues = [parseFloat($("#inputFilterMin").val()),
-							parseFloat($("#inputFilterMax").val()) ];
+		var filterValues = [$("#inputFilterMin").val(),
+							$("#inputFilterMax").val() ];
 
 		if (this.canSlide()) {
+			filterValues[0] = parseFloat(filterValues[0]);
+			filterValues[1] = parseFloat(filterValues[1]);
 			//$('#inputSliderRange').slider('setValue', filterValues, false, false);
 		}
 
