@@ -44,7 +44,7 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 					method = 'PUT';
 					rows = _.map(req.data, function(strRow, id) {
 						var row = me.parse(strRow, parseOpts);
-						row.id = id;
+						row.id = parseInt(id);
 						return row;
 					});
 				break;

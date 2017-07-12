@@ -16,6 +16,7 @@ Donkeylift.FilterView = Backbone.View.extend({
 							model: this.model, el: this.el });
 
 		var th = options.th;
+		this.$th = th;
 		th.find('.dropdown-menu').append(this.el);
 		
 		/*
@@ -50,6 +51,15 @@ Donkeylift.FilterView = Backbone.View.extend({
 			name: field.get('name'),
 			specialAction: field.get('name') == 'id' ? 'All' : 'Nulls'  
 		}));
+
+		var cx = (this.$th[0].getBoundingClientRect().left 
+			+ this.$th[0].getBoundingClientRect().right) / 2;	
+		var setAlign = cx < window.innerWidth / 2
+			? 'left' : 'right';
+		var clearAlign = setAlign == 'left' ? 'right' : 'left';
+
+		this.$el.parent().toggleClass('dropdown-menu-' + clearAlign, false);
+		this.$el.parent().toggleClass('dropdown-menu-' + setAlign, true);
 
 		if (field.get('type').startsWith(Donkeylift.Field.TYPES.text)
 		 || field.get('fk') == 1) {

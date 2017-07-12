@@ -136,6 +136,9 @@ Donkeylift.Field = Backbone.Model.extend({
 			resultError = isNaN(Date.parse(val)); 
 			if ( ! resultError) result = result.toISOString();
 
+		} else if(t == Donkeylift.Field.TYPES.float) {
+			result = parseFloat(val);
+			resultError = isNaN(result); 
 		}
 
 		if (validate && resultError) {
@@ -182,7 +185,10 @@ Donkeylift.Field = Backbone.Model.extend({
 
 		var t = this.typeName();
 
-		if (t == Donkeylift.Field.TYPES.integer || t == Donkeylift.Field.TYPES.decimal) {
+		if (   t == Donkeylift.Field.TYPES.integer 
+			|| t == Donkeylift.Field.TYPES.decimal
+			|| t == Donkeylift.Field.TYPES.float) 
+		{
 			return val;
 
 		} else {
