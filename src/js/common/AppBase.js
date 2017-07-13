@@ -33,7 +33,7 @@ function AppBase(opts) {
   console.log('AppBase ctor');
 	
 	this.navbarView = new Donkeylift.NavbarView();
-	if (Donkeylift.env.AUTH0_DOMAIN) {
+  if (Donkeylift.env.AUTH0_DOMAIN && !Donkeylift.env.DEMO_FLAG) {
     this.lock = new Auth0Lock(Donkeylift.env.AUTH0_CLIENT_ID, Donkeylift.env.AUTH0_DOMAIN);
 	}
 
