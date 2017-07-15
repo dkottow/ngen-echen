@@ -135,6 +135,7 @@ gulp.task('build-3rdparty-js', function() {
 				, src3rd + '/jquery-sortable/jquery-sortable-min.js' 
 				, src3rd + '/bootstrap-datepicker/js/bootstrap-datepicker.min.js'
 				, src3rd + '/bootstrap-slider/bootstrap-slider.min.js'
+				, src3rd + '/clipboard.js-master/dist/clipboard.min.js'
 
 				, extdir + ver3rd.DATATABLES_EDITOR + '/js/dataTables.editor.min.js' 
 				, extdir + ver3rd.DATATABLES_EDITOR + '/js/editor.bootstrap.js' 

@@ -34,7 +34,7 @@ Donkeylift.TableEditView = Backbone.View.extend({
 	removeClick: function() {	
 		if (this.model.collection) {
 			this.model.collection.remove(this.model);
-			Donkeylift.app.tableView.remove();
+			Donkeylift.app.unsetTable();
 		}
 		Donkeylift.app.updateSchema();
 	}

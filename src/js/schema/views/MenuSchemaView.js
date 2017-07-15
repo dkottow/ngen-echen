@@ -21,14 +21,11 @@ Donkeylift.MenuSchemaView = Backbone.View.extend({
 
 	render: function() {
 		console.log('MenuSchemaView.render ' + Donkeylift.app.schema);			
-		this.$el.show();
-		this.$el.html(this.template());
-		if (Donkeylift.app.schema == null) {
-			this.$('.schema-menu button').addClass('disabled');
+		if (! Donkeylift.app.schema) {
+			this.$el.empty();
+		} else {
+			this.$el.html(this.template());
 		}
-		//this.$('#add-table').prop('disabled', Donkeylift.app.schema == null);
-		//this.$('#save-schema').prop('disabled', Donkeylift.app.schema == null);
-
 		return this;
 	},
 

@@ -156,7 +156,7 @@ Donkeylift.Field = Backbone.Model.extend({
 
 	//to formatted string (pretty-print)
 	toFS: function(val) {
-		console.log(val);
+		//console.log(val);
 		var t = this.typeName();
 		if (_.isNumber(val) && this.getProp('scale')) {
 			return val.toFixed(this.getProp('scale'));

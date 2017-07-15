@@ -8,6 +8,7 @@ Donkeylift.MenuDataView = Backbone.View.extend({
 		'click #selection-add': 'evSelectionAdd',
 		'click #selection-filter': 'evSelectionFilter',
 		'click #selection-chown': 'evSelectionChangeOwner',
+		'click #csv-copy': 'evCSVCopy',
 	},
 
 	initialize: function(opts) {
@@ -107,6 +108,14 @@ Donkeylift.MenuDataView = Backbone.View.extend({
 		this.getChangeOwnerView().render();
 	},
 	
+	evCSVCopy: function(ev) {
+		var table = Donkeylift.app.table;
+		table.getRowsAsCSV(function(result) {
+			console.log(result);
+			$('#csv-textarea').val(result);
+			$('#modalShowCSV').modal();
+		});		
+	}
 });
 
 

@@ -263,6 +263,11 @@ table.dataTable {
 	height: 600px;
 } 
 
+#csv-textarea {
+	width: 100%;
+	height: 10em;
+}
+
 /******* compat SP *******/
 
 .btn {

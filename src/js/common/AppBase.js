@@ -49,6 +49,9 @@ function AppBase(opts) {
 	}); 
 
 	Backbone.history.start();
+
+  new Clipboard('.btn'); //attach clipboard option
+
 }
 
 AppBase.prototype.start = function(cbAfter) {

@@ -162,6 +162,7 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 			console.log(url);
 
 			me.lastFilterUrl = me.fullUrl() + '?' + filters.toParam();
+			me.lastFilterQuery = { order: orderClauses, filters: filters };
 
 			$.ajax(url, {
 				cache: false
@@ -308,5 +309,30 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 			alert(err.message);
 		});
 	},
+
+	getRowsAsCSV: function(cbResult) {
+		var me = this;
+		if ( ! this.lastFilterQuery) return;
+
+		var q = this.lastFilterQuery.filters.toParam()
+			+ '&' + '$orderby=' + this.lastFilterQuery.order.join(',')
+			+ '&' + 'format=csv';
+		var url = this.fullUrl() + '?' + q;
+		console.log(url);
+
+		$.ajax(url, {
+
+		}).done(function(response) {
+			me.dataCache[url] = response;
+			cbResult(response);
+
+		}).fail(function(jqXHR, textStatus, errThrown) {
+			console.log("Error requesting " + url);
+			var err = new Error(errThrown + " " + textStatus);
+			console.log(err);
+			alert(err.message);
+			cbResult();
+		});
+	}
 
 });
