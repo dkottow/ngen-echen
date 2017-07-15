@@ -55,7 +55,6 @@ var ver3rd = {
 	DATATABLES : 'DataTables-custom',
 	DATATABLES_EDITOR : 'Editor-1.5.6',
 	SWAGGER_UI : 'swagger-ui-2.1.4',
-	NOUISLIDER : 'nouislider-9.0.0',
 };
 
 gulp.task('default', allTasks, function() {
@@ -109,7 +108,6 @@ gulp.task('build-3rdparty-css', function() {
 	return gulp.src([
 				src3rd + ver3rd.BOOTSTRAP + '/css/bootstrap.min.css' 
 				, src3rd + ver3rd.FONT_AWESOME + '/css/font-awesome.min.css'
-				, src3rd + ver3rd.NOUISLIDER + '/nouislider.min.css' 
 				, src3rd + '/vis/vis.min.css'
 				, src3rd + ver3rd.DATATABLES + '/datatables.min.css'
 				, src3rd + '/bootstrap-datepicker/css/bootstrap-datepicker.min.css'
@@ -130,7 +128,6 @@ gulp.task('build-3rdparty-js', function() {
 				, src3rd + '/backbone/backbone.js' 
 				, src3rd + ver3rd.BOOTSTRAP + '/js/bootstrap.min.js' 
 				, src3rd + '/jwt-decode/jwt-decode.min.js' 
-				, src3rd + ver3rd.NOUISLIDER + '/nouislider.min.js'
 				, src3rd + '/typeahead/typeahead.bundle.js' 
 				, src3rd + '/JSON-Patch-master/dist/json-patch-duplex.min.js' 
 				, src3rd + '/vis/vis.min.js' 

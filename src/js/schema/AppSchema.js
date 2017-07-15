@@ -43,9 +43,6 @@ AppSchema.prototype.getEditorModal = function(name) {
 	var editor = this.editorDialogs[name];
 	if ( ! editor) {
 		switch(name) {
-			case 'schema':
-				editor = new Donkeylift.SchemaEditView();
-				break;
 			case 'table':
 				editor = new Donkeylift.TableEditView();
 				break;
@@ -68,10 +65,6 @@ AppSchema.prototype.getEditorModal = function(name) {
 		this.editorDialogs[name] = editor;
 	}
 	return editor;
-}
-
-AppSchema.prototype.getSchemaEditor = function() {
-	return this.getEditorModal('schema');
 }
 
 AppSchema.prototype.getTableEditor = function() {

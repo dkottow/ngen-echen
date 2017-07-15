@@ -49,20 +49,6 @@ Donkeylift.MenuSchemaView = Backbone.View.extend({
 		$('#content').html(this.usersView.render().el);		
 	},
 
-	evUpdateSchemaClick: function() {
-		if ( ! Donkeylift.app.schema) return;
-		var editor = Donkeylift.app.getSchemaEditor();
-		editor.model = Donkeylift.app.schema;
-		editor.render();
-	},
-
-
-	evNewSchemaClick: function() {
-		var editor = Donkeylift.app.getSchemaEditor();
-		editor.model = new Donkeylift.Schema({name: null});
-		editor.render();
-	},
-
 	evVisTableGraphClick: function() {
 		if ( ! Donkeylift.app.schema) return;
 		if ( ! this.graphView) {
