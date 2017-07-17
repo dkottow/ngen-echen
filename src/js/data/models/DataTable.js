@@ -3,6 +3,7 @@
 var ROWS_EXT = '.rows';
 var STATS_EXT = '.stats';
 var CHOWN_EXT = '.chown';
+var CSV_EXT = '.csv';
 
 Donkeylift.DataTable = Donkeylift.Table.extend({
 
@@ -333,6 +334,38 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 			alert(err.message);
 			cbResult();
 		});
-	}
+	},
+
+	generateCSV : function(fields, cbResult) {
+		var me = this;
+		if ( ! this.lastFilterQuery || ! fields || ! fields.length) return;
+
+		var q = '$select=' + fields.join(',')
+			+ '&' + '$orderby=' + this.lastFilterQuery.order.join(',')
+			+ '&' + this.lastFilterQuery.filters.toParam();
+
+		var path = this.get('url') + CSV_EXT + '?' + q;
+		var url = Donkeylift.env.API_BASE + this.get('url') + '.nonce';
+
+		$.ajax(url, {
+			type: 'POST',
+			data: JSON.stringify({ path: path }),
+			contentType:'application/json; charset=utf-8',
+			dataType: 'json'
+
+		}).done(function(response) {
+			var link = Donkeylift.env.API_BASE + me.get('url') + CSV_EXT + '?nonce=' + response.nonce;
+			cbResult(null, link);
+			console.log(response);
+
+		}).fail(function(jqXHR, textStatus, errThrown) {
+			console.log("Error requesting " + url);
+			var err = new Error(errThrown + " " + textStatus);
+			console.log(err);
+			alert(err.message);
+			cbResult(err);
+		});
+	},
+	
 
 });

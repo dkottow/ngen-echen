@@ -1,0 +1,24 @@
+<div class="modal fade" id="modalCSVDownload" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+	<div class="modal-content">
+	  <div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+		<h4 class="modal-title">Download CSV</h4>
+	  </div>
+	  <div class="modal-body">
+		<form>
+		  <div class="form-group">
+			<label for="modalCSVSelectFields" class="control-label">Select Fields:</label>
+			<select id="modalCSVSelectFields" multiple class="form-control selectpicker" data-actions-box="true">
+			</select>
+		  </div>
+		</form>
+	  </div>
+	  <div class="modal-footer">
+  		<button id="modalCSVGenerate" type="button" class="btn btn-primary">Generate</button>
+	  	<a id="modalCSVDownloadLink" href="#" class="btn">Download</a>
+	  </div>
+	</div>
+  </div>
+</div>
+

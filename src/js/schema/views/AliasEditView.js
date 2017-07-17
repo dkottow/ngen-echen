@@ -21,23 +21,10 @@ Donkeylift.AliasEditView = Backbone.View.extend({
 		console.log("AliasEditView.render ");
 
 		var el = this.$('#modalInputAliasField');
+		el.empty();
 
-		el.html('');
+		Donkeylift.app.addAncestorFieldsToSelect(el);
 
-		var aliasTables = [ this.model ]
-				.concat(Donkeylift.app.schema.get('tables').getAncestors(this.model));
-					
-		_.each(aliasTables, function(table) {
-			el.append('<optgroup label="' + table.get('name') + '">');
-			table.get('fields').each(function(field) {
-				var qn = table.getFieldQN(field);
-				el.append($('<option></option>')
-					.attr('value', qn)
-					.text(field.get('name')));
-			}, this);
-			el.append('</optgroup>');
-		});
-		
 		if (this.alias) {
 			el.val(this.alias.toString());
 		}

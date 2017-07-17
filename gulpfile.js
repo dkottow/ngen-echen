@@ -112,6 +112,7 @@ gulp.task('build-3rdparty-css', function() {
 				, src3rd + ver3rd.DATATABLES + '/datatables.min.css'
 				, src3rd + '/bootstrap-datepicker/css/bootstrap-datepicker.min.css'
 				, src3rd + '/bootstrap-slider/css/bootstrap-slider.min.css'
+				, src3rd + '/bootstrap-select/css/bootstrap-select.min.css'
 
 //				, extdir + ver3rd.DATATABLES_EDITOR + '/css/editor.dataTables.min.css' 
 				, extdir + ver3rd.DATATABLES_EDITOR + '/css/editor.bootstrap.min.css' 
@@ -135,7 +136,8 @@ gulp.task('build-3rdparty-js', function() {
 				, src3rd + '/jquery-sortable/jquery-sortable-min.js' 
 				, src3rd + '/bootstrap-datepicker/js/bootstrap-datepicker.min.js'
 				, src3rd + '/bootstrap-slider/bootstrap-slider.min.js'
-				, src3rd + '/clipboard.js-master/dist/clipboard.min.js'
+				, src3rd + '/clipboard.js/clipboard.min.js'
+				, src3rd + '/bootstrap-select/js/bootstrap-select.min.js'
 
 				, extdir + ver3rd.DATATABLES_EDITOR + '/js/dataTables.editor.min.js' 
 				, extdir + ver3rd.DATATABLES_EDITOR + '/js/editor.bootstrap.js' 

@@ -159,6 +159,22 @@ AppBase.prototype.unsetTable = function() {
 	if (this.tableView) this.tableView.remove();
 }
 
+AppBase.prototype.addAncestorFieldsToSelect = function($select) {
+  var aliasTables = [ this.table ]
+      .concat(this.schema.get('tables').getAncestors(this.table));
+        
+  _.each(aliasTables, function(table) {
+    var $opt = $('<optgroup label="' + table.get('name') + '"></optgroup>');
+    table.get('fields').each(function(field) {
+      var qn = table.getFieldQN(field);
+      $opt.append($('<option></option>')
+        .attr('value', qn)
+        .text(field.get('name')));
+    }, this);
+    $select.append($opt);
+  });
+}
+
 /**** schema stuff ****/
 
 AppBase.prototype.unsetSchema = function() {

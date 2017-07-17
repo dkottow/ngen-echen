@@ -20,9 +20,13 @@
 		</ul>
 	</div>
 	<div class="btn-group" role="group">
-		<button id="csv-copy" type="button" class="btn btn-default">
-			Copy CSV
+		<button id="csv-dropdown" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+			<span>CSV</span> <span class="caret"></span>
 		</button>
+		<ul class="dropdown-menu" role="menu">
+			<li><a id="csv-copy" href="#">Copy</a></li>
+			<li><a id="csv-download" href="#">Download</a></li>
+		</ul>
 	</div>
 </script>
 

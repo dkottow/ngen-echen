@@ -9,6 +9,7 @@ Donkeylift.MenuDataView = Backbone.View.extend({
 		'click #selection-filter': 'evSelectionFilter',
 		'click #selection-chown': 'evSelectionChangeOwner',
 		'click #csv-copy': 'evCSVCopy',
+		'click #csv-download': 'evCSVDownload',
 	},
 
 	initialize: function(opts) {
@@ -108,14 +109,30 @@ Donkeylift.MenuDataView = Backbone.View.extend({
 		this.getChangeOwnerView().render();
 	},
 	
-	evCSVCopy: function(ev) {
+	evCSVCopy: function() {
 		var table = Donkeylift.app.table;
 		table.getRowsAsCSV(function(result) {
 			console.log(result);
 			$('#csv-textarea').val(result);
-			$('#modalShowCSV').modal();
+			$('#modalCSVShow').modal();
 		});		
-	}
+	},
+
+	getCSVDownloadView: function() {
+		if ( ! this.csvDownloadView) {
+			this.csvDownloadView = new Donkeylift.CSVDownloadView({ 
+				model: Donkeylift.app.table 
+			});
+		} else {
+			this.csvDownloadView.model = Donkeylift.app.table;
+		}
+		return this.csvDownloadView;
+	},
+
+	evCSVDownload: function() {
+		var modal = this.getCSVDownloadView();
+		modal.render();
+	}	
 });
 
 
