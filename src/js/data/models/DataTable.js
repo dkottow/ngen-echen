@@ -7,6 +7,11 @@ var CSV_EXT = '.csv';
 
 Donkeylift.DataTable = Donkeylift.Table.extend({
 
+	initialize: function(table) {
+		Donkeylift.Table.prototype.initialize.apply(this, arguments);
+		this.set('skipRowCounts', false); //if true nocounts=1 on api calls.
+	},
+
 	createView: function(options) {
 		return new Donkeylift.DataTableView(options);
 	},
@@ -134,32 +139,31 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 						orderField.vname() + ' ' + query.order[i].dir));
 			}
 			
-			var orderParam = '$orderby=' + orderClauses.join(',');
-
-			var skipParam = '$skip=' + query.start;
-			var topParam = '$top=' + query.length;
+			var params = {
+				'$orderby': orderClauses.join(','),
+				'$skip': query.start,
+				'$top': query.length,
+				'nocounts': me.get('skipRowCounts') ? 1 : 0
+			}
 
 			if (query.search.value.length == 0) {
 				//sometimes necessary after back/fwd
 				Donkeylift.app.filters.clearFilter(me);
 			}
-
 			var filters = Donkeylift.app.filters.clone();
-
 			if (query.search.value.length > 0) {
 				filters.setFilter({
 					table: me,
 					op: Donkeylift.Filter.OPS.SEARCH,
 					value: query.search.value
 				});
-			}
+			}			
 
-			var q = orderParam
-				+ '&' + skipParam
-				+ '&' + topParam
-				+ '&' + filters.toParam();
-			var url = me.fullUrl() + '?' + q;
+			var q = _.map(params, function(v, k) {
+				return k + '=' + v;
+			}).join('&');
 
+			var url = me.fullUrl() + '?' + q + '&' + filters.toParam();
 			console.log(url);
 
 			me.lastFilterUrl = me.fullUrl() + '?' + filters.toParam();
@@ -187,6 +191,14 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 					recordsTotal: response.totalCount,
 					recordsFiltered: response.count,
 				};
+
+				if (me.get('skipRowCounts')) {
+					//unknown number of rows.. check if returned data fills page query.
+					data.recordsFiltered = (data.data.length < query.length) 
+						? query.start + data.data.length : query.start + query.length + 1;
+					data.recordsTotal = data.recordsFiltered;					
+				}
+
 				callback(data);
 			}).fail(function(jqXHR, textStatus, errThrown) {
 				console.log("Error requesting " + url);
