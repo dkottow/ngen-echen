@@ -13,13 +13,12 @@ Donkeylift.Field = Backbone.Model.extend({
 		});
 		this.set('props', props);
 		this.set('disabled', field.disabled == true);
+		this.set('resolveRefs', true); //auto join row alias for all foreign keys
 	},
 
-	vname: function(opts) {
-		opts = opts || {};
-		var resolveRefs = opts.resolveRefs || true;
+	vname: function() {
 
-		if (this.get('fk') == 1 && resolveRefs) {
+		if (this.get('resolveRefs') && this.get('fk') == 1) {
 			if (this.get('name').match(/id$/)) { 
 				return this.get('name').replace(/id$/, "ref");
 			} else {

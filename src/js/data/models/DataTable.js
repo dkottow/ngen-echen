@@ -36,7 +36,8 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 		var me = this;
 
 		try {
-			var parseOpts = { validate: true, resolveRefs: true };
+			var resolveRefs = this.get('fields').at(0).get('resolveRefs');
+			var parseOpts = { validate: true, resolveRefs: resolveRefs };
 			var rows = [];
 			var method;
 			switch(req.action) {
@@ -139,7 +140,12 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 						orderField.vname() + ' ' + query.order[i].dir));
 			}
 			
+			var fieldNames = me.get('fields').map(function(field) {
+				return field.vname();
+			});
+			
 			var params = {
+				'$select': fieldNames.join(','),
 				'$orderby': orderClauses.join(','),
 				'$skip': query.start,
 				'$top': query.length,
@@ -193,7 +199,9 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 				};
 
 				if (me.get('skipRowCounts')) {
-					//unknown number of rows.. check if returned data fills page query.
+					//unknown number of rows.. 
+					//if returned data less than queried data length, stop. 
+					//otherwise make sure we get a next page.
 					data.recordsFiltered = (data.data.length < query.length) 
 						? query.start + data.data.length : query.start + query.length + 1;
 					data.recordsTotal = data.recordsFiltered;					

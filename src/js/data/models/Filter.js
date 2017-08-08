@@ -35,7 +35,9 @@ Donkeylift.Filter = Backbone.Model.extend({
 
 		} else if (this.get('op') == Donkeylift.Filter.OPS.IN) {				
 			//do not use ref string, use foreign key ids instead.
-			var values = this.values({resolveRefs: true});
+			var values = this.values({
+				resolveRefs: this.get('field').get('resolveRefs') 
+			});
 			var key = Donkeylift.Filter.Key(this.get('table'), 
 						this.get('field'));
 			param = key + " in " + values.join(",");
