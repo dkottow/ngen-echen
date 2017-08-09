@@ -10,6 +10,7 @@ Donkeylift.MenuDataView = Backbone.View.extend({
 		'click #selection-chown': 'evSelectionChangeOwner',
 		'click #csv-copy': 'evCSVCopy',
 		'click #csv-download': 'evCSVDownload',
+		'click #edit-prefs': 'evEditPrefs',
 	},
 
 	initialize: function(opts) {
@@ -132,7 +133,28 @@ Donkeylift.MenuDataView = Backbone.View.extend({
 	evCSVDownload: function() {
 		var modal = this.getCSVDownloadView();
 		modal.render();
-	}	
+	},
+
+	getPreferencesView: function() {
+		var prefs = new Donkeylift.Preferences({
+			table: Donkeylift.app.table
+		});
+		if ( ! this.preferncesView) {
+			this.preferencesView = new Donkeylift.PreferencesView({ 
+				model: prefs 
+			});
+		} else {
+			this.preferencesView.model = prefs;
+		}
+		return this.preferencesView;
+	},
+
+	evEditPrefs: function() {
+		//TODO
+		var modal = this.getPreferencesView();
+		modal.render();
+	}
+
 });
 
 

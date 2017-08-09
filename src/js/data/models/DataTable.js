@@ -173,7 +173,11 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 			console.log(url);
 
 			me.lastFilterUrl = me.fullUrl() + '?' + filters.toParam();
-			me.lastFilterQuery = { order: orderClauses, filters: filters };
+			me.lastFilterQuery = { 
+				order: orderClauses, 
+				filters: filters,
+				fields:  fieldNames
+			};
 
 			$.ajax(url, {
 				cache: false
@@ -335,9 +339,12 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 		var me = this;
 		if ( ! this.lastFilterQuery) return;
 
-		var q = this.lastFilterQuery.filters.toParam()
+		var q = '$select=' + this.lastFilterQuery.fields.join(',')
+			+ '&' + this.lastFilterQuery.filters.toParam()
 			+ '&' + '$orderby=' + this.lastFilterQuery.order.join(',')
-			+ '&' + 'format=csv';
+			+ '&' + 'format=csv'
+			+ '&' + 'nocounts=1';
+
 		var url = this.fullUrl() + '?' + q;
 		console.log(url);
 
@@ -387,5 +394,29 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 		});
 	},
 	
+	getPreferences: function() {
+		return {
+			skipRowCounts : this.get('skipRowCounts'),
+			resolveRefs : this.get('fields').at(0).get('resolveRefs')
+		}
+	},
+
+	setPreferences: function(prefs) {
+		_.each(prefs, function(value, name) {
+			switch(name) {
+				case 'skipRowCounts':
+					this.set('skipRowCounts', value);
+					break;
+				case 'resolveRefs':
+					this.get('fields').each(function(field) {
+						field.set('resolveRefs', value);	
+					});
+					break;
+				default:
+					console.log("unknown preference '" + name + "´");
+			}
+		}, this);
+	},
+
 
 });
