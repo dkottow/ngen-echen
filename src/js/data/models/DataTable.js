@@ -168,8 +168,9 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 			var q = _.map(params, function(v, k) {
 				return k + '=' + v;
 			}).join('&');
+			q = q + '&' + filters.toParam();
 
-			var url = me.fullUrl() + '?' + q + '&' + filters.toParam();
+			var url = me.fullUrl() + '?' + q;
 			console.log(url);
 
 			me.lastFilterUrl = me.fullUrl() + '?' + filters.toParam();
@@ -417,6 +418,5 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 			}
 		}, this);
 	},
-
 
 });

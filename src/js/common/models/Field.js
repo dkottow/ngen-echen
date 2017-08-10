@@ -159,9 +159,9 @@ Donkeylift.Field = Backbone.Model.extend({
 		var t = this.typeName();
 		if (_.isNumber(val) && this.getProp('scale')) {
 			return val.toFixed(this.getProp('scale'));
-		} else if (t == 'date') {
+		} else if (t == 'date' || t == 'timestamp') {
 			//JSON - Date ISO string
-			return val.substr(0,10);
+			return this.parse(val);
 		} else if (t == 'text') {
 			return _.escape(String(val));
 		} else {

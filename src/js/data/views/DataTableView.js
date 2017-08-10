@@ -71,7 +71,7 @@ Donkeylift.DataTableView = Backbone.View.extend({
 
 		var columns = _.map(fields, function(field) {
 			var col = {
-				data: field.vname(),
+				data: field.vname()
 			}
 
 			var width = (100 * field.getProp('width')) / totalWidth;
@@ -265,16 +265,16 @@ Donkeylift.DataTableView = Backbone.View.extend({
 	addEvents: function() {
 		var me = this;
 
-		this.$('#grid').on('draw.dt', function() {
+		this.dataTable.on('draw.dt', function() {
 			me.addButtonEllipsisEvent();
 		});
 
-		this.$('#grid').on('page.dt', function() {
+		this.dataTable.on('page.dt', function() {
 			console.log("page.dt");
 			Donkeylift.app.router.navigate("reload-table", {trigger: false});			
 		});
 
-		this.$('#grid').on('init.dt', function() {
+		this.dataTable.on('init.dt', function() {
 			console.log("init.dt");
 
 			me.dataTable.buttons().container()
@@ -300,8 +300,14 @@ Donkeylift.DataTableView = Backbone.View.extend({
 	
 		});
 
-		this.$('#grid').on('buttons-action.dt', function (e, buttonApi, dataTable, node, config) {
+		this.dataTable.on('buttons-action.dt', function (e, buttonApi, dataTable, node, config) {
 			me.addButtonEllipsisEvent();
+			if ($(buttonApi.node()).hasClass('buttons-columnVisibility')) {
+				var field = me.model.get('fields').getByName(buttonApi.text());
+				var visible = $(buttonApi.node()).hasClass('active');
+				//TODO props vs prefs 
+				field.setProp('visible', visible);
+			}
 		});
 
 		//using order.dt event won't work because its fired otherwise, too
@@ -331,6 +337,20 @@ Donkeylift.DataTableView = Backbone.View.extend({
 
 		this.dataEditor.on('submitError', function(ev, xhr, err, thrown, data) {
 			me.dataEditor.error(xhr.responseText);
+		});
+
+		this.dataTable.on('column-reorder', function (e, settings, details) {
+			$(document).mouseup(function() {
+				var columnOrders = me.dataTable.colReorder.order();
+				console.log('column-reorder done.', columnOrders);
+				_.each(columnOrders, function(pos, idx) {
+					var field = settings.aoColumns[pos].data;
+					//TODO props vs prefs 
+					me.model.get('fields').getByName(field).setProp('order', pos);
+					//console.log('col idx ' + idx + ' ' + field + ' order ' + pos) 
+				});
+
+			});
 		});
 	},
 
@@ -386,7 +406,7 @@ Donkeylift.DataTableView = Backbone.View.extend({
 	},
 	
 	getSelection: function() {
-		return this.$('#grid').DataTable().rows({selected: true}).data().toArray();
+		return this.dataTable.rows({selected: true}).data().toArray();
 	}
 
 });
