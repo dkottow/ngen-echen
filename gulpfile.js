@@ -69,7 +69,7 @@ var o365Tasks = [
 ];
 
 gulp.task('o365', o365Tasks, function() {
-	
+	console.log('deployed O365 ressource to tmp dir');
 });
 
 //TODO

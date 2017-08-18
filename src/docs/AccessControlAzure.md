@@ -1,8 +1,12 @@
-# Access Control in Data365
+# Overview
 
 Data365 provides access control through the Azure Active Directory service. Users will need to first authenticate against AAD before being able to access any data. 
 
-Once authenticated, all calls to the API will bear a security token that not only identifies the user, but also includes information on relevant security groups to determine the users' general access rights. 
+Once authenticated, all calls to the API will bear a security token identifies the user including ownership to security groups relevant to Data365.
+
+Authorization is given by a role-based model implemented inside Data365.
+
+# Authentication through AAD
 
 You can read more about AAD security tokens and claims [here](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-token-and-claims). We are using OpenID Connect and the associated JWT Id_token. 
 
@@ -19,10 +23,14 @@ The security token encodes the following fields relevant to the Data365 security
 }
 ```
 
-* `upn` Unique username, corresponds to our AAD user.
+* `upn` User Principal Name, corresponds to our AAD user.
 * `groups` GUID's identifying AAD groups. Note that AAD will only include groups that have been previously assigned to the Data365 application manifest in AAD.
 
-Permissions on specific databases and API methods are obtained through a Data365 owned Access Control List described later in this document. Permissions are defined using the following concepts.
+Data365 will define **a single security group for all database admins** (users that may alter database structures). This is an additional security layer; users with admin rights will have to belong to this AAD group and in adddition be defined as administrators on particular accounts / databases as described below.
+
+# Admin Roles
+
+We define the following admin roles.
 
 ## System Admin
 
@@ -36,9 +44,11 @@ An account admin is bound to a certain account; he has full access to the collec
 
 A database admin is bound to a certain database; he has full access to all data in the database. Only database admins can execute schema change methods (resulting in DDL statements).
 
+# Normal Users
+
 ## Data Access Permissions
 
-For regular users we define permission levels to read and write data. There are different variants of read and write access which rely on a row ownership model. All tables in Data365 have an `own_by` field to establish the owner of each row. Owners may be users or groups. Based on the row ownership, Data365 distinguishes three row scoping modifiers - `all`, `own` and `none` - which are combined with the access mode (read-only / read-write) providing the following permissions:  
+For regular users we define permission levels to read and write data. There are different variants of read and write access which rely on a row ownership model. All tables in Data365 have an `own_by` field to establish the owner of each row. Based on the row ownership, Data365 distinguishes three row scoping modifiers - `all`, `own` and `none` - which are combined with the access mode (read-only / read-write) providing the following permissions:  
 
 ### Read Only 
 * `read: none, write: none`
@@ -69,9 +79,19 @@ A table level permissions can have the same values as the user or group permissi
 Notes: Read and write permissions obey the same table-level overwrite rules.
 
 ### Ownership Column
-The ownerhip field `own_by` can be a user (upn value) or a group (GUID). It can also be `null` which means the anybody with `all` or `own` read (write) access to the table can act on such a row.
+The ownerhip field `own_by` is a user (upn value). It can also be `null` which means anybody with `all` or `own` read (write) access to the table can act on such a row; only users with `none` permission will be denied access.
 
-### SQL Implementation 
+# SQL Model 
+
+All user access control definitions are stored on Data365 tables. This allows for comfortable user and access management using Data365's data browser provided the user has proper database admin rights or has been granted acces to appropriate tables.
+
+Admin access rights - from sys admin to database owner - are defind inside Data365's "master" database to which only admin's themselves have access.
+
+Normal database users are managed inside each database using a few system tables. By default, only database owners and superior have write access to this table.
+
+![SQL diagram](AccessControlDiagram.png "Access Control DB Diagram")
+
+## Implementation Notes
 
 A rule stating that only `own` rows can be written is implemented as permission to:
 
@@ -84,16 +104,5 @@ A rule stating that only `own` rows may be read is implemented by:
 
 `all` and `none` implementations are straightforward.
 
-### ACL for Database-level Roles and Permissions 
 
-| Principal | Account | Database | Admin | Read | Write | Comment |
-| --------- | ------- | -------- | ----- | ---- | ----- | ------- |
-| dkottow@golder.com | * | * | 1 | all | all | System Admin |
-| harmitage@golder.com | Geotech | * | 1 | all | all | Account Admin on Geotech |
-| Soils User Group | Geotech | Soils | 0 | all | own | Reads all data, writes only own data |
-| jstianson@golder.com | Geotech | Soils | 0 | all | all | Soils data owner |
-| Geotech Visitor | Geotech | * | 0 | all | none | Reads all data in any database of Geotech but writes nothing. |
-
-### Overwriting Permissions at Table-level
-Are defined as json.
 

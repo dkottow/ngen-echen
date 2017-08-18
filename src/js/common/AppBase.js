@@ -13,8 +13,8 @@ var Donkeylift = {
 	    , DEMO_FLAG: + "$DONKEYLIFT_DEMO"
 	},
 
-	DEMO_ACCOUNT: 'demo',
-	DEMO_USER: 'demo@donkeylift.com',
+	DEMO_ACCOUNT: 'test',
+	DEMO_USER: 'data365@golder.com',
 	
 	util: {
 		/*** implementation details at eof ***/
