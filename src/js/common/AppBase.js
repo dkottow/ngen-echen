@@ -58,27 +58,31 @@ AppBase.prototype.start = function(cbAfter) {
 	var me = this;
 
 	if (Donkeylift.env.DEMO_FLAG) {
-	  sessionStorage.setItem('dl_user', sessionStorage.getItem('dl_user') || Donkeylift.DEMO_USER);
-	  sessionStorage.setItem('dl_account', sessionStorage.getItem('dl_account') || Donkeylift.DEMO_ACCOUNT);
-		this.loadAccountNoAuth(cbAfter);
-		return;
-	}
+    var opts = {
+      user: sessionStorage.getItem('dl_user') || Donkeylift.DEMO_USER,
+      account: sessionStorage.getItem('dl_account') || Donkeylift.DEMO_ACCOUNT,
+      auth: false
+    }
+		this.loadAccount(opts, cbAfter);
 
-	this.loadAccount({ id_token: sessionStorage.getItem('id_token') }, cbAfter);
-}
+  } else {
+    //auth0 id_token in sessionStorage
+    this.loadAccount({ 
+      id_token: sessionStorage.getItem('id_token'),
+      auth: true      
+    }, cbAfter);
+  }
 
-AppBase.prototype.loadAccountNoAuth = function(cbAfter) {
-  this.loadAccount({ 
-    account: sessionStorage.getItem('dl_account'), 
-    user: sessionStorage.getItem('dl_user'),
-    auth: false
-  }, cbAfter);
 }
 
 AppBase.prototype.loadAccount = function(opts, cbAfter) {
 	var me = this;
 	console.log('loadAccount: ' + opts);
 
+  opts.user = opts.user || sessionStorage.getItem('dl_user');
+  opts.account = opts.account || sessionStorage.getItem('dl_account');
+  opts.auth = opts.auth === true;
+  
 	this.account = new Donkeylift.Account(opts);
 
 	this.navbarView.model = this.account;

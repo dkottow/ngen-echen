@@ -11,29 +11,26 @@ Donkeylift.Account = Backbone.Model.extend({
 			this.set('auth', false);
 
 			$.ajaxSetup( { data: { user: this.get('user') }} );
-			return;
+			
+		} else {
+			
+			console.log("Account.initialize " + attrs.id_token);		
+			var token_attrs = jwt_decode(attrs.id_token);
+			
+			//root users have access to any account.
+			var account = attrs.account || token_attrs.app_metadata.account;
+	
+			this.set('name', account);
+			this.set('user', attrs.user || token_attrs.email);
+			this.set('app_metadata', token_attrs.app_metadata);
+	
+			$.ajaxSetup({
+				'beforeSend': function(xhr) {					
+						xhr.setRequestHeader('Authorization', 
+						'Bearer ' + attrs.id_token);
+				}
+			});
 		}
-
-		console.log("Account.initialize " + attrs.id_token);
-
-		var token_attrs = jwt_decode(attrs.id_token);
-		
-		//root users have access to any account.
-		var account = attrs.account || token_attrs.app_metadata.account;
-
-		this.set('name', account);
-		this.set('user', attrs.user || token_attrs.email);
-		this.set('app_metadata', token_attrs.app_metadata);
-
-		$.ajaxSetup({
-			'beforeSend': function(xhr) {					
-      			xhr.setRequestHeader('Authorization', 
-					'Bearer ' + attrs.id_token);
-			}
-		});
-
-		sessionStorage.setItem('id_token', attrs.id_token);
-
 	},
 
 	url	: function() { 

@@ -38,14 +38,7 @@ Donkeylift.SchemaTableView = Backbone.View.extend({
 		});
 		this.aliasView.render();
 
-		this.accessView = new Donkeylift.AccessView({
-			el: this.$('#access'),
-			model: this.model,
-		});
-		this.accessView.render();
-
 		this.sortableFieldsTable();
-
 		return this;
 	},
 

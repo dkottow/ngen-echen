@@ -100,15 +100,7 @@ Donkeylift.DataTableView = Backbone.View.extend({
 			edField.name = field.vname(); 
 			edField.label = field.vname(); 
 
-			if (field.get('name') == 'own_by') {
-				edField.type = 'select';
-				var users = Donkeylift.app.schema.get('users')
-					.map(function(user) {
-						return user.get('name'); 
-				});
-				edField.options = users;
-
-			} else if (field.get('type') == Donkeylift.Field.TYPES.date) {
+			if (field.get('type') == Donkeylift.Field.TYPES.date) {
 				edField.type = 'datetime';
 
 			} else if (field.getProp('width') > 60) {

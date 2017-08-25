@@ -55,12 +55,6 @@ AppSchema.prototype.getEditorModal = function(name) {
 			case 'alias':
 				editor = new Donkeylift.AliasEditView();
 				break;
-			case 'access':
-				editor = new Donkeylift.AccessEditView();
-				break;
-			case 'user':
-				editor = new Donkeylift.UserEditView();
-				break;
 		}
 		this.editorDialogs[name] = editor;
 	}
@@ -84,16 +78,6 @@ AppSchema.prototype.getRelationEditor = function() {
 
 AppSchema.prototype.getAliasEditor = function() {
 	return this.getEditorModal('alias');
-}
-
-AppSchema.prototype.getUserEditor = function() {
-	var editor = this.getEditorModal('user');
-	editor.users = this.schema.get('users');
-	return editor;
-}
-
-AppSchema.prototype.getAccessEditor = function() {
-	return this.getEditorModal('access');
 }
 
 Donkeylift.AppSchema = AppSchema;

@@ -8,10 +8,6 @@ Donkeylift.Schema = Backbone.Model.extend({
 		if ( ! attrs.tables) {
 			this.set('tables', new Donkeylift.Tables());
 		}
-		if ( ! attrs.users) {
-			this.set('users', new Donkeylift.Users());
-		}
-
 		//this.set('id', attrs.name); //unset me when new
 
 	},
@@ -27,8 +23,7 @@ Donkeylift.Schema = Backbone.Model.extend({
 
 		return {
 			name: this.get('name'),
-			tables: tables,
-			users: this.get('users').toJSON()
+			tables: tables
 		};
 	},	
 
@@ -45,7 +40,6 @@ Donkeylift.Schema = Backbone.Model.extend({
 	parse : function(response) {
 		console.log("Schema.parse " + response);
 		response = this.parseTables(response);
-		response = this.parseUsers(response);
 		return response;
 	},
 
@@ -54,14 +48,6 @@ Donkeylift.Schema = Backbone.Model.extend({
 			return new Donkeylift.Table(table);
 		});
 		response.tables = new Donkeylift.Tables(tables);
-		return response;		
-	},
-
-	parseUsers: function(response) {
-		var users = _.map(response.users, function(user) {
-			return new Donkeylift.User(user);
-		});
-		response.users = new Donkeylift.Users(users);
 		return response;		
 	},
 
