@@ -10,6 +10,8 @@ Donkeylift.Table = Backbone.Model.extend({
 			return new Donkeylift.Field(field);
 		});			
 		this.set('fields', new Donkeylift.Fields(fields));
+
+		table.props.visible = table.name[0] != '_'; //TODO
 		this.set('props', table.props);
 		//relations and row_alias are set in initRefs
 	},
@@ -69,6 +71,10 @@ Donkeylift.Table = Backbone.Model.extend({
 		this.set('row_alias', row_alias, {silent: true});
 	},
 	
+	getProp: function(name) {
+		return this.get('props')[name];
+	},
+
 	getFieldQN: function(field) {
 		return _.isString(field) 
 			? this.get('name') + '.' + field

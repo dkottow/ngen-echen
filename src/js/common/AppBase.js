@@ -208,7 +208,8 @@ AppBase.prototype.setSchema = function(name, cbAfter) {
 		me.tableListView = new Donkeylift.TableListView({
 			collection: me.schema.get('tables')
 		});
-		$('#sidebar').append(me.tableListView.render().el);
+    $('#sidebar').append(me.tableListView.el);
+    me.tableListView.render();
 		$('#toggle-sidebar').show();
 
 		me.schemaListView.render();

@@ -295,6 +295,7 @@ Donkeylift.DataTableView = Backbone.View.extend({
 		this.dataTable.on('buttons-action.dt', function (e, buttonApi, dataTable, node, config) {
 			me.addButtonEllipsisEvent();
 			if ($(buttonApi.node()).hasClass('buttons-columnVisibility')) {
+				//set visibility prop of field according to Datatable colvis button	
 				var field = me.model.get('fields').getByName(buttonApi.text());
 				var visible = $(buttonApi.node()).hasClass('active');
 				//TODO props vs prefs 
