@@ -2,4 +2,5 @@
 /public
 /app
 /ext
+/tmp
 .env

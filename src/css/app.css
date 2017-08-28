@@ -270,7 +270,7 @@ table.dataTable {
 
 /******* compat SP *******/
 
-.btn {
+button, .btn {
 	min-width: 0;
 }
 
