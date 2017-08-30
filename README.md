@@ -1,2 +1,2 @@
-g6-server is a rest-server
-serving a directory tree of sqlite db files.
+While this repo is public, not all of its contents are open source.
+ext.zip includes licensed software from https://datatables.net : extract and use only after proper acquiring a proper license
