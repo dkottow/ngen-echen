@@ -37,12 +37,9 @@ function AppBase(opts) {
     this.lock = new Auth0Lock(Donkeylift.env.AUTH0_CLIENT_ID, Donkeylift.env.AUTH0_DOMAIN);
 	}
 
-	$.ajaxPrefilter(function( options, _, jqXHR ) {
-		$('#ajax-progress-spinner').show();
-	    jqXHR.always(function() {
-			$('#ajax-progress-spinner').hide();
-		});
-	});
+  $.ajaxPrefilter(function( options, orgOptions, jqXHR ) {
+    me.ajaxPrefilter(options, orgOptions, jqXHR);
+  });
 
 	$('#toggle-sidebar').click(function() {
 		me.toggleSidebar();
@@ -52,6 +49,25 @@ function AppBase(opts) {
 
   new Clipboard('.btn'); //attach clipboard option
 
+}
+
+AppBase.prototype.ajaxPrefilter = function(options, orgOptions, jqXHR) {
+
+  $('#ajax-progress-spinner').show();
+  jqXHR.always(function() {
+    $('#ajax-progress-spinner').hide();
+  });
+  
+  //add user authentication
+  if (this.account && this.account.get('auth')) {
+    var id_token = this.account.get('id_token');
+    jqXHR.setRequestHeader('Authorization', 'Bearer ' + id_token);
+
+  } else if (this.account && ! this.account.get('auth')) {
+    var q = 'user=' + encodeURIComponent(this.account.get('user'));
+    if (options.url.indexOf('?') < 0) options.url = options.url + '?' + q;    
+    else options.url = options.url + '&' + q;    
+  }
 }
 
 AppBase.prototype.start = function(cbAfter) {
@@ -69,7 +85,7 @@ AppBase.prototype.start = function(cbAfter) {
     //auth0 id_token in sessionStorage
     this.loadAccount({ 
       id_token: sessionStorage.getItem('id_token'),
-      auth: true      
+      auth: true
     }, cbAfter);
   }
 

@@ -3,6 +3,8 @@
 Donkeylift.Account = Backbone.Model.extend({
 
 	initialize: function(attrs) {		
+		console.log("Account.initialize");		
+		console.log(attrs);
 		
 		
 		if (attrs.auth === false) {
@@ -10,11 +12,8 @@ Donkeylift.Account = Backbone.Model.extend({
 			this.set('user', attrs.user);
 			this.set('auth', false);
 
-			$.ajaxSetup( { data: { user: this.get('user') }} );
-			
 		} else {
 			
-			console.log("Account.initialize " + attrs.id_token);		
 			var token_attrs = jwt_decode(attrs.id_token);
 			
 			//root users have access to any account.
@@ -23,13 +22,7 @@ Donkeylift.Account = Backbone.Model.extend({
 			this.set('name', account);
 			this.set('user', attrs.user || token_attrs.email);
 			this.set('app_metadata', token_attrs.app_metadata);
-	
-			$.ajaxSetup({
-				'beforeSend': function(xhr) {					
-						xhr.setRequestHeader('Authorization', 
-						'Bearer ' + attrs.id_token);
-				}
-			});
+			this.set('id_token', attrs.id_token);
 		}
 	},
 

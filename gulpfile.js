@@ -57,19 +57,16 @@ var ver3rd = {
 	SWAGGER_UI : 'swagger-ui-2.1.4',
 };
 
+var outputs = {
+	DL_COMMON_CSS: 'dl_common.css', //donkeylift.css
+	DL_3RDPARTY_CSS: 'dl_3rdparty.css', //3rdparty.css
+	DL_DATA_JS: 'dl_data.js', //dl_data.js
+	DL_SCHEMA_JS: 'dl_schema.js', //dl_schema.js
+	DL_3RDPARTY_JS: 'dl_3rdparty.js', //3rdparty.js
+}
+
 gulp.task('default', allTasks, function() {
 
-});
-
-var o365Tasks = [
-	'build-data-dialog-snippets',
-	'build-data-template-snippets',
-	'build-schema-dialog-snippets',
-	'build-schema-template-snippets',
-];
-
-gulp.task('o365', o365Tasks, function() {
-	console.log('deployed O365 ressource to tmp dir');
 });
 
 //TODO
@@ -84,7 +81,7 @@ gulp.task('copy-images', function() {
 				//src3rd + ver3rd.DATATABLES + '/media/images/*.png'
 			extdir + ver3rd.DATATABLES_EDITOR + '/images/*',
 			'./src/images/*'
-		])	
+		])
 
 		.pipe(gulp.dest('./public/images/'));
 });
@@ -118,7 +115,7 @@ gulp.task('build-3rdparty-css', function() {
 				, extdir + ver3rd.DATATABLES_EDITOR + '/css/editor.bootstrap.min.css' 
 		])
 
-		.pipe(concat('3rdparty.css'))
+		.pipe(concat(outputs.DL_3RDPARTY_CSS))
 		.pipe(gulp.dest('./public/css/'));
 });
 
@@ -144,14 +141,14 @@ gulp.task('build-3rdparty-js', function() {
 				, extdir + ver3rd.DATATABLES_EDITOR + '/js/editor.typeahead.js' 
 		])
 
-		.pipe(concat('3rdparty.js'))
+		.pipe(concat(outputs.DL_3RDPARTY_JS))
 		.pipe(gulp.dest('./app/js/'));
 			
 });
 
 gulp.task('build-donkeylift-css', function() {
 	return gulp.src('./src/css/*.css')
-		.pipe(concat('donkeylift.css'))
+		.pipe(concat(outputs.DL_COMMON_CSS))
 		.pipe(gulp.dest('./public/css/'));
 });
 
@@ -178,7 +175,7 @@ gulp.task('build-dl-data-js', function() {
 		.pipe(replace("$AUTH0_CLIENT_ID", process.env.AUTH0_CLIENT_ID))
 		.pipe(replace("$AUTH0_DOMAIN", process.env.AUTH0_DOMAIN))
 		.pipe(replace("module.exports =", "var pegParser =")) //Applies only to QueryParser
-		.pipe(concat('dl_data.js'))
+		.pipe(concat(outputs.DL_DATA_JS))
 		.pipe(gulp.dest('./app/js/'));
 			
 });
@@ -204,7 +201,7 @@ gulp.task('build-dl-schema-js', function() {
 		.pipe(replace("$DONKEYLIFT_DEMO", process.env.DONKEYLIFT_DEMO))
 		.pipe(replace("$AUTH0_CLIENT_ID", process.env.AUTH0_CLIENT_ID))
 		.pipe(replace("$AUTH0_DOMAIN", process.env.AUTH0_DOMAIN))
-		.pipe(concat('dl_schema.js'))
+		.pipe(concat(outputs.DL_SCHEMA_JS))
 		.pipe(gulp.dest('./app/js/'));
 			
 });
@@ -222,24 +219,6 @@ gulp.task('build-dl-signup-js', function() {
 		.pipe(replace("$DONKEYLIFT_API", process.env.DONKEYLIFT_API))
 		.pipe(gulp.dest('./app/js/'));
 			
-});
-
-
-gulp.task('build-data-dialog-snippets', function() {
-	var snippets = ['./src/html/common/dialogs/*.html', './src/html/data/dialogs/*.html'];
-
-	return gulp.src(snippets)
-		.pipe(concat('data-dialog-snippets.html'))
-		.pipe(gulp.dest('./tmp/'));
-	
-});
-
-gulp.task('build-data-template-snippets', function() {
-	var snippets = ['./src/html/common/templates/*.html', './src/html/data/templates/*.html'];
-
-	return gulp.src(snippets)
-		.pipe(concat('data-template-snippets.html'))
-		.pipe(gulp.dest('./tmp/'));
 });
 
 
@@ -286,23 +265,6 @@ gulp.task('build-data-html', function() {
 		.pipe(gulp.dest('./app/'));
 });
 
-
-gulp.task('build-schema-dialog-snippets', function() {
-	var snippets = ['./src/html/common/dialogs/*.html', './src/html/schema/dialogs/*.html'];
-
-	return gulp.src(snippets)
-		.pipe(concat('schema-dialog-snippets.html'))
-		.pipe(gulp.dest('./tmp/'));
-	
-});
-
-gulp.task('build-schema-template-snippets', function() {
-	var snippets = ['./src/html/common/templates/*.html', './src/html/schema/templates/*.html'];
-
-	return gulp.src(snippets)
-		.pipe(concat('schema-template-snippets.html'))
-		.pipe(gulp.dest('./tmp/'));
-});
 
 gulp.task('build-schema-html', function() {
 

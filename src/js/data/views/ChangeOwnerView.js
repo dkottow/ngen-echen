@@ -7,27 +7,12 @@ Donkeylift.ChangeOwnerView = Backbone.View.extend({
 		'click #modalOwnerUpdate': 'evUpdateClick',
 	},
 
-	template: _.template($('#change-owner-item-template').html()),
-
 	initialize: function() {
 		console.log("ChangeOwnerView.init");
 	},
 
 	render: function() {
-		var el = this.$('select');
-		el.empty();
-		el.append(this.template({ 
-			user: '' //add empty 
-		}));
-		this.model.get('users').each(function(user) {
-			el.append(this.template({ 
-				user: user.get('name') 
-			}));
-		}, this);	
-		
-
 		$('#modalChangeOwner').modal();
-
 		return this;
 	},
 
