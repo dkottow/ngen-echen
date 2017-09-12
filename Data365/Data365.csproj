@@ -43,6 +43,7 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include=".gitignore" />
     <Content Include="Content\api\css\print.css" />
     <Content Include="Content\api\css\reset.css" />
     <Content Include="Content\api\css\screen.css" />
@@ -84,11 +85,25 @@
     <Content Include="Content\api\o2c.html" />
     <Content Include="Content\api\swagger-ui.js" />
     <Content Include="Content\api\swagger-ui.min.js" />
+    <Content Include="Content\css\dl_3rdparty.css" />
+    <Content Include="Content\css\dl_common.css" />
     <Content Include="Pages\SchemaEditor.aspx" />
+    <Content Include="Scripts\api\dl_swagger.js" />
+    <Content Include="Scripts\api\lib\backbone-min.js" />
+    <Content Include="Scripts\api\lib\handlebars-2.0.0.js" />
+    <Content Include="Scripts\api\lib\highlight.7.3.pack.js" />
+    <Content Include="Scripts\api\lib\jquery-1.8.0.min.js" />
+    <Content Include="Scripts\api\lib\jquery.ba-bbq.min.js" />
+    <Content Include="Scripts\api\lib\jquery.slideto.min.js" />
+    <Content Include="Scripts\api\lib\jquery.wiggle.min.js" />
+    <Content Include="Scripts\api\lib\jsoneditor.min.js" />
+    <Content Include="Scripts\api\lib\marked.js" />
+    <Content Include="Scripts\api\lib\swagger-oauth.js" />
+    <Content Include="Scripts\api\lib\underscore-min.js" />
+    <Content Include="Scripts\api\swagger-ui.min.js" />
     <Content Include="Scripts\dl_3rdparty.js" />
     <Content Include="Scripts\dl_data.js" />
     <Content Include="src\DataBrowser.aspx" />
-    <None Include=".env" />
     <None Include="Content\api\fonts\DroidSans-Bold.ttf" />
     <None Include="Content\api\fonts\DroidSans.ttf" />
     <None Include="Content\api\lib\underscore-min.map" />
@@ -177,10 +192,7 @@
       <SubType>Designer</SubType>
     </AppManifestFile>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Content\css\" />
-    <Folder Include="Scripts\api\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Reference Include="System" />
   </ItemGroup>

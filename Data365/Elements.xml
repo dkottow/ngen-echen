@@ -5,6 +5,6 @@
     <File Path="package.json" Url="package.json" ReplaceContent="TRUE" />
     <File Path="src\DataBrowser.aspx" Url="src/DataBrowser.aspx" ReplaceContent="TRUE" />
     <File Path="src\SchemaEditor.aspx" Url="src/SchemaEditor.aspx" ReplaceContent="TRUE" />
-    <File Path=".env" Url=".env" ReplaceContent="TRUE" />
+    <File Path=".gitignore" Url=".gitignore" ReplaceContent="TRUE" />
   </Module>
 </Elements>

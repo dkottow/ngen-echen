@@ -12,7 +12,9 @@ var markdown = require('gulp-markdown');
 var insert = require('gulp-insert');
 var rename = require('gulp-rename');
 
-require('dotenv').config();
+//require('dotenv').config();
+process.env.DONKEYLIFT_API = "https://azd365testwuas.azurewebsites.net";
+process.env.DONKEYLIFT_DEMO = 1;
 
 var inputs = {
     SRC_DIR: '../src/',
@@ -163,20 +165,20 @@ gulp.task('build-dl-schema-js', function () {
 
 gulp.task('build-dl-3rdparty-js', function () {
     return gulp.src([
-		inputs.SRC_DIR + ver3rd.JQUERY + 'jquery.min.js'
-		, inputs.SRC_DIR + 'underscore/underscore.js'
-		, inputs.SRC_DIR + 'backbone/backbone.js'
-		, inputs.SRC_DIR + ver3rd.BOOTSTRAP + 'js/bootstrap.min.js'
-		, inputs.SRC_DIR + 'jwt-decode/jwt-decode.min.js'
-		, inputs.SRC_DIR + 'typeahead/typeahead.bundle.js'
-		, inputs.SRC_DIR + 'JSON-Patch-master/dist/json-patch-duplex.min.js'
-		, inputs.SRC_DIR + 'vis/vis.min.js'
-		, inputs.SRC_DIR + ver3rd.DATATABLES + 'datatables.min.js'
-		, inputs.SRC_DIR + 'jquery-sortable/jquery-sortable-min.js'
-		, inputs.SRC_DIR + 'bootstrap-datepicker/js/bootstrap-datepicker.min.js'
-		, inputs.SRC_DIR + 'bootstrap-slider/bootstrap-slider.min.js'
-		, inputs.SRC_DIR + 'clipboard.js/clipboard.min.js'
-		, inputs.SRC_DIR + 'bootstrap-select/js/bootstrap-select.min.js'
+		inputs.SRC_3RDPARTY_DIR + ver3rd.JQUERY + 'jquery.min.js'
+		, inputs.SRC_3RDPARTY_DIR + 'underscore/underscore.js'
+		, inputs.SRC_3RDPARTY_DIR + 'backbone/backbone.js'
+		, inputs.SRC_3RDPARTY_DIR + ver3rd.BOOTSTRAP + 'js/bootstrap.min.js'
+		, inputs.SRC_3RDPARTY_DIR + 'jwt-decode/jwt-decode.min.js'
+		, inputs.SRC_3RDPARTY_DIR + 'typeahead/typeahead.bundle.js'
+		, inputs.SRC_3RDPARTY_DIR + 'JSON-Patch-master/dist/json-patch-duplex.min.js'
+		, inputs.SRC_3RDPARTY_DIR + 'vis/vis.min.js'
+		, inputs.SRC_3RDPARTY_DIR + ver3rd.DATATABLES + 'datatables.min.js'
+		, inputs.SRC_3RDPARTY_DIR + 'jquery-sortable/jquery-sortable-min.js'
+		, inputs.SRC_3RDPARTY_DIR + 'bootstrap-datepicker/js/bootstrap-datepicker.min.js'
+		, inputs.SRC_3RDPARTY_DIR + 'bootstrap-slider/bootstrap-slider.min.js'
+		, inputs.SRC_3RDPARTY_DIR + 'clipboard.js/clipboard.min.js'
+		, inputs.SRC_3RDPARTY_DIR + 'bootstrap-select/js/bootstrap-select.min.js'
 
 		, inputs.EXT_DIR + ver3rd.DATATABLES_EDITOR + 'js/dataTables.editor.min.js'
 		, inputs.EXT_DIR + ver3rd.DATATABLES_EDITOR + 'js/editor.bootstrap.js'
@@ -199,21 +201,21 @@ gulp.task('build-dl-swagger-js', ['copy-api-swagger-js', 'copy-api-swagger-lib-j
 
 gulp.task('copy-api-swagger-js', function () {
     return gulp.src([
-        inputs.SRC_3RDPARTY_DIR + ver3rd.SWAGGER_UI + '/dist/swagger-ui.min.js'
+        inputs.SRC_3RDPARTY_DIR + ver3rd.SWAGGER_UI + 'dist/swagger-ui.min.js'
     ])
 	.pipe(gulp.dest(outputs.JS_DIR + 'api'));
 });
 
 gulp.task('copy-api-swagger-lib-js', function () {
     return gulp.src([
-        inputs.SRC_3RDPARTY_DIR + ver3rd.SWAGGER_UI + '/dist/lib/*.js',
+        inputs.SRC_3RDPARTY_DIR + ver3rd.SWAGGER_UI + 'dist/lib/*.js',
     ])
 	.pipe(gulp.dest(outputs.JS_DIR + 'api/lib'));
 
 });
 
 gulp.task('copy-api-swagger-dist', function () {
-    return gulp.src([inputs.SRC_3RDPARTY_DIR + ver3rd.SWAGGER_UI + '/dist/**'])
+    return gulp.src([inputs.SRC_3RDPARTY_DIR + ver3rd.SWAGGER_UI + 'dist/**'])
 	.pipe(gulp.dest('./Content/api'));
 
 });
@@ -236,12 +238,12 @@ gulp.task('build-dl-3rdparty-css', ['copy-fonts'], function () {
 				, inputs.SRC_3RDPARTY_DIR + 'bootstrap-slider/css/bootstrap-slider.min.css'
 				, inputs.SRC_3RDPARTY_DIR + 'bootstrap-select/css/bootstrap-select.min.css'
 
-//				, extdir + ver3rd.DATATABLES_EDITOR + '/css/editor.dataTables.min.css' 
-				, inputs.EXT_DIR + ver3rd.DATATABLES_EDITOR + '/css/editor.bootstrap.min.css'
+//				, extdir + ver3rd.DATATABLES_EDITOR + 'css/editor.dataTables.min.css' 
+				, inputs.EXT_DIR + ver3rd.DATATABLES_EDITOR + 'css/editor.bootstrap.min.css'
     ])
 
-		.pipe(concat(outputs.DL_3RDPARTY_CSS))
-		.pipe(gulp.dest(outputs.CSS_DIR));
+	.pipe(concat(outputs.DL_3RDPARTY_CSS))
+	.pipe(gulp.dest(outputs.CSS_DIR));
 });
 
 gulp.task('copy-fonts', function () {

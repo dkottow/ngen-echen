@@ -56,5 +56,7 @@
     <File Path="Content\api\lib\swagger-oauth.js" Url="Content/api/lib/swagger-oauth.js" ReplaceContent="TRUE" />
     <File Path="Content\api\lib\underscore-min.js" Url="Content/api/lib/underscore-min.js" ReplaceContent="TRUE" />
     <File Path="Content\api\lib\underscore-min.map" Url="Content/api/lib/underscore-min.map" ReplaceContent="TRUE" />
+    <File Path="Content\css\dl_3rdparty.css" Url="Content/css/dl_3rdparty.css" ReplaceContent="TRUE" />
+    <File Path="Content\css\dl_common.css" Url="Content/css/dl_common.css" ReplaceContent="TRUE" />
   </Module>
 </Elements>

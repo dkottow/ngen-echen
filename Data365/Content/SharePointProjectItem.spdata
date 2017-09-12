@@ -57,5 +57,7 @@
     <ProjectItemFile Source="api\lib\swagger-oauth.js" Target="Content\api\lib\" Type="ElementFile" />
     <ProjectItemFile Source="api\lib\underscore-min.js" Target="Content\api\lib\" Type="ElementFile" />
     <ProjectItemFile Source="api\lib\underscore-min.map" Target="Content\api\lib\" Type="ElementFile" />
+    <ProjectItemFile Source="css\dl_3rdparty.css" Target="Content\css\" Type="ElementFile" />
+    <ProjectItemFile Source="css\dl_common.css" Target="Content\css\" Type="ElementFile" />
   </Files>
 </ProjectItem>

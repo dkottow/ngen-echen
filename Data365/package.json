@@ -9,8 +9,6 @@
     "gulp-replace": "*",
     "gulp-if": "*",
     "gulp-insert": "*",
-    "gulp-rename": "*",
-    "gulp-markdown": "*",
-    "gulp-git": "*"
+    "gulp-rename": "*"
   }
 }

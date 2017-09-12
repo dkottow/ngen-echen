@@ -14,5 +14,18 @@
     <ProjectItemFile Source="WebApi.js" Target="Scripts\" Type="ElementFile" />
     <ProjectItemFile Source="dl_data.js" Target="Scripts\" Type="ElementFile" />
     <ProjectItemFile Source="dl_3rdparty.js" Target="Scripts\" Type="ElementFile" />
+    <ProjectItemFile Source="api\dl_swagger.js" Target="Scripts\api\" Type="ElementFile" />
+    <ProjectItemFile Source="api\swagger-ui.min.js" Target="Scripts\api\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lib\backbone-min.js" Target="Scripts\api\lib\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lib\handlebars-2.0.0.js" Target="Scripts\api\lib\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lib\highlight.7.3.pack.js" Target="Scripts\api\lib\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lib\jquery-1.8.0.min.js" Target="Scripts\api\lib\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lib\jquery.ba-bbq.min.js" Target="Scripts\api\lib\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lib\jquery.slideto.min.js" Target="Scripts\api\lib\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lib\jquery.wiggle.min.js" Target="Scripts\api\lib\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lib\jsoneditor.min.js" Target="Scripts\api\lib\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lib\marked.js" Target="Scripts\api\lib\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lib\swagger-oauth.js" Target="Scripts\api\lib\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lib\underscore-min.js" Target="Scripts\api\lib\" Type="ElementFile" />
   </Files>
 </ProjectItem>

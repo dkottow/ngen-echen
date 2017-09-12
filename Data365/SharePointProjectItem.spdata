@@ -6,6 +6,6 @@
     <ProjectItemFile Source="package.json" Type="ElementFile" />
     <ProjectItemFile Source="src\DataBrowser.aspx" Target="src\" Type="ElementFile" />
     <ProjectItemFile Source="src\SchemaEditor.aspx" Target="src\" Type="ElementFile" />
-    <ProjectItemFile Source=".env" Type="ElementFile" />
+    <ProjectItemFile Source=".gitignore" Type="ElementFile" />
   </Files>
 </ProjectItem>

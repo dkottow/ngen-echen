@@ -1,2 +1,8 @@
+/bin
+/obj
+/pkg
+/pkgobj
+/packages
+/.vs
 /node_modules
 .env
