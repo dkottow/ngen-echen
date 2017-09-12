@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ProjectItem Type="Microsoft.VisualStudio.SharePoint.Module" DefaultFile="Elements.xml" SupportedTrustLevels="All" SupportedDeploymentScopes="Web, Site" xmlns="http://schemas.microsoft.com/VisualStudio/2010/SharePointTools/SharePointProjectItemModel">
+  <Files>
+    <ProjectItemFile Source="Elements.xml" Target="Content\" Type="ElementManifest" />
+    <ProjectItemFile Source="fonts\FontAwesome.otf" Target="Content\fonts\" Type="ElementFile" />
+    <ProjectItemFile Source="fonts\fontawesome-webfont.eot" Target="Content\fonts\" Type="ElementFile" />
+    <ProjectItemFile Source="fonts\fontawesome-webfont.svg" Target="Content\fonts\" Type="ElementFile" />
+    <ProjectItemFile Source="fonts\fontawesome-webfont.ttf" Target="Content\fonts\" Type="ElementFile" />
+    <ProjectItemFile Source="fonts\fontawesome-webfont.woff" Target="Content\fonts\" Type="ElementFile" />
+    <ProjectItemFile Source="fonts\fontawesome-webfont.woff2" Target="Content\fonts\" Type="ElementFile" />
+    <ProjectItemFile Source="fonts\glyphicons-halflings-regular.eot" Target="Content\fonts\" Type="ElementFile" />
+    <ProjectItemFile Source="fonts\glyphicons-halflings-regular.svg" Target="Content\fonts\" Type="ElementFile" />
+    <ProjectItemFile Source="fonts\glyphicons-halflings-regular.ttf" Target="Content\fonts\" Type="ElementFile" />
+    <ProjectItemFile Source="fonts\glyphicons-halflings-regular.woff" Target="Content\fonts\" Type="ElementFile" />
+    <ProjectItemFile Source="fonts\glyphicons-halflings-regular.woff2" Target="Content\fonts\" Type="ElementFile" />
+    <ProjectItemFile Source="api\index.html" Target="Content\api\" Type="ElementFile" />
+    <ProjectItemFile Source="api\o2c.html" Target="Content\api\" Type="ElementFile" />
+    <ProjectItemFile Source="api\swagger-ui.js" Target="Content\api\" Type="ElementFile" />
+    <ProjectItemFile Source="api\swagger-ui.min.js" Target="Content\api\" Type="ElementFile" />
+    <ProjectItemFile Source="api\css\print.css" Target="Content\api\css\" Type="ElementFile" />
+    <ProjectItemFile Source="api\css\reset.css" Target="Content\api\css\" Type="ElementFile" />
+    <ProjectItemFile Source="api\css\screen.css" Target="Content\api\css\" Type="ElementFile" />
+    <ProjectItemFile Source="api\css\style.css" Target="Content\api\css\" Type="ElementFile" />
+    <ProjectItemFile Source="api\css\typography.css" Target="Content\api\css\" Type="ElementFile" />
+    <ProjectItemFile Source="api\fonts\DroidSans-Bold.ttf" Target="Content\api\fonts\" Type="ElementFile" />
+    <ProjectItemFile Source="api\fonts\DroidSans.ttf" Target="Content\api\fonts\" Type="ElementFile" />
+    <ProjectItemFile Source="api\images\collapse.gif" Target="Content\api\images\" Type="ElementFile" />
+    <ProjectItemFile Source="api\images\expand.gif" Target="Content\api\images\" Type="ElementFile" />
+    <ProjectItemFile Source="api\images\explorer_icons.png" Target="Content\api\images\" Type="ElementFile" />
+    <ProjectItemFile Source="api\images\favicon-16x16.png" Target="Content\api\images\" Type="ElementFile" />
+    <ProjectItemFile Source="api\images\favicon-32x32.png" Target="Content\api\images\" Type="ElementFile" />
+    <ProjectItemFile Source="api\images\favicon.ico" Target="Content\api\images\" Type="ElementFile" />
+    <ProjectItemFile Source="api\images\logo_small.png" Target="Content\api\images\" Type="ElementFile" />
+    <ProjectItemFile Source="api\images\pet_store_api.png" Target="Content\api\images\" Type="ElementFile" />
+    <ProjectItemFile Source="api\images\throbber.gif" Target="Content\api\images\" Type="ElementFile" />
+    <ProjectItemFile Source="api\images\wordnik_api.png" Target="Content\api\images\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lang\en.js" Target="Content\api\lang\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lang\es.js" Target="Content\api\lang\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lang\fr.js" Target="Content\api\lang\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lang\it.js" Target="Content\api\lang\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lang\ja.js" Target="Content\api\lang\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lang\pl.js" Target="Content\api\lang\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lang\pt.js" Target="Content\api\lang\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lang\ru.js" Target="Content\api\lang\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lang\tr.js" Target="Content\api\lang\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lang\translator.js" Target="Content\api\lang\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lang\zh-cn.js" Target="Content\api\lang\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lib\backbone-min.js" Target="Content\api\lib\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lib\handlebars-2.0.0.js" Target="Content\api\lib\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lib\highlight.7.3.pack.js" Target="Content\api\lib\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lib\jquery-1.8.0.min.js" Target="Content\api\lib\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lib\jquery.ba-bbq.min.js" Target="Content\api\lib\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lib\jquery.slideto.min.js" Target="Content\api\lib\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lib\jquery.wiggle.min.js" Target="Content\api\lib\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lib\jsoneditor.min.js" Target="Content\api\lib\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lib\marked.js" Target="Content\api\lib\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lib\swagger-oauth.js" Target="Content\api\lib\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lib\underscore-min.js" Target="Content\api\lib\" Type="ElementFile" />
+    <ProjectItemFile Source="api\lib\underscore-min.map" Target="Content\api\lib\" Type="ElementFile" />
+  </Files>
+</ProjectItem>

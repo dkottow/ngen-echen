@@ -1,0 +1,193 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3AD4854A-915D-40A4-B588-0493652C9126}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>RMDataService</RootNamespace>
+    <AssemblyName>RMDataService</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetOfficeVersion>16.1</TargetOfficeVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{C1CDDADD-2546-481F-9697-4EA41081F2FC};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <MinimumVisualStudioVersion>12.0</MinimumVisualStudioVersion>
+    <MinimumOfficeToolsVersion>12.2</MinimumOfficeToolsVersion>
+    <IncludeAssemblyInPackage>False</IncludeAssemblyInPackage>
+    <ProjectMode>SharePointApp</ProjectMode>
+    <AppFeaturePartId>{6fb089c4-7cdf-4e57-806d-2a77029892c8}</AppFeaturePartId>
+    <WspPartId>{8355b479-1e12-432f-b056-0f4c82432dca}</WspPartId>
+    <WorkflowPartId>{b851ce8c-33f7-4ea1-bcae-39f7cdaa1c81}</WorkflowPartId>
+    <CspkgPartId>{76a53edc-a015-4673-9f7d-2b69f1159f25}</CspkgPartId>
+    <SqlPackagePartId>{cb754ca5-a044-402e-b67c-8bb9a758f162}</SqlPackagePartId>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="Content\api\css\print.css" />
+    <Content Include="Content\api\css\reset.css" />
+    <Content Include="Content\api\css\screen.css" />
+    <Content Include="Content\api\css\style.css" />
+    <Content Include="Content\api\css\typography.css" />
+    <Content Include="Content\api\images\collapse.gif" />
+    <Content Include="Content\api\images\expand.gif" />
+    <Content Include="Content\api\images\explorer_icons.png" />
+    <Content Include="Content\api\images\favicon-16x16.png" />
+    <Content Include="Content\api\images\favicon-32x32.png" />
+    <Content Include="Content\api\images\favicon.ico" />
+    <Content Include="Content\api\images\logo_small.png" />
+    <Content Include="Content\api\images\pet_store_api.png" />
+    <Content Include="Content\api\images\throbber.gif" />
+    <Content Include="Content\api\images\wordnik_api.png" />
+    <Content Include="Content\api\index.html" />
+    <Content Include="Content\api\lang\en.js" />
+    <Content Include="Content\api\lang\es.js" />
+    <Content Include="Content\api\lang\fr.js" />
+    <Content Include="Content\api\lang\it.js" />
+    <Content Include="Content\api\lang\ja.js" />
+    <Content Include="Content\api\lang\pl.js" />
+    <Content Include="Content\api\lang\pt.js" />
+    <Content Include="Content\api\lang\ru.js" />
+    <Content Include="Content\api\lang\tr.js" />
+    <Content Include="Content\api\lang\translator.js" />
+    <Content Include="Content\api\lang\zh-cn.js" />
+    <Content Include="Content\api\lib\backbone-min.js" />
+    <Content Include="Content\api\lib\handlebars-2.0.0.js" />
+    <Content Include="Content\api\lib\highlight.7.3.pack.js" />
+    <Content Include="Content\api\lib\jquery-1.8.0.min.js" />
+    <Content Include="Content\api\lib\jquery.ba-bbq.min.js" />
+    <Content Include="Content\api\lib\jquery.slideto.min.js" />
+    <Content Include="Content\api\lib\jquery.wiggle.min.js" />
+    <Content Include="Content\api\lib\jsoneditor.min.js" />
+    <Content Include="Content\api\lib\marked.js" />
+    <Content Include="Content\api\lib\swagger-oauth.js" />
+    <Content Include="Content\api\lib\underscore-min.js" />
+    <Content Include="Content\api\o2c.html" />
+    <Content Include="Content\api\swagger-ui.js" />
+    <Content Include="Content\api\swagger-ui.min.js" />
+    <Content Include="Pages\SchemaEditor.aspx" />
+    <Content Include="Scripts\dl_3rdparty.js" />
+    <Content Include="Scripts\dl_data.js" />
+    <Content Include="src\DataBrowser.aspx" />
+    <None Include=".env" />
+    <None Include="Content\api\fonts\DroidSans-Bold.ttf" />
+    <None Include="Content\api\fonts\DroidSans.ttf" />
+    <None Include="Content\api\lib\underscore-min.map" />
+    <None Include="package.json" />
+    <None Include="Content\fonts\fontawesome-webfont.eot" />
+    <None Include="Content\fonts\fontawesome-webfont.ttf" />
+    <None Include="Content\fonts\fontawesome-webfont.woff" />
+    <None Include="Content\fonts\fontawesome-webfont.woff2" />
+    <None Include="Content\fonts\FontAwesome.otf" />
+    <None Include="Content\fonts\glyphicons-halflings-regular.eot" />
+    <None Include="Content\fonts\glyphicons-halflings-regular.ttf" />
+    <None Include="Content\fonts\glyphicons-halflings-regular.woff" />
+    <None Include="Content\fonts\glyphicons-halflings-regular.woff2" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Pages\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{ac9a87dc-c526-42e7-91d9-fda43229b20c}</SharePointProjectItemId>
+    </None>
+    <Content Include="gulpfile.js" />
+    <Content Include="Pages\WebApi.aspx" />
+    <Content Include="Scripts\WebApi.js" />
+    <Content Include="Content\fonts\fontawesome-webfont.svg" />
+    <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Elements.xml" />
+    <Content Include="Images\progress-spinner.gif" />
+    <Content Include="Pages\DataBrowser.aspx" />
+    <Content Include="Pages\Elements.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Pages\Default.aspx" />
+    <None Include="SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{f715d94f-daad-472c-a555-af6ae2360089}</SharePointProjectItemId>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Scripts\jquery-1.9.1.min.map" />
+    <None Include="Scripts\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{cb754ca5-a044-402e-b67c-8bb9a758f162}</SharePointProjectItemId>
+    </None>
+    <Content Include="src\SchemaEditor.aspx" />
+    <Content Include="Scripts\SchemaEditor.js" />
+    <Content Include="Scripts\DataBrowser.js" />
+    <Content Include="Scripts\Config.js" />
+    <Content Include="Scripts\dl_schema.js" />
+    <Content Include="Scripts\Elements.xml" />
+    <Content Include="Scripts\jquery-1.9.1.intellisense.js" />
+    <Content Include="Scripts\jquery-1.9.1.js" />
+    <Content Include="Scripts\jquery-1.9.1.min.js" />
+    <Content Include="Scripts\Settings.js" />
+    <Content Include="Scripts\_references.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Content\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{2ebf8551-cde1-4eaf-8477-2c2669257a00}</SharePointProjectItemId>
+    </None>
+    <Content Include="Content\Elements.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Images\AppIcon.png">
+      <OpcRelationship>manifest-icon</OpcRelationship>
+    </Content>
+    <Content Include="Images\Elements.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <None Include="Images\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{62195172-f3d5-4b62-9ad3-6b6543f76a50}</SharePointProjectItemId>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Package\Package.package">
+      <PackageId>{6cbe0131-b2e8-4ba5-8f04-7b24cee1a545}</PackageId>
+    </None>
+    <None Include="Package\Package.Template.xml">
+      <DependentUpon>Package.package</DependentUpon>
+    </None>
+    <None Include="Features\Feature1\Feature1.feature">
+      <FeatureId>{714fcb07-b0b5-429c-8244-0bed848ed9ef}</FeatureId>
+    </None>
+    <None Include="Features\Feature1\Feature1.Template.xml">
+      <DependentUpon>Feature1.feature</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <AppManifestFile Include="AppManifest.xml">
+      <SubType>Designer</SubType>
+    </AppManifestFile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Content\css\" />
+    <Folder Include="Scripts\api\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(VSToolsPath)\SharePointTools\Microsoft.VisualStudio.SharePoint.targets" Condition="'$(VSToolsPath)' != ''" />
+</Project>

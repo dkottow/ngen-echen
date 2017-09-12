@@ -1,0 +1,16 @@
+{
+	"version": "1.0.0",
+	"name": "asp.net",
+	"private": true,
+  "devDependencies": {
+    "gulp": "3.9.1",
+    "gulp-concat": "*",
+    "gulp-inject": "*",
+    "gulp-replace": "*",
+    "gulp-if": "*",
+    "gulp-insert": "*",
+    "gulp-rename": "*",
+    "gulp-markdown": "*",
+    "gulp-git": "*"
+  }
+}

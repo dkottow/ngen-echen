@@ -1,0 +1,279 @@
+
+body {
+	background-color: white;
+}
+
+.navbar-nav > li > a, .navbar-brand {
+    padding-top:10px !important; padding-bottom:0 !important;
+    height: 40px;
+}
+.navbar {min-height:30px !important;}
+
+.side-nav {
+	top: 50px;
+}
+
+#main {
+	margin-top: 40px;
+}
+
+#ajax-progress-spinner {
+	display: none;
+	position: absolute;
+	z-index: 999;
+	right: 30px;
+	bottom: 30px;
+}
+
+#grid-panel {
+	padding: 1em;
+}
+
+#sidebar {
+  padding-top: 10px;
+} 
+
+#menu {
+  margin-top: 10px;	
+  margin-left: 1em;	
+}
+
+#schema-dropdown span {
+	color: black;
+	font-weight: bold;
+}
+
+#table-list span {
+	color: grey;
+	font-weight: bold;
+}
+
+#table-list a.active {
+	background-color: #eee;
+	color: black;
+	font-weight: bold;
+	border: 0;
+}
+
+#nav-login {
+	color: darkred;
+	font-weight: bold;
+}
+
+#modalSchemaResultMessage {
+	margin-right: 1em;
+}
+
+.navbar-top-btn  {
+	margin-top: 8px;
+	margin-right: 15px;
+}
+
+#toggle-sidebar {
+	margin-left: -20px;
+	margin-right: 20px;
+}
+
+.tab-pane {
+	padding: 1em;
+}
+
+.edit-table {
+	margin-right: 1em;
+}
+
+.panel {
+	margin: 0.5em;
+}
+
+.panel-collapse {
+	padding: 1em 1em 1em 3em;
+}
+
+.field-panel {
+	margin-bottom: 1em;
+}
+
+.panel-title {
+	font-size: large;
+}
+
+.panel-title span {
+	color: grey;
+}
+
+.tab-table {
+	float: left;
+	max-width: 80%;
+	margin-bottom: 1em;
+	margin-right: 2em;
+}
+
+
+/* line 94, /Users/jonasvonandrian/jquery-sortable/source/css/application.css.sass */
+.sortable-table tr {
+  cursor: pointer; }
+/* line 96, /Users/jonasvonandrian/jquery-sortable/source/css/application.css.sass */
+.sortable-table tr.placeholder {
+  display: block;
+  background: red;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  border: none; }
+  /* line 103, /Users/jonasvonandrian/jquery-sortable/source/css/application.css.sass */
+  .sortable-table tr.placeholder:before {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    border: 5px solid transparent;
+    border-left-color: red;
+    margin-top: -5px;
+    left: -5px;
+    border-right: none; }
+
+
+.field-table>tbody>tr>td, .relation-table>tbody>tr>td {
+	vertical-align: middle;
+}
+
+table.dataTable {
+	white-space: nowrap; 
+}
+
+.dataTable th {
+	white-space: nowrap; 
+	padding: 5px;
+	border-bottom: 1px solid black;
+}
+
+.dataTable td {
+	padding: 5px;
+	border-bottom: 1px solid #ddd;
+}
+
+#grid_length label, #grid_filter label {
+	font-weight: normal;
+}
+
+.filter-column {
+	width: 32em;
+}
+.filter-form {
+	padding: 10px;
+}
+#sliderRange {
+	margin: 10px;
+}
+
+
+#inputFilterMax, #inputFilterMin {
+	width: 12em;
+}
+
+#inputFilterMin {
+	margin-right: 4em;
+}
+
+#inputFilterItemsSearch {
+	width: 10.5em;
+}
+
+#filterOptions, #filterSelection {
+	margin-top: 1em;
+}
+#filterOptions button, #filterSelection button {
+	padding: 3px 5px;
+}
+.filter-reset {
+	text-align: right; margin-top: 1em	
+}
+
+.filter-btn-active {
+	border: 1px solid blue;
+}
+
+.scrollable-menu {
+	height: auto;
+	max-height: 21em;
+	overflow-x: hidden;
+}
+
+.col-sm-0 {
+    width: 0px;
+    float: left;
+    overflow: hidden;
+    margin: 0px;
+    padding: 0px;
+    min-height: 1px;
+}
+
+/* typeahead */
+
+.tt-menu {
+  background-color: white;
+  cursor: pointer;
+}
+
+.tt-suggestion {
+	padding: 3px;
+}
+
+.tt-suggestion:hover {
+	background-color: #ddd;
+}
+
+/***** schema.css *****/
+
+.table > tbody > tr > td {
+	vertical-align: middle;
+}
+
+
+#modalToggleProps {
+	
+}
+
+.btn-field-up, .btn-field-down {
+	padding: 6px 6px;
+}
+
+#fields td:nth-child(1) {
+	width: 80px;
+}
+
+#fields td:nth-child(2) {
+	width: 8px;
+}
+
+.field-primary-key {
+	color: #d80;
+}
+
+.field-foreign-key {
+	color: #888;
+}
+
+.field-no-key {
+	visibility: hidden;
+}
+
+#vis-graph {
+	height: 600px;
+} 
+
+#csv-textarea {
+	width: 100%;
+	height: 10em;
+}
+
+/******* compat SP *******/
+
+button, .btn {
+	min-width: 0;
+}
+
+.col-sm-3 {
+	max-width: 16em;
+}

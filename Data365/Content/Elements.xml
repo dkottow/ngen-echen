@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+  <Module Name="Content">
+    <File Path="Content\fonts\FontAwesome.otf" Url="Content/fonts/FontAwesome.otf" ReplaceContent="TRUE" />
+    <File Path="Content\fonts\fontawesome-webfont.eot" Url="Content/fonts/fontawesome-webfont.eot" ReplaceContent="TRUE" />
+    <File Path="Content\fonts\fontawesome-webfont.svg" Url="Content/fonts/fontawesome-webfont.svg" ReplaceContent="TRUE" />
+    <File Path="Content\fonts\fontawesome-webfont.ttf" Url="Content/fonts/fontawesome-webfont.ttf" ReplaceContent="TRUE" />
+    <File Path="Content\fonts\fontawesome-webfont.woff" Url="Content/fonts/fontawesome-webfont.woff" ReplaceContent="TRUE" />
+    <File Path="Content\fonts\fontawesome-webfont.woff2" Url="Content/fonts/fontawesome-webfont.woff2" ReplaceContent="TRUE" />
+    <File Path="Content\fonts\glyphicons-halflings-regular.eot" Url="Content/fonts/glyphicons-halflings-regular.eot" ReplaceContent="TRUE" />
+    <File Path="Content\fonts\glyphicons-halflings-regular.svg" Url="Content/fonts/glyphicons-halflings-regular.svg" ReplaceContent="TRUE" />
+    <File Path="Content\fonts\glyphicons-halflings-regular.ttf" Url="Content/fonts/glyphicons-halflings-regular.ttf" ReplaceContent="TRUE" />
+    <File Path="Content\fonts\glyphicons-halflings-regular.woff" Url="Content/fonts/glyphicons-halflings-regular.woff" ReplaceContent="TRUE" />
+    <File Path="Content\fonts\glyphicons-halflings-regular.woff2" Url="Content/fonts/glyphicons-halflings-regular.woff2" ReplaceContent="TRUE" />
+    <File Path="Content\api\index.html" Url="Content/api/index.html" ReplaceContent="TRUE" />
+    <File Path="Content\api\o2c.html" Url="Content/api/o2c.html" ReplaceContent="TRUE" />
+    <File Path="Content\api\swagger-ui.js" Url="Content/api/swagger-ui.js" ReplaceContent="TRUE" />
+    <File Path="Content\api\swagger-ui.min.js" Url="Content/api/swagger-ui.min.js" ReplaceContent="TRUE" />
+    <File Path="Content\api\css\print.css" Url="Content/api/css/print.css" ReplaceContent="TRUE" />
+    <File Path="Content\api\css\reset.css" Url="Content/api/css/reset.css" ReplaceContent="TRUE" />
+    <File Path="Content\api\css\screen.css" Url="Content/api/css/screen.css" ReplaceContent="TRUE" />
+    <File Path="Content\api\css\style.css" Url="Content/api/css/style.css" ReplaceContent="TRUE" />
+    <File Path="Content\api\css\typography.css" Url="Content/api/css/typography.css" ReplaceContent="TRUE" />
+    <File Path="Content\api\fonts\DroidSans-Bold.ttf" Url="Content/api/fonts/DroidSans-Bold.ttf" ReplaceContent="TRUE" />
+    <File Path="Content\api\fonts\DroidSans.ttf" Url="Content/api/fonts/DroidSans.ttf" ReplaceContent="TRUE" />
+    <File Path="Content\api\images\collapse.gif" Url="Content/api/images/collapse.gif" ReplaceContent="TRUE" />
+    <File Path="Content\api\images\expand.gif" Url="Content/api/images/expand.gif" ReplaceContent="TRUE" />
+    <File Path="Content\api\images\explorer_icons.png" Url="Content/api/images/explorer_icons.png" ReplaceContent="TRUE" />
+    <File Path="Content\api\images\favicon-16x16.png" Url="Content/api/images/favicon-16x16.png" ReplaceContent="TRUE" />
+    <File Path="Content\api\images\favicon-32x32.png" Url="Content/api/images/favicon-32x32.png" ReplaceContent="TRUE" />
+    <File Path="Content\api\images\favicon.ico" Url="Content/api/images/favicon.ico" ReplaceContent="TRUE" />
+    <File Path="Content\api\images\logo_small.png" Url="Content/api/images/logo_small.png" ReplaceContent="TRUE" />
+    <File Path="Content\api\images\pet_store_api.png" Url="Content/api/images/pet_store_api.png" ReplaceContent="TRUE" />
+    <File Path="Content\api\images\throbber.gif" Url="Content/api/images/throbber.gif" ReplaceContent="TRUE" />
+    <File Path="Content\api\images\wordnik_api.png" Url="Content/api/images/wordnik_api.png" ReplaceContent="TRUE" />
+    <File Path="Content\api\lang\en.js" Url="Content/api/lang/en.js" ReplaceContent="TRUE" />
+    <File Path="Content\api\lang\es.js" Url="Content/api/lang/es.js" ReplaceContent="TRUE" />
+    <File Path="Content\api\lang\fr.js" Url="Content/api/lang/fr.js" ReplaceContent="TRUE" />
+    <File Path="Content\api\lang\it.js" Url="Content/api/lang/it.js" ReplaceContent="TRUE" />
+    <File Path="Content\api\lang\ja.js" Url="Content/api/lang/ja.js" ReplaceContent="TRUE" />
+    <File Path="Content\api\lang\pl.js" Url="Content/api/lang/pl.js" ReplaceContent="TRUE" />
+    <File Path="Content\api\lang\pt.js" Url="Content/api/lang/pt.js" ReplaceContent="TRUE" />
+    <File Path="Content\api\lang\ru.js" Url="Content/api/lang/ru.js" ReplaceContent="TRUE" />
+    <File Path="Content\api\lang\tr.js" Url="Content/api/lang/tr.js" ReplaceContent="TRUE" />
+    <File Path="Content\api\lang\translator.js" Url="Content/api/lang/translator.js" ReplaceContent="TRUE" />
+    <File Path="Content\api\lang\zh-cn.js" Url="Content/api/lang/zh-cn.js" ReplaceContent="TRUE" />
+    <File Path="Content\api\lib\backbone-min.js" Url="Content/api/lib/backbone-min.js" ReplaceContent="TRUE" />
+    <File Path="Content\api\lib\handlebars-2.0.0.js" Url="Content/api/lib/handlebars-2.0.0.js" ReplaceContent="TRUE" />
+    <File Path="Content\api\lib\highlight.7.3.pack.js" Url="Content/api/lib/highlight.7.3.pack.js" ReplaceContent="TRUE" />
+    <File Path="Content\api\lib\jquery-1.8.0.min.js" Url="Content/api/lib/jquery-1.8.0.min.js" ReplaceContent="TRUE" />
+    <File Path="Content\api\lib\jquery.ba-bbq.min.js" Url="Content/api/lib/jquery.ba-bbq.min.js" ReplaceContent="TRUE" />
+    <File Path="Content\api\lib\jquery.slideto.min.js" Url="Content/api/lib/jquery.slideto.min.js" ReplaceContent="TRUE" />
+    <File Path="Content\api\lib\jquery.wiggle.min.js" Url="Content/api/lib/jquery.wiggle.min.js" ReplaceContent="TRUE" />
+    <File Path="Content\api\lib\jsoneditor.min.js" Url="Content/api/lib/jsoneditor.min.js" ReplaceContent="TRUE" />
+    <File Path="Content\api\lib\marked.js" Url="Content/api/lib/marked.js" ReplaceContent="TRUE" />
+    <File Path="Content\api\lib\swagger-oauth.js" Url="Content/api/lib/swagger-oauth.js" ReplaceContent="TRUE" />
+    <File Path="Content\api\lib\underscore-min.js" Url="Content/api/lib/underscore-min.js" ReplaceContent="TRUE" />
+    <File Path="Content\api\lib\underscore-min.map" Url="Content/api/lib/underscore-min.map" ReplaceContent="TRUE" />
+  </Module>
+</Elements>
