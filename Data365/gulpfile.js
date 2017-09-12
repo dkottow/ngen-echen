@@ -8,7 +8,6 @@ var concat = require('gulp-concat');
 var inject = require('gulp-inject');
 var replace = require('gulp-replace');
 var gulpif = require('gulp-if');
-var markdown = require('gulp-markdown');
 var insert = require('gulp-insert');
 var rename = require('gulp-rename');
 
