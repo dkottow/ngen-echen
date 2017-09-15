@@ -29,10 +29,6 @@ body {
 	padding: 1em;
 }
 
-#sidebar {
-  padding-top: 10px;
-} 
-
 #menu {
   margin-top: 10px;	
   margin-left: 1em;	
@@ -43,6 +39,24 @@ body {
 	font-weight: bold;
 }
 
+.database-info, .user-info {
+	margin-top: 10px;
+	font-weight: bold;	
+}
+
+.database-info {
+	margin-left: 15px;
+}
+
+.user-info {
+	margin-right: 15px;
+	text-align: right;
+}
+
+#table-list {
+	padding-top: 10px;
+} 
+  
 #table-list span {
 	color: grey;
 	font-weight: bold;

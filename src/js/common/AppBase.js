@@ -135,16 +135,18 @@ AppBase.prototype.onAccountLoaded = function(cbAfter) {
 
 AppBase.prototype.toggleSidebar = function() {
 	if ($('#table-list').is(':visible')) {
-        $('#menu').hide('slide');
-        $('#table-list').hide('slide', function() {
-		   	$('#module').toggleClass('col-sm-16 col-sm-13');             
-		   	$('#sidebar').toggleClass('col-sm-3 col-sm-0');
-		});
+    $('.profile-info').hide('slide');
+    $('#menu').hide();
+    $('#table-list').hide('slide', function() {
+      $('#module').toggleClass('col-sm-16 col-sm-13');             
+      $('#sidebar').toggleClass('col-sm-3 col-sm-0');
+    });
 	} else {
 		$('#module').toggleClass('col-sm-16 col-sm-13');             
 		$('#sidebar').toggleClass('col-sm-3 col-sm-0');
     $('#table-list').show('slide');
     $('#menu').show('slide');
+    $('.profile-info').show('slide');
 	}
 }
 
@@ -222,6 +224,7 @@ AppBase.prototype.setSchema = function(name, cbAfter) {
 	var updateViewsFn = function() {
 		//always false if (me.tableListView) me.tableListView.remove();
 		me.tableListView = new Donkeylift.TableListView({
+			model: me.schema,
 			collection: me.schema.get('tables')
 		});
     $('#sidebar').append(me.tableListView.el);

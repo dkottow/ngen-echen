@@ -11,12 +11,22 @@ Donkeylift.NavbarView = Backbone.View.extend({
 	initialize: function() {
 	},
 
-	navSchemaTemplate: _.template($('#nav-schema-template').html()),
+	navUserInfoTemplate: _.template($('#nav-user-info-template').html()),
 	navProfileTemplate: _.template($('#nav-profile-template').html()),
 
 	render: function() {
 		this.renderProfileDropDown();
+		this.renderUserInfo();
 		return this;
+	},
+
+	renderUserInfo: function() {
+		var $el = $('#user-info');
+		$el.empty();	
+		var html = this.navUserInfoTemplate({
+			user: this.model.get('user')
+		});
+		$el.append(html);
 	},
 
 	renderProfileDropDown: function() {
