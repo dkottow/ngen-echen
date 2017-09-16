@@ -98,13 +98,16 @@ AppBase.prototype.setAccount = function(opts, cbAfter) {
 	var me = this;
 	console.log('setAccount: ' + opts);
 
+  opts.reset = opts.reset || (!! opts.account); 
   opts.user = opts.user || sessionStorage.getItem('dl_user');
   opts.account = opts.account || sessionStorage.getItem('dl_account');
   opts.auth = opts.auth === true;
   
 	this.account = new Donkeylift.Account(opts);
 
-	this.navbarView.model = this.account;
+  if (opts.reset) me.unsetSchema();
+
+  this.navbarView.model = this.account;
   me.navbarView.render();
 
   me.menuView.render();
@@ -121,7 +124,7 @@ AppBase.prototype.loadAccount = function(opts, cbAfter) {
   opts.user = opts.user || sessionStorage.getItem('dl_user');
   opts.account = opts.account || sessionStorage.getItem('dl_account');
   opts.auth = opts.auth === true;
-  
+
 	this.account = new Donkeylift.Account(opts);
 
 	this.navbarView.model = this.account;
@@ -141,15 +144,6 @@ AppBase.prototype.loadAccount = function(opts, cbAfter) {
 
 	$('#toggle-sidebar').hide();
 }
-
-AppBase.prototype.switchAccount = function(account) {
-	this.unsetSchema();
-	this.loadAccount({ 
-		id_token: sessionStorage.getItem('id_token'), 
-		account: account
-	})
-}
-
 
 AppBase.prototype.onAccountLoaded = function(cbAfter) {
   if (cbAfter) cbAfter();

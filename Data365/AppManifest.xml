@@ -3,7 +3,7 @@
 <App xmlns="http://schemas.microsoft.com/sharepoint/2012/app/manifest"
      Name="Data365"
      ProductID="{ac9a87dc-c526-42e7-91d9-fda43229b20c}"
-     Version="1.7.1.0"
+     Version="1.7.2.1"
      SharePointMinVersion="16.0.0.0"
 >
   <Properties>
