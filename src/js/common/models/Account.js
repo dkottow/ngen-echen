@@ -24,6 +24,9 @@ Donkeylift.Account = Backbone.Model.extend({
 			this.set('app_metadata', token_attrs.app_metadata);
 			this.set('id_token', attrs.id_token);
 		}
+
+		sessionStorage.setItem('dl_user', this.get('user'));
+		sessionStorage.setItem('dl_account', this.get('name'));
 	},
 
 	url	: function() { 

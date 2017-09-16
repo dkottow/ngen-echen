@@ -79,8 +79,11 @@ AppBase.prototype.start = function(cbAfter) {
       account: sessionStorage.getItem('dl_account') || Donkeylift.DEMO_ACCOUNT,
       auth: false
     }
-		this.loadAccount(opts, cbAfter);
 
+    //TODO ? 
+		//this.loadAccount(opts, cbAfter);
+		this.setAccount(opts, cbAfter);
+    
   } else {
     //auth0 id_token in sessionStorage
     this.loadAccount({ 
@@ -89,6 +92,26 @@ AppBase.prototype.start = function(cbAfter) {
     }, cbAfter);
   }
 
+}
+
+AppBase.prototype.setAccount = function(opts, cbAfter) {
+	var me = this;
+	console.log('setAccount: ' + opts);
+
+  opts.user = opts.user || sessionStorage.getItem('dl_user');
+  opts.account = opts.account || sessionStorage.getItem('dl_account');
+  opts.auth = opts.auth === true;
+  
+	this.account = new Donkeylift.Account(opts);
+
+	this.navbarView.model = this.account;
+  me.navbarView.render();
+
+  me.menuView.render();
+  $('#content').empty();
+  me.onAccountLoaded(cbAfter);
+
+	$('#toggle-sidebar').hide();
 }
 
 AppBase.prototype.loadAccount = function(opts, cbAfter) {
@@ -102,7 +125,7 @@ AppBase.prototype.loadAccount = function(opts, cbAfter) {
 	this.account = new Donkeylift.Account(opts);
 
 	this.navbarView.model = this.account;
-
+  
   if (this.schemaListView) this.schemaListView.remove();
   this.schemaListView = new Donkeylift.SchemaListView({ model: this.account });
 
@@ -231,7 +254,7 @@ AppBase.prototype.setSchema = function(name, cbAfter) {
     me.tableListView.render();
 		$('#toggle-sidebar').show();
 
-		me.schemaListView.render();
+		if (me.schemaListView) me.schemaListView.render();
 		me.navbarView.render();
 		me.menuView.render();
 	}
