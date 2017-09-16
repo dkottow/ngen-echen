@@ -24,7 +24,7 @@ Config.update = function (fieldValues, onSuccess) {
     sessionStorage.setItem('dl_user', _spPageContextInfo.userLoginName);
     sessionStorage.setItem('dl_account', fieldValues.account);
     sessionStorage.setItem('dl_database', fieldValues.database);
-    onSuccess({
+    if (onSuccess) onSuccess({
         user: sessionStorage.getItem('dl_user'),
         account: sessionStorage.getItem('dl_account'),
         database: sessionStorage.getItem('dl_database')

@@ -200,7 +200,7 @@ gulp.task('build-dl-swagger-js', ['copy-api-swagger-js', 'copy-api-swagger-lib-j
 
 gulp.task('copy-api-swagger-js', function () {
     return gulp.src([
-        inputs.SRC_3RDPARTY_DIR + ver3rd.SWAGGER_UI + 'dist/swagger-ui.min.js'
+        inputs.SRC_3RDPARTY_DIR + ver3rd.SWAGGER_UI + 'dist/swagger-ui.js'
     ])
 	.pipe(gulp.dest(outputs.JS_DIR + 'api'));
 });

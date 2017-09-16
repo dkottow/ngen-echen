@@ -4,3 +4,4 @@
 /ext
 /tmp
 .env
+*~

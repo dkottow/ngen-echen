@@ -100,7 +100,7 @@
     <Content Include="Scripts\api\lib\marked.js" />
     <Content Include="Scripts\api\lib\swagger-oauth.js" />
     <Content Include="Scripts\api\lib\underscore-min.js" />
-    <Content Include="Scripts\api\swagger-ui.min.js" />
+    <Content Include="Scripts\api\swagger-ui.js" />
     <Content Include="Scripts\dl_3rdparty.js" />
     <Content Include="Scripts\dl_data.js" />
     <Content Include="src\DataBrowser.aspx" />

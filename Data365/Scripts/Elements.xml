@@ -14,7 +14,6 @@
     <File Path="Scripts\dl_data.js" Url="Scripts/dl_data.js" ReplaceContent="TRUE" />
     <File Path="Scripts\dl_3rdparty.js" Url="Scripts/dl_3rdparty.js" ReplaceContent="TRUE" />
     <File Path="Scripts\api\dl_swagger.js" Url="Scripts/api/dl_swagger.js" ReplaceContent="TRUE" />
-    <File Path="Scripts\api\swagger-ui.min.js" Url="Scripts/api/swagger-ui.min.js" ReplaceContent="TRUE" />
     <File Path="Scripts\api\lib\backbone-min.js" Url="Scripts/api/lib/backbone-min.js" ReplaceContent="TRUE" />
     <File Path="Scripts\api\lib\handlebars-2.0.0.js" Url="Scripts/api/lib/handlebars-2.0.0.js" ReplaceContent="TRUE" />
     <File Path="Scripts\api\lib\highlight.7.3.pack.js" Url="Scripts/api/lib/highlight.7.3.pack.js" ReplaceContent="TRUE" />
@@ -26,5 +25,6 @@
     <File Path="Scripts\api\lib\marked.js" Url="Scripts/api/lib/marked.js" ReplaceContent="TRUE" />
     <File Path="Scripts\api\lib\swagger-oauth.js" Url="Scripts/api/lib/swagger-oauth.js" ReplaceContent="TRUE" />
     <File Path="Scripts\api\lib\underscore-min.js" Url="Scripts/api/lib/underscore-min.js" ReplaceContent="TRUE" />
+    <File Path="Scripts\api\swagger-ui.js" Url="Scripts/api/swagger-ui.js" ReplaceContent="TRUE" />
   </Module>
 </Elements>

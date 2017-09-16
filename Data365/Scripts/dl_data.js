@@ -7,7 +7,7 @@ var Donkeylift = {
 // e.g. DONKEYLIFT_API. "http://api.donkeylift.com";
 
 	env: {
-	    API_BASE: "https://azwu-data365-test01.azurewebsites.net"
+	    API_BASE: "https://azd365testwuas.azurewebsites.net"
 	    , AUTH0_CLIENT_ID: "$AUTH0_CLIENT_ID"
 	    , AUTH0_DOMAIN: "$AUTH0_DOMAIN"
 	    , DEMO_FLAG: + "1"
@@ -79,8 +79,11 @@ AppBase.prototype.start = function(cbAfter) {
       account: sessionStorage.getItem('dl_account') || Donkeylift.DEMO_ACCOUNT,
       auth: false
     }
-		this.loadAccount(opts, cbAfter);
 
+    //TODO ? 
+		//this.loadAccount(opts, cbAfter);
+		this.setAccount(opts, cbAfter);
+    
   } else {
     //auth0 id_token in sessionStorage
     this.loadAccount({ 
@@ -89,6 +92,26 @@ AppBase.prototype.start = function(cbAfter) {
     }, cbAfter);
   }
 
+}
+
+AppBase.prototype.setAccount = function(opts, cbAfter) {
+	var me = this;
+	console.log('setAccount: ' + opts);
+
+  opts.user = opts.user || sessionStorage.getItem('dl_user');
+  opts.account = opts.account || sessionStorage.getItem('dl_account');
+  opts.auth = opts.auth === true;
+  
+	this.account = new Donkeylift.Account(opts);
+
+	this.navbarView.model = this.account;
+  me.navbarView.render();
+
+  me.menuView.render();
+  $('#content').empty();
+  me.onAccountLoaded(cbAfter);
+
+	$('#toggle-sidebar').hide();
 }
 
 AppBase.prototype.loadAccount = function(opts, cbAfter) {
@@ -102,7 +125,7 @@ AppBase.prototype.loadAccount = function(opts, cbAfter) {
 	this.account = new Donkeylift.Account(opts);
 
 	this.navbarView.model = this.account;
-
+  
   if (this.schemaListView) this.schemaListView.remove();
   this.schemaListView = new Donkeylift.SchemaListView({ model: this.account });
 
@@ -135,16 +158,18 @@ AppBase.prototype.onAccountLoaded = function(cbAfter) {
 
 AppBase.prototype.toggleSidebar = function() {
 	if ($('#table-list').is(':visible')) {
-        $('#menu').hide('slide');
-        $('#table-list').hide('slide', function() {
-		   	$('#module').toggleClass('col-sm-16 col-sm-13');             
-		   	$('#sidebar').toggleClass('col-sm-3 col-sm-0');
-		});
+    $('.profile-info').hide('slide');
+    $('#menu').hide();
+    $('#table-list').hide('slide', function() {
+      $('#module').toggleClass('col-sm-16 col-sm-13');             
+      $('#sidebar').toggleClass('col-sm-3 col-sm-0');
+    });
 	} else {
 		$('#module').toggleClass('col-sm-16 col-sm-13');             
 		$('#sidebar').toggleClass('col-sm-3 col-sm-0');
     $('#table-list').show('slide');
     $('#menu').show('slide');
+    $('.profile-info').show('slide');
 	}
 }
 
@@ -222,13 +247,14 @@ AppBase.prototype.setSchema = function(name, cbAfter) {
 	var updateViewsFn = function() {
 		//always false if (me.tableListView) me.tableListView.remove();
 		me.tableListView = new Donkeylift.TableListView({
+			model: me.schema,
 			collection: me.schema.get('tables')
 		});
     $('#sidebar').append(me.tableListView.el);
     me.tableListView.render();
 		$('#toggle-sidebar').show();
 
-		me.schemaListView.render();
+		if (me.schemaListView) me.schemaListView.render();
 		me.navbarView.render();
 		me.menuView.render();
 	}
@@ -596,6 +622,9 @@ Donkeylift.Account = Backbone.Model.extend({
 			this.set('app_metadata', token_attrs.app_metadata);
 			this.set('id_token', attrs.id_token);
 		}
+
+		sessionStorage.setItem('dl_user', this.get('user'));
+		sessionStorage.setItem('dl_account', this.get('name'));
 	},
 
 	url	: function() { 
@@ -2344,12 +2373,22 @@ Donkeylift.NavbarView = Backbone.View.extend({
 	initialize: function() {
 	},
 
-	navSchemaTemplate: _.template($('#nav-schema-template').html()),
+	navUserInfoTemplate: _.template($('#nav-user-info-template').html()),
 	navProfileTemplate: _.template($('#nav-profile-template').html()),
 
 	render: function() {
 		this.renderProfileDropDown();
+		this.renderUserInfo();
 		return this;
+	},
+
+	renderUserInfo: function() {
+		var $el = $('#user-info');
+		$el.empty();	
+		var html = this.navUserInfoTemplate({
+			user: this.model.get('user')
+		});
+		$el.append(html);
 	},
 
 	renderProfileDropDown: function() {
@@ -2432,7 +2471,6 @@ Donkeylift.ProfileView = Backbone.View.extend({
 		this.$el.html(this.template({
 			user: this.model.get("user"),
 			account: this.model.get("name"),
-			isAdmin: this.model.get("app_metadata").admin === true,
 		}));
 		$('#menu').empty(); //clear module menu
 	},
@@ -2521,8 +2559,8 @@ Donkeylift.TableListView = Backbone.View.extend({
 
 	render: function() {
 		var me = this;
-		console.log('TableListView.render ');			
-		this.$el.html(this.template());
+		console.log('TableListView.render ');	
+		this.$el.html(this.template({ database: me.model.get('name') }));
 		this.collection.each(function(table) {
 			var visible = table.getProp('visible') == true;
 			if (visible) {
@@ -2543,7 +2581,6 @@ Donkeylift.TableListView = Backbone.View.extend({
 		$('#selectShowTables').selectpicker('refresh');
 
 		$('#selectShowTables').on('hidden.bs.select', function (e) {
-console.log('dada');
 			me.render();
 		});
 		return this;

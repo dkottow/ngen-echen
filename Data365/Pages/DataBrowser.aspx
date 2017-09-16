@@ -77,6 +77,11 @@
 </script>
 
 
+<script type="text/template" id="nav-user-info-template">
+    <i class="fa fa-user">&nbsp;</i>{{ user }}
+</script>
+
+
 <script type="text/template" id="profile-template">
 	<div>
 	<div class="panel panel-default">
@@ -92,9 +97,6 @@
 			<dl class="dl-horizontal">
 				<dt>Account</dt><dd>{{ account }}</dd>
 			</dl>
-			<dl class="dl-horizontal">
-				<dt>Admin</dt><dd>{{ isAdmin }}</dd>
-			</dl>
 		</div>
 	</div>
 	</div>
@@ -109,6 +111,7 @@
 
 
 <script type="text/template" id="table-list-template">
+	<div class="row database-info"><i class="fa fa-database">&nbsp;</i><span>{{ database }}</span></div>
 	<div id="table-list" class="list-group">	  
 		<div>
 			<select id="selectShowTables" title="Tables" data-header="Check to show" multiple class="form-control show-tick show-menu-arrow selectpicker" data-width="100%" data-selected-text-format="static" >
@@ -296,6 +299,7 @@
 
      <!-- Dynamic Content -->
 		    <div id="module" class="col-sm-13">
+    			<div id="user-info" class="row user-info"></div>
 			    <div id="menu" class="row"></div>
 			    <section id="content" class="row">
 			    </section>

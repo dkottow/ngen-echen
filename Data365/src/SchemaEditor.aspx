@@ -49,6 +49,7 @@
 
  <!-- Dynamic Content -->
 		<div id="module" class="col-sm-13">
+   			<div id="user-info" class="row user-info"></div>
 			<div id="menu" class="row"></div>
 			<section id="content" class="row"></section>
 		</div>		
