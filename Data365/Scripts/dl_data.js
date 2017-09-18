@@ -105,13 +105,14 @@ AppBase.prototype.setAccount = function(opts, cbAfter) {
   
 	this.account = new Donkeylift.Account(opts);
 
-  if (opts.reset) me.unsetSchema();
-
   this.navbarView.model = this.account;
   me.navbarView.render();
 
   me.menuView.render();
   $('#content').empty();
+
+  if (opts.reset) me.unsetSchema();
+
   me.onAccountLoaded(cbAfter);
 
 	$('#toggle-sidebar').hide();
