@@ -81,8 +81,8 @@ AppBase.prototype.start = function(cbAfter) {
     }
 
     //TODO ? 
-		//this.loadAccount(opts, cbAfter);
-		this.setAccount(opts, cbAfter);
+		this.loadAccount(opts, cbAfter);
+		//this.setAccount(opts, cbAfter);
     
   } else {
     //auth0 id_token in sessionStorage
@@ -1286,8 +1286,10 @@ Donkeylift.Table = Backbone.Model.extend({
 		});			
 		this.set('fields', new Donkeylift.Fields(fields));
 
-		table.props.visible = table.name[0] != '_'; //TODO
+		table.props = table.props || {};
 		this.set('props', table.props);
+
+		table.props.visible = ! (table.name && table.name[0] == '_'); //TODO
 		//relations and row_alias are set in initRefs
 	},
 

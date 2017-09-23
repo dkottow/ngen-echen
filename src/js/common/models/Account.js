@@ -60,6 +60,10 @@ Donkeylift.Account = Backbone.Model.extend({
 		});
 	},
 	
+	principal: function() {
+		return this.get('principal') || this.get('user');
+	},
+
 	isAdmin : function() {
 		return this.get('auth') === false || 
 			(this.get('app_metadata') && this.get('app_metadata').admin);		

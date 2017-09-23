@@ -24,7 +24,7 @@ Donkeylift.NavbarView = Backbone.View.extend({
 		var $el = $('#user-info');
 		$el.empty();	
 		var html = this.navUserInfoTemplate({
-			user: this.model.get('user')
+			user: this.model.principal()
 		});
 		$el.append(html);
 	},
