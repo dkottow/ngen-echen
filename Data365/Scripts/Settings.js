@@ -19,7 +19,7 @@ function startDefault()
     Config.get(function (cfg) {
         $('input[name="dl_account"]').val(cfg.account);
 
-        var url = 'https://azwu-data365-test01.azurewebsites.net' + '/' + cfg.account;
+        var url = 'https://azd365devwuas.azurewebsites.net' + '/' + cfg.account;
         $.get(url, function (data) {
             console.log(data);
 

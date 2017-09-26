@@ -7,7 +7,7 @@ var Donkeylift = {
 // e.g. DONKEYLIFT_API. "http://api.donkeylift.com";
 
 	env: {
-	    API_BASE: "https://azd365testwuas.azurewebsites.net"
+	    API_BASE: "https://azd365devwuas.azurewebsites.net"
 	    , AUTH0_CLIENT_ID: "$AUTH0_CLIENT_ID"
 	    , AUTH0_DOMAIN: "$AUTH0_DOMAIN"
 	    , DEMO_FLAG: + "1"
@@ -81,8 +81,8 @@ AppBase.prototype.start = function(cbAfter) {
     }
 
     //TODO ? 
-		this.loadAccount(opts, cbAfter);
-		//this.setAccount(opts, cbAfter);
+		//this.loadAccount(opts, cbAfter);
+		this.setAccount(opts, cbAfter);
     
   } else {
     //auth0 id_token in sessionStorage
@@ -258,7 +258,8 @@ AppBase.prototype.setSchema = function(name, cbAfter) {
 		this.unsetSchema();
 		this.schema = this.createSchema(name);
 		this.schema.fetch(function() {
-			updateViewsFn();
+      me.account.set('principal', me.schema.get('login').principal);
+      updateViewsFn();
 			if (cbAfter) cbAfter();
 		});
 
@@ -653,6 +654,10 @@ Donkeylift.Account = Backbone.Model.extend({
 		});
 	},
 	
+	principal: function() {
+		return this.get('principal') || this.get('user');
+	},
+
 	isAdmin : function() {
 		return this.get('auth') === false || 
 			(this.get('app_metadata') && this.get('app_metadata').admin);		
@@ -2383,7 +2388,7 @@ Donkeylift.NavbarView = Backbone.View.extend({
 		var $el = $('#user-info');
 		$el.empty();	
 		var html = this.navUserInfoTemplate({
-			user: this.model.get('user')
+			user: this.model.principal()
 		});
 		$el.append(html);
 	},

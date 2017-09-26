@@ -6,7 +6,7 @@ Config.get = function(onSuccess) {
 
     var result = {
         user: sessionStorage.getItem('dl_user') || _spPageContextInfo.userLoginName,
-        account: getParameterByName('dl_account') || sessionStorage.getItem('dl_account') || 'test',
+        account: getParameterByName('dl_account') || sessionStorage.getItem('dl_account') || 'dev',
         database: getParameterByName('dl_database') || sessionStorage.getItem('dl_database') || 'sandwiches'
     };
     console.log(result);

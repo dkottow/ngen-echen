@@ -81,8 +81,8 @@ AppBase.prototype.start = function(cbAfter) {
     }
 
     //TODO ? 
-		this.loadAccount(opts, cbAfter);
-		//this.setAccount(opts, cbAfter);
+		//this.loadAccount(opts, cbAfter); //loads all schemas - wont work for non-admins
+		this.setAccount(opts, cbAfter);
     
   } else {
     //auth0 id_token in sessionStorage

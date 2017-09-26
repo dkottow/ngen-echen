@@ -12,7 +12,7 @@ var insert = require('gulp-insert');
 var rename = require('gulp-rename');
 
 //require('dotenv').config();
-process.env.DONKEYLIFT_API = "https://azd365testwuas.azurewebsites.net";
+process.env.DONKEYLIFT_API = "https://azd365devwuas.azurewebsites.net";
 process.env.DONKEYLIFT_DEMO = 1;
 
 var inputs = {
