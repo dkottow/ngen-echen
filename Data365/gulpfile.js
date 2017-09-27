@@ -43,6 +43,7 @@ var outputs = {
 var allTasks = [
     'DataBrowser',
     'SchemaEditor',
+    'WebApi',
     'build-dl-data-js',
     'build-dl-schema-js',
     'build-dl-3rdparty-js',
@@ -108,6 +109,11 @@ gulp.task('SchemaEditor', function () {
 		.pipe(gulp.dest('./Pages/'));
 });
 
+gulp.task('WebApi', function () {
+    return gulp.src(['./src/WebApi.aspx'])
+		.pipe(replace("$DONKEYLIFT_API", process.env.DONKEYLIFT_API))	
+		.pipe(gulp.dest('./Pages/'));
+});
 
 gulp.task('build-dl-data-js', function () {
 

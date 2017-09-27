@@ -81,7 +81,7 @@ AppBase.prototype.start = function(cbAfter) {
     }
 
     //TODO ? 
-		//this.loadAccount(opts, cbAfter);
+		//this.loadAccount(opts, cbAfter); //loads all schemas - wont work for non-admins
 		this.setAccount(opts, cbAfter);
     
   } else {

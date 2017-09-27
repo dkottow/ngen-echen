@@ -1,4 +1,4 @@
-﻿
+
 <%-- The following 4 lines are ASP.NET directives needed when using SharePoint components --%>
 
 <%@ Page Inherits="Microsoft.SharePoint.WebPartPages.WebPartPage, Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" MasterPageFile="~masterurl/default.master" Language="C#" %>
@@ -84,7 +84,7 @@
       if (url && url.length > 1) {
         url = decodeURIComponent(url[1]);
       } else {
-          url = "https://azd365testwuas.azurewebsites.net/public/swagger.json";
+          url = "https://azd365devwuas.azurewebsites.net" + "/public/swagger.json";
       }
 
       // Pre load translate...

@@ -81,7 +81,7 @@ AppBase.prototype.start = function(cbAfter) {
     }
 
     //TODO ? 
-		//this.loadAccount(opts, cbAfter);
+		//this.loadAccount(opts, cbAfter); //loads all schemas - wont work for non-admins
 		this.setAccount(opts, cbAfter);
     
   } else {
@@ -1672,7 +1672,7 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 				'$orderby': orderClauses.join(','),
 				'$skip': query.start,
 				'$top': query.length,
-				'nocounts': me.get('skipRowCounts') ? 1 : 0
+				'counts': me.get('skipRowCounts') ? 0 : 1
 			}
 
 			if (query.search.value.length == 0) {

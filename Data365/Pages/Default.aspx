@@ -40,7 +40,7 @@
     </style>
 
 
-    <button type="button" id="SignIn" onclick="signIn()">Sign In</button>
+<!--    <button type="button" id="SignIn" onclick="signIn()">Sign In</button> -->
     <h3 id="WelcomeMessage"></h3>
 
     <h3>Database Connection</h3>
