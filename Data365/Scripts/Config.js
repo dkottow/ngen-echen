@@ -6,9 +6,9 @@ Config.get = function(onSuccess) {
 
     var result = {
         user: sessionStorage.getItem('dl_user') || _spPageContextInfo.userLoginName,
-        server: sessionStorage.getItem('dl_server'),
-        account: sessionStorage.getItem('dl_account'),
-        database: sessionStorage.getItem('dl_database') || 'sandwiches'
+        server: getParameterByName('dl_server') || sessionStorage.getItem('dl_server'),
+        account: getParameterByName('dl_account') || sessionStorage.getItem('dl_account'),
+        database: getParameterByName('dl_database') || sessionStorage.getItem('dl_database') || 'sandwiches'
     };
     console.log(result);
 
@@ -34,6 +34,11 @@ Config.update = function (fieldValues, onSuccess) {
         account: sessionStorage.getItem('dl_account'),
         database: sessionStorage.getItem('dl_database')
     });
+}
+
+Config.resetUser = function(upn) {
+    Donkeylift.app.setAccount({user: upn });
+    Donkeylift.app.resetSchema({ reload: true });
 }
 
 //stackoverflow - https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript

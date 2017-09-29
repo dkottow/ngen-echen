@@ -229,15 +229,21 @@ AppBase.prototype.createSchema = function(name) {
 	//overwrite me
 }
 
-AppBase.prototype.resetSchema = function(cbAfter) {
-	if (this.schema) this.setSchema(this.schema.get('name'), cbAfter);
+AppBase.prototype.resetSchema = function(opts, cbAfter) {
+	if (this.schema) this.setSchema(this.schema.get('name'), opts, cbAfter);
 }
 
-AppBase.prototype.setSchema = function(name, cbAfter) {
+AppBase.prototype.setSchema = function(name, opts, cbAfter) {
 	console.log('AppBase.setSchema ' + name);
 	var me = this;
 
+  opts = typeof opts == 'object' ? opts : {};
+  if (typeof arguments[arguments.length - 1] == 'function') {
+    cbAfter = arguments[arguments.length - 1];
+  }
+
 	var loadRequired = (! this.schema) || (this.schema.get('name') != name);
+  var reload = opts.reload !== undefined ? opts.reload : loadRequired; 
 
 	var updateViewsFn = function() {
 		//always false if (me.tableListView) me.tableListView.remove();
@@ -254,7 +260,7 @@ AppBase.prototype.setSchema = function(name, cbAfter) {
 		me.menuView.render();
 	}
 
-	if (loadRequired) {
+	if (reload) {
 		this.unsetSchema();
 		this.schema = this.createSchema(name);
 		this.schema.fetch(function() {
@@ -264,7 +270,7 @@ AppBase.prototype.setSchema = function(name, cbAfter) {
 		});
 
 	} else {
-		console.log(' ! loadRequired ' + this.schema.get('name'));
+		console.log(' ! reload ' + this.schema.get('name'));
 		var currentSchema = this.schema;
 		this.unsetSchema();
 		this.schema = currentSchema;

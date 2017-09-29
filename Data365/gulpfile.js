@@ -14,7 +14,11 @@ var rename = require('gulp-rename');
 //require('dotenv').config();
 process.env.DATA365_SERVER = "https://azd365devwuas.azurewebsites.net";
 process.env.DATA365_ACCOUNT = "dev";
+
+
+//for dl_data.js and others
 process.env.DONKEYLIFT_DEMO = 1;
+process.env.DONKEYLIFT_API = process.env.DATA365_SERVER;
 
 var inputs = {
     SRC_DIR: '../src/',
@@ -126,8 +130,8 @@ gulp.task('ChooseDB', function () {
 
 gulp.task('build-dl-data-js', function () {
 
-    if (!process.env.DATA365_SERVER) {
-        console.log("ERROR. Define env var DATA365_SERVER");
+    if (!process.env.DONKEYLIFT_API) {
+        console.log("ERROR. Define env var DONKEYLIFT_API");
         process.exit(1);
     }
 
@@ -144,7 +148,7 @@ gulp.task('build-dl-data-js', function () {
 		inputs.SRC_DIR + "js/data/AppData.js"
     ])
 
-	.pipe(replace("$DATA365_SERVER", process.env.DATA365_SERVER))
+	.pipe(replace("$DONKEYLIFT_API", process.env.DONKEYLIFT_API))
 	.pipe(replace("$DONKEYLIFT_DEMO", process.env.DONKEYLIFT_DEMO))
 	.pipe(replace("module.exports =", "var pegParser =")) //Applies only to QueryParser
 	.pipe(concat(outputs.DL_DATA_JS))
@@ -154,8 +158,8 @@ gulp.task('build-dl-data-js', function () {
 
 gulp.task('build-dl-schema-js', function () {
 
-    if (!process.env.DATA365_SERVER) {
-        console.log("ERROR. Define env var DATA365_SERVER");
+    if (!process.env.DONKEYLIFT_API) {
+        console.log("ERROR. Define env var DONKEYLIFT_API");
         process.exit(1);
     }
 
@@ -171,7 +175,7 @@ gulp.task('build-dl-schema-js', function () {
 		inputs.SRC_DIR + "js/schema/AppSchema.js"
     ])
 
-	.pipe(replace("$DATA365_SERVER", process.env.DATA365_SERVER))
+	.pipe(replace("$DONKEYLIFT_API", process.env.DONKEYLIFT_API))
 	.pipe(replace("$DONKEYLIFT_DEMO", process.env.DONKEYLIFT_DEMO))
 	.pipe(concat(outputs.DL_SCHEMA_JS))
 	.pipe(gulp.dest(outputs.JS_DIR));
@@ -205,11 +209,11 @@ gulp.task('build-dl-3rdparty-js', function () {
 });
 
 gulp.task('build-dl-swagger-js', ['copy-api-swagger-js', 'copy-api-swagger-lib-js', 'copy-api-swagger-dist'], function () {
-    var host = process.env.DATA365_SERVER.replace(new RegExp('http://'), '');
+    var host = process.env.DONKEYLIFT_API.replace(new RegExp('http://'), '');
 
     return gulp.src([inputs.SRC_DIR + 'api/dl_swagger.js'])
 
-		.pipe(replace("$DATA365_SERVER", host))
+		.pipe(replace("$DONKEYLIFT_API", host))
 		.pipe(gulp.dest(outputs.JS_DIR + 'api'));
 });
 

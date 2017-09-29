@@ -84,7 +84,7 @@
       if (url && url.length > 1) {
         url = decodeURIComponent(url[1]);
       } else {
-          url = "$DONKEYLIFT_API" + "/public/swagger.json";
+          url = "$DATA365_SERVER" + "/public/swagger.json";
       }
 
       // Pre load translate...
