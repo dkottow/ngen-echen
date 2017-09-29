@@ -5,21 +5,22 @@ $(document).ready(function () {
 
     startDefault();
 
-    $('select[name="dl_database"]').change(function () {
-        Config.update({
-            account: $('input[name="dl_account"]').val(),
-            database: $('select[name="dl_database"]').val()
-        });
-    });
 });
 
 function startDefault()
 {
-
     Config.get(function (cfg) {
-        $('input[name="dl_account"]').val(cfg.account);
 
-        var url = 'https://azd365devwuas.azurewebsites.net' + '/' + cfg.account;
+        if (cfg.server) {
+            //update ui
+            $('input[name="dl_server"]').val(cfg.server);
+            $('input[name="dl_account"]').val(cfg.account);
+        } else { 
+            //read from ui. html input elems initial values    
+            cfg.server = $('input[name="dl_server"]').val();
+            cfg.account = $('input[name="dl_account"]').val();
+        }    
+        var url = cfg.server + '/' + cfg.account;
         $.get(url, function (data) {
             console.log(data);
 
@@ -29,8 +30,17 @@ function startDefault()
                     text: name
                 }));
 
+                $('select[name="dl_database"]').change(function () {
+                    Config.update({
+                        server: $('input[name="dl_server"]').val(),
+                        account: $('input[name="dl_account"]').val(),
+                        database: $('select[name="dl_database"]').val()
+                    });
+                });
+
                 //try to set current
                 $('select[name="dl_database"]').val(cfg.database);
+                
             });
         });
     });

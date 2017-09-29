@@ -6,12 +6,13 @@ Config.get = function(onSuccess) {
 
     var result = {
         user: sessionStorage.getItem('dl_user') || _spPageContextInfo.userLoginName,
-        account: getParameterByName('dl_account') || sessionStorage.getItem('dl_account') || 'dev',
-        database: getParameterByName('dl_database') || sessionStorage.getItem('dl_database') || 'sandwiches'
+        server: sessionStorage.getItem('dl_server'),
+        account: sessionStorage.getItem('dl_account'),
+        database: sessionStorage.getItem('dl_database') || 'sandwiches'
     };
     console.log(result);
 
-    if (!sessionStorage.getItem('dl_account')) {
+    if (!sessionStorage.getItem('dl_user')) {
         Config.update(result, onSuccess);
     } else {
         onSuccess(result);
@@ -22,10 +23,14 @@ Config.update = function (fieldValues, onSuccess) {
 
     console.log(fieldValues);
     sessionStorage.setItem('dl_user', _spPageContextInfo.userLoginName);
-    sessionStorage.setItem('dl_account', fieldValues.account);
-    sessionStorage.setItem('dl_database', fieldValues.database);
+    if (fieldValues.server) {
+        sessionStorage.setItem('dl_server', fieldValues.server);
+        sessionStorage.setItem('dl_account', fieldValues.account);
+        sessionStorage.setItem('dl_database', fieldValues.database);
+    } 
     if (onSuccess) onSuccess({
         user: sessionStorage.getItem('dl_user'),
+        server: sessionStorage.getItem('dl_server'),
         account: sessionStorage.getItem('dl_account'),
         database: sessionStorage.getItem('dl_database')
     });

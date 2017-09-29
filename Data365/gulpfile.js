@@ -12,7 +12,8 @@ var insert = require('gulp-insert');
 var rename = require('gulp-rename');
 
 //require('dotenv').config();
-process.env.DONKEYLIFT_API = "https://azd365devwuas.azurewebsites.net";
+process.env.DATA365_SERVER = "https://azd365devwuas.azurewebsites.net";
+process.env.DATA365_ACCOUNT = "dev";
 process.env.DONKEYLIFT_DEMO = 1;
 
 var inputs = {
@@ -44,6 +45,7 @@ var allTasks = [
     'DataBrowser',
     'SchemaEditor',
     'WebApi',
+    'ChooseDB',
     'build-dl-data-js',
     'build-dl-schema-js',
     'build-dl-3rdparty-js',
@@ -111,14 +113,21 @@ gulp.task('SchemaEditor', function () {
 
 gulp.task('WebApi', function () {
     return gulp.src(['./src/WebApi.aspx'])
-		.pipe(replace("$DONKEYLIFT_API", process.env.DONKEYLIFT_API))	
+		.pipe(replace("$DATA365_SERVER", process.env.DATA365_SERVER))	
+		.pipe(gulp.dest('./Pages/'));
+});
+
+gulp.task('ChooseDB', function () {
+    return gulp.src(['./src/Default.aspx'])
+		.pipe(replace("$DATA365_SERVER", process.env.DATA365_SERVER))	
+		.pipe(replace("$DATA365_ACCOUNT", process.env.DATA365_ACCOUNT))	
 		.pipe(gulp.dest('./Pages/'));
 });
 
 gulp.task('build-dl-data-js', function () {
 
-    if (!process.env.DONKEYLIFT_API) {
-        console.log("ERROR. Define env var DONKEYLIFT_API");
+    if (!process.env.DATA365_SERVER) {
+        console.log("ERROR. Define env var DATA365_SERVER");
         process.exit(1);
     }
 
@@ -135,7 +144,7 @@ gulp.task('build-dl-data-js', function () {
 		inputs.SRC_DIR + "js/data/AppData.js"
     ])
 
-	.pipe(replace("$DONKEYLIFT_API", process.env.DONKEYLIFT_API))
+	.pipe(replace("$DATA365_SERVER", process.env.DATA365_SERVER))
 	.pipe(replace("$DONKEYLIFT_DEMO", process.env.DONKEYLIFT_DEMO))
 	.pipe(replace("module.exports =", "var pegParser =")) //Applies only to QueryParser
 	.pipe(concat(outputs.DL_DATA_JS))
@@ -145,8 +154,8 @@ gulp.task('build-dl-data-js', function () {
 
 gulp.task('build-dl-schema-js', function () {
 
-    if (!process.env.DONKEYLIFT_API) {
-        console.log("ERROR. Define env var DONKEYLIFT_API");
+    if (!process.env.DATA365_SERVER) {
+        console.log("ERROR. Define env var DATA365_SERVER");
         process.exit(1);
     }
 
@@ -162,7 +171,7 @@ gulp.task('build-dl-schema-js', function () {
 		inputs.SRC_DIR + "js/schema/AppSchema.js"
     ])
 
-	.pipe(replace("$DONKEYLIFT_API", process.env.DONKEYLIFT_API))
+	.pipe(replace("$DATA365_SERVER", process.env.DATA365_SERVER))
 	.pipe(replace("$DONKEYLIFT_DEMO", process.env.DONKEYLIFT_DEMO))
 	.pipe(concat(outputs.DL_SCHEMA_JS))
 	.pipe(gulp.dest(outputs.JS_DIR));
@@ -196,11 +205,11 @@ gulp.task('build-dl-3rdparty-js', function () {
 });
 
 gulp.task('build-dl-swagger-js', ['copy-api-swagger-js', 'copy-api-swagger-lib-js', 'copy-api-swagger-dist'], function () {
-    var host = process.env.DONKEYLIFT_API.replace(new RegExp('http://'), '');
+    var host = process.env.DATA365_SERVER.replace(new RegExp('http://'), '');
 
     return gulp.src([inputs.SRC_DIR + 'api/dl_swagger.js'])
 
-		.pipe(replace("$DONKEYLIFT_API", host))
+		.pipe(replace("$DATA365_SERVER", host))
 		.pipe(gulp.dest(outputs.JS_DIR + 'api'));
 });
 

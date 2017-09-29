@@ -1,4 +1,4 @@
-<%-- The following 4 lines are ASP.NET directives needed when using SharePoint components --%>
+﻿<%-- The following 4 lines are ASP.NET directives needed when using SharePoint components --%>
 
 <%@ Page Inherits="Microsoft.SharePoint.WebPartPages.WebPartPage, Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" MasterPageFile="~masterurl/default.master" Language="C#" %>
 
@@ -47,10 +47,10 @@
 
     <div>
         <label for="dl_server">API Server</label>
-        <input disabled="disabled" type="text" size="25" name="dl_server" value="https://azd365devwuas.azurewebsites.net" />
+        <input disabled="disabled" type="text" size="25" name="dl_server" value="$DATA365_SERVER" />
 
         <label for="dl_account">Account</label>
-        <input disabled="disabled" type="text" name="dl_account" value="dev" />
+        <input disabled="disabled" type="text" name="dl_account" value="$DATA365_ACCOUNT" />
     </div>
 
     <div>
