@@ -13,8 +13,8 @@ var Donkeylift = {
 	    , DEMO_FLAG: + "$DONKEYLIFT_DEMO"
 	},
 
-	DEMO_ACCOUNT: 'test',
-	DEMO_USER: 'data365@golder.com',
+	DEMO_ACCOUNT: 'dev',
+	DEMO_USER: 'dkottow@golder.com',
 	
 	util: {
 		/*** implementation details at eof ***/
@@ -81,8 +81,8 @@ AppBase.prototype.start = function(cbAfter) {
     }
 
     //TODO ? 
-		//this.loadAccount(opts, cbAfter); //loads all schemas - wont work for non-admins
-		this.setAccount(opts, cbAfter);
+		this.loadAccount(opts, cbAfter); //loads all schemas - wont work for non-admins
+		//this.setAccount(opts, cbAfter);
     
   } else {
     //auth0 id_token in sessionStorage
@@ -262,11 +262,11 @@ AppBase.prototype.setSchema = function(name, opts, cbAfter) {
 
 	if (reload) {
 		this.unsetSchema();
-		this.schema = this.createSchema(name);
-		this.schema.fetch(function() {
+		this.schema = this.createSchema(name); //impl in AppData / AppSchema
+    this.schema.fetch(function() {
       me.account.set('principal', me.schema.get('login').principal);
       updateViewsFn();
-			if (cbAfter) cbAfter();
+      if (cbAfter) cbAfter();
 		});
 
 	} else {
@@ -277,6 +277,14 @@ AppBase.prototype.setSchema = function(name, opts, cbAfter) {
 		updateViewsFn();
 		if (cbAfter) cbAfter();
 	}
+}
+
+AppBase.prototype.getProp = function(key) {
+  return this.schema.get('props').get(key);
+}
+  
+AppBase.prototype.setProp = function(key, value) {
+  return this.schema.get('props').set(key, value);
 }
 
 /******* init on script load ******/

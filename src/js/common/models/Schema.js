@@ -9,7 +9,8 @@ Donkeylift.Schema = Backbone.Model.extend({
 			this.set('tables', new Donkeylift.Tables());
 		}
 		//this.set('id', attrs.name); //unset me when new
-
+		this.set('props', new Donkeylift.Properties({ schema: this }));
+		
 	},
 
 	attrJSON: function() {
@@ -61,8 +62,11 @@ Donkeylift.Schema = Backbone.Model.extend({
 		Backbone.Model.prototype.fetch.call(this, {
 			success: function() {
 				me.orgJSON = JSON.parse(JSON.stringify(me.toJSON())); //copy
+				me.get('props').setKeyFuncs(me);
 				console.log("Schema.fetch OK");
-				cbAfter();
+				me.get('props').fetch(function() {
+					cbAfter();
+				});					
 			}
 		});
 	},

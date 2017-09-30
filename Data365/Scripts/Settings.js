@@ -40,7 +40,7 @@ function startDefault()
 
                 //try to set current
                 $('select[name="dl_database"]').val(cfg.database);
-                
+                Config.update(cfg);                
             });
         });
     });

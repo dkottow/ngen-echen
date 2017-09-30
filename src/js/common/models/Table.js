@@ -10,11 +10,6 @@ Donkeylift.Table = Backbone.Model.extend({
 			return new Donkeylift.Field(field);
 		});			
 		this.set('fields', new Donkeylift.Fields(fields));
-
-		table.props = table.props || {};
-		this.set('props', table.props);
-
-		table.props.visible = ! (table.name && table.name[0] == '_'); //TODO
 		//relations and row_alias are set in initRefs
 	},
 
@@ -74,7 +69,17 @@ Donkeylift.Table = Backbone.Model.extend({
 	},
 	
 	getProp: function(name) {
-		return this.get('props')[name];
+		if ( ! this.propKey) return undefined;
+		return Donkeylift.app.getProp(this.propKey(name));
+	},
+
+	setProp: function(name, value) {
+		if ( ! this.propKey) return;
+		Donkeylift.app.setProp(this.propKey(name), value);
+	},
+
+	allProps : function() {
+		//TODO
 	},
 
 	getFieldQN: function(field) {

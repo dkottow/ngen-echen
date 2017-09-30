@@ -6,7 +6,6 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 	events: {
 		'click #modalFieldUpdate': 'updateClick',
 		'click #modalFieldRemove': 'removeClick',
-		'click #modalToggleProps': 'togglePropsClick',
 		'click input[name="disabled"]': 'toggleDisableFieldClick',
 	},
 
@@ -14,10 +13,6 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 		console.log("FieldEditView.init");
 	},
 
-	propTemplate: function(type) {
-		return _.template($('#edit-prop-' + type.toLowerCase() + '-template').html());
-	},
-	
 	render: function() {
 		//console.log("FieldEditView.render " + this.model.get('type'));
 
@@ -32,22 +27,9 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 				? '<input type="checkbox" checked name="disabled"> Disable Field'
 				: '<input type="checkbox" name="disabled"> Disable Field'
 
-		$('#modalTabProps form').append(htmlDisabled);
+		$('#modalTabDefs form').append(htmlDisabled);
 
-		$('#modalTabProps form').append('<div class="well inject-props"></div>');
-
-		_.each(this.model.get('props').getAll(), function(prop) {
-			//console.log(prop);
-			var template = this.propTemplate(prop.type);
-			var params = { 
-				name: prop.name, 
-				value: prop.value 
-			};
-			if (prop.type == 'Boolean') {
-				params.checked = prop.value === true ? 'checked' : ''; 
-			}
-			$('#modalTabProps .inject-props').append(template(params));
-		}, this);
+		$('#modalTabDefs form').append('<div class="well inject-props"></div>');
 
 		$('#modalEditField').modal();
 		this.showDefinition(true);
@@ -62,11 +44,8 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 		this.model.setType($('#modalInputFieldType').val(), $('#modalInputFieldTypeSuffix').val());
 		//this.model.set('type', $('#modalInputFieldType').val());
 
-		this.model.set('disabled', $('#modalTabProps input[name=disabled]:checked').val() == "on");
+		this.model.set('disabled', $('#modalTabDefs input[name=disabled]:checked').val() == "on");
 
-		var propValues = $("#modalTabProps form").serializeArray();
-		this.model.setPropArray(propValues);
-		
 		if ( ! this.model.collection) {
 			Donkeylift.app.table.get('fields').addNew(this.model);
 		}
@@ -88,12 +67,8 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 	showDefinition: function(show) {
 		if (show) {
 			$('#modalTabDefs').show();
-			$('#modalTabProps').hide();
-			$('#modalToggleProps').text('View Properties');
 		} else {
-			$('#modalTabProps').show();
 			$('#modalTabDefs').hide();
-			$('#modalToggleProps').text('View Definition');
 		}
 	},
 
@@ -104,7 +79,6 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 	
 	toggleDisableFieldClick: function(ev) {
 		var disabled = $(ev.target).is(':checked');
-		$('#modalTabProps .inject-props input').prop('disabled', disabled);
 	}
 
 });

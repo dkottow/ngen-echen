@@ -2,79 +2,84 @@
 
 Donkeylift.Properties = Backbone.Model.extend({
 
-	initialize: function(props, params) {
+	initialize: function(attrs) {
 
-        this.parent = params.parent;
-        this.defs = params.propDefs; 
-
-        //this.parent instanceof Donkeylift.Field
-        
-		_.each(this.defs, function(p) {
-			if (this.getDefinition(p.name) && this.get(p.name) === undefined) {
-				this.setDefault(p);
-			}
-		}, this);
 	},
 	
-	getDefinition: function(name) {
-		var prop = _.find(this.defs, function(p) { return p.name == name; });
-		if (! prop) return undefined;
-		if (! prop.scope) return prop;
-        return _.contains(prop.scope, this.parent.get('type'))
-            ? prop : undefined;
+	url : function() {
+		return this.get('schema').url() + '/' + Donkeylift.Properties.TABLE;
 	},
 
-	getAll: function() {
-		var props = [];
-		for(var i=0; i<this.defs.length; ++i) {
-			var prop = this.getDefinition(this.defs[i].name);
-			if (prop) {
-				prop.value = this.get(prop.name);
-				props.push(prop);
+	parse : function(response) {
+		console.log("Properties.parse " + response);
+		_.each(response.rows, function(row) {
+			var key = this.key(row[Donkeylift.Properties.FIELDS.name], {
+				table : row[Donkeylift.Properties.FIELDS.table],
+				field : row[Donkeylift.Properties.FIELDS.field]
+			});
+			try {
+				this.set(key, JSON.parse(row[Donkeylift.Properties.FIELDS.value]));
+			} catch(err) { 
+				console.log(err);
+				alert('Error parsing ' + key + ' = ' + row[Donkeylift.Properties.FIELDS.value]); 
 			}
-		}
-		return props;
-	},
-
-	setFromArray: function(inputValues) {
-		var props = _.object(_.pluck(inputValues, 'name'), 
-							 _.pluck(inputValues, 'value'));
-		_.each(this.getAll(), function(p) {
-
-			var val;
-			if (p.type == 'Boolean') {
-				this.set(p.name, props[p.name] == "on");
-
-			} else if (p.type == 'Integer') {
-				var val = parseInt(props[p.name]);
-				if ( ! isNaN(val)) this.set(p.name, val);
-
-			} else if (p.type == 'Decimal') {
-				var val = parseFloat(props[p.name]);
-				if ( ! isNaN(val)) this.set(p.name, val);
-
-			} else {
-				var val = props[p.name];
-				if (val) this.set(p.name, val);
-			}
-
 		}, this);
-
+		return response;
 	},
 
-	setDefault: function(propDef) {
-
-        if (this.parent instanceof Donkeylift.Field) {
-			if (propDef.name == 'visible') {
-				var v = _.contains(Donkeylift.Table.INITHIDE_FIELDS, this.parent.get('name'))
-						? false : true;
-				this.set(propDef.name, v);
-	
-			} else {
-				this.set(propDef.name, propDef.default);			
+	fetch : function(cbAfter) {
+		var me = this;
+		console.log("Properties.fetch...");
+		Backbone.Model.prototype.fetch.call(this, {
+			success: function() {
+				console.log("Properties.fetch OK");
+				cbAfter();
 			}
-        }
+		});
 	},
+	
+	setKeyFuncs : function(schema) {
+		schema.get('tables').each(function(table) {
+			table.propKey = function(name) {
+				var key = [Donkeylift.Properties.PREFIX, 
+						table.get('name'),	
+						name
+					].join('.');
+				return key;		
+			}
+			table.get('fields').each(function(field) {
+				field.propKey = function(name) {
+					var key = [Donkeylift.Properties.PREFIX, 
+							table.get('name'),	
+							field.get('name'),	
+							name
+						].join('.');
+					return key;		
+				}
+			});
+		});		
+	},
+
+	key : function(name, opts) {
+		opts = opts || {};
+		var key = [ Donkeylift.Properties.PREFIX ];
+		if (opts.table) {
+			key.push(opts.table); 
+		} 
+		if (opts.field) {
+			key.push(opts.field); 
+		} 
+		key.push(name); 
+		return key.join('.');		
+	}
 
 });
-	
+
+Donkeylift.Properties.PREFIX = 'prop';
+Donkeylift.Properties.TABLE = '_d365Properties';
+Donkeylift.Properties.FIELDS = {
+	name : 'Name',
+	table : 'TableName',
+	field : 'FieldName',
+	value : 'Value'
+};

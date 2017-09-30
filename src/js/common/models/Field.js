@@ -6,13 +6,7 @@ function escapeStr(str) {
 
 Donkeylift.Field = Backbone.Model.extend({
 	initialize: function(field) {
-
-		var props = new Donkeylift.Properties(field.props || {}, {
-				parent: this,
-				propDefs: Donkeylift.Field.PROPERTIES
-		});
-		this.set('props', props);
-		this.set('disabled', field.disabled == true);
+		this.set('disabled', field.disabled == true);		
 		this.set('resolveRefs', true); //auto join row alias for all foreign keys
 	},
 
@@ -59,25 +53,23 @@ Donkeylift.Field = Backbone.Model.extend({
 	},
 
 	getProp: function(name) {
-		return this.get('props').get(name);
+		if ( ! this.propKey) return undefined;
+		return Donkeylift.app.getProp(this.propKey(name));
 	},
 
 	setProp: function(name, value) {
-		if (this.get('props').getDefinition(name)) {
-			this.get('props').set(name, value);
-		} else {
-			throw new Error("setProp failed. Unknown property '" + name + "'");			
-		}
+		if ( ! this.propKey) return;
+		Donkeylift.app.setProp(this.propKey(name), value);
 	},
 
-	setPropArray: function(inputArray) {
-		this.get('props').setFromArray(inputArray);
-		this.trigger('change', this);
+	allProps : function() {
+		//TODO
 	},
 
 	attrJSON: function() {
 		var attrs = _.clone(_.omit(this.attributes, 'props'));
-		attrs.props = this.get('props').attributes;
+		attrs.props = this.allProps();
+		//attrs.props = this.get('props').attributes;
 		return attrs;
 	},
 
@@ -88,7 +80,7 @@ Donkeylift.Field = Backbone.Model.extend({
 			name: this.get('name'),
 			type: this.get('type'),
 			disabled: this.get('disabled'),
-			props: this.get('props').attributes
+			props: this.allProps()
 		};
 	},
 
