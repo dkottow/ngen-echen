@@ -136,39 +136,6 @@
 </script>
 
 
-<script type="text/template" id="edit-prop-boolean-template">
-
-  <div class="form-group">
-	  <label for="{{ name }}" class="col-sm-2 control-label">{{ name }}:</label>
-	  <div class="checkbox col-sm-14">
-		<label>
-			<input {{ checked }} type="checkbox" name="{{ name }}">
-		</label>		
-	  </div>
-	</div>	  
-</script>
-
-
-<script type="text/template" id="edit-prop-integer-template">
-  <div class="form-group">
-	<label for="{{ name }}" class="col-sm-2 control-label">{{ name }}:</label>
-	<div class="col-sm-14">
-	    <input type="number" step="1" class="form-control" name="{{ name }}" value="{{ value }}">
-    </div>	    
-  </div>
-</script>
-
-
-<script type="text/template" id="edit-prop-text-template">
-  <div class="form-group">
-	<label for="{{ name }}" class="col-sm-2 control-label">{{ name }}:</label>
-    <div class="col-sm-14">
-        <input type="text" class="form-control" name="{{ name }}" value="{{ value }}">
-    </div>
-  </div>
-</script>
-
-
 <script type="text/template" id="field-template">
 	<td>
 		<button type="button" class="btn-field-edit btn btn-default">
@@ -179,7 +146,6 @@
 	<td>{{ name }}</td>
 	<td>{{ type }}</td>
 	<td>{{ disabled }}</td>
-	<td>{{ props }}</td>
 </script>
 
 
@@ -256,7 +222,6 @@
 						<th>Name</th>
 						<th>Type</th>
 						<th>Disabled</th>
-						<th>Properties</th>
 					</tr>
 					</thead>
 					<tbody></tbody>
@@ -371,13 +336,8 @@
   <div class="modal-dialog">
 	<div class="modal-content">
 	  <div class="modal-header">
-		<button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-		<h4 class="modal-title">Edit Field</h4>
-
-		<div class="text-right">
-			<button id="modalToggleProps" type="button" class="btn btn-default">View Properties</button>
-		</div>
-
+			<button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+			<h4 class="modal-title">Edit Field</h4>
 	  </div>
 	  <div class="modal-body">
 
@@ -406,18 +366,6 @@
 			</form>
 
 		</div>	
-		<div id="modalTabProps">
-			<form class="form-horizontal">
-			</form>
-			<!-- placeholder -->
-		</div>	
-
-		<ul class="nav">
-<!--
-			<li role="presentation" class="active"><a href="#defs" data-toggle="tab">Definition</a></li>
-			<li role="presentation"><a id="#modalToggleProps" href="#props" data-toggle="tab">Properties</a></li>
--->
-		</ul>
 
 	  </div><!-- modal-body -->
 	  <div class="modal-footer">

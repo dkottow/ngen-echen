@@ -13,8 +13,8 @@ var Donkeylift = {
 	    , DEMO_FLAG: + "1"
 	},
 
-	DEMO_ACCOUNT: 'test',
-	DEMO_USER: 'data365@golder.com',
+	DEMO_ACCOUNT: 'dev',
+	DEMO_USER: 'dkottow@golder.com',
 	
 	util: {
 		/*** implementation details at eof ***/
@@ -262,11 +262,11 @@ AppBase.prototype.setSchema = function(name, opts, cbAfter) {
 
 	if (reload) {
 		this.unsetSchema();
-		this.schema = this.createSchema(name);
-		this.schema.fetch(function() {
+		this.schema = this.createSchema(name); //impl in AppData / AppSchema
+    this.schema.fetch(function() {
       me.account.set('principal', me.schema.get('login').principal);
       updateViewsFn();
-			if (cbAfter) cbAfter();
+      if (cbAfter) cbAfter();
 		});
 
 	} else {
@@ -277,6 +277,14 @@ AppBase.prototype.setSchema = function(name, opts, cbAfter) {
 		updateViewsFn();
 		if (cbAfter) cbAfter();
 	}
+}
+
+AppBase.prototype.getProp = function(key) {
+  return this.schema.get('props').getProp(key);
+}
+  
+AppBase.prototype.setProp = function(key, value) {
+  return this.schema.get('props').setProp(key, value);
 }
 
 /******* init on script load ******/
@@ -702,13 +710,7 @@ function escapeStr(str) {
 
 Donkeylift.Field = Backbone.Model.extend({
 	initialize: function(field) {
-
-		var props = new Donkeylift.Properties(field.props || {}, {
-				parent: this,
-				propDefs: Donkeylift.Field.PROPERTIES
-		});
-		this.set('props', props);
-		this.set('disabled', field.disabled == true);
+		this.set('disabled', field.disabled == true);		
 		this.set('resolveRefs', true); //auto join row alias for all foreign keys
 	},
 
@@ -755,25 +757,23 @@ Donkeylift.Field = Backbone.Model.extend({
 	},
 
 	getProp: function(name) {
-		return this.get('props').get(name);
+		if ( ! this.propKey) return undefined;
+		return Donkeylift.app.getProp(this.propKey(name));
 	},
 
 	setProp: function(name, value) {
-		if (this.get('props').getDefinition(name)) {
-			this.get('props').set(name, value);
-		} else {
-			throw new Error("setProp failed. Unknown property '" + name + "'");			
-		}
+		if ( ! this.propKey) return;
+		Donkeylift.app.setProp(this.propKey(name), value);
 	},
 
-	setPropArray: function(inputArray) {
-		this.get('props').setFromArray(inputArray);
-		this.trigger('change', this);
+	allProps : function() {
+		//TODO
 	},
 
 	attrJSON: function() {
 		var attrs = _.clone(_.omit(this.attributes, 'props'));
-		attrs.props = this.get('props').attributes;
+		attrs.props = this.allProps();
+		//attrs.props = this.get('props').attributes;
 		return attrs;
 	},
 
@@ -784,7 +784,7 @@ Donkeylift.Field = Backbone.Model.extend({
 			name: this.get('name'),
 			type: this.get('type'),
 			disabled: this.get('disabled'),
-			props: this.get('props').attributes
+			props: this.allProps()
 		};
 	},
 
@@ -993,85 +993,171 @@ Donkeylift.Field.getIdFromRef = function(val) {
 
 /*global Donkeylift, Backbone, _ */
 
-Donkeylift.Properties = Backbone.Model.extend({
 
-	initialize: function(props, params) {
+Donkeylift.Property = Backbone.Model.extend({ 
+	
+	initialize : function(attrs) {
+		console.log("Row.initialize " + attrs);
+	},
+});		
 
-        this.parent = params.parent;
-        this.defs = params.propDefs; 
+Donkeylift.Properties = Backbone.Collection.extend({
 
-        //this.parent instanceof Donkeylift.Field
-        
-		_.each(this.defs, function(p) {
-			if (this.getDefinition(p.name) && this.get(p.name) === undefined) {
-				this.setDefault(p);
-			}
-		}, this);
+	model: Donkeylift.Property,
+	
+	initialize: function(props, options) {
+		this.schema = options.schema;
 	},
 	
-	getDefinition: function(name) {
-		var prop = _.find(this.defs, function(p) { return p.name == name; });
-		if (! prop) return undefined;
-		if (! prop.scope) return prop;
-        return _.contains(prop.scope, this.parent.get('type'))
-            ? prop : undefined;
+	url : function() {
+		return this.schema.url() + '/' + Donkeylift.Properties.TABLE;
 	},
 
-	getAll: function() {
-		var props = [];
-		for(var i=0; i<this.defs.length; ++i) {
-			var prop = this.getDefinition(this.defs[i].name);
-			if (prop) {
-				prop.value = this.get(prop.name);
-				props.push(prop);
+	parse : function(response) {
+		console.log("Properties.parse " + response);
+		var rows = _.map(response.rows, function(row) {			
+			row[Donkeylift.Properties.FIELDS.value] = JSON.parse(row[Donkeylift.Properties.FIELDS.value]);
+			return row;
+		});
+		return rows;
+	},
+
+	getUpdateRows : function() {
+		var updateRows = [];
+		var insertRows = [];
+		this.each(function(row) {
+			if (row.get('own_by') == Donkeylift.Properties.SYSTEM_OWNER) {
+				; //ignore
+			} else if (row.has('id')) {
+				updateRows.push(row.attributes);
+			} else {
+				insertRows.push(row.attributes);		
 			}
+		});
+		return {
+			update: updateRows,
+			insert: insertRows
 		}
-		return props;
 	},
 
-	setFromArray: function(inputValues) {
-		var props = _.object(_.pluck(inputValues, 'name'), 
-							 _.pluck(inputValues, 'value'));
-		_.each(this.getAll(), function(p) {
+	update : function(cbAfter) {
+		var rows = this.getUpdateRows();
+		var url = this.url();
+		$.ajax(url, {
+			method: 'POST'
+			, data: JSON.stringify(rows.insert)
+			, contentType: "application/json"
+			, processData: false
 
-			var val;
-			if (p.type == 'Boolean') {
-				this.set(p.name, props[p.name] == "on");
+		}).done(function(response) {
+			console.log("Properties.update POST ok.");			
+			console.log(response);			
+			if (cbAfter) cbAfter();
 
-			} else if (p.type == 'Integer') {
-				var val = parseInt(props[p.name]);
-				if ( ! isNaN(val)) this.set(p.name, val);
+		}).fail(function(jqXHR, textStatus, errThrown) {
+			console.log("Error requesting " + url);
+			console.log(errThrown + " " + textStatus);
+			if (cbAfter) cbAfter(new Error(errThrown + " " + jqXHR.responseJSON.error), jqXHR.responseJSON.schema);
+		});
 
-			} else if (p.type == 'Decimal') {
-				var val = parseFloat(props[p.name]);
-				if ( ! isNaN(val)) this.set(p.name, val);
+		$.ajax(url, {
+			method: 'PUT'
+			, data: JSON.stringify(rows.update)
+			, contentType: "application/json"
+			, processData: false
 
-			} else {
-				var val = props[p.name];
-				if (val) this.set(p.name, val);
+		}).done(function(response) {
+			console.log("Properties.update PUT ok.");			
+			console.log(response);			
+			if (cbAfter) cbAfter();
+
+		}).fail(function(jqXHR, textStatus, errThrown) {
+			console.log("Error requesting " + url);
+			console.log(errThrown + " " + textStatus);
+			if (cbAfter) cbAfter(new Error(errThrown + " " + jqXHR.responseJSON.error), jqXHR.responseJSON.schema);
+		});		
+	},
+
+	setKeyFuncs : function() {
+		this.schema.get('tables').each(function(table) {
+			table.propKey = function(name) {
+				var key = [ table.get('name'), name ].join('.');
+				return key;		
 			}
-
-		}, this);
-
+			table.get('fields').each(function(field) {
+				field.propKey = function(name) {
+					var key = [ 
+						table.get('name'), 
+						field.get('name'), 
+						name ].join('.');
+					return key;		
+				}
+			});
+		});		
 	},
 
-	setDefault: function(propDef) {
+	getProp : function(key) {
+		var row = this.getRow(key);
+		return row ? row.get(Donkeylift.Properties.FIELDS.value) : undefined;
+	},
 
-        if (this.parent instanceof Donkeylift.Field) {
-			if (propDef.name == 'visible') {
-				var v = _.contains(Donkeylift.Table.INITHIDE_FIELDS, this.parent.get('name'))
-						? false : true;
-				this.set(propDef.name, v);
+	setProp : function(key, value) {
+		var row = this.getRow(key);
+
+		if (row && row.get('own_by') == Donkeylift.Properties.SYSTEM_OWNER) {
+			throw new Error('cannot update system property ' + key);
+
+		} else if (row) {
+			row.set(Donkeylift.Properties.FIELDS.value, value);
+
+		} else {
+			var newRow = new Donkeylift.Property();
+			var key = this.parseKey(key);	
+			newRow.set(Donkeylift.Properties.FIELDS.name, key.name);
+			newRow.set(Donkeylift.Properties.FIELDS.table, key.table);
+			newRow.set(Donkeylift.Properties.FIELDS.field, key.field);
+
+			newRow.set(Donkeylift.Properties.FIELDS.value, value);
+			this.add(newRow);			
+		}
+	},
+
+	getRow: function(key) {
+		var key = this.parseKey(key);
+		var row = this.find(function(row) {
+			return key.name == row.get(Donkeylift.Properties.FIELDS.name)
+				&& key.table == row.get(Donkeylift.Properties.FIELDS.table)
+				&& key.field == row.get(Donkeylift.Properties.FIELDS.field);
+		});
+		return row;
+	},
+
+	parseKey : function(key) {
+		var parts = key.split('.');
+		switch(parts.length) {
+			case 1:
+				return { table: null, field: null, name: parts[0] };
+			case 2:
+				return { table: parts[0], field: null, name: parts[1] };	
+			case 3:
+				return { table: parts[0], field: parts[1], name: parts[2] };	
+			default:
+				throw new Error('undefined key structure');
+		}
+	}
 	
-			} else {
-				this.set(propDef.name, propDef.default);			
-			}
-        }
-	},
-
 });
 	
 
+
+Donkeylift.Properties.SYSTEM_OWNER = 'system';
+Donkeylift.Properties.TABLE = '_d365Properties';
+Donkeylift.Properties.FIELDS = {
+	name : 'Name',
+	table : 'TableName',
+	field : 'FieldName',
+	value : 'Value'
+};
 /*global Donkeylift, Backbone */
 
 Donkeylift.Relation = Backbone.Model.extend({ 
@@ -1105,7 +1191,8 @@ Donkeylift.Schema = Backbone.Model.extend({
 			this.set('tables', new Donkeylift.Tables());
 		}
 		//this.set('id', attrs.name); //unset me when new
-
+		this.set('props', new Donkeylift.Properties(null, { schema: this }));
+		
 	},
 
 	attrJSON: function() {
@@ -1157,8 +1244,11 @@ Donkeylift.Schema = Backbone.Model.extend({
 		Backbone.Model.prototype.fetch.call(this, {
 			success: function() {
 				me.orgJSON = JSON.parse(JSON.stringify(me.toJSON())); //copy
+				me.get('props').setKeyFuncs();
 				console.log("Schema.fetch OK");
-				cbAfter();
+				me.get('props').fetch(function() {
+					cbAfter();
+				});					
 			}
 		});
 	},
@@ -1296,11 +1386,6 @@ Donkeylift.Table = Backbone.Model.extend({
 			return new Donkeylift.Field(field);
 		});			
 		this.set('fields', new Donkeylift.Fields(fields));
-
-		table.props = table.props || {};
-		this.set('props', table.props);
-
-		table.props.visible = ! (table.name && table.name[0] == '_'); //TODO
 		//relations and row_alias are set in initRefs
 	},
 
@@ -1360,7 +1445,17 @@ Donkeylift.Table = Backbone.Model.extend({
 	},
 	
 	getProp: function(name) {
-		return this.get('props')[name];
+		if ( ! this.propKey) return undefined;
+		return Donkeylift.app.getProp(this.propKey(name));
+	},
+
+	setProp: function(name, value) {
+		if ( ! this.propKey) return;
+		Donkeylift.app.setProp(this.propKey(name), value);
+	},
+
+	allProps : function() {
+		//TODO
 	},
 
 	getFieldQN: function(field) {
@@ -1873,7 +1968,7 @@ Donkeylift.TableListView = Backbone.View.extend({
 	evSelectShowTableChange: function(ev) {
 		$('#selectShowTables option').each(function() {
 			var table = Donkeylift.app.schema.get('tables').getByName( $(this).val() );
-			table.get('props').visible = $(this).prop('selected');	
+			table.setProp('visible', $(this).prop('selected'));	
 		});
 	}
 });
@@ -2018,7 +2113,6 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 	events: {
 		'click #modalFieldUpdate': 'updateClick',
 		'click #modalFieldRemove': 'removeClick',
-		'click #modalToggleProps': 'togglePropsClick',
 		'click input[name="disabled"]': 'toggleDisableFieldClick',
 	},
 
@@ -2026,10 +2120,6 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 		console.log("FieldEditView.init");
 	},
 
-	propTemplate: function(type) {
-		return _.template($('#edit-prop-' + type.toLowerCase() + '-template').html());
-	},
-	
 	render: function() {
 		//console.log("FieldEditView.render " + this.model.get('type'));
 
@@ -2044,22 +2134,9 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 				? '<input type="checkbox" checked name="disabled"> Disable Field'
 				: '<input type="checkbox" name="disabled"> Disable Field'
 
-		$('#modalTabProps form').append(htmlDisabled);
+		$('#modalTabDefs form').append(htmlDisabled);
 
-		$('#modalTabProps form').append('<div class="well inject-props"></div>');
-
-		_.each(this.model.get('props').getAll(), function(prop) {
-			//console.log(prop);
-			var template = this.propTemplate(prop.type);
-			var params = { 
-				name: prop.name, 
-				value: prop.value 
-			};
-			if (prop.type == 'Boolean') {
-				params.checked = prop.value === true ? 'checked' : ''; 
-			}
-			$('#modalTabProps .inject-props').append(template(params));
-		}, this);
+		$('#modalTabDefs form').append('<div class="well inject-props"></div>');
 
 		$('#modalEditField').modal();
 		this.showDefinition(true);
@@ -2074,11 +2151,8 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 		this.model.setType($('#modalInputFieldType').val(), $('#modalInputFieldTypeSuffix').val());
 		//this.model.set('type', $('#modalInputFieldType').val());
 
-		this.model.set('disabled', $('#modalTabProps input[name=disabled]:checked').val() == "on");
+		this.model.set('disabled', $('#modalTabDefs input[name=disabled]:checked').val() == "on");
 
-		var propValues = $("#modalTabProps form").serializeArray();
-		this.model.setPropArray(propValues);
-		
 		if ( ! this.model.collection) {
 			Donkeylift.app.table.get('fields').addNew(this.model);
 		}
@@ -2100,12 +2174,8 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 	showDefinition: function(show) {
 		if (show) {
 			$('#modalTabDefs').show();
-			$('#modalTabProps').hide();
-			$('#modalToggleProps').text('View Properties');
 		} else {
-			$('#modalTabProps').show();
 			$('#modalTabDefs').hide();
-			$('#modalToggleProps').text('View Definition');
 		}
 	},
 
@@ -2116,7 +2186,6 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 	
 	toggleDisableFieldClick: function(ev) {
 		var disabled = $(ev.target).is(':checked');
-		$('#modalTabProps .inject-props input').prop('disabled', disabled);
 	}
 
 });

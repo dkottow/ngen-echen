@@ -5,4 +5,4 @@
 /tmp
 .env
 *~
-npm-debug.log
+npm-debug.*

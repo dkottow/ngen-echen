@@ -81,8 +81,8 @@ AppBase.prototype.start = function(cbAfter) {
     }
 
     //TODO ? 
-		this.loadAccount(opts, cbAfter); //loads all schemas - wont work for non-admins
-		//this.setAccount(opts, cbAfter);
+		//this.loadAccount(opts, cbAfter); //loads all schemas - wont work for non-admins
+		this.setAccount(opts, cbAfter);
     
   } else {
     //auth0 id_token in sessionStorage
@@ -280,11 +280,11 @@ AppBase.prototype.setSchema = function(name, opts, cbAfter) {
 }
 
 AppBase.prototype.getProp = function(key) {
-  return this.schema.get('props').get(key);
+  return this.schema.get('props').getProp(key);
 }
   
 AppBase.prototype.setProp = function(key, value) {
-  return this.schema.get('props').set(key, value);
+  return this.schema.get('props').setProp(key, value);
 }
 
 /******* init on script load ******/

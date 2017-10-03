@@ -5,6 +5,7 @@ Donkeylift.PreferencesView = Backbone.View.extend({
 
 	events: {
 		'click #modalEditPrefsApply': 'evPreferencesApplyClick',
+		'click #modalEditPrefsSave': 'evPreferencesSaveClick',		
 	},
 
 	initialize: function() {
@@ -27,6 +28,10 @@ Donkeylift.PreferencesView = Backbone.View.extend({
         Donkeylift.app.table.setPreferences(tablePrefs);
         Donkeylift.app.resetTable();
 	},
+
+	evPreferencesSaveClick: function() {
+		Donkeylift.app.schema.get('props').update();
+	}
 
 });
 
