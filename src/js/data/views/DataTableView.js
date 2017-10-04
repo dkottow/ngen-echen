@@ -335,7 +335,7 @@ Donkeylift.DataTableView = Backbone.View.extend({
 		this.dataTable.on('column-reorder', function (e, settings, details) {
 			$(document).mouseup(function() {
 				var columnOrders = me.dataTable.colReorder.order();
-				console.log('column-reorder done.', columnOrders);
+				//console.log('column-reorder done.', columnOrders);
 				_.each(columnOrders, function(pos, idx) {
 					var field = settings.aoColumns[pos].data;
 					//TODO props vs prefs 

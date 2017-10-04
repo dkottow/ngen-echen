@@ -29,19 +29,24 @@ function startDefault()
                     value: name,
                     text: name
                 }));
-
-                $('select[name="dl_database"]').change(function () {
-                    Config.update({
-                        server: $('input[name="dl_server"]').val(),
-                        account: $('input[name="dl_account"]').val(),
-                        database: $('select[name="dl_database"]').val()
-                    });
-                });
-
-                //try to set current
-                $('select[name="dl_database"]').val(cfg.database);
-                Config.update(cfg);                
             });
+            
+            $('select[name="dl_database"]').change(function () {
+                Config.update({
+                    server: $('input[name="dl_server"]').val(),
+                    account: $('input[name="dl_account"]').val(),
+                    database: $('select[name="dl_database"]').val()
+                });
+            });
+
+            //try to set current
+            if (cfg.database) {
+                $('select[name="dl_database"]').val(cfg.database);
+            } else {
+                cfg.database = $('select[name="dl_database"]').val();                   
+            }
+            
+            Config.update(cfg);
         });
     });
 

@@ -4,7 +4,7 @@
 Donkeylift.Property = Backbone.Model.extend({ 
 	
 	initialize : function(attrs) {
-		console.log("Row.initialize " + attrs);
+		//console.log("Row.initialize " + attrs);
 	},
 });		
 
@@ -21,7 +21,7 @@ Donkeylift.Properties = Backbone.Collection.extend({
 	},
 
 	parse : function(response) {
-		console.log("Properties.parse " + response);
+		console.log("Properties.parse...");
 		var rows = _.map(response.rows, function(row) {			
 			row[Donkeylift.Properties.FIELDS.value] = JSON.parse(row[Donkeylift.Properties.FIELDS.value]);
 			return row;
@@ -29,6 +29,22 @@ Donkeylift.Properties = Backbone.Collection.extend({
 		return rows;
 	},
 
+	fetch : function(cbAfter) {
+		var me = this;
+		console.log("Properties.fetch...");
+		Backbone.Collection.prototype.fetch.call(this, {
+			success: function() {
+				console.log("Properties.fetch OK");
+				if (cbAfter) cbAfter();
+			},
+			error: function(collection, response, options) {
+				console.log("Error requesting " + me.url());		
+				console.log(response);
+			}
+		});
+	},
+			
+			 
 	getUpdateRows : function() {
 		var updateRows = [];
 		var insertRows = [];
@@ -36,9 +52,9 @@ Donkeylift.Properties = Backbone.Collection.extend({
 			if (row.get('own_by') == Donkeylift.Properties.SYSTEM_OWNER) {
 				; //ignore
 			} else if (row.has('id')) {
-				updateRows.push(row.attributes);
+				updateRows.push(row);
 			} else {
-				insertRows.push(row.attributes);		
+				insertRows.push(row);		
 			}
 		});
 		return {
@@ -48,17 +64,23 @@ Donkeylift.Properties = Backbone.Collection.extend({
 	},
 
 	update : function(cbAfter) {
+		var me = this;
 		var rows = this.getUpdateRows();
+		var insertData = JSON.stringify(_.map(rows.insert, function(row) { return row.attributes; }));
+		var updateData = JSON.stringify(_.map(rows.update, function(row) { return row.attributes; }));
 		var url = this.url();
 		$.ajax(url, {
 			method: 'POST'
-			, data: JSON.stringify(rows.insert)
+			, data: insertData
 			, contentType: "application/json"
 			, processData: false
 
 		}).done(function(response) {
 			console.log("Properties.update POST ok.");			
-			console.log(response);			
+			//console.log(response);			
+			_.each(rows.insert, function(row, idx) {
+				row.set('id', response.rows[idx].id);
+			});
 			if (cbAfter) cbAfter();
 
 		}).fail(function(jqXHR, textStatus, errThrown) {
@@ -69,7 +91,7 @@ Donkeylift.Properties = Backbone.Collection.extend({
 
 		$.ajax(url, {
 			method: 'PUT'
-			, data: JSON.stringify(rows.update)
+			, data: updateData
 			, contentType: "application/json"
 			, processData: false
 
