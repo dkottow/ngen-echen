@@ -23,7 +23,12 @@ Donkeylift.Properties = Backbone.Collection.extend({
 	parse : function(response) {
 		console.log("Properties.parse...");
 		var rows = _.map(response.rows, function(row) {			
-			row[Donkeylift.Properties.FIELDS.value] = JSON.parse(row[Donkeylift.Properties.FIELDS.value]);
+			try {
+				row[Donkeylift.Properties.FIELDS.value] = JSON.parse(row[Donkeylift.Properties.FIELDS.value]);
+			} catch(err) {
+				console.log("Error parsing property " + row[Donkeylift.Properties.FIELDS.value]);
+				console.log(JSON.stringify(row));
+			}
 			return row;
 		});
 		return rows;
@@ -152,7 +157,7 @@ Donkeylift.Properties = Backbone.Collection.extend({
 	},
 
 	getRow: function(key) {
-		var key = this.parseKey(key);
+		key = this.parseKey(key);
 		var row = this.find(function(row) {
 			return key.name == row.get(Donkeylift.Properties.FIELDS.name)
 				&& key.table == row.get(Donkeylift.Properties.FIELDS.table)

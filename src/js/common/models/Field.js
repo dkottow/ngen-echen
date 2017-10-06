@@ -66,6 +66,14 @@ Donkeylift.Field = Backbone.Model.extend({
 		//TODO
 	},
 
+	visible: function() {
+		var visible = this.getProp('visible');
+		if (visible === undefined) {
+			visible = this.get('name')[0] != '_';	
+		}  
+		return visible;
+	},
+
 	attrJSON: function() {
 		var attrs = _.clone(_.omit(this.attributes, 'props'));
 		attrs.props = this.allProps();

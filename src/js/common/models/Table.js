@@ -82,6 +82,14 @@ Donkeylift.Table = Backbone.Model.extend({
 		//TODO
 	},
 
+	visible: function() {
+		var visible = this.getProp('visible');
+		if (visible === undefined) {
+			visible = this.get('name')[0] != '_';	
+		}  
+		return visible;
+	},
+
 	getFieldQN: function(field) {
 		return _.isString(field) 
 			? this.get('name') + '.' + field

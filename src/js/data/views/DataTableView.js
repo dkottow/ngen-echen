@@ -76,7 +76,7 @@ Donkeylift.DataTableView = Backbone.View.extend({
 
 			var width = (100 * field.getProp('width')) / totalWidth;
 			col.width = String(Math.floor(width)) + '%';
-			col.visible = field.getProp('visible');
+			col.visible = field.visible();
 			col.render = this.columnDataFn(field);
 
 			return col;

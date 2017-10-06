@@ -26,8 +26,7 @@ Donkeylift.TableListView = Backbone.View.extend({
 		console.log('TableListView.render ');	
 		this.$el.html(this.template({ database: me.model.get('name') }));
 		this.collection.each(function(table) {
-			var visible = table.getProp('visible') == true;
-			if (visible) {
+			if (table.visible()) {
 				var href = "#table" 
 						+ "/" + table.get('name');
 				this.$('#table-list-items').append(this.itemTemplate({
@@ -39,7 +38,7 @@ Donkeylift.TableListView = Backbone.View.extend({
 				$('<option></option>')
 					.attr('value', table.get('name'))
 					.text(table.get('name'))
-					.prop('selected', visible)						
+					.prop('selected', table.visible())						
 			);
 		}, this);	
 		$('#selectShowTables').selectpicker('refresh');
