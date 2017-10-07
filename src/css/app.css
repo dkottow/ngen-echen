@@ -282,6 +282,10 @@ table.dataTable {
 	height: 10em;
 }
 
+.dt-button-collection .dropdown-menu {
+	overflow-y: auto;
+}
+
 /******* compat SP *******/
 
 button, .btn {
