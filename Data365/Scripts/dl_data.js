@@ -770,6 +770,14 @@ Donkeylift.Field = Backbone.Model.extend({
 		//TODO
 	},
 
+	visible: function() {
+		var visible = this.getProp('visible');
+		if (visible === undefined) {
+			visible = this.get('name')[0] != '_';	
+		}  
+		return visible;
+	},
+
 	attrJSON: function() {
 		var attrs = _.clone(_.omit(this.attributes, 'props'));
 		attrs.props = this.allProps();
@@ -1150,7 +1158,7 @@ Donkeylift.Properties = Backbone.Collection.extend({
 	},
 
 	getRow: function(key) {
-		var key = this.parseKey(key);
+		key = this.parseKey(key);
 		var row = this.find(function(row) {
 			return key.name == row.get(Donkeylift.Properties.FIELDS.name)
 				&& key.table == row.get(Donkeylift.Properties.FIELDS.table)
@@ -1483,6 +1491,14 @@ Donkeylift.Table = Backbone.Model.extend({
 
 	allProps : function() {
 		//TODO
+	},
+
+	visible: function() {
+		var visible = this.getProp('visible');
+		if (visible === undefined) {
+			visible = this.get('name')[0] != '_';	
+		}  
+		return visible;
 	},
 
 	getFieldQN: function(field) {
@@ -2689,8 +2705,7 @@ Donkeylift.TableListView = Backbone.View.extend({
 		console.log('TableListView.render ');	
 		this.$el.html(this.template({ database: me.model.get('name') }));
 		this.collection.each(function(table) {
-			var visible = table.getProp('visible') == true;
-			if (visible) {
+			if (table.visible()) {
 				var href = "#table" 
 						+ "/" + table.get('name');
 				this.$('#table-list-items').append(this.itemTemplate({
@@ -2702,7 +2717,7 @@ Donkeylift.TableListView = Backbone.View.extend({
 				$('<option></option>')
 					.attr('value', table.get('name'))
 					.text(table.get('name'))
-					.prop('selected', visible)						
+					.prop('selected', table.visible())						
 			);
 		}, this);	
 		$('#selectShowTables').selectpicker('refresh');
@@ -2882,7 +2897,7 @@ Donkeylift.DataTableView = Backbone.View.extend({
 
 			var width = (100 * field.getProp('width')) / totalWidth;
 			col.width = String(Math.floor(width)) + '%';
-			col.visible = field.getProp('visible');
+			col.visible = field.visible();
 			col.render = this.columnDataFn(field);
 
 			return col;

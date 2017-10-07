@@ -30,7 +30,8 @@ Donkeylift.PreferencesView = Backbone.View.extend({
 	},
 
 	evPreferencesSaveClick: function() {
-		Donkeylift.app.schema.get('props').update();
+		var table = this.model.get('table').get('name');
+		Donkeylift.app.schema.get('props').update({ table: table });
 	}
 
 });

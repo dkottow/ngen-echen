@@ -770,6 +770,14 @@ Donkeylift.Field = Backbone.Model.extend({
 		//TODO
 	},
 
+	visible: function() {
+		var visible = this.getProp('visible');
+		if (visible === undefined) {
+			visible = this.get('name')[0] != '_';	
+		}  
+		return visible;
+	},
+
 	attrJSON: function() {
 		var attrs = _.clone(_.omit(this.attributes, 'props'));
 		attrs.props = this.allProps();
@@ -1150,7 +1158,7 @@ Donkeylift.Properties = Backbone.Collection.extend({
 	},
 
 	getRow: function(key) {
-		var key = this.parseKey(key);
+		key = this.parseKey(key);
 		var row = this.find(function(row) {
 			return key.name == row.get(Donkeylift.Properties.FIELDS.name)
 				&& key.table == row.get(Donkeylift.Properties.FIELDS.table)
@@ -1483,6 +1491,14 @@ Donkeylift.Table = Backbone.Model.extend({
 
 	allProps : function() {
 		//TODO
+	},
+
+	visible: function() {
+		var visible = this.getProp('visible');
+		if (visible === undefined) {
+			visible = this.get('name')[0] != '_';	
+		}  
+		return visible;
 	},
 
 	getFieldQN: function(field) {
@@ -1968,8 +1984,7 @@ Donkeylift.TableListView = Backbone.View.extend({
 		console.log('TableListView.render ');	
 		this.$el.html(this.template({ database: me.model.get('name') }));
 		this.collection.each(function(table) {
-			var visible = table.getProp('visible') == true;
-			if (visible) {
+			if (table.visible()) {
 				var href = "#table" 
 						+ "/" + table.get('name');
 				this.$('#table-list-items').append(this.itemTemplate({
@@ -1981,7 +1996,7 @@ Donkeylift.TableListView = Backbone.View.extend({
 				$('<option></option>')
 					.attr('value', table.get('name'))
 					.text(table.get('name'))
-					.prop('selected', visible)						
+					.prop('selected', table.visible())						
 			);
 		}, this);	
 		$('#selectShowTables').selectpicker('refresh');
@@ -2695,9 +2710,9 @@ Donkeylift.SchemaTableView = Backbone.View.extend({
 	evNewFieldClick: function() {
 		console.log('TableView.evNewFieldClick');
 		var field = Donkeylift.Field.create();
-		var order = 10*(this.model.get('fields').filter(function(f) { 
-			return f.getProp('visible'); 
-		}).length) + 1;
+		var order = this.model.get('fields').filter(function(f) { 
+			return f.visible(); 
+		}).length + 1;
 		field.setProp('order', order);
 		var editor = Donkeylift.app.getFieldEditor();
 		editor.model = field;
