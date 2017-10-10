@@ -282,7 +282,20 @@ table.dataTable {
 	height: 10em;
 }
 
+ul.dt-button-collection.dropdown-menu {
+	max-height: 32em;
+	overflow-y: auto;
+}
+
 /******* compat SP *******/
+
+#sideNavBox  {  
+	display:none;  
+}  
+
+#contentBox {
+	margin-left: 1em;
+}
 
 button, .btn {
 	min-width: 0;

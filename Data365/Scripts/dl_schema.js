@@ -1051,14 +1051,20 @@ Donkeylift.Properties = Backbone.Collection.extend({
 	},
 			
 			 
-	getUpdateRows : function() {
+	getUpdateRows : function(opts) {
 		var updateRows = [];
 		var insertRows = [];
+		opts = opts || {};
 		this.each(function(row) {
 			if (row.get('own_by') == Donkeylift.Properties.SYSTEM_OWNER) {
-				; //ignore
+				; //ignore system props
+
+			} else if (opts.table && row.get('TableName') != opts.table && row.get('FieldName')) {
+				; //ignore field props from other tables
+
 			} else if (row.has('id')) {
 				updateRows.push(row);
+
 			} else {
 				insertRows.push(row);		
 			}
@@ -1069,9 +1075,15 @@ Donkeylift.Properties = Backbone.Collection.extend({
 		}
 	},
 
-	update : function(cbAfter) {
-		var me = this;
-		var rows = this.getUpdateRows();
+	update : function(opts, cbAfter) {
+		var me = this;  
+		
+		opts = typeof opts == 'object' ? opts : {};
+		if (typeof arguments[arguments.length - 1] == 'function') {
+		  cbAfter = arguments[arguments.length - 1];
+		}
+	  
+		var rows = this.getUpdateRows(opts);
 		var insertData = JSON.stringify(_.map(rows.insert, function(row) { return row.attributes; }));
 		var updateData = JSON.stringify(_.map(rows.update, function(row) { return row.attributes; }));
 		var url = this.url();
