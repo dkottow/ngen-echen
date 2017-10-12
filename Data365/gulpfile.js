@@ -12,8 +12,8 @@ var insert = require('gulp-insert');
 var rename = require('gulp-rename');
 
 //require('dotenv').config();
-process.env.DATA365_SERVER = "https://azd365devwuas.azurewebsites.net";
-process.env.DATA365_ACCOUNT = "dev";
+process.env.DATA365_SERVER = "https://azd365testwuas.azurewebsites.net";
+process.env.DATA365_ACCOUNT = "test";
 
 
 //for dl_data.js and others

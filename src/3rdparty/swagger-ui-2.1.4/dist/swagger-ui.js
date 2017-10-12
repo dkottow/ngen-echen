@@ -25634,7 +25634,8 @@ SwaggerUi.Views.OperationView = Backbone.View.extend({
     for (m = 0, len1 = ref2.length; m < len1; m++) {
       o = ref2[m];
       val = this.getTextAreaValue(o);
-      if ((val !== null) && jQuery.trim(val).length > 0) {
+      if ((val !== null) /* && jQuery.trim(val).length > 0 */ ) {
+        //dkottow - dont trim since getTextAreaValue can return array
         map[o.name] = val;
       }
     }

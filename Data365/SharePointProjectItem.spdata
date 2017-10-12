@@ -7,5 +7,7 @@
     <ProjectItemFile Source="src\DataBrowser.aspx" Target="src\" Type="ElementFile" />
     <ProjectItemFile Source="src\SchemaEditor.aspx" Target="src\" Type="ElementFile" />
     <ProjectItemFile Source=".gitignore" Type="ElementFile" />
+    <ProjectItemFile Source="src\Default.aspx" Target="src\" Type="ElementFile" />
+    <ProjectItemFile Source="src\WebApi.aspx" Target="src\" Type="ElementFile" />
   </Files>
 </ProjectItem>

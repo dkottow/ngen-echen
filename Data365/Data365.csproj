@@ -104,6 +104,7 @@
     <Content Include="Scripts\dl_3rdparty.js" />
     <Content Include="Scripts\dl_data.js" />
     <Content Include="src\DataBrowser.aspx" />
+    <Content Include="src\WebApi.aspx" />
     <None Include="Content\api\fonts\DroidSans-Bold.ttf" />
     <None Include="Content\api\fonts\DroidSans.ttf" />
     <None Include="Content\api\lib\underscore-min.map" />
@@ -144,6 +145,7 @@
     <None Include="Scripts\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{cb754ca5-a044-402e-b67c-8bb9a758f162}</SharePointProjectItemId>
     </None>
+    <Content Include="src\Default.aspx" />
     <Content Include="src\SchemaEditor.aspx" />
     <Content Include="Scripts\SchemaEditor.js" />
     <Content Include="Scripts\DataBrowser.js" />

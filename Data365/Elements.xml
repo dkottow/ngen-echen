@@ -6,5 +6,7 @@
     <File Path="src\DataBrowser.aspx" Url="src/DataBrowser.aspx" ReplaceContent="TRUE" />
     <File Path="src\SchemaEditor.aspx" Url="src/SchemaEditor.aspx" ReplaceContent="TRUE" />
     <File Path=".gitignore" Url=".gitignore" ReplaceContent="TRUE" />
+    <File Path="src\Default.aspx" Url="src/Default.aspx" ReplaceContent="TRUE" />
+    <File Path="src\WebApi.aspx" Url="src/WebApi.aspx" ReplaceContent="TRUE" />
   </Module>
 </Elements>

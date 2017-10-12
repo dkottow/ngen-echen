@@ -7,7 +7,7 @@ var Donkeylift = {
 // e.g. DONKEYLIFT_API. "http://api.donkeylift.com";
 
 	env: {
-	    API_BASE: "https://azd365devwuas.azurewebsites.net"
+	    API_BASE: "https://azd365testwuas.azurewebsites.net"
 	    , AUTH0_CLIENT_ID: "$AUTH0_CLIENT_ID"
 	    , AUTH0_DOMAIN: "$AUTH0_DOMAIN"
 	    , DEMO_FLAG: + "1"
