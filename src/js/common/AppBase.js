@@ -13,7 +13,7 @@ var Donkeylift = {
 	    , DEMO_FLAG: + "$DONKEYLIFT_DEMO"
 	},
 
-	DEMO_ACCOUNT: 'dev',
+	DEMO_ACCOUNT: 'test',
 	DEMO_USER: 'dkottow@golder.com',
 	
 	util: {
@@ -237,11 +237,11 @@ AppBase.prototype.setSchema = function(name, opts, cbAfter) {
 	console.log('AppBase.setSchema ' + name);
 	var me = this;
 
-  opts = typeof opts == 'object' ? opts : {};
   if (typeof arguments[arguments.length - 1] == 'function') {
     cbAfter = arguments[arguments.length - 1];
   }
-
+  opts = typeof opts == 'object' ? opts : {};
+  
 	var loadRequired = (! this.schema) || (this.schema.get('name') != name);
   var reload = opts.reload !== undefined ? opts.reload : loadRequired; 
 
