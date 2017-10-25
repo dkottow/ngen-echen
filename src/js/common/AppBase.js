@@ -14,7 +14,7 @@ var Donkeylift = {
 	},
 
 	DEMO_ACCOUNT: 'test',
-	DEMO_USER: 'dkottow@golder.com',
+	DEMO_USER: '',
 	
 	util: {
 		/*** implementation details at eof ***/

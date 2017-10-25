@@ -29,6 +29,7 @@ AppSchema.prototype.createSchema = function(name) {
 AppSchema.prototype.updateSchema = function(cbAfter) {
 	var currentTable = Donkeylift.app.table ? Donkeylift.app.table.get('name') : undefined;
 	Donkeylift.app.schema.update(function() {
+/*
 		Donkeylift.app.resetSchema(function() {
 			if (currentTable) {
 				var table = Donkeylift.app.schema.get('tables').getByName(currentTable);
@@ -36,6 +37,7 @@ AppSchema.prototype.updateSchema = function(cbAfter) {
 			}
 			if (cbAfter) cbAfter();
 		});
+*/
 	});
 }
 
