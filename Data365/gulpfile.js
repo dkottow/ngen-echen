@@ -10,6 +10,7 @@ var replace = require('gulp-replace');
 var gulpif = require('gulp-if');
 var insert = require('gulp-insert');
 var rename = require('gulp-rename');
+var util = require('util');
 
 //require('dotenv').config();
 process.env.DATA365_SERVER = "https://azd365testwuas.azurewebsites.net";
@@ -45,32 +46,45 @@ var outputs = {
     CSS_DIR: './Content/css/',
 }
 
-var allTasks = [
+var appTasks = [
     'DataBrowser',
     'SchemaEditor',
     'WebApi',
-    'ChooseDB',
+    'ChooseDB'
+];
+
+var siteTasks = [
+    'SiteDataBrowser',
+    'SiteSchemaEditor'
+];
+
+var commonTasks = [
     'build-dl-data-js',
     'build-dl-schema-js',
     'build-dl-3rdparty-js',
     'build-dl-swagger-js',
     'build-dl-common-css',
-    'build-dl-3rdparty-css',
+    'build-dl-3rdparty-css'
 ];
 
+gulp.task('default', appTasks.concat(commonTasks), function () {
+    // place code for your default task here
+});
 
-gulp.task('default', allTasks, function () {
+gulp.task('site', siteTasks.concat(commonTasks), function () {
     // place code for your default task here
 });
 
 
-gulp.task('DataBrowser', function () {
+function CreateDataBrowser(ed) {
     var snippets = {
         dialogs: ['../src/html/common/dialogs/*.html', '../src/html/data/dialogs/*.html'],
         templates: ['../src/html/common/templates/*.html', '../src/html/data/templates/*.html']
     };
 
-    return gulp.src(['./src/DataBrowser.aspx'])
+	var srcFile = util.format("./src/%s/DataBrowser.aspx", ed);
+console.log(srcFile);
+    return gulp.src([ srcFile ])
 
 		.pipe(inject(gulp.src(snippets.dialogs), {
 		    starttag: '<!-- inject:dialogs:{{ext}} -->',
@@ -88,15 +102,17 @@ gulp.task('DataBrowser', function () {
 
 		.pipe(gulp.dest('./Pages/'));
 
-});
+}
 
-gulp.task('SchemaEditor', function () {
+function CreateSchemaEditor(ed) {
     var snippets = {
         dialogs: ['../src/html/common/dialogs/*.html', '../src/html/schema/dialogs/*.html'],
         templates: ['../src/html/common/templates/*.html', '../src/html/schema/templates/*.html']
     };
 
-    return gulp.src(['./src/SchemaEditor.aspx'])
+	var srcFile = util.format("./src/%s/SchemaEditor.aspx", ed);
+	
+    return gulp.src([ srcFile ])
 
 		.pipe(inject(gulp.src(snippets.dialogs), {
 		    starttag: '<!-- inject:dialogs:{{ext}} -->',
@@ -113,16 +129,33 @@ gulp.task('SchemaEditor', function () {
 		}))
 
 		.pipe(gulp.dest('./Pages/'));
+}
+
+
+gulp.task('DataBrowser', function () {
+	return CreateDataBrowser('app');
+});
+
+gulp.task('SchemaEditor', function () {
+	return CreateSchemaEditor('app');
+});
+
+gulp.task('SiteDataBrowser', function () {
+	return CreateDataBrowser('site');
+});
+
+gulp.task('SiteSchemaEditor', function () {
+	return CreateSchemaEditor('site');
 });
 
 gulp.task('WebApi', function () {
-    return gulp.src(['./src/WebApi.aspx'])
+    return gulp.src(['./src/app/WebApi.aspx'])
 		.pipe(replace("$DATA365_SERVER", process.env.DATA365_SERVER))	
 		.pipe(gulp.dest('./Pages/'));
 });
 
 gulp.task('ChooseDB', function () {
-    return gulp.src(['./src/Default.aspx'])
+    return gulp.src(['./src/app/Default.aspx'])
 		.pipe(replace("$DATA365_SERVER", process.env.DATA365_SERVER))	
 		.pipe(replace("$DATA365_ACCOUNT", process.env.DATA365_ACCOUNT))	
 		.pipe(gulp.dest('./Pages/'));

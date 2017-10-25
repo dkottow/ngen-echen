@@ -7,38 +7,31 @@ $(document).ready(function () {
 
 function startDataBrowser() {
     console.log('startDataBrowser');
+
+    startApp({
+        user: _spPageContextInfo.userLoginName,
+        server: "https://azd365testwuas.azurewebsites.net",
+        account: "test",
+        database: "SolomonMine_HydroDB"
+    });
+/*
     Config.get(function (cfg) {
         startApp(cfg);
     });
+*/
+
 }
 
 /**** DONKEYLIFT  ****/
+
+// Data 365 hardcoded D365 database.
 
 // Data 365 pilot, no auth.
 function startApp(cfg) {
     console.log(cfg);
     Donkeylift.app = new Donkeylift.AppData();
-    Donkeylift.app.start(function () {
+    Donkeylift.app.start(cfg, function () {
         Donkeylift.app.setSchema(cfg.database);
     });
 }
 
-/* 
-// using api.donkeylift.com and Auth0 
-function startApp(cfg) {
-
-    Donkeylift.app = new Donkeylift.AppData();
-
-    $.post(Donkeylift.env.API_BASE + "/public/login", {
-        email: cfg.email,
-        password: cfg.password
-
-    }, function (data) {
-        //console.log(data);
-        sessionStorage.setItem('id_token', data.id_token);
-        Donkeylift.app.start(function () {
-            Donkeylift.app.setSchema(cfg.database);
-        });
-    });
-}
-*/

@@ -14,7 +14,7 @@ var Donkeylift = {
 	},
 
 	DEMO_ACCOUNT: 'test',
-	DEMO_USER: '',
+	DEMO_USER: 'dkottow@golder.com',
 	
 	util: {
 		/*** implementation details at eof ***/
@@ -70,16 +70,15 @@ AppBase.prototype.ajaxPrefilter = function(options, orgOptions, jqXHR) {
   }
 }
 
-AppBase.prototype.start = function(cbAfter) {
+AppBase.prototype.start = function(opts, cbAfter) {
 	var me = this;
 
 	if (Donkeylift.env.DEMO_FLAG) {
-    var opts = {
-      user: sessionStorage.getItem('dl_user') || Donkeylift.DEMO_USER,
-      account: sessionStorage.getItem('dl_account') || Donkeylift.DEMO_ACCOUNT,
-      auth: false
-    }
-
+    Donkeylift.env.API_BASE = opts.server || Donkeylift.env.API_BASE;
+    opts.user = opts.user || sessionStorage.getItem('dl_user') || Donkeylift.DEMO_USER
+    opts.account = opts.account || sessionStorage.getItem('dl_account') || Donkeylift.DEMO_ACCOUNT
+    opts.auth = opts.auth === true;
+    
     //TODO ? 
 		//this.loadAccount(opts, cbAfter); //loads all schemas - wont work for non-admins
 		this.setAccount(opts, cbAfter);
@@ -94,16 +93,13 @@ AppBase.prototype.start = function(cbAfter) {
 
 }
 
-AppBase.prototype.setAccount = function(opts, cbAfter) {
+AppBase.prototype.setAccount = function(params, cbAfter) {
 	var me = this;
-	console.log('setAccount: ' + opts);
+	console.log('setAccount: ' + params);
 
-  opts.reset = opts.reset || (!! opts.account); 
-  opts.user = opts.user || sessionStorage.getItem('dl_user');
-  opts.account = opts.account || sessionStorage.getItem('dl_account');
-  opts.auth = opts.auth === true;
+  params.reset = params.reset || (!! params.account); 
   
-	this.account = new Donkeylift.Account(opts);
+	this.account = new Donkeylift.Account(params);
 
   this.navbarView.model = this.account;
   me.navbarView.render();
@@ -111,22 +107,18 @@ AppBase.prototype.setAccount = function(opts, cbAfter) {
   me.menuView.render();
   $('#content').empty();
 
-  if (opts.reset) me.unsetSchema();
+  if (params.reset) me.unsetSchema();
 
   me.onAccountLoaded(cbAfter);
 
 	$('#toggle-sidebar').hide();
 }
 
-AppBase.prototype.loadAccount = function(opts, cbAfter) {
+AppBase.prototype.loadAccount = function(params, cbAfter) {
 	var me = this;
-	console.log('loadAccount: ' + opts);
+	console.log('loadAccount: ' + params);
 
-  opts.user = opts.user || sessionStorage.getItem('dl_user');
-  opts.account = opts.account || sessionStorage.getItem('dl_account');
-  opts.auth = opts.auth === true;
-
-	this.account = new Donkeylift.Account(opts);
+	this.account = new Donkeylift.Account(params);
 
 	this.navbarView.model = this.account;
   

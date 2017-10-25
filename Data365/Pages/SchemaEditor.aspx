@@ -15,8 +15,8 @@
     <meta name="WebPartPageExpansion" content="full" />
 
     <!-- Add your CSS styles to the following file -->
-    <link rel="Stylesheet" type="text/css" href="../Content/css/dl_3rdparty.css" />
-    <link rel="Stylesheet" type="text/css" href="../Content/css/dl_common.css" />
+    <link rel="Stylesheet" type="text/css" href="/SiteAssets/Data365/Content/css/dl_3rdparty.css" />
+    <link rel="Stylesheet" type="text/css" href="/SiteAssets/Data365/Content/css/dl_common.css" />
 
 <!-- inject:templates:html -->
 <script type="text/template" id="downloads-template">
@@ -266,12 +266,12 @@
 <!-- endinject -->
 
     <!-- Donkeylift data app -->
-    <script type="text/javascript" src="../Scripts/dl_3rdparty.js"></script>
-    <script type="text/javascript" src="../Scripts/dl_schema.js"></script>
+    <script type="text/javascript" src="/SiteAssets/Data365/Scripts/dl_3rdparty.js"></script>
+    <script type="text/javascript" src="/SiteAssets/Data365/Scripts/dl_schema.js"></script>
 
     <!-- Actual SP App starts inside here -->
-    <script type="text/javascript" src="../Scripts/Config.js"></script>
-    <script type="text/javascript" src="../Scripts/SchemaEditor.js"></script>
+    <script type="text/javascript" src="/SiteAssets/Data365/Scripts/Config.js"></script>
+    <script type="text/javascript" src="/SiteAssets/Data365/Scripts/SchemaEditor.js"></script>
 
 </asp:Content>
 
@@ -303,7 +303,7 @@
     <!-- end FIXED PAGE ELEMENTS --> 
 
 	    <div id="ajax-progress-spinner">
-		    <img src="../Images/progress-spinner.gif" />
+		    <img src="/SiteAssets/Data365/Images/progress-spinner.gif" />
 	    </div>	
 
 <!-- inject:dialogs:html -->
