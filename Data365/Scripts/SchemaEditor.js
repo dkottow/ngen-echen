@@ -6,8 +6,12 @@ $(document).ready(function () {
 });
 
 function startSchemaEditor() {
-    Config.get(function (cfg) {
-        startApp(cfg);
+
+    startApp({
+        user: _spPageContextInfo.userLoginName,
+        server: "https://azd365testwuas.azurewebsites.net",
+        account: "test",
+        database: "SolomonMine_HydroDB_02"
     });
 }
 
@@ -15,13 +19,8 @@ function startSchemaEditor() {
 
 // Data 365 pilot, no auth.
 function startApp(cfg) {
-
-    sessionStorage.setItem('dl_account', cfg.account);
-    sessionStorage.setItem('dl_user', cfg.user);
-
     Donkeylift.app = new Donkeylift.AppSchema();
-
-    Donkeylift.app.start(function () {
+    Donkeylift.app.start(cfg, function () {
         Donkeylift.app.setSchema(cfg.database);
     });
 }

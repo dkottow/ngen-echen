@@ -275,8 +275,6 @@
     <!-- Actual SP App starts inside here -->
     <script type="text/javascript" src="../SiteAssets/Data365/Scripts/DataBrowser.js"></script>
     
-
-
 </asp:Content>
 
 <%-- The markup in the following Content element will be placed in the TitleArea of the page --%>

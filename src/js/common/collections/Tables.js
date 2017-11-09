@@ -17,6 +17,11 @@ Donkeylift.Tables = Backbone.Collection.extend({
 		return this.find(function(t) { return t.get('name') == name; });
 	},
 
+	getAll: function(opts) {
+		//TODO sort by user-defined order 
+		return this.sortBy(function(t) { return t.get('name'); });
+	},
+		
 	getAncestors: function(table) {
 		var result = [];
 		var tables = [table];

@@ -12,7 +12,7 @@ function startDataBrowser() {
         user: _spPageContextInfo.userLoginName,
         server: "https://azd365testwuas.azurewebsites.net",
         account: "test",
-        database: "SolomonMine_HydroDB"
+        database: "SolomonMine_HydroDB_02"
     });
 /*
     Config.get(function (cfg) {
