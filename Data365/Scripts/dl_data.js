@@ -2739,8 +2739,9 @@ Donkeylift.TableListView = Backbone.View.extend({
 	},
 
 	evSelectShowTableChange: function(ev) {
+		var me = this;
 		$('#selectShowTables option').each(function() {
-			var table = this.collection.getByName( $(this).val() );
+			var table = me.collection.getByName( $(this).val() );
 			//var table = Donkeylift.app.schema.get('tables').getByName( $(this).val() );
 			table.setProp('visible', $(this).prop('selected'));	
 		});
