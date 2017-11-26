@@ -7,10 +7,8 @@ var Donkeylift = {
 // e.g. DONKEYLIFT_API. "http://api.donkeylift.com";
 
 	env: {
-	    API_BASE: "https://azd365testwuas.azurewebsites.net"
-	    , AUTH0_CLIENT_ID: "$AUTH0_CLIENT_ID"
-	    , AUTH0_DOMAIN: "$AUTH0_DOMAIN"
-	    , DEMO_FLAG: + "1"
+	    API_BASE: "https://azd365devwuas.azurewebsites.net"
+	    , DEMO_FLAG: + "0"
 	},
 
 	DEMO_ACCOUNT: 'test',
@@ -33,9 +31,6 @@ function AppBase(opts) {
   console.log('AppBase ctor');
 	
 	this.navbarView = new Donkeylift.NavbarView();
-  if (Donkeylift.env.AUTH0_DOMAIN && !Donkeylift.env.DEMO_FLAG) {
-    this.lock = new Auth0Lock(Donkeylift.env.AUTH0_CLIENT_ID, Donkeylift.env.AUTH0_DOMAIN);
-	}
 
   $.ajaxPrefilter(function( options, orgOptions, jqXHR ) {
     me.ajaxPrefilter(options, orgOptions, jqXHR);
@@ -72,25 +67,27 @@ AppBase.prototype.ajaxPrefilter = function(options, orgOptions, jqXHR) {
 
 AppBase.prototype.start = function(opts, cbAfter) {
 	var me = this;
+  var opts;
 
 	if (Donkeylift.env.DEMO_FLAG) {
-    Donkeylift.env.API_BASE = opts.server || Donkeylift.env.API_BASE;
-    opts.user = opts.user || sessionStorage.getItem('dl_user') || Donkeylift.DEMO_USER
-    opts.account = opts.account || sessionStorage.getItem('dl_account') || Donkeylift.DEMO_ACCOUNT
-    opts.auth = opts.auth === true;
-    
-    //TODO ? 
-		//this.loadAccount(opts, cbAfter); //loads all schemas - wont work for non-admins
-		this.setAccount(opts, cbAfter);
+    opts = {
+      user: sessionStorage.getItem('dl_user') || Donkeylift.DEMO_USER,
+      account: sessionStorage.getItem('dl_account') || Donkeylift.DEMO_ACCOUNT,
+      auth: false
+    };
     
   } else {
-    //auth0 id_token in sessionStorage
-    this.loadAccount({ 
+    //Authorization token (jwt from AAD) in sessionStorage
+    opts = { 
       id_token: sessionStorage.getItem('id_token'),
+      account: sessionStorage.getItem('dl_account'),
       auth: true
-    }, cbAfter);
+    };
   }
 
+  //TODO sites that fix DB use setAccount, D365 app uses loadAccount 
+  //this.loadAccount(opts, cbAfter); //loads all schemas - wont work for non-admins
+  this.setAccount(opts, cbAfter);  
 }
 
 AppBase.prototype.setAccount = function(params, cbAfter) {
@@ -613,7 +610,14 @@ Donkeylift.Account = Backbone.Model.extend({
 			this.set('auth', false);
 
 		} else {
-			
+			//AAD token			
+			var token_attrs = jwt_decode(attrs.id_token);
+			this.set('name', attrs.account);
+			this.set('user', token_attrs.upn);
+			this.set('id_token', attrs.id_token);
+/*
+		} else {
+			//auth0 token			
 			var token_attrs = jwt_decode(attrs.id_token);
 			
 			//root users have access to any account.
@@ -623,6 +627,7 @@ Donkeylift.Account = Backbone.Model.extend({
 			this.set('user', attrs.user || token_attrs.email);
 			this.set('app_metadata', token_attrs.app_metadata);
 			this.set('id_token', attrs.id_token);
+*/			
 		}
 
 		sessionStorage.setItem('dl_user', this.get('user'));

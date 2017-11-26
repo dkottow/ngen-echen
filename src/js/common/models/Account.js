@@ -13,7 +13,14 @@ Donkeylift.Account = Backbone.Model.extend({
 			this.set('auth', false);
 
 		} else {
-			
+			//AAD token			
+			var token_attrs = jwt_decode(attrs.id_token);
+			this.set('name', attrs.account);
+			this.set('user', token_attrs.upn);
+			this.set('id_token', attrs.id_token);
+/*
+		} else {
+			//auth0 token			
 			var token_attrs = jwt_decode(attrs.id_token);
 			
 			//root users have access to any account.
@@ -23,6 +30,7 @@ Donkeylift.Account = Backbone.Model.extend({
 			this.set('user', attrs.user || token_attrs.email);
 			this.set('app_metadata', token_attrs.app_metadata);
 			this.set('id_token', attrs.id_token);
+*/			
 		}
 
 		sessionStorage.setItem('dl_user', this.get('user'));

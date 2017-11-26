@@ -8,8 +8,6 @@ var Donkeylift = {
 
 	env: {
 	    API_BASE: "$DONKEYLIFT_API"
-	    , AUTH0_CLIENT_ID: "$AUTH0_CLIENT_ID"
-	    , AUTH0_DOMAIN: "$AUTH0_DOMAIN"
 	    , DEMO_FLAG: + "$DONKEYLIFT_DEMO"
 	},
 
@@ -33,9 +31,6 @@ function AppBase(opts) {
   console.log('AppBase ctor');
 	
 	this.navbarView = new Donkeylift.NavbarView();
-  if (Donkeylift.env.AUTH0_DOMAIN && !Donkeylift.env.DEMO_FLAG) {
-    this.lock = new Auth0Lock(Donkeylift.env.AUTH0_CLIENT_ID, Donkeylift.env.AUTH0_DOMAIN);
-	}
 
   $.ajaxPrefilter(function( options, orgOptions, jqXHR ) {
     me.ajaxPrefilter(options, orgOptions, jqXHR);
@@ -72,25 +67,27 @@ AppBase.prototype.ajaxPrefilter = function(options, orgOptions, jqXHR) {
 
 AppBase.prototype.start = function(opts, cbAfter) {
 	var me = this;
+  var opts;
 
 	if (Donkeylift.env.DEMO_FLAG) {
-    Donkeylift.env.API_BASE = opts.server || Donkeylift.env.API_BASE;
-    opts.user = opts.user || sessionStorage.getItem('dl_user') || Donkeylift.DEMO_USER
-    opts.account = opts.account || sessionStorage.getItem('dl_account') || Donkeylift.DEMO_ACCOUNT
-    opts.auth = opts.auth === true;
-    
-    //TODO ? 
-		//this.loadAccount(opts, cbAfter); //loads all schemas - wont work for non-admins
-		this.setAccount(opts, cbAfter);
+    opts = {
+      user: sessionStorage.getItem('dl_user') || Donkeylift.DEMO_USER,
+      account: sessionStorage.getItem('dl_account') || Donkeylift.DEMO_ACCOUNT,
+      auth: false
+    };
     
   } else {
-    //auth0 id_token in sessionStorage
-    this.loadAccount({ 
+    //Authorization token (jwt from AAD) in sessionStorage
+    opts = { 
       id_token: sessionStorage.getItem('id_token'),
+      account: sessionStorage.getItem('dl_account'),
       auth: true
-    }, cbAfter);
+    };
   }
 
+  //TODO sites that fix DB use setAccount, D365 app uses loadAccount 
+  //this.loadAccount(opts, cbAfter); //loads all schemas - wont work for non-admins
+  this.setAccount(opts, cbAfter);  
 }
 
 AppBase.prototype.setAccount = function(params, cbAfter) {

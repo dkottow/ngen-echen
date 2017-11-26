@@ -13,12 +13,12 @@ var rename = require('gulp-rename');
 var util = require('util');
 
 //require('dotenv').config();
-process.env.DATA365_SERVER = "https://azd365testwuas.azurewebsites.net";
+process.env.DATA365_SERVER = "https://azd365devwuas.azurewebsites.net";
 process.env.DATA365_ACCOUNT = "test";
 
 
 //for dl_data.js and others
-process.env.DONKEYLIFT_DEMO = 1;
+process.env.DONKEYLIFT_DEMO = 0;
 process.env.DONKEYLIFT_API = process.env.DATA365_SERVER;
 
 var inputs = {

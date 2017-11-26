@@ -84,7 +84,7 @@
       if (url && url.length > 1) {
         url = decodeURIComponent(url[1]);
       } else {
-          url = "https://azd365testwuas.azurewebsites.net" + "/public/swagger.json";
+          url = "https://azd365devwuas.azurewebsites.net" + "/public/swagger.json";
       }
 
       // Pre load translate...

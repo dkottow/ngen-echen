@@ -47,7 +47,7 @@
 
     <div>
         <label for="dl_server">API Server</label>
-        <input disabled="disabled" type="text" size="25" name="dl_server" value="https://azd365testwuas.azurewebsites.net" />
+        <input disabled="disabled" type="text" size="25" name="dl_server" value="https://azd365devwuas.azurewebsites.net" />
 
         <label for="dl_account">Account</label>
         <input disabled="disabled" type="text" name="dl_account" value="test" />
