@@ -11,7 +11,7 @@ function login(config, cbAfter) {
             tenant: config.tenant, //COMMON OR YOUR TENANT ID - tenant (golderassociates.sharepoint.com)
             clientId: config.clientId, //REPLACE WITH YOUR CLIENT ID - Data365 AAD app on Golder tenant
             callback: cbAfterLogin(cbAfter),
-            popUp: true
+            popUp: false
         });
     }
 
