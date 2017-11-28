@@ -5,36 +5,14 @@ Donkeylift.Account = Backbone.Model.extend({
 	initialize: function(attrs) {		
 		console.log("Account.initialize");		
 		console.log(attrs);
-		
-		
-		if (attrs.auth === false) {
-			this.set('name', attrs.account);
-			this.set('user', attrs.user);
-			this.set('auth', false);
 
-		} else {
-			//AAD token			
-			var token_attrs = jwt_decode(attrs.id_token);
-			this.set('name', attrs.account);
-			this.set('user', token_attrs.upn);
+		this.set('name', attrs.account);
+		this.set('user', attrs.user);
+		this.set('auth', attrs.auth);
+		if (attrs.auth) {
 			this.set('id_token', attrs.id_token);
-/*
-		} else {
-			//auth0 token			
-			var token_attrs = jwt_decode(attrs.id_token);
-			
-			//root users have access to any account.
-			var account = attrs.account || token_attrs.app_metadata.account;
-	
-			this.set('name', account);
-			this.set('user', attrs.user || token_attrs.email);
-			this.set('app_metadata', token_attrs.app_metadata);
-			this.set('id_token', attrs.id_token);
-*/			
 		}
 
-		sessionStorage.setItem('dl_user', this.get('user'));
-		sessionStorage.setItem('dl_account', this.get('name'));
 	},
 
 	url	: function() { 
@@ -73,8 +51,7 @@ Donkeylift.Account = Backbone.Model.extend({
 	},
 
 	isAdmin : function() {
-		return this.get('auth') === false || 
-			(this.get('app_metadata') && this.get('app_metadata').admin);		
+		return true; ///TODO
 	}
 
 });

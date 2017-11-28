@@ -53,12 +53,13 @@ AppBase.prototype.ajaxPrefilter = function(options, orgOptions, jqXHR) {
     $('#ajax-progress-spinner').hide();
   });
   
+  if ( ! this.account) return;
   //add user authentication
-  if (this.account && this.account.get('auth')) {
+  if (this.account.get('auth')) {
     var id_token = this.account.get('id_token');
     jqXHR.setRequestHeader('Authorization', 'Bearer ' + id_token);
 
-  } else if (this.account && ! this.account.get('auth')) {
+  } else {
     var q = 'user=' + encodeURIComponent(this.account.get('user'));
     if (options.url.indexOf('?') < 0) options.url = options.url + '?' + q;    
     else options.url = options.url + '&' + q;    
@@ -70,19 +71,11 @@ AppBase.prototype.start = function(opts, cbAfter) {
   var opts;
 
 	if (Donkeylift.env.DEMO_FLAG) {
-    opts = {
-      user: sessionStorage.getItem('dl_user') || Donkeylift.DEMO_USER,
-      account: sessionStorage.getItem('dl_account') || Donkeylift.DEMO_ACCOUNT,
-      auth: false
-    };
-    
+    opts.user = opts.user || Donkeylift.DEMO_USER;
+    opts.account = opts.account ||  Donkeylift.DEMO_ACCOUNT;
+    opts.auth = false;
   } else {
-    //Authorization token (jwt from AAD) in sessionStorage
-    opts = { 
-      id_token: sessionStorage.getItem('id_token'),
-      account: sessionStorage.getItem('dl_account'),
-      auth: true
-    };
+    opts.auth = true;
   }
 
   //TODO sites that fix DB use setAccount, D365 app uses loadAccount 
@@ -602,32 +595,12 @@ Donkeylift.Account = Backbone.Model.extend({
 	initialize: function(attrs) {		
 		console.log("Account.initialize");		
 		console.log(attrs);
-		
-		
-		if (attrs.auth === false) {
-			this.set('name', attrs.account);
-			this.set('user', attrs.user);
-			this.set('auth', false);
 
-		} else {
-			//AAD token			
-			var token_attrs = jwt_decode(attrs.id_token);
-			this.set('name', attrs.account);
-			this.set('user', token_attrs.upn);
+		this.set('name', attrs.account);
+		this.set('user', attrs.user);
+		this.set('auth', attrs.auth);
+		if (attrs.auth) {
 			this.set('id_token', attrs.id_token);
-/*
-		} else {
-			//auth0 token			
-			var token_attrs = jwt_decode(attrs.id_token);
-			
-			//root users have access to any account.
-			var account = attrs.account || token_attrs.app_metadata.account;
-	
-			this.set('name', account);
-			this.set('user', attrs.user || token_attrs.email);
-			this.set('app_metadata', token_attrs.app_metadata);
-			this.set('id_token', attrs.id_token);
-*/			
 		}
 
 		sessionStorage.setItem('dl_user', this.get('user'));
@@ -670,8 +643,7 @@ Donkeylift.Account = Backbone.Model.extend({
 	},
 
 	isAdmin : function() {
-		return this.get('auth') === false || 
-			(this.get('app_metadata') && this.get('app_metadata').admin);		
+		return true; ///TODO
 	}
 
 });
