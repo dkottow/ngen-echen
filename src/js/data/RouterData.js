@@ -73,6 +73,8 @@
 						params: this.parseParams(parts[3])
 				}; 
 				this.gotoTable(parts[2], opts, cbAfter);
+			} else {
+				cbAfter();
 			}
 		},
 

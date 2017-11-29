@@ -24,7 +24,7 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 
 	fullUrl: function(ext) {
 		ext = ext || ROWS_EXT;
-		return Donkeylift.env.API_BASE + this.get('url') + ext;
+		return Donkeylift.env.server + this.get('url') + ext;
 	},
 
 	getAllRowsUrl: function() {
@@ -373,7 +373,7 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 			+ '&' + this.lastFilterQuery.filters.toParam();
 
 		var path = this.get('url') + CSV_EXT + '?' + q;
-		var url = Donkeylift.env.API_BASE + this.get('url') + '.nonce';
+		var url = Donkeylift.env.server + this.get('url') + '.nonce';
 
 		$.ajax(url, {
 			type: 'POST',
@@ -382,7 +382,7 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 			dataType: 'json'
 
 		}).done(function(response) {
-			var link = Donkeylift.env.API_BASE + me.get('url') + CSV_EXT + '?nonce=' + response.nonce;
+			var link = Donkeylift.env.server + me.get('url') + CSV_EXT + '?nonce=' + response.nonce;
 			cbResult(null, link);
 			console.log(response);
 

@@ -60,13 +60,17 @@ Donkeylift.Schema = Backbone.Model.extend({
 		var me = this;
 		console.log("Schema.fetch...");
 		Backbone.Model.prototype.fetch.call(this, {
-			success: function() {
+			success: function(model, response, options) {
 				me.orgJSON = JSON.parse(JSON.stringify(me.toJSON())); //copy
 				me.get('props').setKeyFuncs();
 				console.log("Schema.fetch OK");
 				me.get('props').fetch(function() {
 					cbAfter();
 				});					
+			},
+			error: function(model, response, options) {
+				console.log(JSON.stringify(response));
+				alert(response.responseText);
 			}
 		});
 	},

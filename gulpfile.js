@@ -1,484 +1,332 @@
+﻿/*
+This file in the main entry point for defining Gulp tasks and using Gulp plugins.
+Click here to learn more. http://go.microsoft.com/fwlink/?LinkId=518007
+*/
+
 var gulp = require('gulp');
 var concat = require('gulp-concat');
 var inject = require('gulp-inject');
 var replace = require('gulp-replace');
 var gulpif = require('gulp-if');
-var markdown = require('gulp-markdown');
 var insert = require('gulp-insert');
 var rename = require('gulp-rename');
+var util = require('util');
 
-var envPath = './.env';
-if (process.env.OPENSHIFT_DATA_DIR) {
-	envPath = process.env.OPENSHIFT_DATA_DIR + '/.env';
-}
+process.env.AZURE_TENANT = "46b66e86-3482-4192-842f-3472ff5fe764"; //Golder
+process.env.AAD_APPLICATION_ID = "7a3c34b5-2f2b-4c45-a317-242ac3f48114"; //Data365
 
-require('dotenv').config({path: envPath});
+process.env.DATA365_SERVER = "https://azd365devwuas.azurewebsites.net";
+process.env.DATA365_ACCOUNT = "test";
+process.env.DATA365_DATABASE = "SolomonMine_HydroDB_02";
 
+process.env.DATA365_SITEASSETS_DIR = "..";
 
-//var gulp_data = require('./gulp-data.js');
-//var gulp_schema = require('./gulp-schema.js');
-
-var allTasks = [ 'copy-images'
-				, 'copy-fonts'
-				, 'copy-excel' 
-				, 'build-3rdparty-js' 
-				, 'build-dl-data-js' 
-				, 'build-dl-schema-js' 
-				, 'build-dl-signup-js' 
-				, 'build-3rdparty-css' 
-				, 'build-donkeylift-css'
-				, 'build-data-html'
-				, 'build-schema-html'
-				, 'build-index-html'
-				, 'build-signup-html'
-				, 'build-api-swagger'
-				, 'build-api-js'
-				, 'build-api-html'
-				, 'build-auth-md'
-				, 'build-docs'
-				, 'build-docs-html'
-				, 'build-samples'
-				, 'build-samples-html'
-];
-
-var src3rd = './src/3rdparty/';
-
-var extdir = './ext/';
-if (process.env.OPENSHIFT_DATA_DIR) {
-	extdir = process.env.OPENSHIFT_DATA_DIR + '/ext/';
-}
+var inputs = {
+    SRC_DIR: './src/',
+    SRC_3RDPARTY_DIR: './src/3rdparty/',
+    EXT_DIR: './ext/'
+};
 
 var ver3rd = {
-	BOOTSTRAP : 'bootstrap-custom',
-	JQUERY : 'jquery-2.1.4',
-	FONT_AWESOME : 'font-awesome-4.3.0',
-	DATATABLES : 'DataTables-custom',
-	DATATABLES_EDITOR : 'Editor-1.5.6',
-	SWAGGER_UI : 'swagger-ui-2.1.4',
+    BOOTSTRAP: 'bootstrap-custom/',
+    JQUERY: 'jquery-2.1.4/',
+    FONT_AWESOME: 'font-awesome-4.3.0/',
+    DATATABLES: 'DataTables-custom/',
+    DATATABLES_EDITOR: 'Editor-1.5.6/',
+    SWAGGER_UI: 'swagger-ui-2.1.4/',
 };
 
 var outputs = {
-	DL_COMMON_CSS: 'dl_common.css', //donkeylift.css
-	DL_3RDPARTY_CSS: 'dl_3rdparty.css', //3rdparty.css
+    DL_COMMON_CSS: 'dl_common.css', //donkeylift.css
+    DL_3RDPARTY_CSS: 'dl_3rdparty.css', //3rdparty.css
+
 	DL_DATA_JS: 'dl_data.js', //dl_data.js
-	DL_SCHEMA_JS: 'dl_schema.js', //dl_schema.js
-	DL_3RDPARTY_JS: 'dl_3rdparty.js', //3rdparty.js
+    DL_SCHEMA_JS: 'dl_schema.js', //dl_schema.js
+    DL_3RDPARTY_JS: 'dl_3rdparty.js', //3rdparty.js
+
+	D365_DATA_JS: 'd365_data.js', 
+	D365_SCHEMA_JS: 'd365_schema.js', 
+	
+    JS_DIR: './SPSite/Scripts/',
+	CONTENT_DIR: './SPSite/Content/',
+	ASPX_DIR: './SPSite/Pages/'
 }
 
-gulp.task('default', allTasks, function() {
+var tasks = [
+    'build-DataBrowser-aspx',
+    'build-SchemaEditor-aspx',
+    'build-d365-data-js',
+    'build-d365-schema-js',
+	//    'WebApi',
+    'build-dl-data-js',
+    'build-dl-schema-js',
+    'build-dl-3rdparty-js',
+    'build-dl-swagger-js',
+    'build-dl-common-css',
+	'build-dl-3rdparty-css',
+	
+	'copy-images',
+	'copy-fonts'
+];
+
+gulp.task('default', tasks, function () {
+    // place code for your default task here
+});
+
+gulp.task('build-DataBrowser-aspx', function () {
+    var snippets = {
+        dialogs: [
+			inputs.SRC_DIR + 'html/common/dialogs/*.html', 
+			inputs.SRC_DIR + 'html/data/dialogs/*.html'
+		],
+        templates: [
+			inputs.SRC_DIR + 'html/common/templates/*.html', 
+			inputs.SRC_DIR + 'html/data/templates/*.html'
+		]
+    };
+
+    return gulp.src([ inputs.SRC_DIR + 'aspx/DataBrowser.aspx' ])
+
+		.pipe(inject(gulp.src(snippets.dialogs), {
+		    starttag: '<!-- inject:dialogs:{{ext}} -->',
+		    transform: function (filePath, file) {
+		        return file.contents.toString('utf8')
+		    }
+		}))
+
+		.pipe(inject(gulp.src(snippets.templates), {
+		    starttag: '<!-- inject:templates:{{ext}} -->',
+		    transform: function (filePath, file) {
+		        return file.contents.toString('utf8')
+		    }
+		}))
+
+		.pipe(replace("$DATA365_SITEASSETS_DIR", process.env.DATA365_SITEASSETS_DIR))	
+		
+		.pipe(gulp.dest(outputs.ASPX_DIR));
+});
+
+gulp.task('build-SchemaEditor-aspx', function () {
+    var snippets = {
+        dialogs: [
+			inputs.SRC_DIR + 'html/common/dialogs/*.html', 
+			inputs.SRC_DIR + 'html/schema/dialogs/*.html'
+		],
+        templates: [
+			inputs.SRC_DIR + 'html/common/templates/*.html', 
+			inputs.SRC_DIR + 'html/schema/templates/*.html'
+		]
+    };
+
+    return gulp.src([ inputs.SRC_DIR + 'aspx/SchemaEditor.aspx' ])
+
+		.pipe(inject(gulp.src(snippets.dialogs), {
+		    starttag: '<!-- inject:dialogs:{{ext}} -->',
+		    transform: function (filePath, file) {
+		        return file.contents.toString('utf8')
+		    }
+		}))
+
+		.pipe(inject(gulp.src(snippets.templates), {
+		    starttag: '<!-- inject:templates:{{ext}} -->',
+		    transform: function (filePath, file) {
+		        return file.contents.toString('utf8')
+		    }
+		}))
+
+		.pipe(replace("$DATA365_SITEASSETS_DIR", process.env.DATA365_SITEASSETS_DIR))	
+
+		.pipe(gulp.dest(outputs.ASPX_DIR));
+});
+
+gulp.task('build-d365-data-js', function () {
+
+    return gulp.src([
+        inputs.SRC_DIR + "js/SharePoint/Config.js",
+		inputs.SRC_DIR + "js/SharePoint/App.js",
+        inputs.SRC_DIR + "js/SharePoint/Login.js",
+	])
+	.pipe(replace("$AZURE_TENANT", process.env.AZURE_TENANT))	
+	.pipe(replace("$AAD_APPLICATION_ID", process.env.AAD_APPLICATION_ID))	
+	.pipe(replace("$DATA365_SERVER", process.env.DATA365_SERVER))	
+	.pipe(replace("$DATA365_ACCOUNT", process.env.DATA365_ACCOUNT))	
+	.pipe(replace("$DATA365_DATABASE", process.env.DATA365_DATABASE))	
+
+	.pipe(replace("$DATA365_APPLICATION", "Donkeylift.AppData"))
+	
+	.pipe(concat(outputs.D365_DATA_JS))
+	.pipe(gulp.dest(outputs.JS_DIR));
+});
+
+gulp.task('build-d365-schema-js', function () {
+	
+		return gulp.src([
+			inputs.SRC_DIR + "js/SharePoint/Config.js",
+			inputs.SRC_DIR + "js/SharePoint/App.js",
+			inputs.SRC_DIR + "js/SharePoint/Login.js",
+		])
+		.pipe(replace("$AZURE_TENANT", process.env.AZURE_TENANT))	
+		.pipe(replace("$AAD_APPLICATION_ID", process.env.AAD_APPLICATION_ID))	
+		.pipe(replace("$DATA365_SERVER", process.env.DATA365_SERVER))	
+		.pipe(replace("$DATA365_ACCOUNT", process.env.DATA365_ACCOUNT))	
+		.pipe(replace("$DATA365_DATABASE", process.env.DATA365_DATABASE))	
+	
+		.pipe(replace("$DATA365_APPLICATION", "Donkeylift.AppSchema"))
+		
+		.pipe(concat(outputs.D365_SCHEMA_JS))
+		.pipe(gulp.dest(outputs.JS_DIR));
+	});
+	
+gulp.task('WebApi', function () {
+	//TODO
+    return gulp.src(['./src/app/WebApi.aspx'])
+		.pipe(replace("$DATA365_SERVER", process.env.DATA365_SERVER))	
+		.pipe(gulp.dest(outputs.JS_DIR));
+});
+
+gulp.task('build-dl-data-js', function () {
+
+    return gulp.src([
+        inputs.SRC_DIR + "js/common/AppBase.js",
+		inputs.SRC_DIR + "js/common/models/*.js",
+		inputs.SRC_DIR + "js/data/models/*.js",
+		inputs.SRC_DIR + "js/common/collections/*.js",
+		inputs.SRC_DIR + "js/data/collections/*.js",
+		inputs.SRC_DIR + "js/common/views/*.js",
+		inputs.SRC_DIR + "js/data/views/*.js",
+		inputs.SRC_DIR + "js/data/QueryParser.js",
+		inputs.SRC_DIR + "js/data/RouterData.js",
+		inputs.SRC_DIR + "js/data/AppData.js"
+    ])
+
+	.pipe(replace("module.exports =", "var pegParser =")) //Applies only to QueryParser
+
+	.pipe(concat(outputs.DL_DATA_JS))
+	.pipe(gulp.dest(outputs.JS_DIR));
 
 });
 
-//TODO
-gulp.task('copy-images', function() {
-	gulp.src([
-		src3rd + ver3rd.DATATABLES + '/DataTables-1.10.12/images/*.png'
-		])
-		.pipe(gulp.dest('./public/css/DataTables-1.10.12/images'));
+gulp.task('build-dl-schema-js', function () {
+
+    return gulp.src([
+        inputs.SRC_DIR + "js/common/AppBase.js",
+		inputs.SRC_DIR + "js/common/models/*.js",
+		inputs.SRC_DIR + "js/schema/models/*.js",
+		inputs.SRC_DIR + "js/common/collections/*.js",
+		inputs.SRC_DIR + "js/schema/collections/*.js",
+		inputs.SRC_DIR + "js/common/views/*.js",
+		inputs.SRC_DIR + "js/schema/views/*.js",
+		inputs.SRC_DIR + "js/schema/RouterSchema.js",
+		inputs.SRC_DIR + "js/schema/AppSchema.js"
+    ])
+
+	.pipe(concat(outputs.DL_SCHEMA_JS))
+	.pipe(gulp.dest(outputs.JS_DIR));
+});
+
+gulp.task('build-dl-3rdparty-js', function () {
+    return gulp.src([
+		inputs.SRC_3RDPARTY_DIR + ver3rd.JQUERY + 'jquery.min.js'
+		, inputs.SRC_3RDPARTY_DIR + 'underscore/underscore.js'
+		, inputs.SRC_3RDPARTY_DIR + 'backbone/backbone.js'
+		, inputs.SRC_3RDPARTY_DIR + ver3rd.BOOTSTRAP + 'js/bootstrap.min.js'
+		, inputs.SRC_3RDPARTY_DIR + 'jwt-decode/jwt-decode.min.js'
+		, inputs.SRC_3RDPARTY_DIR + 'typeahead/typeahead.bundle.js'
+		, inputs.SRC_3RDPARTY_DIR + 'JSON-Patch-master/dist/json-patch-duplex.min.js'
+		, inputs.SRC_3RDPARTY_DIR + 'vis/vis.min.js'
+		, inputs.SRC_3RDPARTY_DIR + ver3rd.DATATABLES + 'datatables.min.js'
+		, inputs.SRC_3RDPARTY_DIR + 'jquery-sortable/jquery-sortable-min.js'
+		, inputs.SRC_3RDPARTY_DIR + 'bootstrap-datepicker/js/bootstrap-datepicker.min.js'
+		, inputs.SRC_3RDPARTY_DIR + 'bootstrap-slider/bootstrap-slider.min.js'
+		, inputs.SRC_3RDPARTY_DIR + 'clipboard.js/clipboard.min.js'
+		, inputs.SRC_3RDPARTY_DIR + 'bootstrap-select/js/bootstrap-select.min.js'
+
+		, inputs.SRC_3RDPARTY_DIR + 'adal-1.0.15/adal.min.js'
 		
+		, inputs.EXT_DIR + ver3rd.DATATABLES_EDITOR + 'js/dataTables.editor.min.js'
+		, inputs.EXT_DIR + ver3rd.DATATABLES_EDITOR + 'js/editor.bootstrap.js'
+		, inputs.EXT_DIR + ver3rd.DATATABLES_EDITOR + 'js/editor.typeahead.js'
+    ])
+
+	.pipe(concat(outputs.DL_3RDPARTY_JS))
+	.pipe(gulp.dest(outputs.JS_DIR));
+
+});
+
+gulp.task('build-dl-swagger-js', ['copy-api-swagger-js', 'copy-api-swagger-lib-js', 'copy-api-swagger-dist'], function () {
+    var host = process.env.DATA365_SERVER.replace(new RegExp('http://'), '');
+
+    return gulp.src([inputs.SRC_DIR + 'api/dl_swagger.js'])
+
+		.pipe(replace("$DONKEYLIFT_API", host))
+		.pipe(gulp.dest(outputs.JS_DIR + 'api'));
+});
+
+gulp.task('copy-api-swagger-js', function () {
+    return gulp.src([
+        inputs.SRC_3RDPARTY_DIR + ver3rd.SWAGGER_UI + 'dist/swagger-ui.js'
+    ])
+	.pipe(gulp.dest(outputs.JS_DIR + 'api'));
+});
+
+gulp.task('copy-api-swagger-lib-js', function () {
+    return gulp.src([
+        inputs.SRC_3RDPARTY_DIR + ver3rd.SWAGGER_UI + 'dist/lib/*.js',
+    ])
+	.pipe(gulp.dest(outputs.JS_DIR + 'api/lib'));
+
+});
+
+gulp.task('copy-api-swagger-dist', function () {
+    return gulp.src([inputs.SRC_3RDPARTY_DIR + ver3rd.SWAGGER_UI + 'dist/**'])
+	.pipe(gulp.dest(outputs.CONTENT_DIR + 'api'));
+
+});
+
+
+gulp.task('build-dl-common-css', function () {
+    return gulp.src(inputs.SRC_DIR + 'css/*.css')
+		.pipe(concat(outputs.DL_COMMON_CSS))
+		.pipe(gulp.dest(outputs.CONTENT_DIR + 'css'));
+});
+
+gulp.task('build-dl-3rdparty-css', function () {
+
+    return gulp.src([
+				inputs.SRC_3RDPARTY_DIR + ver3rd.BOOTSTRAP + 'css/bootstrap.min.css'
+				, inputs.SRC_3RDPARTY_DIR + ver3rd.FONT_AWESOME + 'css/font-awesome.min.css'
+				, inputs.SRC_3RDPARTY_DIR + 'vis/vis.min.css'
+				, inputs.SRC_3RDPARTY_DIR + ver3rd.DATATABLES + 'datatables.min.css'
+				, inputs.SRC_3RDPARTY_DIR + 'bootstrap-datepicker/css/bootstrap-datepicker.min.css'
+				, inputs.SRC_3RDPARTY_DIR + 'bootstrap-slider/css/bootstrap-slider.min.css'
+				, inputs.SRC_3RDPARTY_DIR + 'bootstrap-select/css/bootstrap-select.min.css'
+
+//				, extdir + ver3rd.DATATABLES_EDITOR + 'css/editor.dataTables.min.css' 
+				, inputs.EXT_DIR + ver3rd.DATATABLES_EDITOR + 'css/editor.bootstrap.min.css'
+    ])
+
+	.pipe(concat(outputs.DL_3RDPARTY_CSS))
+	.pipe(gulp.dest(outputs.CONTENT_DIR + 'css'));
+});
+
+gulp.task('copy-fonts', function () {
+    return gulp.src([
+				inputs.SRC_3RDPARTY_DIR + ver3rd.BOOTSTRAP + 'fonts/*'
+				, inputs.SRC_3RDPARTY_DIR + ver3rd.FONT_AWESOME + 'fonts/*'
+    ])
+
+	.pipe(gulp.dest(outputs.CONTENT_DIR + 'fonts'));
+});
+
+
+gulp.task('copy-images', function() {
 
 	return gulp.src([
 				//src3rd + ver3rd.DATATABLES + '/media/images/*.png'
-			extdir + ver3rd.DATATABLES_EDITOR + '/images/*',
+				inputs.EXT_DIR + ver3rd.DATATABLES_EDITOR + '/images/*',
 			'./src/images/*'
 		])
 
-		.pipe(gulp.dest('./public/images/'));
-});
-
-gulp.task('copy-fonts', function() {
-	return gulp.src([
-				src3rd + ver3rd.BOOTSTRAP + '/fonts/*'
-				, src3rd + ver3rd.FONT_AWESOME + '/fonts/*'
-		])	
-
-		.pipe(gulp.dest('./public/fonts/'));
-});
-
-gulp.task('copy-excel', function() {
-	return gulp.src([extdir + 'ngen-ko/DonkeyExcel.xlsm'])	
-		.pipe(gulp.dest('./public/'));
-});
-
-gulp.task('build-3rdparty-css', function() {
-
-	return gulp.src([
-				src3rd + ver3rd.BOOTSTRAP + '/css/bootstrap.min.css' 
-				, src3rd + ver3rd.FONT_AWESOME + '/css/font-awesome.min.css'
-				, src3rd + '/vis/vis.min.css'
-				, src3rd + ver3rd.DATATABLES + '/datatables.min.css'
-				, src3rd + '/bootstrap-datepicker/css/bootstrap-datepicker.min.css'
-				, src3rd + '/bootstrap-slider/css/bootstrap-slider.min.css'
-				, src3rd + '/bootstrap-select/css/bootstrap-select.min.css'
-
-//				, extdir + ver3rd.DATATABLES_EDITOR + '/css/editor.dataTables.min.css' 
-				, extdir + ver3rd.DATATABLES_EDITOR + '/css/editor.bootstrap.min.css' 
-		])
-
-		.pipe(concat(outputs.DL_3RDPARTY_CSS))
-		.pipe(gulp.dest('./public/css/'));
-});
-
-gulp.task('build-3rdparty-js', function() {
-	return gulp.src([
-				src3rd + ver3rd.JQUERY + '/jquery.min.js' 
-				, src3rd + '/underscore/underscore.js' 
-				, src3rd + '/backbone/backbone.js' 
-				, src3rd + ver3rd.BOOTSTRAP + '/js/bootstrap.min.js' 
-				, src3rd + '/jwt-decode/jwt-decode.min.js' 
-				, src3rd + '/typeahead/typeahead.bundle.js' 
-				, src3rd + '/JSON-Patch-master/dist/json-patch-duplex.min.js' 
-				, src3rd + '/vis/vis.min.js' 
-				, src3rd + ver3rd.DATATABLES + '/datatables.min.js' 
-				, src3rd + '/jquery-sortable/jquery-sortable-min.js' 
-				, src3rd + '/bootstrap-datepicker/js/bootstrap-datepicker.min.js'
-				, src3rd + '/bootstrap-slider/bootstrap-slider.min.js'
-				, src3rd + '/clipboard.js/clipboard.min.js'
-				, src3rd + '/bootstrap-select/js/bootstrap-select.min.js'
-
-				, extdir + ver3rd.DATATABLES_EDITOR + '/js/dataTables.editor.min.js' 
-				, extdir + ver3rd.DATATABLES_EDITOR + '/js/editor.bootstrap.js' 
-				, extdir + ver3rd.DATATABLES_EDITOR + '/js/editor.typeahead.js' 
-		])
-
-		.pipe(concat(outputs.DL_3RDPARTY_JS))
-		.pipe(gulp.dest('./app/js/'));
-			
-});
-
-gulp.task('build-donkeylift-css', function() {
-	return gulp.src('./src/css/*.css')
-		.pipe(concat(outputs.DL_COMMON_CSS))
-		.pipe(gulp.dest('./public/css/'));
-});
-
-gulp.task('build-dl-data-js', function() {
-
-	if ( ! process.env.DONKEYLIFT_API) {
-		console.log("ERROR. Define env var DONKEYLIFT_API");
-		process.exit(1);
-	}
-
-	return gulp.src(["./src/js/common/AppBase.js",
-					 "./src/js/common/models/*.js",
-					 "./src/js/data/models/*.js",
-					 "./src/js/common/collections/*.js",
-					 "./src/js/data/collections/*.js",
-					 "./src/js/common/views/*.js",
-					 "./src/js/data/views/*.js",
-					 "./src/js/data/QueryParser.js",
-					 "./src/js/data/RouterData.js",
-					 "./src/js/data/AppData.js"
-			])
-		.pipe(replace("$DONKEYLIFT_API", process.env.DONKEYLIFT_API))
-		.pipe(replace("$DONKEYLIFT_DEMO", process.env.DONKEYLIFT_DEMO))
-		.pipe(replace("$AUTH0_CLIENT_ID", process.env.AUTH0_CLIENT_ID))
-		.pipe(replace("$AUTH0_DOMAIN", process.env.AUTH0_DOMAIN))
-		.pipe(replace("module.exports =", "var pegParser =")) //Applies only to QueryParser
-		.pipe(concat(outputs.DL_DATA_JS))
-		.pipe(gulp.dest('./app/js/'));
-			
-});
-
-gulp.task('build-dl-schema-js', function() {
-
-	if ( ! process.env.DONKEYLIFT_API) {
-		console.log("ERROR. Define env var DONKEYLIFT_API");
-		process.exit(1);
-	}
-
-	return gulp.src(["./src/js/common/AppBase.js",
-					 , "./src/js/common/models/*.js"
-					 , "./src/js/schema/models/*.js"
-					 , "./src/js/common/collections/*.js"
-					 , "./src/js/schema/collections/*.js"
-					 , "./src/js/common/views/*.js"
-					 , "./src/js/schema/views/*.js"
-					 , "./src/js/schema/RouterSchema.js"
-					 , "./src/js/schema/AppSchema.js"
-			])
-		.pipe(replace("$DONKEYLIFT_API", process.env.DONKEYLIFT_API))
-		.pipe(replace("$DONKEYLIFT_DEMO", process.env.DONKEYLIFT_DEMO))
-		.pipe(replace("$AUTH0_CLIENT_ID", process.env.AUTH0_CLIENT_ID))
-		.pipe(replace("$AUTH0_DOMAIN", process.env.AUTH0_DOMAIN))
-		.pipe(concat(outputs.DL_SCHEMA_JS))
-		.pipe(gulp.dest('./app/js/'));
-			
-});
-
-
-gulp.task('build-dl-signup-js', function() {
-
-	if ( ! process.env.DONKEYLIFT_API) {
-		console.log("ERROR. Define env var DONKEYLIFT_API");
-		process.exit(1);
-	}
-
-	return gulp.src(["./src/js/dl_signup.js"
-			])
-		.pipe(replace("$DONKEYLIFT_API", process.env.DONKEYLIFT_API))
-		.pipe(gulp.dest('./app/js/'));
-			
-});
-
-
-gulp.task('build-data-html', function() {
-
-	var snippets = { dialogs: 
-						['./src/html/common/dialogs/*.html'
-						, './src/html/data/dialogs/*.html']
-					, templates: 
-						['./src/html/common/templates/*.html'
-						, './src/html/data/templates/*.html']
-					};
-
-	return gulp.src(['./src/data.html'])
-
-		.pipe(inject(gulp.src('./src/html/common/nav.html'), {
-		    starttag: '<!-- inject:nav:{{ext}} -->',
-		    transform: function (filePath, file) {
-		      return file.contents.toString('utf8')
-    		}
-  		}))
-
-		.pipe(inject(gulp.src(snippets.dialogs), {
-		    starttag: '<!-- inject:dialogs:{{ext}} -->',
-		    transform: function (filePath, file) {
-		      return file.contents.toString('utf8')
-    		}
-  		}))
-		
-		.pipe(inject(gulp.src(snippets.templates), {
-		    starttag: '<!-- inject:templates:{{ext}} -->',
-		    transform: function (filePath, file) {
-		      return file.contents.toString('utf8')
-    		}
-  		}))
-
-		.pipe(inject(gulp.src('./src/html/common/google_analytics.html'), {
-		    starttag: '<!-- inject:google_analytics:{{ext}} -->',
-		    transform: function (filePath, file) {
-		      return file.contents.toString('utf8')
-    		}
-  		}))
-
-		.pipe(gulp.dest('./app/'));
-});
-
-
-gulp.task('build-schema-html', function() {
-
-	var snippets = { dialogs: 
-						['./src/html/common/dialogs/*.html'
-						, './src/html/schema/dialogs/*.html']
-					, templates: 
-						['./src/html/common/templates/*.html'
-						, './src/html/schema/templates/*.html']
-					};
-
-	return gulp.src(['./src/schema.html'])
-
-		.pipe(inject(gulp.src('./src/html/common/nav.html'), {
-		    starttag: '<!-- inject:nav:{{ext}} -->',
-		    transform: function (filePath, file) {
-		      return file.contents.toString('utf8')
-    		}
-  		}))
-
-		.pipe(inject(gulp.src(snippets.dialogs), {
-		    starttag: '<!-- inject:dialogs:{{ext}} -->',
-		    transform: function (filePath, file) {
-		      return file.contents.toString('utf8')
-    		}
-  		}))
-		
-		.pipe(inject(gulp.src(snippets.templates), {
-		    starttag: '<!-- inject:templates:{{ext}} -->',
-		    transform: function (filePath, file) {
-		      return file.contents.toString('utf8')
-    		}
-  		}))
-
-		.pipe(inject(gulp.src('./src/html/common/google_analytics.html'), {
-		    starttag: '<!-- inject:google_analytics:{{ext}} -->',
-		    transform: function (filePath, file) {
-		      return file.contents.toString('utf8')
-    		}
-  		}))
-
-		.pipe(gulp.dest('./app/'));
-});
-
-gulp.task('build-api-swagger', function() {
-	return gulp.src([src3rd + ver3rd.SWAGGER_UI + '/dist/**'])
-	.pipe(gulp.dest('./app/api'));
-
-});
-
-
-gulp.task('build-api-js', ['build-api-swagger'], function() {
-	var host = process.env.DONKEYLIFT_API.replace(new RegExp('http://'), '');
-
-	return gulp.src(['./src/api/dl_swagger.js'])
-
-		.pipe(replace("$DONKEYLIFT_API", host))
-		.pipe(replace("$AUTH0_CLIENT_ID", process.env.AUTH0_CLIENT_ID))
-		.pipe(replace("$AUTH0_DOMAIN", process.env.AUTH0_DOMAIN))
-
-		.pipe(gulp.dest('./app/api'));
-});
-
-gulp.task('build-api-html', ['build-api-js'], function() {
-	return gulp.src(['./src/api/index.html'])
-
-		.pipe(inject(gulp.src('./src/html/common/nav-login.html'), {
-		    starttag: '<!-- inject:nav:{{ext}} -->',
-		    transform: function (filePath, file) {
-		      return file.contents.toString('utf8')
-    		}
-  		}))
-
-		.pipe(inject(gulp.src('./src/html/common/google_analytics.html'), {
-		    starttag: '<!-- inject:google_analytics:{{ext}} -->',
-		    transform: function (filePath, file) {
-		      return file.contents.toString('utf8')
-    		}
-  		}))
-
-		.pipe(gulp.dest('./app/api'));
-});	
-
-
-gulp.task('build-auth-md', ['build-docs'], function() {
-
-	var pre = ['<html>'
-		, '<head>'
-		, '<link rel="stylesheet" href="github-markdown.css">'
-	    , '<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/styles/github.min.css">'
-		, '<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/highlight.min.js"></script>'
-		, '<script>hljs.initHighlightingOnLoad();</script>'
-		, '</head>'
-		, '<body><div class="markdown-body">'].join('\n');
-
-	var post = ['</div>', '</body>', '</html>'].join('\n');
-
-	return gulp.src(['./src/docs/AccessControl.md'])
-	.pipe(markdown())
-	.pipe(insert.wrap(pre, post))
-	.pipe(rename('access_control.html'))
-	.pipe(gulp.dest('./public/docs/'));
-});
-
-gulp.task('build-docs', function() {
-	
-	return gulp.src(['./src/docs/*'])
-	.pipe(gulp.dest('./public/docs/'));
-});
-
-gulp.task('build-docs-html', ['build-docs'], function() {
-	return gulp.src(['./src/docs/index.html', './src/docs/guides.html', './src/docs/betty.html'])
-
-	.pipe(inject(gulp.src('./src/html/common/nav-signup.html'), {
-	    starttag: '<!-- inject:nav:{{ext}} -->',
-	    transform: function (filePath, file) {
-	      return file.contents.toString('utf8')
-   		}
-  	}))
-
-	.pipe(inject(gulp.src('./src/html/common/google_analytics.html'), {
-	    starttag: '<!-- inject:google_analytics:{{ext}} -->',
-	    transform: function (filePath, file) {
-	      return file.contents.toString('utf8')
-   		}
-  	}))
-
-	.pipe(gulp.dest('./public/docs/'));
-});
-
-gulp.task('build-samples', function() {
-	
-	return gulp.src(['./src/docs/samples/*'])
-	.pipe(gulp.dest('./public/docs/samples/'));
-});
-
-gulp.task('build-samples-html', ['build-samples'], function() {
-	
-	return gulp.src(['./src/docs/samples/*.html'])
-
-	.pipe(replace("$DONKEYLIFT_API", process.env.DONKEYLIFT_API))
-	.pipe(inject(gulp.src('./src/html/common/google_analytics.html'), {
-	    starttag: '<!-- inject:google_analytics:{{ext}} -->',
-	    transform: function (filePath, file) {
-	      return file.contents.toString('utf8')
-   		}
-  	}))
-
-	.pipe(gulp.dest('./public/docs/samples/'));
-});
-
-gulp.task('build-index-html', function() {
-
-	return gulp.src(['./src/index.html'])
-
-		.pipe(inject(gulp.src('./src/html/common/nav-signup.html'), {
-		    starttag: '<!-- inject:nav:{{ext}} -->',
-		    transform: function (filePath, file) {
-		      return file.contents.toString('utf8')
-    		}
-  		}))
-
-		.pipe(inject(gulp.src('./src/html/common/google_analytics.html'), {
-		    starttag: '<!-- inject:google_analytics:{{ext}} -->',
-		    transform: function (filePath, file) {
-		      return file.contents.toString('utf8')
-    		}
-  		}))
-
-		.pipe(gulp.dest('./public/'));
-	
-});
-
-gulp.task('build-signup-html', function() {
-
-	return gulp.src(['./src/signup.html'])
-
-		.pipe(inject(gulp.src('./src/html/common/nav-signup.html'), {
-		    starttag: '<!-- inject:nav:{{ext}} -->',
-		    transform: function (filePath, file) {
-		      return file.contents.toString('utf8')
-    		}
-  		}))
-
-		.pipe(inject(gulp.src('./src/html/common/google_analytics.html'), {
-		    starttag: '<!-- inject:google_analytics:{{ext}} -->',
-		    transform: function (filePath, file) {
-		      return file.contents.toString('utf8')
-    		}
-  		}))
-
-		.pipe(gulp.dest('./app/'));
-	
-});
-
-// Watch Files For Changes
-gulp.task('watch', function() {
-    gulp.watch('./src/js/**/*.js', [
-		'build-dl-data-js'
-		, 'build-dl-schema-js'
-		, 'build-dl-signup-js'
-	]);
-    gulp.watch('./src/html/**/*.html', [
-		'build-data-html' 
-		, 'build-schema-html'
-		, 'build-signup-html'
-		, 'build-index-html'
-	]);
-    gulp.watch('./src/data.html', ['build-data-html']);
-    gulp.watch('./src/schema.html', ['build-schema-html']);
-    gulp.watch('./src/css/*.css', ['build-donkeylift-css']);
-    gulp.watch('./src/api/*', ['build-api-html']);
-    gulp.watch('./src/docs/samples/*', ['build-samples', 'build-samples-html']);
-    gulp.watch('./src/signup.html', ['build-signup-html']);
-    gulp.watch('./src/index.html', ['build-index-html']);
+		.pipe(gulp.dest(outputs.CONTENT_DIR + 'Images'));
 });
 

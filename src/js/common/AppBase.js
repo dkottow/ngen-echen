@@ -2,18 +2,11 @@
 
 
 var Donkeylift = {
-	
-//set by gulp according to env vars
-// e.g. DONKEYLIFT_API. "http://api.donkeylift.com";
 
-	env: {
-	    API_BASE: "$DONKEYLIFT_API"
-	    , DEMO_FLAG: + "$DONKEYLIFT_DEMO"
-	},
+  env: {
+    server: undefined //set on app start
+  },
 
-	DEMO_ACCOUNT: 'test',
-	DEMO_USER: 'dkottow@golder.com',
-	
 	util: {
 		/*** implementation details at eof ***/
 		removeDiacritics: function(str) {
@@ -28,6 +21,7 @@ var Donkeylift = {
 function AppBase(opts) {
 	var me = this;
 
+  Donkeylift.env.server = opts.server;
   console.log('AppBase ctor');
 	
 	this.navbarView = new Donkeylift.NavbarView();
@@ -68,9 +62,8 @@ AppBase.prototype.ajaxPrefilter = function(options, orgOptions, jqXHR) {
 
 AppBase.prototype.start = function(opts, cbAfter) {
 	var me = this;
-  var opts;
 
-	if (Donkeylift.env.DEMO_FLAG) {
+  if (opts.demo) {
     opts.user = opts.user || Donkeylift.DEMO_USER;
     opts.account = opts.account ||  Donkeylift.DEMO_ACCOUNT;
     opts.auth = false;
@@ -85,7 +78,8 @@ AppBase.prototype.start = function(opts, cbAfter) {
 
 AppBase.prototype.setAccount = function(params, cbAfter) {
 	var me = this;
-	console.log('setAccount: ' + params);
+  console.log('setAccount...');
+  console.log(JSON.stringify(params));
 
   params.reset = params.reset || (!! params.account); 
   
@@ -129,6 +123,7 @@ AppBase.prototype.loadAccount = function(params, cbAfter) {
 }
 
 AppBase.prototype.onAccountLoaded = function(cbAfter) {
+  console.log('onAccountLoaded...');
   if (cbAfter) cbAfter();
   //overwrite me
 }
