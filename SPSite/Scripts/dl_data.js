@@ -73,7 +73,46 @@ AppBase.prototype.start = function(opts, cbAfter) {
 
   //TODO sites that fix DB use setAccount, D365 app uses loadAccount 
   //this.loadAccount(opts, cbAfter); //loads all schemas - wont work for non-admins
-  this.setAccount(opts, cbAfter);  
+  this.setAccount(opts, cbAfter);      
+
+  //TODO
+  /*
+  this.getSiteConfig(opts, function(err, config) {
+    this.setAccount(opts, cbAfter);      
+  });
+  */
+}
+
+AppBase.prototype.getSiteConfig = function(params, cbAfter) {  
+  var path = '/d365/_d365Master/Applications.rows?';
+  var query = '$select=Databases.name,Account.name' + '&'
+            + "$filter=SiteUrl eq '" + _spPageContextInfo.siteAbsoluteUrl + "'";
+  var url = Data365.env.server + path + query;
+  $.ajax(url, {
+    
+  }).done(function(response) {
+    console.log(response);
+    if (response.rows.length == 1) {
+      var result = {
+        account: response.rows[0]['Account$name'],
+        database: response.rows[0]['Databases$name']
+      };
+      cbAfter(null, result);
+
+    } else {
+      var err = new Error("Application configuration error in master database.");
+      console.log(err);
+      alert(err.message);
+      cbAfter(err);
+    }
+
+  }).fail(function(jqXHR, textStatus, errThrown) {
+    console.log("Error requesting " + url);
+    var err = new Error(errThrown + " " + textStatus);
+    console.log(err);
+    alert(err.message);
+    cbAfter(err);
+  });         
 }
 
 AppBase.prototype.setAccount = function(params, cbAfter) {

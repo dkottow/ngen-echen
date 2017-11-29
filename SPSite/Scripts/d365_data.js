@@ -35,6 +35,7 @@ $(document).ready(function () {
             });
 
             Donkeylift.app.start({
+                site: _spPageContextInfo.siteAbsoluteUrl,
                 account: Data365.config.d365Account,
                 user: auth.upn,
                 id_token: token
