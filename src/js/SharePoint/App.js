@@ -17,17 +17,23 @@ $(document).ready(function () {
         
             // Donkeylift.AppData or Donkeylift.AppSchema                        
             Donkeylift.app = new $DATA365_APPLICATION({
-                server: Data365.config.d365Server
+                server: Data365.config.d365Server,
+                id_token: token                
             });
 
             Donkeylift.app.start({
                 site: _spPageContextInfo.siteAbsoluteUrl,
+                user: auth.upn
+            });
+/*            
+            Donkeylift.app.start({
                 account: Data365.config.d365Account,
                 user: auth.upn,
                 id_token: token
             }, function () {
                 Donkeylift.app.setSchema(Data365.config.d365Database);
             });
+*/            
         }
     });
 });

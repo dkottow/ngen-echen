@@ -12,12 +12,6 @@ function AppSchema(opts) {
 AppSchema.prototype = Object.create(Donkeylift.AppBase.prototype);
 AppSchema.prototype.constructor=AppSchema; 
 
-
-AppSchema.prototype.start = function(opts, cbAfter) {
-	Donkeylift.AppBase.prototype.start.call(this, opts, cbAfter);
-	$('#nav-schema').closest("li").addClass("active");
-}
-
 AppSchema.prototype.createTableView = function(table, params) {
 	return new Donkeylift.SchemaTableView({model: table});
 }

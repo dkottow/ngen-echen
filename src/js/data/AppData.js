@@ -14,11 +14,6 @@ function AppData(opts) {
 AppData.prototype = Object.create(Donkeylift.AppBase.prototype);
 AppData.prototype.constructor = AppData; 
 
-AppData.prototype.start = function(opts, cbAfter) {
-	Donkeylift.AppBase.prototype.start.call(this, opts, cbAfter);
-	$('#nav-data').closest("li").addClass("active");
-}
-
 /*** override AppBase methods ***/ 
 
 AppData.prototype.createTableView = function(table, params) {

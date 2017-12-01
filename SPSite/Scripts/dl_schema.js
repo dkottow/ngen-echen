@@ -18,10 +18,12 @@ var Donkeylift = {
 	
 };
 
-function AppBase(opts) {
+function AppBase(params) {
 	var me = this;
 
-  Donkeylift.env.server = opts.server;
+  Donkeylift.env.server = params.server;
+  this.id_token = params.id_token;
+
   console.log('AppBase ctor');
 	
 	this.navbarView = new Donkeylift.NavbarView();
@@ -47,52 +49,58 @@ AppBase.prototype.ajaxPrefilter = function(options, orgOptions, jqXHR) {
     $('#ajax-progress-spinner').hide();
   });
   
-  if ( ! this.account) return;
   //add user authentication
-  if (this.account.get('auth')) {
-    var id_token = this.account.get('id_token');
-    jqXHR.setRequestHeader('Authorization', 'Bearer ' + id_token);
+  if (this.id_token) {
+    jqXHR.setRequestHeader('Authorization', 'Bearer ' + this.id_token);
 
-  } else {
+  } else if (this.account) {
+    //add user as query parameter (used for testing only)
     var q = 'user=' + encodeURIComponent(this.account.get('user'));
     if (options.url.indexOf('?') < 0) options.url = options.url + '?' + q;    
     else options.url = options.url + '&' + q;    
   }
 }
 
-AppBase.prototype.start = function(opts, cbAfter) {
+AppBase.prototype.start = function(params, cbAfter) {
 	var me = this;
 
-  if (opts.demo) {
-    opts.user = opts.user || Donkeylift.DEMO_USER;
-    opts.account = opts.account ||  Donkeylift.DEMO_ACCOUNT;
-    opts.auth = false;
-  } else {
-    opts.auth = true;
-  }
+  this.getSiteConfig(params.site, function(err, config) {
+    me.setAccount({
+      user: params.user,
+      account: config.account,
+      id_token: params.id_token
 
-  //TODO sites that fix DB use setAccount, D365 app uses loadAccount 
-  //this.loadAccount(opts, cbAfter); //loads all schemas - wont work for non-admins
-  this.setAccount(opts, cbAfter);      
+    }, function() {
+      if (config.database != '_d365Master') {
+        me.setSchema(config.database);
 
-  //TODO
-  /*
-  this.getSiteConfig(opts, function(err, config) {
-    this.setAccount(opts, cbAfter);      
+      } else {
+        me.listSchemas(params.user);
+        /*
+            https://azd365testwuas.azurewebsites.net/test/_d365Master/_d365AdminDatabases.view
+              ?$filter=UserPrincipalName eq 'rfurman@golder.com'
+        */
+        console.log('TODO query all databases in account and insert combobox to select them');
+      }
+    });      
   });
-  */
+  
 }
 
-AppBase.prototype.getSiteConfig = function(params, cbAfter) {  
-  var path = '/d365/_d365Master/Applications.rows?';
+AppBase.prototype.masterUrl = function() {
+  return Donkeylift.env.server + '/test/_d365Master';
+}
+
+AppBase.prototype.getSiteConfig = function(siteUrl, cbAfter) {  
+  console.log('AppBase.getSiteConfig..');
   var query = '$select=Databases.name,Account.name' + '&'
-            + "$filter=SiteUrl eq '" + _spPageContextInfo.siteAbsoluteUrl + "'";
-  var url = Data365.env.server + path + query;
+            + "$filter=SiteUrl eq '" + siteUrl + "'";
+  var url = this.masterUrl() + '/Applications.rows' + '?' + query;
   $.ajax(url, {
-    
+
   }).done(function(response) {
     console.log(response);
-    if (response.rows.length == 1) {
+    if (response.rows.length > 0) {
       var result = {
         account: response.rows[0]['Account$name'],
         database: response.rows[0]['Databases$name']
@@ -100,9 +108,7 @@ AppBase.prototype.getSiteConfig = function(params, cbAfter) {
       cbAfter(null, result);
 
     } else {
-      var err = new Error("Application configuration error in master database.");
-      console.log(err);
-      alert(err.message);
+      var err = new Error("Site '" + siteUrl + "' configuration not found on master database.");
       cbAfter(err);
     }
 
@@ -137,34 +143,10 @@ AppBase.prototype.setAccount = function(params, cbAfter) {
 	$('#toggle-sidebar').hide();
 }
 
-AppBase.prototype.loadAccount = function(params, cbAfter) {
-	var me = this;
-	console.log('loadAccount: ' + params);
-
-	this.account = new Donkeylift.Account(params);
-
-	this.navbarView.model = this.account;
-  
-  if (this.schemaListView) this.schemaListView.remove();
-  this.schemaListView = new Donkeylift.SchemaListView({ model: this.account });
-
-	this.account.fetch({ success: function() {
-		me.navbarView.render();
-
-		$('#schema-dropdown').append(me.schemaListView.render().el);
-		//me.schemaListView.render();
-		me.menuView.render();
-		$('#content').empty();
-		me.onAccountLoaded(cbAfter);
-	}});
-
-	$('#toggle-sidebar').hide();
-}
-
 AppBase.prototype.onAccountLoaded = function(cbAfter) {
+  //overwrite me
   console.log('onAccountLoaded...');
   if (cbAfter) cbAfter();
-  //overwrite me
 }
 
 AppBase.prototype.toggleSidebar = function() {
@@ -232,6 +214,33 @@ AppBase.prototype.addAncestorFieldsToSelect = function($select) {
 }
 
 /**** schema stuff ****/
+
+AppBase.prototype.listSchemas = function(userPrincipalName, cbAfter) {
+  console.log('listSchemas...');
+
+/*
+  https://azd365testwuas.azurewebsites.net/test/_d365Master/_d365AdminDatabases.view
+  ?$filter=UserPrincipalName eq 'dkottow@golder.com'
+*/
+
+  var query = "$filter=UserPrincipalName eq '" + userPrincipalName + "'";
+  var url = this.masterUrl() + '/_d365AdminDatabases.view' + '?' + query;
+  $.ajax(url, {
+
+  }).done(function(response) {
+    console.log(response);
+    var result = response.rows;
+    cbAfter(null, result);
+
+  }).fail(function(jqXHR, textStatus, errThrown) {
+    console.log("Error requesting " + url);
+    var err = new Error(errThrown + " " + textStatus);
+    console.log(err);
+    alert(err.message);
+    cbAfter(err);
+  });         
+  
+}
 
 AppBase.prototype.unsetSchema = function() {
 	this.schema = null;
@@ -632,11 +641,7 @@ Donkeylift.Account = Backbone.Model.extend({
 
 		this.set('name', attrs.account);
 		this.set('user', attrs.user);
-		this.set('auth', attrs.auth);
-		if (attrs.auth) {
-			this.set('id_token', attrs.id_token);
-		}
-
+		this.set('id_token', attrs.id_token);
 	},
 
 	url	: function() { 
@@ -649,27 +654,6 @@ Donkeylift.Account = Backbone.Model.extend({
 		return response;
 	},
 
-	getDownloadLink : function(dbName, cbResult) {
-		var me = this;
-		var db = this.get('databases').find(function(db) { 
-			return db.get('name') == dbName; 
-		});
-		
-		var path = '/' + this.get('name') + '/' + db.get('name') + '.sqlite';
-		var url = this.url() + '/' + db.get('name') + '.nonce';
-
-		$.ajax(url, {
-			type: 'POST',
-			data: JSON.stringify({ path: path }),
-			contentType:'application/json; charset=utf-8',
-			dataType: 'json'
-		}).done(function(response) {
-			var link = Donkeylift.env.server + path + '?nonce=' + response.nonce;
-			cbResult(null, link);
-			//console.dir(response);
-		});
-	},
-	
 	principal: function() {
 		return this.get('principal') || this.get('user');
 	},
@@ -1756,72 +1740,18 @@ Donkeylift.Tables = Backbone.Collection.extend({
 
 /*global Donkeylift, Backbone, jQuery, _, $ */
 
-Donkeylift.DownloadsView = Backbone.View.extend({
-
-	el:  '#content',
-	events: {
-		'click .download-database': 'evDownloadDatabaseClick'
-	},
-
-	initialize: function() {
-		console.log("DownloadsView.init");
-	},
-
-	template: _.template($('#downloads-template').html()),
-	db_template: _.template('<li class="list-group-item"><a href="#" data-db="{{ name }}" class="download-database">Get {{ name }}</a></li>'),
-	//db_template: _.template('<li class="list-group-item"><a href="<%= link%>">Get link for <%= name%></a></li>'),
-
-	render: function() {
-		console.log("DownloadsView.render ");
-		this.$el.html(this.template());
-		$('#menu').empty(); //clear module menu
-		var dbLinks = this.model.get('databases').map(function(db) {
-			return this.db_template({
-				name: db.get('name'),
-			});
-		}, this);
-		this.$('#database-list').html(dbLinks);
-	},
-
-	evDownloadDatabaseClick: function(ev) {
-
-		if ($(ev.target).attr('href') != '#') return true;
-		
-		var db = $(ev.target).attr('data-db');
-		console.log('evDownloadDatabaseClick ' + db);
-		this.model.getDownloadLink(db, function(err, link) {
-			if (err) {
-				console.log(err);
-			} else {
-				$(ev.target).attr('href', link);
-				$(ev.target).text('Download ' + db);
-			}
-		});
-		return false;
-	},
-
-});
-
-
-
-/*global Donkeylift, Backbone, jQuery, _, $ */
-
 Donkeylift.NavbarView = Backbone.View.extend({
 	el:  'nav',
 
 	events: {
-		'click #nav-login': 'evLoginClick',
-		'click #nav-profile': 'evProfileClick'
 	},
 
 	initialize: function() {
 	},
 
 	navUserInfoTemplate: _.template($('#nav-user-info-template').html()),
-	navProfileTemplate: _.template($('#nav-profile-template').html()),
 
 	render: function() {
-		this.renderProfileDropDown();
 		this.renderUserInfo();
 		return this;
 	},
@@ -1833,92 +1763,7 @@ Donkeylift.NavbarView = Backbone.View.extend({
 			user: this.model.principal()
 		});
 		$el.append(html);
-	},
-
-	renderProfileDropDown: function() {
-		var me = this;
-		var $el = this.$('#menu-profile');
-		$el.empty();	
-		var html = this.navProfileTemplate({
-			account: this.model.get('name')
-		});
-		$el.append(html);
-		
-		this.$('#nav-downloads').click(function(ev) { 
-			me.evDownloadsClick(ev); 
-		});
-
-		this.$('#nav-logout').click(function(ev) { 
-			me.evLogoutClick(ev); 
-		});
-	},
-
-	evDownloadsClick: function() {
-		if ( ! this.downloadsView) {
-			this.downloadsView = new Donkeylift.DownloadsView();
-		}
-		this.downloadsView.model = Donkeylift.app.account;
-		this.downloadsView.render();
-	},
-
-	evProfileClick: function() {
-		if ( ! this.profileView) {
-			this.profileView = new Donkeylift.ProfileView();
-		} 
-		this.profileView.model = Donkeylift.app.account;
-		this.profileView.render();
-	},
-
-	evLogoutClick: function(ev) {
-		sessionStorage.clear();
-		window.location = "https://" + Donkeylift.env.AUTH0_DOMAIN + "/v2/logout";
-	},
-
-	evLoginClick: function(ev) {
-
-		var opts = {
-			signupLink: '/public/signup.html'
-			, authParams: { scope: 'openid email app_metadata' } 
-		};
-
-		Donkeylift.app.lock.show(opts, function(err, profile, id_token) {
-			if (err) {
-				console.log("There was an error :/", err);
-				return;
-		  	}
-
-			Donkeylift.app.loadAccount({ id_token: id_token, auth: true });
-		});
 	}
-
-});
-
-
-
-/*global Donkeylift, Backbone, jQuery, _, $ */
-
-
-Donkeylift.ProfileView = Backbone.View.extend({
-
-	el:  '#content',
-	events: {
-	},
-
-	initialize: function() {
-		console.log("ProfileView.init");
-	},
-
-	template: _.template($('#profile-template').html()),
-
-	render: function() {
-		console.log("ProfileView.render ");
-		this.$el.html(this.template({
-			user: this.model.get("user"),
-			account: this.model.get("name"),
-		}));
-		$('#menu').empty(); //clear module menu
-	},
-
 
 });
 
@@ -2034,7 +1879,6 @@ Donkeylift.TableListView = Backbone.View.extend({
 		var me = this;
 		$('#selectShowTables option').each(function() {
 			var table = me.collection.getByName( $(this).val() );
-			//var table = Donkeylift.app.schema.get('tables').getByName( $(this).val() );
 			table.setProp('visible', $(this).prop('selected'));	
 		});
 	}
@@ -2901,12 +2745,6 @@ function AppSchema(opts) {
 
 AppSchema.prototype = Object.create(Donkeylift.AppBase.prototype);
 AppSchema.prototype.constructor=AppSchema; 
-
-
-AppSchema.prototype.start = function(opts, cbAfter) {
-	Donkeylift.AppBase.prototype.start.call(this, opts, cbAfter);
-	$('#nav-schema').closest("li").addClass("active");
-}
 
 AppSchema.prototype.createTableView = function(table, params) {
 	return new Donkeylift.SchemaTableView({model: table});
