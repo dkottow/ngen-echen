@@ -83,7 +83,7 @@
 
 
 <script type="text/template" id="profile-template">
-	<div>
+<div>
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<h3 class="panel-title">
@@ -99,10 +99,18 @@
 			</dl>
 		</div>
 	</div>
-	</div>
+</div>
 </script>
 
 
+<script type="text/template" id="schema-list-template">
+    
+<div class="row">
+    <select id="selectDatabase" title="Databases" class="form-control show-menu-arrow selectpicker" data-width="100%" >
+    </select>
+</div>
+
+</script>
 <script type="text/template" id="table-item-template">
 	<a data-target="{{ name }}" class="list-group-item table-item" href="{{ href }}"> 
 		{{ name }} 

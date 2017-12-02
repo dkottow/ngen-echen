@@ -217,11 +217,7 @@ AppBase.prototype.addAncestorFieldsToSelect = function($select) {
 
 AppBase.prototype.listSchemas = function(userPrincipalName, cbAfter) {
   console.log('listSchemas...');
-
-/*
-  https://azd365testwuas.azurewebsites.net/test/_d365Master/_d365AdminDatabases.view
-  ?$filter=UserPrincipalName eq 'dkottow@golder.com'
-*/
+  var me = this;
 
   var query = "$filter=UserPrincipalName eq '" + userPrincipalName + "'";
   var url = this.masterUrl() + '/_d365AdminDatabases.view' + '?' + query;
@@ -229,15 +225,20 @@ AppBase.prototype.listSchemas = function(userPrincipalName, cbAfter) {
 
   }).done(function(response) {
     console.log(response);
-    var result = response.rows;
-    cbAfter(null, result);
+
+    me.schemas = Donkeylift.Schemas.Create(response.rows);
+		me.schemaListView = new Donkeylift.SchemaListView({
+			collection: me.schemas
+		});
+    $('#sidebar').append(me.schemaListView.el);
+    me.schemaListView.render();
+    if (cbAfter) cbAfter();
 
   }).fail(function(jqXHR, textStatus, errThrown) {
     console.log("Error requesting " + url);
     var err = new Error(errThrown + " " + textStatus);
     console.log(err);
     alert(err.message);
-    cbAfter(err);
   });         
   
 }
@@ -280,8 +281,6 @@ AppBase.prototype.setSchema = function(name, opts, cbAfter) {
     me.tableListView.render();
 		$('#toggle-sidebar').show();
 
-		if (me.schemaListView) me.schemaListView.render();
-		me.navbarView.render();
 		me.menuView.render();
 	}
 
@@ -1406,6 +1405,10 @@ return;
 		var table = this.get('tables').getByName(parts[0]);
 		var field = table.get('fields').getByName(parts[1]);
 		return { table: table, field: field };
+	},
+
+	fullName: function() {
+		return this.get('account') + '$' + this.get('name');
 	}
 
 });
@@ -1700,6 +1703,30 @@ Donkeylift.Relations = Backbone.Collection.extend({
 // Tables Collection
 // ---------------
 
+Donkeylift.Schemas = Backbone.Collection.extend({
+	// Reference to this collection's model.
+	model: Donkeylift.Schema,
+
+	initialize : function(schemas) {
+	},
+
+});
+
+Donkeylift.Schemas.Create = function(rows) {
+    var schemas = _.map(rows, function(row) {
+        return {
+            account: row.Account,
+            name: row.Database
+        };
+    });
+    return new Donkeylift.Schemas(schemas);
+}
+
+/*global Donkeylift, Backbone, _ */
+
+// Tables Collection
+// ---------------
+
 Donkeylift.Tables = Backbone.Collection.extend({
 	// Reference to this collection's model.
 	model: Donkeylift.Table,
@@ -1772,21 +1799,23 @@ Donkeylift.NavbarView = Backbone.View.extend({
 /*global Donkeylift, Backbone, jQuery, _, $ */
 
 Donkeylift.SchemaListView = Backbone.View.extend({
+/*
 	id:  'schema-list',
 	tagName: 'ul',
 	className: 'dropdown-menu',
-
+*/
 	events: {
-		'click .schema-option': 'evSchemaClick',
+		'change #selectDatabase': 'evSchemaChange',
 	},
 
 	initialize: function() {
 	},
 
-	schemaListTemplate: _.template($('#nav-schema-template').html()),
+	template: _.template($('#schema-list-template').html()),
 
 	render: function() {
 
+		this.$el.html(this.template());
 		this.renderSchemaList();
 		this.renderCurrentSchemaName();
 
@@ -1794,29 +1823,42 @@ Donkeylift.SchemaListView = Backbone.View.extend({
 	},
 
 	renderSchemaList: function() {
-		var $ul = this.$el;
-		$ul.empty();
-		if (this.model.get('databases')) {
-			this.model.get('databases').each(function(schema) {
-				var html = this.schemaListTemplate({name: schema.get('name')});
-				$ul.append(html);
-			}, this);
-		}
+		var accounts = this.collection.groupBy(function(schema) {
+			return schema.get('account');
+		});
+		_.each(accounts, function(schemas, account) {
+			$('#selectDatabase').append(
+				$('<optgroup></optgroup>')
+					.attr('label', account)
+			);
+			_.each(schemas, function(schema) {
+				$('#selectDatabase optgroup').last().append(
+					$('<option></option>')
+						.attr('value', schema.fullName())
+						.text(schema.get('name'))
+				);
+				console.log(schema.fullName());
+			});	
+		});
+		$('#selectDatabase').selectpicker('refresh');
 	},
 
 	renderCurrentSchemaName: function() {
+/*
 		var $span = this.$el.closest('li').find('a:first span');
 		if (Donkeylift.app.schema) {
 			$span.html(' DB ' + Donkeylift.app.schema.get('name'));
 		} else {
 			$span.html(' Choose DB ');
 		}		
+*/
 	},
 
-	evSchemaClick: function(ev) {
-		var name = $(ev.target).attr('data-target');
-		console.log('SchemaListView.evSchemaClick ' + name);
-		Donkeylift.app.setSchema(name);
+	evSchemaChange: function(ev) {
+		console.log('SchemaListView.evSchemaChange ' + $(ev.target).val());
+		var parts = $(ev.target).val().split('$');
+		Donkeylift.app.account.set('name', parts[0]);
+		Donkeylift.app.setSchema(parts[1], { reload: true });			
 	},
 
 });

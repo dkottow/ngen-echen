@@ -217,11 +217,7 @@ AppBase.prototype.addAncestorFieldsToSelect = function($select) {
 
 AppBase.prototype.listSchemas = function(userPrincipalName, cbAfter) {
   console.log('listSchemas...');
-
-/*
-  https://azd365testwuas.azurewebsites.net/test/_d365Master/_d365AdminDatabases.view
-  ?$filter=UserPrincipalName eq 'dkottow@golder.com'
-*/
+  var me = this;
 
   var query = "$filter=UserPrincipalName eq '" + userPrincipalName + "'";
   var url = this.masterUrl() + '/_d365AdminDatabases.view' + '?' + query;
@@ -229,15 +225,20 @@ AppBase.prototype.listSchemas = function(userPrincipalName, cbAfter) {
 
   }).done(function(response) {
     console.log(response);
-    var result = response.rows;
-    cbAfter(null, result);
+
+    me.schemas = Donkeylift.Schemas.Create(response.rows);
+		me.schemaListView = new Donkeylift.SchemaListView({
+			collection: me.schemas
+		});
+    $('#sidebar').append(me.schemaListView.el);
+    me.schemaListView.render();
+    if (cbAfter) cbAfter();
 
   }).fail(function(jqXHR, textStatus, errThrown) {
     console.log("Error requesting " + url);
     var err = new Error(errThrown + " " + textStatus);
     console.log(err);
     alert(err.message);
-    cbAfter(err);
   });         
   
 }
@@ -280,8 +281,6 @@ AppBase.prototype.setSchema = function(name, opts, cbAfter) {
     me.tableListView.render();
 		$('#toggle-sidebar').show();
 
-		if (me.schemaListView) me.schemaListView.render();
-		me.navbarView.render();
 		me.menuView.render();
 	}
 
