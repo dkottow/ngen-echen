@@ -39,13 +39,19 @@ body {
 	font-weight: bold;
 }
 
+.database-select {
+	margin-left: 0;
+	margin-right: 0;
+	margin-top: -15px;
+}
+
 .database-info, .user-info {
 	margin-top: 10px;
 	font-weight: bold;	
 }
 
 .database-info {
-	margin-left: 15px;
+	margin-left: 5px;
 }
 
 .user-info {

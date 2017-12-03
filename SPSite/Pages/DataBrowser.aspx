@@ -105,8 +105,8 @@
 
 <script type="text/template" id="schema-list-template">
     
-<div class="row">
-    <select id="selectDatabase" title="Databases" class="form-control show-menu-arrow selectpicker" data-width="100%" >
+<div class="row database-select">
+    <select id="selectDatabase" title="Databases" class="form-control show-menu-arrow selectpicker" data-width="fit" data-selected-text-format="static" >
     </select>
 </div>
 
