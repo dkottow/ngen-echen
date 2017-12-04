@@ -33,7 +33,7 @@ var ver3rd = {
     FONT_AWESOME: 'font-awesome-4.3.0/',
     DATATABLES: 'DataTables-custom/',
     DATATABLES_EDITOR: 'Editor-1.5.6/',
-    SWAGGER_UI: 'swagger-ui-2.1.4/',
+    SWAGGER_UI: 'swagger-ui-master/',
 };
 
 var outputs = {
@@ -46,7 +46,8 @@ var outputs = {
 
 	D365_DATA_JS: 'd365_data.js', 
 	D365_SCHEMA_JS: 'd365_schema.js', 
-	
+	D365_API_JS: 'd365_api.js',
+
     JS_DIR: './SPSite/Scripts/',
 	CONTENT_DIR: './SPSite/Content/',
 	ASPX_DIR: './SPSite/Pages/'
@@ -55,15 +56,20 @@ var outputs = {
 var tasks = [
     'build-DataBrowser-aspx',
     'build-SchemaEditor-aspx',
-    'build-d365-data-js',
+    'build-WebApi-aspx',
+	
+	'build-d365-data-js',
     'build-d365-schema-js',
-	//    'WebApi',
-    'build-dl-data-js',
+    'build-d365-api-js',
+	
+	'build-dl-data-js',
     'build-dl-schema-js',
     'build-dl-3rdparty-js',
-    'build-dl-swagger-js',
     'build-dl-common-css',
 	'build-dl-3rdparty-css',
+	
+	'copy-webapi-js',
+	'copy-webapi-css',
 	
 	'copy-images',
 	'copy-fonts'
@@ -139,6 +145,16 @@ gulp.task('build-SchemaEditor-aspx', function () {
 		.pipe(gulp.dest(outputs.ASPX_DIR));
 });
 
+gulp.task('build-WebApi-aspx', function () {
+
+    return gulp.src([ inputs.SRC_DIR + 'aspx/WebApi.aspx' ])
+
+		.pipe(replace("$DATA365_SITEASSETS_DIR", process.env.DATA365_SITEASSETS_DIR))	
+		.pipe(replace("$DATA365_SERVER", process.env.DATA365_SERVER))	
+		
+		.pipe(gulp.dest(outputs.ASPX_DIR));
+});
+
 gulp.task('build-d365-data-js', function () {
 
     return gulp.src([
@@ -159,31 +175,46 @@ gulp.task('build-d365-data-js', function () {
 });
 
 gulp.task('build-d365-schema-js', function () {
+
+	return gulp.src([
+		inputs.SRC_DIR + "js/SharePoint/Config.js",
+		inputs.SRC_DIR + "js/SharePoint/App.js",
+		inputs.SRC_DIR + "js/SharePoint/Login.js",
+	])
+	.pipe(replace("$AZURE_TENANT", process.env.AZURE_TENANT))	
+	.pipe(replace("$AAD_APPLICATION_ID", process.env.AAD_APPLICATION_ID))	
+	.pipe(replace("$DATA365_SERVER", process.env.DATA365_SERVER))	
+	.pipe(replace("$DATA365_ACCOUNT", process.env.DATA365_ACCOUNT))	
+	.pipe(replace("$DATA365_DATABASE", process.env.DATA365_DATABASE))	
+
+	.pipe(replace("$DATA365_APPLICATION", "Donkeylift.AppSchema"))
 	
-		return gulp.src([
-			inputs.SRC_DIR + "js/SharePoint/Config.js",
-			inputs.SRC_DIR + "js/SharePoint/App.js",
-			inputs.SRC_DIR + "js/SharePoint/Login.js",
-		])
-		.pipe(replace("$AZURE_TENANT", process.env.AZURE_TENANT))	
-		.pipe(replace("$AAD_APPLICATION_ID", process.env.AAD_APPLICATION_ID))	
-		.pipe(replace("$DATA365_SERVER", process.env.DATA365_SERVER))	
-		.pipe(replace("$DATA365_ACCOUNT", process.env.DATA365_ACCOUNT))	
-		.pipe(replace("$DATA365_DATABASE", process.env.DATA365_DATABASE))	
-	
-		.pipe(replace("$DATA365_APPLICATION", "Donkeylift.AppSchema"))
-		
-		.pipe(concat(outputs.D365_SCHEMA_JS))
-		.pipe(gulp.dest(outputs.JS_DIR));
-	});
-	
-gulp.task('WebApi', function () {
-	//TODO
-    return gulp.src(['./src/app/WebApi.aspx'])
-		.pipe(replace("$DATA365_SERVER", process.env.DATA365_SERVER))	
-		.pipe(gulp.dest(outputs.JS_DIR));
+	.pipe(concat(outputs.D365_SCHEMA_JS))
+	.pipe(gulp.dest(outputs.JS_DIR));
 });
 
+	
+gulp.task('build-d365-api-js', function () {
+
+    return gulp.src([
+		
+        inputs.SRC_DIR + "js/SharePoint/Config.js",
+		inputs.SRC_DIR + "js/SharePoint/OpenApi.js",
+		inputs.SRC_DIR + "js/SharePoint/Login.js",
+		
+		inputs.SRC_3RDPARTY_DIR + 'jwt-decode/jwt-decode.min.js',
+		inputs.SRC_3RDPARTY_DIR + 'adal-1.0.15/adal.min.js',
+	])
+	.pipe(replace("$AZURE_TENANT", process.env.AZURE_TENANT))	
+	.pipe(replace("$AAD_APPLICATION_ID", process.env.AAD_APPLICATION_ID))	
+	.pipe(replace("$DATA365_SERVER", process.env.DATA365_SERVER))	
+	.pipe(replace("$DATA365_ACCOUNT", process.env.DATA365_ACCOUNT))	
+	.pipe(replace("$DATA365_DATABASE", process.env.DATA365_DATABASE))	
+
+	.pipe(concat(outputs.D365_API_JS))
+	.pipe(gulp.dest(outputs.JS_DIR));
+});
+	
 gulp.task('build-dl-data-js', function () {
 
     return gulp.src([
@@ -253,37 +284,6 @@ gulp.task('build-dl-3rdparty-js', function () {
 
 });
 
-gulp.task('build-dl-swagger-js', ['copy-api-swagger-js', 'copy-api-swagger-lib-js', 'copy-api-swagger-dist'], function () {
-    var host = process.env.DATA365_SERVER.replace(new RegExp('http://'), '');
-
-    return gulp.src([inputs.SRC_DIR + 'api/dl_swagger.js'])
-
-		.pipe(replace("$DONKEYLIFT_API", host))
-		.pipe(gulp.dest(outputs.JS_DIR + 'api'));
-});
-
-gulp.task('copy-api-swagger-js', function () {
-    return gulp.src([
-        inputs.SRC_3RDPARTY_DIR + ver3rd.SWAGGER_UI + 'dist/swagger-ui.js'
-    ])
-	.pipe(gulp.dest(outputs.JS_DIR + 'api'));
-});
-
-gulp.task('copy-api-swagger-lib-js', function () {
-    return gulp.src([
-        inputs.SRC_3RDPARTY_DIR + ver3rd.SWAGGER_UI + 'dist/lib/*.js',
-    ])
-	.pipe(gulp.dest(outputs.JS_DIR + 'api/lib'));
-
-});
-
-gulp.task('copy-api-swagger-dist', function () {
-    return gulp.src([inputs.SRC_3RDPARTY_DIR + ver3rd.SWAGGER_UI + 'dist/**'])
-	.pipe(gulp.dest(outputs.CONTENT_DIR + 'api'));
-
-});
-
-
 gulp.task('build-dl-common-css', function () {
     return gulp.src(inputs.SRC_DIR + 'css/*.css')
 		.pipe(concat(outputs.DL_COMMON_CSS))
@@ -329,4 +329,19 @@ gulp.task('copy-images', function() {
 
 		.pipe(gulp.dest(outputs.CONTENT_DIR + 'Images'));
 });
+
+gulp.task('copy-webapi-js', function () {
+    return gulp.src([
+        inputs.SRC_3RDPARTY_DIR + ver3rd.SWAGGER_UI + 'dist/swagger-ui-bundle.js',
+        inputs.SRC_3RDPARTY_DIR + ver3rd.SWAGGER_UI + 'dist/swagger-ui-standalone-preset.js'
+    ])
+	.pipe(gulp.dest(outputs.JS_DIR));
+});
+
+gulp.task('copy-webapi-css', function () {
+    return gulp.src([inputs.SRC_3RDPARTY_DIR + ver3rd.SWAGGER_UI + 'dist/swagger-ui.css'])
+	.pipe(gulp.dest(outputs.CONTENT_DIR + 'css'));
+
+});
+
 
