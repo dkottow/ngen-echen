@@ -13,11 +13,10 @@ var rename = require('gulp-rename');
 var util = require('util');
 
 process.env.AZURE_TENANT = "46b66e86-3482-4192-842f-3472ff5fe764"; //Golder
-process.env.AAD_APPLICATION_ID = "7a3c34b5-2f2b-4c45-a317-242ac3f48114"; //Data365
+process.env.AAD_APPLICATION_ID = "7a3c34b5-2f2b-4c45-a317-242ac3f48114"; //Data365 AAD
 
-process.env.DATA365_SERVER = "https://azd365devwuas.azurewebsites.net";
-process.env.DATA365_ACCOUNT = "test";
-process.env.DATA365_DATABASE = "SolomonMine_HydroDB_02";
+process.env.DATA365_SERVER = "https://azd365devwuas.azurewebsites.net"; //dev api
+//process.env.DATA365_SERVER = "https://azd365testwuas.azurewebsites.net"; //test api
 
 process.env.DATA365_SITEASSETS_DIR = "..";
 
@@ -48,9 +47,15 @@ var outputs = {
 	D365_SCHEMA_JS: 'd365_schema.js', 
 	D365_API_JS: 'd365_api.js',
 
+/*	
     JS_DIR: './SPSite/Scripts/',
 	CONTENT_DIR: './SPSite/Content/',
 	ASPX_DIR: './SPSite/Pages/'
+*/
+    JS_DIR: './SPApp/Data365/Scripts/',
+	CONTENT_DIR: './SPApp/Data365/Content/',
+	IMAGES_DIR: './SPApp/Data365/Images/',
+	ASPX_DIR: './SPApp/Data365/Pages/'
 }
 
 var tasks = [
@@ -160,15 +165,16 @@ gulp.task('build-d365-data-js', function () {
     return gulp.src([
         inputs.SRC_DIR + "js/SharePoint/Config.js",
 		inputs.SRC_DIR + "js/SharePoint/App.js",
-        inputs.SRC_DIR + "js/SharePoint/Login.js",
+        inputs.SRC_DIR + "js/SharePoint/Common.js",
 	])
 	.pipe(replace("$AZURE_TENANT", process.env.AZURE_TENANT))	
 	.pipe(replace("$AAD_APPLICATION_ID", process.env.AAD_APPLICATION_ID))	
-	.pipe(replace("$DATA365_SERVER", process.env.DATA365_SERVER))	
+	.pipe(replace("$DATA365_SERVER", process.env.DATA365_SERVER))
+	.pipe(replace("$DATA365_APPLICATION", "Donkeylift.AppData"))
+/*
 	.pipe(replace("$DATA365_ACCOUNT", process.env.DATA365_ACCOUNT))	
 	.pipe(replace("$DATA365_DATABASE", process.env.DATA365_DATABASE))	
-
-	.pipe(replace("$DATA365_APPLICATION", "Donkeylift.AppData"))
+*/
 	
 	.pipe(concat(outputs.D365_DATA_JS))
 	.pipe(gulp.dest(outputs.JS_DIR));
@@ -179,15 +185,16 @@ gulp.task('build-d365-schema-js', function () {
 	return gulp.src([
 		inputs.SRC_DIR + "js/SharePoint/Config.js",
 		inputs.SRC_DIR + "js/SharePoint/App.js",
-		inputs.SRC_DIR + "js/SharePoint/Login.js",
+		inputs.SRC_DIR + "js/SharePoint/Common.js",
 	])
 	.pipe(replace("$AZURE_TENANT", process.env.AZURE_TENANT))	
 	.pipe(replace("$AAD_APPLICATION_ID", process.env.AAD_APPLICATION_ID))	
 	.pipe(replace("$DATA365_SERVER", process.env.DATA365_SERVER))	
-	.pipe(replace("$DATA365_ACCOUNT", process.env.DATA365_ACCOUNT))	
-	.pipe(replace("$DATA365_DATABASE", process.env.DATA365_DATABASE))	
-
 	.pipe(replace("$DATA365_APPLICATION", "Donkeylift.AppSchema"))
+/*
+	.pipe(replace("$DATA365_ACCOUNT", process.env.DATA365_ACCOUNT))
+	.pipe(replace("$DATA365_DATABASE", process.env.DATA365_DATABASE))	
+*/
 	
 	.pipe(concat(outputs.D365_SCHEMA_JS))
 	.pipe(gulp.dest(outputs.JS_DIR));
@@ -200,16 +207,14 @@ gulp.task('build-d365-api-js', function () {
 		
         inputs.SRC_DIR + "js/SharePoint/Config.js",
 		inputs.SRC_DIR + "js/SharePoint/OpenApi.js",
-		inputs.SRC_DIR + "js/SharePoint/Login.js",
+		inputs.SRC_DIR + "js/SharePoint/Common.js",
 		
 		inputs.SRC_3RDPARTY_DIR + 'jwt-decode/jwt-decode.min.js',
 		inputs.SRC_3RDPARTY_DIR + 'adal-1.0.15/adal.min.js',
 	])
 	.pipe(replace("$AZURE_TENANT", process.env.AZURE_TENANT))	
 	.pipe(replace("$AAD_APPLICATION_ID", process.env.AAD_APPLICATION_ID))	
-	.pipe(replace("$DATA365_SERVER", process.env.DATA365_SERVER))	
-	.pipe(replace("$DATA365_ACCOUNT", process.env.DATA365_ACCOUNT))	
-	.pipe(replace("$DATA365_DATABASE", process.env.DATA365_DATABASE))	
+	.pipe(replace("$DATA365_SERVER", process.env.DATA365_SERVER))
 
 	.pipe(concat(outputs.D365_API_JS))
 	.pipe(gulp.dest(outputs.JS_DIR));
@@ -327,7 +332,7 @@ gulp.task('copy-images', function() {
 			'./src/images/*'
 		])
 
-		.pipe(gulp.dest(outputs.CONTENT_DIR + 'Images'));
+		.pipe(gulp.dest(outputs.IMAGES_DIR));
 });
 
 gulp.task('copy-webapi-js', function () {

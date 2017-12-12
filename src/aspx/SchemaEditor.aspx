@@ -29,6 +29,10 @@
 
 </asp:Content>
 
+<asp:Content ContentPlaceHolderID="PlaceHolderTopNavBar" runat="server">
+    <a class="d365-anchor" href="DataBrowser.aspx">Data Browser</a>
+</asp:Content>
+
 <%-- The markup in the following Content element will be placed in the TitleArea of the page --%>
 <asp:Content ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server">
     Schema Editor

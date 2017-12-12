@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!--Created:cb85b80c-f585-40ff-8bfc-12ff4d0e34a9-->
+<App xmlns="http://schemas.microsoft.com/sharepoint/2012/app/manifest"
+     Name="Data365"
+     ProductID="{7ce43273-03f8-4318-a8db-c84eaeec8a5e}"
+     Version="2.0.1.2"
+     SharePointMinVersion="16.0.0.0"
+>
+  <Properties>
+    <Title>Data365</Title>
+    <StartPage>~appWebUrl/Pages/DataBrowser.aspx?{StandardTokens}</StartPage>
+  </Properties>
+
+  <AppPrincipal>
+    <Internal />
+  </AppPrincipal>
+
+
+</App>

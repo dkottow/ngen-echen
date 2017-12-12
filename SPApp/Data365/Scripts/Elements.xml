@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+  <Module Name="Scripts">
+    <File Path="Scripts\d365_data.js" Url="Scripts/d365_data.js" ReplaceContent="TRUE" />
+    <File Path="Scripts\d365_schema.js" Url="Scripts/d365_schema.js" ReplaceContent="TRUE" />
+    <File Path="Scripts\dl_3rdparty.js" Url="Scripts/dl_3rdparty.js" ReplaceContent="TRUE" />
+    <File Path="Scripts\dl_data.js" Url="Scripts/dl_data.js" ReplaceContent="TRUE" />
+    <File Path="Scripts\dl_schema.js" Url="Scripts/dl_schema.js" ReplaceContent="TRUE" />
+  </Module>
+</Elements>

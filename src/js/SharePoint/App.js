@@ -15,8 +15,12 @@ $(document).ready(function () {
             console.log('login ok...');  
             console.log(JSON.stringify(auth));
         
-            // Donkeylift.AppData or Donkeylift.AppSchema                        
-            Donkeylift.app = new $DATA365_APPLICATION({
+            /* 
+             * $DATA365_APPLICATION injected from gulp. 
+             * either Donkeylift.AppData or Donkeylift.AppSchema                        
+             */
+            
+            Donkeylift.app = new $DATA365_APPLICATION({           
                 server: Data365.config.d365Server,
                 id_token: token                
             });
@@ -25,16 +29,14 @@ $(document).ready(function () {
                 site: _spPageContextInfo.siteAbsoluteUrl,
                 user: auth.upn
             });
-/*            
-            Donkeylift.app.start({
-                account: Data365.config.d365Account,
-                user: auth.upn,
-                id_token: token
-            }, function () {
-                Donkeylift.app.setSchema(Data365.config.d365Database);
-            });
-*/            
+        }
+
+        //add AAD token to links
+        if (getParameterByName('id_token')) {
+            var href = $('.d365-anchor').attr('href') + "#id_token=" + getParameterByName('id_token');
+            $('.d365-anchor').attr('href', href);
         }
     });
+
 });
 

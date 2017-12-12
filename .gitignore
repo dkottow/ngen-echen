@@ -6,3 +6,6 @@
 .env
 *~
 npm-debug.*
+/SPApp/Data365/bin
+/SPApp/Data365/obj
+/SPApp/.vs

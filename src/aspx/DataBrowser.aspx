@@ -29,6 +29,10 @@
     
 </asp:Content>
 
+<asp:Content ContentPlaceHolderID="PlaceHolderSiteName" runat="server">
+    <a class="d365-anchor" href="SchemaEditor.aspx">Schema Editor</a>
+</asp:Content>
+
 <%-- The markup in the following Content element will be placed in the TitleArea of the page --%>
 <asp:Content ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server">
     Data Browser

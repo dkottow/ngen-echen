@@ -65,6 +65,13 @@ AppBase.prototype.start = function(params, cbAfter) {
 	var me = this;
 
   this.getSiteConfig(params.site, function(err, config) {
+
+    if (err) {
+      console.log(err);
+      alert(err);
+      return;
+    }
+
     me.setAccount({
       user: params.user,
       account: config.account,

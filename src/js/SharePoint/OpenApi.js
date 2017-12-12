@@ -12,18 +12,16 @@ window.onload = function() {
             console.log('login ok...');  
             console.log(JSON.stringify(auth));
     
-    
-            // Build a system
             const ui = SwaggerUIBundle({
                 url: "$DATA365_SERVER/public/swagger.json",
                 dom_id: '#swagger-ui',
                 deepLinking: true,
                 presets: [
-                SwaggerUIBundle.presets.apis,
-                SwaggerUIStandalonePreset
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
                 ],
                 plugins: [
-                SwaggerUIBundle.plugins.DownloadUrl
+                    SwaggerUIBundle.plugins.DownloadUrl
                 ],
                 layout: "StandaloneLayout"
             })

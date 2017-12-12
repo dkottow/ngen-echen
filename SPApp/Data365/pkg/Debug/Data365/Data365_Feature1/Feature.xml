@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Feature xmlns="http://schemas.microsoft.com/sharepoint/" Description="SharePoint App Feature" Id="3268ae89-5df0-4798-aaa4-73831de01838" Scope="Web" Title="Data365 Feature1" Version="2.0.1.2">
+  <ElementManifests>
+    <ElementManifest Location="Pages\Elements.xml" />
+    <ElementFile Location="Pages\DataBrowser.aspx" />
+    <ElementFile Location="Pages\SchemaEditor.aspx" />
+    <ElementManifest Location="Scripts\Elements.xml" />
+    <ElementFile Location="Scripts\d365_data.js" />
+    <ElementFile Location="Scripts\d365_schema.js" />
+    <ElementFile Location="Scripts\dl_3rdparty.js" />
+    <ElementFile Location="Scripts\dl_data.js" />
+    <ElementFile Location="Scripts\dl_schema.js" />
+    <ElementManifest Location="Content\Elements.xml" />
+    <ElementFile Location="Content\css\dl_3rdparty.css" />
+    <ElementFile Location="Content\css\dl_common.css" />
+    <ElementFile Location="Content\css\swagger-ui.css" />
+    <ElementFile Location="Content\fonts\fontawesome-webfont.eot" />
+    <ElementFile Location="Content\fonts\fontawesome-webfont.svg" />
+    <ElementFile Location="Content\fonts\fontawesome-webfont.ttf" />
+    <ElementFile Location="Content\fonts\fontawesome-webfont.woff" />
+    <ElementFile Location="Content\fonts\fontawesome-webfont.woff2" />
+    <ElementFile Location="Content\fonts\FontAwesome.otf" />
+    <ElementFile Location="Content\fonts\glyphicons-halflings-regular.eot" />
+    <ElementFile Location="Content\fonts\glyphicons-halflings-regular.svg" />
+    <ElementFile Location="Content\fonts\glyphicons-halflings-regular.ttf" />
+    <ElementFile Location="Content\fonts\glyphicons-halflings-regular.woff" />
+    <ElementFile Location="Content\fonts\glyphicons-halflings-regular.woff2" />
+    <ElementFile Location="Content\Images\ajax-loader-small.gif" />
+    <ElementFile Location="Content\Images\ajax-loader.gif" />
+    <ElementFile Location="Content\Images\arch.png" />
+    <ElementFile Location="Content\Images\calender.png" />
+    <ElementFile Location="Content\Images\close.png" />
+    <ElementFile Location="Content\Images\progress-spinner.gif" />
+    <ElementFile Location="Content\Images\shadow_left.png" />
+    <ElementFile Location="Content\Images\shadow_right.png" />
+    <ElementManifest Location="Images\Elements.xml" />
+    <ElementFile Location="Images\AppIcon.png" />
+    <ElementFile Location="Images\progress-spinner.gif" />
+  </ElementManifests>
+  <UpgradeActions>
+    <VersionRange>
+      <ApplyElementManifests>
+        <ElementManifest Location="Pages\Elements.xml" />
+        <ElementManifest Location="Scripts\Elements.xml" />
+        <ElementManifest Location="Content\Elements.xml" />
+        <ElementManifest Location="Images\Elements.xml" />
+      </ApplyElementManifests>
+    </VersionRange>
+  </UpgradeActions>
+</Feature>
