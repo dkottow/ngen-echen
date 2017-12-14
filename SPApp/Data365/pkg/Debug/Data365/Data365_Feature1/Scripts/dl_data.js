@@ -907,6 +907,13 @@ Donkeylift.Field = Backbone.Model.extend({
 			return;
 		} 
 		this.set('type', Donkeylift.Field.TYPES.text);
+	},
+
+	setStats: function(stats) {
+		this.set('stats', {
+			min: this.toFS(stats.min),
+			max: this.toFS(stats.max)
+		});		
 	}
 
 });
@@ -2157,8 +2164,8 @@ Donkeylift.Filter = Backbone.Model.extend({
 
 	loadRange: function(cbAfter) {
 		var field = this.get('field');
-		this.get('table').stats(this, function(stats) {
-			field.set('stats', stats);
+		this.get('table').stats(this, function(stats) {			
+			field.setStats(stats);
 			cbAfter();
 		});
 	},

@@ -281,7 +281,7 @@
 
 </asp:Content>
 
-<asp:Content ContentPlaceHolderID="PlaceHolderTopNavBar" runat="server">
+<asp:Content ContentPlaceHolderID="PlaceHolderSiteName" runat="server">
     <a class="d365-anchor" href="DataBrowser.aspx">Data Browser</a>
 </asp:Content>
 

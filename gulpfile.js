@@ -14,9 +14,7 @@ var util = require('util');
 
 process.env.AZURE_TENANT = "46b66e86-3482-4192-842f-3472ff5fe764"; //Golder
 process.env.AAD_APPLICATION_ID = "7a3c34b5-2f2b-4c45-a317-242ac3f48114"; //Data365 AAD
-
-process.env.DATA365_SERVER = "https://azd365devwuas.azurewebsites.net"; //dev api
-//process.env.DATA365_SERVER = "https://azd365testwuas.azurewebsites.net"; //test api
+process.env.DATA365_SERVER = "https://data365.golder.com"; //vanity domain, currenty pointing to azd365devwuas.azurewebsites.net
 
 process.env.DATA365_SITEASSETS_DIR = "..";
 

@@ -4,7 +4,7 @@ var Data365 = {
     config : {
         azureTenant: '46b66e86-3482-4192-842f-3472ff5fe764', //Golder
         aadApplicationId: '7a3c34b5-2f2b-4c45-a317-242ac3f48114', //Data365
-        d365Server: "https://azd365devwuas.azurewebsites.net",
+        d365Server: "https://data365.golder.com",
     }
            
 };
