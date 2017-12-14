@@ -56,8 +56,8 @@ Donkeylift.Filter = Backbone.Model.extend({
 
 	loadRange: function(cbAfter) {
 		var field = this.get('field');
-		this.get('table').stats(this, function(stats) {
-			field.set('stats', stats);
+		this.get('table').stats(this, function(stats) {			
+			field.setStats(stats);
 			cbAfter();
 		});
 	},

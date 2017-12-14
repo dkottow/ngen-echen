@@ -36,6 +36,9 @@ $(document).ready(function () {
             var href = $('.d365-anchor').attr('href') + "#id_token=" + getParameterByName('id_token');
             $('.d365-anchor').attr('href', href);
         }
+
+        //hide top level menu options
+        $('.ms-core-deltaSuiteLinks').hide(); 
     });
 
 });
