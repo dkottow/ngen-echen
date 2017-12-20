@@ -26,6 +26,19 @@ window.onload = function() {
                 layout: "StandaloneLayout"
             })
 
+            ui.authActions.authorize({
+                api_key: {
+                    name: "api_key", 
+                    schema: {
+                        type: "apiKey", 
+                        in: "header", 
+                        name: "Authorization", 
+                        description: ""
+                    }, 
+                    value: "Bearer " + token
+                }
+            });           
+
             window.ui = ui
         }
     });
