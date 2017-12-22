@@ -52,13 +52,19 @@ Donkeylift.Schema = Backbone.Model.extend({
 		return response;		
 	},
 
-	url : function() {
-		return Donkeylift.app.account.url() + '/' + this.get('name');
+	url : function(params) {
+		var url = Donkeylift.app.account.url() + '/' + this.get('name');
+		if (params) {
+			url = url + '?' 
+				+ _.map(params, function(v, k) { return k + '=' + encodeURI(v) }).join('&');
+		}
+		return url;
 	},
 
 	fetch : function(cbAfter) {
 		var me = this;
 		console.log("Schema.fetch...");
+		var url = me.url({ reload : 1 });		
 		Backbone.Model.prototype.fetch.call(this, {
 			success: function(model, response, options) {
 				me.orgJSON = JSON.parse(JSON.stringify(me.toJSON())); //copy
@@ -71,7 +77,8 @@ Donkeylift.Schema = Backbone.Model.extend({
 			error: function(model, response, options) {
 				console.log(JSON.stringify(response));
 				alert(response.responseText);
-			}
+			},
+			url: url
 		});
 	},
 

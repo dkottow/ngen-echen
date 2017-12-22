@@ -38,6 +38,10 @@
         margin:0;
         background: #fafafa;
       }
+
+      #swagger-ui {
+        margin-top: 1em;
+      }
     </style>
   
     <!-- Donkeylift scripts -->

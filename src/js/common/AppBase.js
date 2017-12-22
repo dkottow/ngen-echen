@@ -83,11 +83,6 @@ AppBase.prototype.start = function(params, cbAfter) {
 
       } else {
         me.listSchemas(params.user);
-        /*
-            https://azd365testwuas.azurewebsites.net/test/_d365Master/_d365AdminDatabases.view
-              ?$filter=UserPrincipalName eq 'rfurman@golder.com'
-        */
-        console.log('TODO query all databases in account and insert combobox to select them');
       }
     });      
   });

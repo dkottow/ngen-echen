@@ -48,7 +48,7 @@ Donkeylift.DataTableView = Backbone.View.extend({
 		params = params || {};
 		var dtOptions = {};
 		
-		dtOptions.lengthMenu = params.lengthMenu || [5, 10, 25, 50, 100];
+		dtOptions.lengthMenu = params.lengthMenu || [5, 10, 25, 50, 100, 500];
 
 		dtOptions.displayStart = params.$skip || 0;
 		dtOptions.pageLength = params.$top || 10;
