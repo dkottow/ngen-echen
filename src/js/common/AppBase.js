@@ -49,6 +49,11 @@ AppBase.prototype.ajaxPrefilter = function(options, orgOptions, jqXHR) {
     $('#ajax-progress-spinner').hide();
   });
   
+  //TODO - instead of adding the token as below, call authContext.acquireToken()
+  // for that, we first need to expose authContext currently in SharePoint/Common.js ...
+  // see here 
+  // https://github.com/Azure-Samples/active-directory-javascript-singlepageapp-dotnet-webapi/blob/master/TodoSPA/App/Scripts/Ctrls/todoListCtrl.js
+
   //add user authentication
   if (this.id_token) {
     jqXHR.setRequestHeader('Authorization', 'Bearer ' + this.id_token);
