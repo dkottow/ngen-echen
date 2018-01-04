@@ -65,7 +65,7 @@ Donkeylift.Schema = Backbone.Model.extend({
 		var me = this;
 		console.log("Schema.fetch...");
 		var url = me.url({ reload : 1 });		
-		Backbone.Model.prototype.fetch.call(this, {
+		me.bbFetch({
 			success: function(model, response, options) {
 				me.orgJSON = JSON.parse(JSON.stringify(me.toJSON())); //copy
 				me.get('props').setKeyFuncs();
@@ -82,6 +82,34 @@ Donkeylift.Schema = Backbone.Model.extend({
 		});
 	},
 
+    bbFetch: function(options) {
+		//minimally adapted from backbone.js
+		options = _.extend({parse: true}, options);
+		var success = options.success;
+		var model = this;
+
+		var url = options.url || this.url();
+		//use Donkeylift.ajax instead of Backbone.sync
+		Donkeylift.ajax(url, {
+
+		}).then(function(result) {
+			var resp = result.response;
+
+			var serverAttrs = options.parse ? model.parse(resp, options) : resp;
+			if (!model.set(serverAttrs, options)) return false;
+			if (success) success.call(options.context, model, resp, options);
+			model.trigger('sync', model, resp, options);
+
+		}).catch(function(result) {
+			console.log("Error requesting " + url);
+			var err = new Error(result.errThrown + " " + result.textStatus);
+			console.log(err);
+			alert(err.message);
+			cbResult(err);
+		});
+
+	  },	
+	
 	update : function(cbAfter) {
 		var me = this;
 		if ( ! this.updateDebounced) {
@@ -118,20 +146,22 @@ return;
 	patch : function(diff, cbResult) {
 		console.log("Schema.patch...");
 		var url = this.url();
-		$.ajax(url, {
+		Donkeylift.ajax(url, {
 			method: 'PATCH'
 			, data: JSON.stringify(diff)
 			, contentType: "application/json"
 			, processData: false
 
-		}).done(function(response) {
+		}).then(function(result) {
+			var response = result.response;
 			console.log(response);
 			cbResult(null, response);
 
-		}).fail(function(jqXHR, textStatus, errThrown) {
+		}).catch(function(result) {
+			var jqXHR = result.jqXHR;
 			console.log("Error requesting " + url);
-			console.log(errThrown + " " + textStatus);
-			cbResult(new Error(errThrown + " " + jqXHR.responseJSON.error), jqXHR.responseJSON.schema);
+			console.log(result.errThrown + " " + result.textStatus);
+			cbResult(new Error(result.errThrown + " " + jqXHR.responseJSON.error), jqXHR.responseJSON.schema);
 		});
 		
 	},

@@ -109,20 +109,21 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 			var q = ['retmod=true'];
 			var url = me.fullUrl() + '?' + q.join('&');
 
-			$.ajax(url, {
+			Donkeylift.ajax(url, {
 				method: req.method,
 				data: req.data,
 				contentType: "application/json",
 				processData: false
 
-			}).done(function(response) {
+			}).then(function(result) {
+				var response = result.response;
 				console.log(response);
 				success({data: response.rows});
 
-			}).fail(function(jqXHR, textStatus, errThrown) {
-				error(jqXHR, textStatus, errThrown);
+			}).catch(function(result) {
+				error(result.jqXHR, result.textStatus, result.errThrown);
 				console.log("Error requesting " + url);
-				console.log(textStatus + " " + errThrown);
+				console.log(result.textStatus + " " + result.errThrown);
 			});
 		}
 	},
@@ -180,10 +181,12 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 				fields:  fieldNames
 			};
 
-			$.ajax(url, {
+			Donkeylift.ajax(url, {
 				cache: false
-			}).done(function(response) {
-				//console.log('response from api');
+
+			}).then(function(result) {
+				var response = result.response;
+					//console.log('response from api');
 				//console.dir(response);
 
 				var fragment = 'data'
@@ -213,9 +216,9 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 				}
 
 				callback(data);
-			}).fail(function(jqXHR, textStatus, errThrown) {
+			}).catch(function(result) {
 				console.log("Error requesting " + url);
-				var err = new Error(errThrown + " " + textStatus);
+				var err = new Error(result.errThrown + " " + result.textStatus);
 				console.log(err);
 				alert(err.message);
 			});
@@ -254,16 +257,17 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 			callback(this.dataCache[url][fieldName]);
 
 		} else {
-			$.ajax(url, {
+			Donkeylift.ajax(url, {
 				
-			}).done(function(response) {
-				//console.dir(response);
+			}).then(function(result) {
+				var response = result.response;
+					//console.dir(response);
 				me.dataCache[url] = response;
 				callback(response[fieldName]);
 
-			}).fail(function(jqXHR, textStatus, errThrown) {
+			}).catch(function(result) {
 				console.log("Error requesting " + url);
-				var err = new Error(errThrown + " " + textStatus);
+				var err = new Error(result.errThrown + " " + result.textStatus);
 				console.log(err);
 				alert(err.message);
 			});
@@ -297,16 +301,17 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 			callback(this.dataCache[url]['rows']);
 
 		} else {
-			$.ajax(url, {
+			Donkeylift.ajax(url, {
 
-			}).done(function(response) {
-				//console.dir(response.rows);
+			}).then(function(result) {
+				var response = result.response;
+					//console.dir(response.rows);
 				me.dataCache[url] = response;
 				callback(response.rows);
 
-			}).fail(function(jqXHR, textStatus, errThrown) {
+			}).catch(function(result) {
 				console.log("Error requesting " + url);
-				var err = new Error(errThrown + " " + textStatus);
+				var err = new Error(result.errThrown + " " + result.textStatus);
 				console.log(err);
 				alert(err.message);
 			});
@@ -318,19 +323,20 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 		var q = 'owner=' + encodeURIComponent(owner);
 		var url = this.fullUrl(CHOWN_EXT) + '?' + q;
 
-		$.ajax(url, {
+		Donkeylift.ajax(url, {
 			method: 'PUT',
 			data: JSON.stringify(rowIds),
 			contentType: "application/json",
 			processData: false
 
-		}).done(function(response) {
+		}).then(function(result) {
+			var response = result.response;
 			console.log(response);
 			me.reload();
 
-		}).fail(function(jqXHR, textStatus, errThrown) {
+		}).catch(function(result) {
 			console.log("Error requesting " + url);
-			var err = new Error(errThrown + " " + textStatus);
+			var err = new Error(result.errThrown + " " + result.textStatus);
 			console.log(err);
 			alert(err.message);
 		});
@@ -349,15 +355,16 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 		var url = this.fullUrl() + '?' + q;
 		console.log(url);
 
-		$.ajax(url, {
+		Donkeylift.ajax(url, {
 
-		}).done(function(response) {
+		}).then(function(result) {
+			var response = result.response;
 			me.dataCache[url] = response;
 			cbResult(response);
 
-		}).fail(function(jqXHR, textStatus, errThrown) {
+		}).catch(function(result) {
 			console.log("Error requesting " + url);
-			var err = new Error(errThrown + " " + textStatus);
+			var err = new Error(result.errThrown + " " + result.textStatus);
 			console.log(err);
 			alert(err.message);
 			cbResult();
@@ -375,20 +382,21 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 		var path = this.get('url') + CSV_EXT + '?' + q;
 		var url = Donkeylift.env.server + this.get('url') + '.nonce';
 
-		$.ajax(url, {
+		Donkeylift.ajax(url, {
 			type: 'POST',
 			data: JSON.stringify({ path: path }),
 			contentType:'application/json; charset=utf-8',
 			dataType: 'json'
 
-		}).done(function(response) {
+		}).then(function(result) {
+			var response = result.response;
 			var link = Donkeylift.env.server + me.get('url') + CSV_EXT + '?nonce=' + response.nonce;
 			cbResult(null, link);
 			console.log(response);
 
-		}).fail(function(jqXHR, textStatus, errThrown) {
+		}).catch(function(result) {
 			console.log("Error requesting " + url);
-			var err = new Error(errThrown + " " + textStatus);
+			var err = new Error(result.errThrown + " " + result.textStatus);
 			console.log(err);
 			alert(err.message);
 			cbResult(err);

@@ -7,6 +7,38 @@ var Donkeylift = {
     server: undefined //set on app start
   },
 
+  ajax: function(url, settings) {
+    console.log('Donkeylift.ajax...');
+    $('#ajax-progress-spinner').show();
+    return new Promise(function(resolve, reject) {
+
+      var jqXHR = $.ajax(url, settings);
+  
+      jqXHR.always(function() {
+        $('#ajax-progress-spinner').hide();
+      });
+
+      jqXHR.success(function(response, textStatus, jqXHR) {
+        console.log(response);
+        console.log('jqXHR.success ...Donkeylift.ajax');
+        resolve({
+          response: response,
+          jqXHR: jqXHR, 
+          textStatus: textStatus
+        })
+      });
+
+      jqXHR.error(function(jqXHR, textStatus, errorThrown) {
+        console.log('jqXHR.error ...Donkeylift.ajax');
+        reject({
+          jqXHR: jqXHR, 
+          textStatus: textStatus, 
+          errorThrown: errorThrown 
+        })
+      });
+    });
+  },
+
 	util: {
 		/*** implementation details at eof ***/
 		removeDiacritics: function(str) {
@@ -28,9 +60,12 @@ function AppBase(params) {
 	
 	this.navbarView = new Donkeylift.NavbarView();
 
+  //TODO remove
+  /*
   $.ajaxPrefilter(function( options, orgOptions, jqXHR ) {
     me.ajaxPrefilter(options, orgOptions, jqXHR);
   });
+*/
 
 	$('#toggle-sidebar').click(function() {
 		me.toggleSidebar();
@@ -38,17 +73,26 @@ function AppBase(params) {
 
 	Backbone.history.start();
 
+  //overwrite Backbone.ajax with Donkeylift.ajax 
+  //Backbone.ajax = Donkeylift.ajax;
+
   new Clipboard('.btn'); //attach clipboard option
 
 }
 
 AppBase.prototype.ajaxPrefilter = function(options, orgOptions, jqXHR) {
-
+/*
   $('#ajax-progress-spinner').show();
   jqXHR.always(function() {
     $('#ajax-progress-spinner').hide();
   });
-  
+*/
+
+  //TODO - instead of adding the token as below, call authContext.acquireToken()
+  // for that, we first need to expose authContext currently in SharePoint/Common.js ...
+  // see here 
+  // https://github.com/Azure-Samples/active-directory-javascript-singlepageapp-dotnet-webapi/blob/master/TodoSPA/App/Scripts/Ctrls/todoListCtrl.js
+
   //add user authentication
   if (this.id_token) {
     jqXHR.setRequestHeader('Authorization', 'Bearer ' + this.id_token);
@@ -98,9 +142,10 @@ AppBase.prototype.getSiteConfig = function(siteUrl, cbAfter) {
   var query = '$select=Databases.name,Account.name' + '&'
             + "$filter=SiteUrl eq '" + siteUrl + "'";
   var url = this.masterUrl() + '/Applications.rows' + '?' + query;
-  $.ajax(url, {
+  Donkeylift.ajax(url, {
 
-  }).done(function(response) {
+  }).then(function(result) {
+    var response = result.response;
     console.log(response);
     if (response.rows.length > 0) {
       var result = {
@@ -114,9 +159,9 @@ AppBase.prototype.getSiteConfig = function(siteUrl, cbAfter) {
       cbAfter(err);
     }
 
-  }).fail(function(jqXHR, textStatus, errThrown) {
+  }).catch(function(result) {
     console.log("Error requesting " + url);
-    var err = new Error(errThrown + " " + textStatus);
+    var err = new Error(result.errThrown + " " + result.textStatus);
     console.log(err);
     alert(err.message);
     cbAfter(err);
@@ -223,9 +268,10 @@ AppBase.prototype.listSchemas = function(userPrincipalName, cbAfter) {
 
   var query = "$filter=UserPrincipalName eq '" + userPrincipalName + "'";
   var url = this.masterUrl() + '/_d365AdminDatabases.view' + '?' + query;
-  $.ajax(url, {
+  Donkeylift.ajax(url, {
 
-  }).done(function(response) {
+  }).then(function(result) {
+    var response = result.response;
     console.log(response);
 
     me.schemas = Donkeylift.Schemas.Create(response.rows);
@@ -236,9 +282,9 @@ AppBase.prototype.listSchemas = function(userPrincipalName, cbAfter) {
     me.schemaListView.render();
     if (cbAfter) cbAfter();
 
-  }).fail(function(jqXHR, textStatus, errThrown) {
+  }).catch(function(result) {
     console.log("Error requesting " + url);
-    var err = new Error(errThrown + " " + textStatus);
+    var err = new Error(result.errThrown + " " + result.textStatus);
     console.log(err);
     alert(err.message);
   });         
@@ -1031,7 +1077,7 @@ Donkeylift.Properties = Backbone.Collection.extend({
 	fetch : function(cbAfter) {
 		var me = this;
 		console.log("Properties.fetch...");
-		Backbone.Collection.prototype.fetch.call(this, {
+		me.bbFetch({
 			success: function() {
 				console.log("Properties.fetch OK");
 				if (cbAfter) cbAfter();
@@ -1042,7 +1088,34 @@ Donkeylift.Properties = Backbone.Collection.extend({
 			}
 		});
 	},
-			
+
+    bbFetch: function(options) {
+		//minimally adapted from backbone.js
+		options = _.extend({parse: true}, options);
+		var success = options.success;
+		var collection = this;
+
+		var url = options.url || this.url();
+		//use Donkeylift.ajax instead of Backbone.sync
+		Donkeylift.ajax(this.url(), {
+
+		}).then(function(result) {
+			var resp = result.response;
+
+			var method = options.reset ? 'reset' : 'set';
+			collection[method](resp, options);
+			if (success) success.call(options.context, collection, resp, options);
+			collection.trigger('sync', collection, resp, options);
+
+		}).catch(function(result) {
+			console.log("Error requesting " + url);
+			var err = new Error(result.errThrown + " " + result.textStatus);
+			console.log(err);
+			alert(err.message);
+			cbResult(err);
+		});
+
+	  },	
 			 
 	getUpdateRows : function(opts) {
 		var updateRows = [];
@@ -1080,13 +1153,14 @@ Donkeylift.Properties = Backbone.Collection.extend({
 		var insertData = JSON.stringify(_.map(rows.insert, function(row) { return row.attributes; }));
 		var updateData = JSON.stringify(_.map(rows.update, function(row) { return row.attributes; }));
 		var url = this.url();
-		$.ajax(url, {
+		Donkeylift.ajax(url, {
 			method: 'POST'
 			, data: insertData
 			, contentType: "application/json"
 			, processData: false
 
-		}).done(function(response) {
+		}).then(function(result) {
+			var response = result.response;
 			console.log("Properties.update POST ok.");			
 			//console.log(response);			
 			_.each(rows.insert, function(row, idx) {
@@ -1094,27 +1168,30 @@ Donkeylift.Properties = Backbone.Collection.extend({
 			});
 			if (cbAfter) cbAfter();
 
-		}).fail(function(jqXHR, textStatus, errThrown) {
+		}).catch(function(result) {
+			var jqXHR = result.jqXHR;
 			console.log("Error requesting " + url);
-			console.log(errThrown + " " + textStatus);
-			if (cbAfter) cbAfter(new Error(errThrown + " " + jqXHR.responseJSON.error), jqXHR.responseJSON.schema);
+			console.log(result.errThrown + " " + result.textStatus);
+			if (cbAfter) cbAfter(new Error(result.errThrown + " " + jqXHR.responseJSON.error), jqXHR.responseJSON.schema);
 		});
 
-		$.ajax(url, {
+		Donkeylift.ajax(url, {
 			method: 'PUT'
 			, data: updateData
 			, contentType: "application/json"
 			, processData: false
 
-		}).done(function(response) {
+		}).then(function(result) {
+			var response = result.response;
 			console.log("Properties.update PUT ok.");			
 			console.log(response);			
 			if (cbAfter) cbAfter();
 
-		}).fail(function(jqXHR, textStatus, errThrown) {
+		}).catch(function(result) {
+			var jqXHR = result.jqXHR;
 			console.log("Error requesting " + url);
-			console.log(errThrown + " " + textStatus);
-			if (cbAfter) cbAfter(new Error(errThrown + " " + jqXHR.responseJSON.error), jqXHR.responseJSON.schema);
+			console.log(result.errThrown + " " + result.textStatus);
+			if (cbAfter) cbAfter(new Error(result.errThrown + " " + jqXHR.responseJSON.error), jqXHR.responseJSON.schema);
 		});		
 	},
 
@@ -1287,7 +1364,7 @@ Donkeylift.Schema = Backbone.Model.extend({
 		var me = this;
 		console.log("Schema.fetch...");
 		var url = me.url({ reload : 1 });		
-		Backbone.Model.prototype.fetch.call(this, {
+		me.bbFetch({
 			success: function(model, response, options) {
 				me.orgJSON = JSON.parse(JSON.stringify(me.toJSON())); //copy
 				me.get('props').setKeyFuncs();
@@ -1304,6 +1381,34 @@ Donkeylift.Schema = Backbone.Model.extend({
 		});
 	},
 
+    bbFetch: function(options) {
+		//minimally adapted from backbone.js
+		options = _.extend({parse: true}, options);
+		var success = options.success;
+		var model = this;
+
+		var url = options.url || this.url();
+		//use Donkeylift.ajax instead of Backbone.sync
+		Donkeylift.ajax(url, {
+
+		}).then(function(result) {
+			var resp = result.response;
+
+			var serverAttrs = options.parse ? model.parse(resp, options) : resp;
+			if (!model.set(serverAttrs, options)) return false;
+			if (success) success.call(options.context, model, resp, options);
+			model.trigger('sync', model, resp, options);
+
+		}).catch(function(result) {
+			console.log("Error requesting " + url);
+			var err = new Error(result.errThrown + " " + result.textStatus);
+			console.log(err);
+			alert(err.message);
+			cbResult(err);
+		});
+
+	  },	
+	
 	update : function(cbAfter) {
 		var me = this;
 		if ( ! this.updateDebounced) {
@@ -1340,20 +1445,22 @@ return;
 	patch : function(diff, cbResult) {
 		console.log("Schema.patch...");
 		var url = this.url();
-		$.ajax(url, {
+		Donkeylift.ajax(url, {
 			method: 'PATCH'
 			, data: JSON.stringify(diff)
 			, contentType: "application/json"
 			, processData: false
 
-		}).done(function(response) {
+		}).then(function(result) {
+			var response = result.response;
 			console.log(response);
 			cbResult(null, response);
 
-		}).fail(function(jqXHR, textStatus, errThrown) {
+		}).catch(function(result) {
+			var jqXHR = result.jqXHR;
 			console.log("Error requesting " + url);
-			console.log(errThrown + " " + textStatus);
-			cbResult(new Error(errThrown + " " + jqXHR.responseJSON.error), jqXHR.responseJSON.schema);
+			console.log(result.errThrown + " " + result.textStatus);
+			cbResult(new Error(result.errThrown + " " + jqXHR.responseJSON.error), jqXHR.responseJSON.schema);
 		});
 		
 	},
@@ -1602,8 +1709,10 @@ Donkeylift.Table = Backbone.Model.extend({
 			callback(this.dataCache[url]['rows'], { cached: true });
 
 		} else {
-			$.ajax(url, {
-			}).done(function(response) {
+			Donkeylift.ajax(url, {})
+			
+			.then(function(result) {
+				var response = result.response;
 				//console.dir(response.rows);
 				me.dataCache[url] = response;
 				callback(response.rows);

@@ -37,7 +37,7 @@ Donkeylift.Properties = Backbone.Collection.extend({
 	fetch : function(cbAfter) {
 		var me = this;
 		console.log("Properties.fetch...");
-		Backbone.Collection.prototype.fetch.call(this, {
+		me.bbFetch({
 			success: function() {
 				console.log("Properties.fetch OK");
 				if (cbAfter) cbAfter();
@@ -48,7 +48,34 @@ Donkeylift.Properties = Backbone.Collection.extend({
 			}
 		});
 	},
-			
+
+    bbFetch: function(options) {
+		//minimally adapted from backbone.js
+		options = _.extend({parse: true}, options);
+		var success = options.success;
+		var collection = this;
+
+		var url = options.url || this.url();
+		//use Donkeylift.ajax instead of Backbone.sync
+		Donkeylift.ajax(this.url(), {
+
+		}).then(function(result) {
+			var resp = result.response;
+
+			var method = options.reset ? 'reset' : 'set';
+			collection[method](resp, options);
+			if (success) success.call(options.context, collection, resp, options);
+			collection.trigger('sync', collection, resp, options);
+
+		}).catch(function(result) {
+			console.log("Error requesting " + url);
+			var err = new Error(result.errThrown + " " + result.textStatus);
+			console.log(err);
+			alert(err.message);
+			cbResult(err);
+		});
+
+	  },	
 			 
 	getUpdateRows : function(opts) {
 		var updateRows = [];
@@ -86,13 +113,14 @@ Donkeylift.Properties = Backbone.Collection.extend({
 		var insertData = JSON.stringify(_.map(rows.insert, function(row) { return row.attributes; }));
 		var updateData = JSON.stringify(_.map(rows.update, function(row) { return row.attributes; }));
 		var url = this.url();
-		$.ajax(url, {
+		Donkeylift.ajax(url, {
 			method: 'POST'
 			, data: insertData
 			, contentType: "application/json"
 			, processData: false
 
-		}).done(function(response) {
+		}).then(function(result) {
+			var response = result.response;
 			console.log("Properties.update POST ok.");			
 			//console.log(response);			
 			_.each(rows.insert, function(row, idx) {
@@ -100,27 +128,30 @@ Donkeylift.Properties = Backbone.Collection.extend({
 			});
 			if (cbAfter) cbAfter();
 
-		}).fail(function(jqXHR, textStatus, errThrown) {
+		}).catch(function(result) {
+			var jqXHR = result.jqXHR;
 			console.log("Error requesting " + url);
-			console.log(errThrown + " " + textStatus);
-			if (cbAfter) cbAfter(new Error(errThrown + " " + jqXHR.responseJSON.error), jqXHR.responseJSON.schema);
+			console.log(result.errThrown + " " + result.textStatus);
+			if (cbAfter) cbAfter(new Error(result.errThrown + " " + jqXHR.responseJSON.error), jqXHR.responseJSON.schema);
 		});
 
-		$.ajax(url, {
+		Donkeylift.ajax(url, {
 			method: 'PUT'
 			, data: updateData
 			, contentType: "application/json"
 			, processData: false
 
-		}).done(function(response) {
+		}).then(function(result) {
+			var response = result.response;
 			console.log("Properties.update PUT ok.");			
 			console.log(response);			
 			if (cbAfter) cbAfter();
 
-		}).fail(function(jqXHR, textStatus, errThrown) {
+		}).catch(function(result) {
+			var jqXHR = result.jqXHR;
 			console.log("Error requesting " + url);
-			console.log(errThrown + " " + textStatus);
-			if (cbAfter) cbAfter(new Error(errThrown + " " + jqXHR.responseJSON.error), jqXHR.responseJSON.schema);
+			console.log(result.errThrown + " " + result.textStatus);
+			if (cbAfter) cbAfter(new Error(result.errThrown + " " + jqXHR.responseJSON.error), jqXHR.responseJSON.schema);
 		});		
 	},
 

@@ -7,6 +7,38 @@ var Donkeylift = {
     server: undefined //set on app start
   },
 
+  ajax: function(url, settings) {
+    console.log('Donkeylift.ajax...');
+    $('#ajax-progress-spinner').show();
+    return new Promise(function(resolve, reject) {
+
+      var jqXHR = $.ajax(url, settings);
+  
+      jqXHR.always(function() {
+        $('#ajax-progress-spinner').hide();
+      });
+
+      jqXHR.success(function(response, textStatus, jqXHR) {
+        console.log(response);
+        console.log('jqXHR.success ...Donkeylift.ajax');
+        resolve({
+          response: response,
+          jqXHR: jqXHR, 
+          textStatus: textStatus
+        })
+      });
+
+      jqXHR.error(function(jqXHR, textStatus, errorThrown) {
+        console.log('jqXHR.error ...Donkeylift.ajax');
+        reject({
+          jqXHR: jqXHR, 
+          textStatus: textStatus, 
+          errorThrown: errorThrown 
+        })
+      });
+    });
+  },
+
 	util: {
 		/*** implementation details at eof ***/
 		removeDiacritics: function(str) {
@@ -28,9 +60,12 @@ function AppBase(params) {
 	
 	this.navbarView = new Donkeylift.NavbarView();
 
+  //TODO remove
+  /*
   $.ajaxPrefilter(function( options, orgOptions, jqXHR ) {
     me.ajaxPrefilter(options, orgOptions, jqXHR);
   });
+*/
 
 	$('#toggle-sidebar').click(function() {
 		me.toggleSidebar();
@@ -38,17 +73,21 @@ function AppBase(params) {
 
 	Backbone.history.start();
 
+  //overwrite Backbone.ajax with Donkeylift.ajax 
+  //Backbone.ajax = Donkeylift.ajax;
+
   new Clipboard('.btn'); //attach clipboard option
 
 }
 
 AppBase.prototype.ajaxPrefilter = function(options, orgOptions, jqXHR) {
-
+/*
   $('#ajax-progress-spinner').show();
   jqXHR.always(function() {
     $('#ajax-progress-spinner').hide();
   });
-  
+*/
+
   //TODO - instead of adding the token as below, call authContext.acquireToken()
   // for that, we first need to expose authContext currently in SharePoint/Common.js ...
   // see here 
@@ -103,9 +142,10 @@ AppBase.prototype.getSiteConfig = function(siteUrl, cbAfter) {
   var query = '$select=Databases.name,Account.name' + '&'
             + "$filter=SiteUrl eq '" + siteUrl + "'";
   var url = this.masterUrl() + '/Applications.rows' + '?' + query;
-  $.ajax(url, {
+  Donkeylift.ajax(url, {
 
-  }).done(function(response) {
+  }).then(function(result) {
+    var response = result.response;
     console.log(response);
     if (response.rows.length > 0) {
       var result = {
@@ -119,9 +159,9 @@ AppBase.prototype.getSiteConfig = function(siteUrl, cbAfter) {
       cbAfter(err);
     }
 
-  }).fail(function(jqXHR, textStatus, errThrown) {
+  }).catch(function(result) {
     console.log("Error requesting " + url);
-    var err = new Error(errThrown + " " + textStatus);
+    var err = new Error(result.errThrown + " " + result.textStatus);
     console.log(err);
     alert(err.message);
     cbAfter(err);
@@ -228,9 +268,10 @@ AppBase.prototype.listSchemas = function(userPrincipalName, cbAfter) {
 
   var query = "$filter=UserPrincipalName eq '" + userPrincipalName + "'";
   var url = this.masterUrl() + '/_d365AdminDatabases.view' + '?' + query;
-  $.ajax(url, {
+  Donkeylift.ajax(url, {
 
-  }).done(function(response) {
+  }).then(function(result) {
+    var response = result.response;
     console.log(response);
 
     me.schemas = Donkeylift.Schemas.Create(response.rows);
@@ -241,9 +282,9 @@ AppBase.prototype.listSchemas = function(userPrincipalName, cbAfter) {
     me.schemaListView.render();
     if (cbAfter) cbAfter();
 
-  }).fail(function(jqXHR, textStatus, errThrown) {
+  }).catch(function(result) {
     console.log("Error requesting " + url);
-    var err = new Error(errThrown + " " + textStatus);
+    var err = new Error(result.errThrown + " " + result.textStatus);
     console.log(err);
     alert(err.message);
   });         

@@ -15,9 +15,11 @@ var Data365 = {
 
 // This code runs when the DOM is ready and creates a context object which is needed to use the SharePoint object model
 $(document).ready(function () {
+
     login({
         tenant: Data365.config.azureTenant,
-        clientId: Data365.config.aadApplicationId        
+        clientId: Data365.config.aadApplicationId,
+        ajax: Donkeylift.ajax //Data365 wraps ajax implementation
 
     }, function(err, auth, token) {
         if (err) {
@@ -26,12 +28,14 @@ $(document).ready(function () {
 
             console.log('login ok...');  
             console.log(JSON.stringify(auth));
-        
+
+            Donkeylift.ajax = Data365.ajax; //adopt the ajax wrapper including AAD token
+            
             /* 
              * Donkeylift.AppSchema injected from gulp. 
              * either Donkeylift.AppData or Donkeylift.AppSchema                        
              */
-            
+
             Donkeylift.app = new Donkeylift.AppSchema({           
                 server: Data365.config.d365Server,
                 id_token: token                
@@ -59,6 +63,7 @@ $(document).ready(function () {
 
 function login(config, cbAfter) {
 
+/*    
     var token = getParameterByName("id_token");
     if (token) {
         //we have been redirected successfully from AAD login process
@@ -67,15 +72,62 @@ function login(config, cbAfter) {
         return;
     }
 
-    var ADAL = new AuthenticationContext({
-        instance: 'https://login.microsoftonline.com/',
+    authContext.login();
+*/
+    var authContext = new AuthenticationContext({
+        //instance: 'https://login.microsoftonline.com/',
         tenant: config.tenant, //COMMON OR YOUR TENANT ID - golderassociates.sharepoint.com
-        clientId: config.clientId, //REPLACE WITH YOUR CLIENT ID - Data365 AAD app on Golder tenant
-        callback: cbAfterLogin(cbAfter),
-        popUp: false
+        clientId: config.clientId //REPLACE WITH YOUR CLIENT ID - Data365 AAD app on Golder tenant
+        //popUp: false
     });
 
-    ADAL.login();        
+    // Check For & Handle Redirect From AAD After Login
+    authContext.handleWindowCallback();
+        
+    if ( ! authContext.getCachedUser()) {
+        authContext.config.redirectUri = window.location.href;        
+        authContext.login();
+        return;
+    }
+
+    var ajaxFn = config.ajax; //config.ajax holds Donkeylift ajax impl. 
+
+    Data365.ajax = function(url, settings) {
+        console.log("Data365.ajax...");
+        return new Promise(function(resolve, reject) {
+
+            authContext.acquireToken(authContext.config.clientId, function(error, token) {
+                if (error || !token) {
+                    windows.alert("Error acquiring AAD token. Please reload page.");
+                    console.log(error);
+                    reject(error);
+
+                } else {
+                    //add AAD token to ajax request header    
+                    settings = settings || {}; settings.headers = settings.headers || {};
+                    settings.headers['Authorization'] = 'Bearer ' + token;
+
+                    ajaxFn(url, settings).then(function(result) {
+                        console.log("ajaxFn.then ...Data365.ajax");
+                        resolve(result);
+                    });
+                }    
+            });
+        });    
+    }
+
+    authContext.acquireToken(authContext.config.clientId, function(error, token) {
+        console.log("authContext.acquireToken...");
+        if (error || !token) {
+            windows.alert("Error acquiring AAD token");
+            console.log(error);
+            return;
+        }
+
+        var attrs = jwt_decode(token);
+        cbAfter(null, attrs, token);        
+    });
+
 }
 
 function cbAfterLogin(cbAfter) {

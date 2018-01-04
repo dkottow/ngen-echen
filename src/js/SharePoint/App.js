@@ -3,9 +3,11 @@
 
 // This code runs when the DOM is ready and creates a context object which is needed to use the SharePoint object model
 $(document).ready(function () {
+
     login({
         tenant: Data365.config.azureTenant,
-        clientId: Data365.config.aadApplicationId        
+        clientId: Data365.config.aadApplicationId,
+        ajax: Donkeylift.ajax //Data365 wraps ajax implementation
 
     }, function(err, auth, token) {
         if (err) {
@@ -14,12 +16,14 @@ $(document).ready(function () {
 
             console.log('login ok...');  
             console.log(JSON.stringify(auth));
-        
+
+            Donkeylift.ajax = Data365.ajax; //adopt the ajax wrapper including AAD token
+            
             /* 
              * $DATA365_APPLICATION injected from gulp. 
              * either Donkeylift.AppData or Donkeylift.AppSchema                        
              */
-            
+
             Donkeylift.app = new $DATA365_APPLICATION({           
                 server: Data365.config.d365Server,
                 id_token: token                
