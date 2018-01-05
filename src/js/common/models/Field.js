@@ -135,9 +135,13 @@ Donkeylift.Field = Backbone.Model.extend({
 			resultError = isNaN(Date.parse(val)); 
 			if ( ! resultError) result = result.toISOString();
 
-		} else if(t == Donkeylift.Field.TYPES.float) {
+		} else if (t == Donkeylift.Field.TYPES.float) {
 			result = parseFloat(val);
 			resultError = isNaN(result); 
+
+		} else if (t == Donkeylift.Field.TYPES.boolean) {
+			result = Boolean(JSON.parse(val));
+			resultError = false; 
 		}
 
 		if (validate && resultError) {
@@ -186,7 +190,8 @@ Donkeylift.Field = Backbone.Model.extend({
 
 		if (   t == Donkeylift.Field.TYPES.integer 
 			|| t == Donkeylift.Field.TYPES.decimal
-			|| t == Donkeylift.Field.TYPES.float) 
+			|| t == Donkeylift.Field.TYPES.float
+			|| t == Donkeylift.Field.TYPES.boolean) 
 		{
 			return val;
 
@@ -237,38 +242,9 @@ Donkeylift.Field.TYPES = {
 	decimal: 'decimal', 
 	date: 'date', 
 	timestamp: 'timestamp', 
-	float: 'float'
+	float: 'float',
+	boolean: 'boolean'
 };
-
-Donkeylift.Field.PROPERTIES = [
-	{ 
-		'name': 'order'
-		, 'type': 'Integer' 
-		, 'default': 100
-	}
-	, { 
-		'name': 'width'
-		, 'type': 'Integer'
-		, 'default': 16
-	}
-	, { 
-		'name': 'scale'
-		, 'type': 'Integer'
-		, 'scope': [ 'Decimal' ]
-		, 'default': 2
-	}
-/*	
-	, { 
-		'name': 'label',
-		'type': 'Text'
-	}
-*/	
-	, { 
-		'name': 'visible'
-		, 'type': 'Boolean'
-		, 'default': true
-	}
-];	
 
 Donkeylift.Field.typeName = function(fieldType) 
 {

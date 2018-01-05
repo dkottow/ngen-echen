@@ -345,18 +345,18 @@
 <div class="modal fade" id="modalEditField" tabindex="-1" role="dialog">
   <div class="modal-dialog">
 	<div class="modal-content">
-	  <div class="modal-header">
+
+		<div class="modal-header">
 			<button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
 			<h4 class="modal-title">Edit Field</h4>
-	  </div>
+		</div>
+		
 	  <div class="modal-body">
-
 		<div id="modalTabDefs">
-
 			<form>
 			  <div class="form-group">
 				<label for="modalInputFieldName" class="control-label">Name:</label>
-				<input type="text" class="form-control" id="modalInputFieldName">
+				<input type="text" class="form-control" name="fieldName" id="modalInputFieldName">
 			  </div>
 			  <div class="form-group">
 				<label for="modalInputFieldType" class="control-label">Type:</label>
@@ -372,16 +372,19 @@
 			  <div class="form-group">
 				<label for="modalInputFieldTypeSuffix" class="control-label">Optional Type Modifier (Text length / Decimal precision, scale):</label>
 				<input type="text" class="form-control" id="modalInputFieldTypeSuffix">
-			  </div>
+				</div>
+				<div class="form-group">
+					<input type="checkbox" id="modalInputFieldDisabled">Disable Field
+				</div>
 			</form>
-
 		</div>	
-
-	  </div><!-- modal-body -->
+		</div><!-- modal-body -->
+		
 	  <div class="modal-footer">
-		<button id="modalFieldRemove" type="button" class="btn btn-danger" data-dismiss="modal">Delete</button>
-		<button id="modalFieldUpdate" type="button" data-dismiss="modal" class="btn btn-primary">Update</button>
-	  </div>
+			<button id="modalFieldRemove" type="button" class="btn btn-danger" data-dismiss="modal">Delete</button>
+			<button id="modalFieldUpdate" type="button" data-dismiss="modal" class="btn btn-primary">Update</button>
+		</div>
+		
 	</div>
   </div>
 </div>

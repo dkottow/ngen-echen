@@ -871,9 +871,13 @@ Donkeylift.Field = Backbone.Model.extend({
 			resultError = isNaN(Date.parse(val)); 
 			if ( ! resultError) result = result.toISOString();
 
-		} else if(t == Donkeylift.Field.TYPES.float) {
+		} else if (t == Donkeylift.Field.TYPES.float) {
 			result = parseFloat(val);
 			resultError = isNaN(result); 
+
+		} else if (t == Donkeylift.Field.TYPES.boolean) {
+			result = Boolean(JSON.parse(val));
+			resultError = false; 
 		}
 
 		if (validate && resultError) {
@@ -922,7 +926,8 @@ Donkeylift.Field = Backbone.Model.extend({
 
 		if (   t == Donkeylift.Field.TYPES.integer 
 			|| t == Donkeylift.Field.TYPES.decimal
-			|| t == Donkeylift.Field.TYPES.float) 
+			|| t == Donkeylift.Field.TYPES.float
+			|| t == Donkeylift.Field.TYPES.boolean) 
 		{
 			return val;
 
@@ -973,38 +978,9 @@ Donkeylift.Field.TYPES = {
 	decimal: 'decimal', 
 	date: 'date', 
 	timestamp: 'timestamp', 
-	float: 'float'
+	float: 'float',
+	boolean: 'boolean'
 };
-
-Donkeylift.Field.PROPERTIES = [
-	{ 
-		'name': 'order'
-		, 'type': 'Integer' 
-		, 'default': 100
-	}
-	, { 
-		'name': 'width'
-		, 'type': 'Integer'
-		, 'default': 16
-	}
-	, { 
-		'name': 'scale'
-		, 'type': 'Integer'
-		, 'scope': [ 'Decimal' ]
-		, 'default': 2
-	}
-/*	
-	, { 
-		'name': 'label',
-		'type': 'Text'
-	}
-*/	
-	, { 
-		'name': 'visible'
-		, 'type': 'Boolean'
-		, 'default': true
-	}
-];	
 
 Donkeylift.Field.typeName = function(fieldType) 
 {
@@ -2191,7 +2167,6 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 	events: {
 		'click #modalFieldUpdate': 'updateClick',
 		'click #modalFieldRemove': 'removeClick',
-		'click input[name="disabled"]': 'toggleDisableFieldClick',
 	},
 
 	initialize: function() {
@@ -2204,20 +2179,9 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 		$('#modalInputFieldName').val(this.model.get('name'));
 		$('#modalInputFieldType').val(this.model.typeName());
 		$('#modalInputFieldTypeSuffix').val(this.model.typeSuffix());						
-
-		$('#modalTabProps form').empty();
-	
-		var disabled = this.model.get('disabled');
-		var htmlDisabled = disabled 
-				? '<input type="checkbox" checked name="disabled"> Disable Field'
-				: '<input type="checkbox" name="disabled"> Disable Field'
-
-		$('#modalTabDefs form').append(htmlDisabled);
-
-		$('#modalTabDefs form').append('<div class="well inject-props"></div>');
+		$('#modalInputFieldDisabled').prop('checked', this.model.get('disabled'));
 
 		$('#modalEditField').modal();
-		this.showDefinition(true);
 
 		return this;
 	},
@@ -2227,9 +2191,7 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 
 		this.model.set('name', $('#modalInputFieldName').val());
 		this.model.setType($('#modalInputFieldType').val(), $('#modalInputFieldTypeSuffix').val());
-		//this.model.set('type', $('#modalInputFieldType').val());
-
-		this.model.set('disabled', $('#modalTabDefs input[name=disabled]:checked').val() == "on");
+		this.model.set('disabled', $('#modalInputFieldDisabled').prop('checked'));
 
 		if ( ! this.model.collection) {
 			Donkeylift.app.table.get('fields').addNew(this.model);
@@ -2248,23 +2210,6 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 		Donkeylift.app.updateSchema();
 		Donkeylift.app.tableView.render();
 	},
-
-	showDefinition: function(show) {
-		if (show) {
-			$('#modalTabDefs').show();
-		} else {
-			$('#modalTabDefs').hide();
-		}
-	},
-
-	togglePropsClick: function() {	
-		var show = $('#modalTabDefs:visible').length == 0;
-		this.showDefinition(show);
-	},
-	
-	toggleDisableFieldClick: function(ev) {
-		var disabled = $(ev.target).is(':checked');
-	}
 
 });
 
