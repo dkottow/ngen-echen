@@ -106,6 +106,9 @@ function login(config, cbAfter) {
                     ajaxFn(url, settings).then(function(result) {
                         console.log("ajaxFn.then ...Data365.ajax");
                         resolve(result);
+                    }).catch(function(result) {
+                        console.log("ajaxFn.catch ...Data365.ajax");
+                        reject(result);                        
                     });
                 }    
             });

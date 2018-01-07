@@ -116,7 +116,7 @@ Donkeylift.Schema = Backbone.Model.extend({
 			this.updateDebounced = _.debounce(function(cbAfter) {
 				var diff = jsonpatch.compare(me.orgJSON, me.toJSON());
 				console.log('Schema.update');		
-				console.log(diff);		
+				console.log(JSON.stringify(diff));		
 				if (diff.length > 0) {
 					me.patch(diff, function(err, result) {
 						

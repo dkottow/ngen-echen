@@ -60,13 +60,6 @@ function AppBase(params) {
 	
 	this.navbarView = new Donkeylift.NavbarView();
 
-  //TODO remove
-  /*
-  $.ajaxPrefilter(function( options, orgOptions, jqXHR ) {
-    me.ajaxPrefilter(options, orgOptions, jqXHR);
-  });
-*/
-
 	$('#toggle-sidebar').click(function() {
 		me.toggleSidebar();
 	}); 
@@ -78,31 +71,6 @@ function AppBase(params) {
 
   new Clipboard('.btn'); //attach clipboard option
 
-}
-
-AppBase.prototype.ajaxPrefilter = function(options, orgOptions, jqXHR) {
-/*
-  $('#ajax-progress-spinner').show();
-  jqXHR.always(function() {
-    $('#ajax-progress-spinner').hide();
-  });
-*/
-
-  //TODO - instead of adding the token as below, call authContext.acquireToken()
-  // for that, we first need to expose authContext currently in SharePoint/Common.js ...
-  // see here 
-  // https://github.com/Azure-Samples/active-directory-javascript-singlepageapp-dotnet-webapi/blob/master/TodoSPA/App/Scripts/Ctrls/todoListCtrl.js
-
-  //add user authentication
-  if (this.id_token) {
-    jqXHR.setRequestHeader('Authorization', 'Bearer ' + this.id_token);
-
-  } else if (this.account) {
-    //add user as query parameter (used for testing only)
-    var q = 'user=' + encodeURIComponent(this.account.get('user'));
-    if (options.url.indexOf('?') < 0) options.url = options.url + '?' + q;    
-    else options.url = options.url + '&' + q;    
-  }
 }
 
 AppBase.prototype.start = function(params, cbAfter) {
