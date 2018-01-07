@@ -2179,7 +2179,6 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 		$('#modalInputFieldName').val(this.model.get('name'));
 		$('#modalInputFieldType').val(this.model.typeName());
 		$('#modalInputFieldTypeSuffix').val(this.model.typeSuffix());						
-		$('#modalInputFieldDisabled').prop('checked', this.model.get('disabled'));
 
 		$('#modalEditField').modal();
 
@@ -2191,7 +2190,6 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 
 		this.model.set('name', $('#modalInputFieldName').val());
 		this.model.setType($('#modalInputFieldType').val(), $('#modalInputFieldTypeSuffix').val());
-		this.model.set('disabled', $('#modalInputFieldDisabled').prop('checked'));
 
 		if ( ! this.model.collection) {
 			Donkeylift.app.table.get('fields').addNew(this.model);
