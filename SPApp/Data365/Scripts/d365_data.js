@@ -63,17 +63,6 @@ $(document).ready(function () {
 
 function login(config, cbAfter) {
 
-/*    
-    var token = getParameterByName("id_token");
-    if (token) {
-        //we have been redirected successfully from AAD login process
-        var attrs = jwt_decode(token);
-        cbAfter(null, attrs, token);    
-        return;
-    }
-
-    authContext.login();
-*/
     var authContext = new AuthenticationContext({
         //instance: 'https://login.microsoftonline.com/',
         tenant: config.tenant, //COMMON OR YOUR TENANT ID - golderassociates.sharepoint.com

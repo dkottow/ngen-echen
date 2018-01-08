@@ -38,10 +38,11 @@ Donkeylift.SchemaTableView = Backbone.View.extend({
 		});
 		this.aliasView.render();
 
-		this.sortableFieldsTable();
+		//this.sortableFieldsTable();
 		return this;
 	},
 
+/*	
 	sortableFieldsTable: function() {
 		$('.sortable-table').sortable({
 		  containerSelector: 'table',
@@ -63,6 +64,7 @@ Donkeylift.SchemaTableView = Backbone.View.extend({
 		  }
 		});
 	},
+*/
 
 	elFields: function() {
 		return this.$('#fields tbody');
