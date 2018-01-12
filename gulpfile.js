@@ -270,10 +270,12 @@ gulp.task('build-dl-3rdparty-js', function () {
 		, inputs.SRC_3RDPARTY_DIR + 'vis/vis.min.js'
 		, inputs.SRC_3RDPARTY_DIR + ver3rd.DATATABLES + 'datatables.min.js'
 		, inputs.SRC_3RDPARTY_DIR + 'jquery-sortable/jquery-sortable-min.js'
-		, inputs.SRC_3RDPARTY_DIR + 'bootstrap-datepicker/js/bootstrap-datepicker.min.js'
+//		, inputs.SRC_3RDPARTY_DIR + 'bootstrap-datepicker/js/bootstrap-datepicker.min.js'
 		, inputs.SRC_3RDPARTY_DIR + 'bootstrap-slider/bootstrap-slider.min.js'
 		, inputs.SRC_3RDPARTY_DIR + 'clipboard.js/clipboard.min.js'
 		, inputs.SRC_3RDPARTY_DIR + 'bootstrap-select/js/bootstrap-select.min.js'
+		, inputs.SRC_3RDPARTY_DIR + 'momentjs/moment.min.js'
+		, inputs.SRC_3RDPARTY_DIR + 'bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js'
 
 		, inputs.SRC_3RDPARTY_DIR + 'adal-1.0.15/adal.min.js'
 		
@@ -300,9 +302,10 @@ gulp.task('build-dl-3rdparty-css', function () {
 				, inputs.SRC_3RDPARTY_DIR + ver3rd.FONT_AWESOME + 'css/font-awesome.min.css'
 				, inputs.SRC_3RDPARTY_DIR + 'vis/vis.min.css'
 				, inputs.SRC_3RDPARTY_DIR + ver3rd.DATATABLES + 'datatables.min.css'
-				, inputs.SRC_3RDPARTY_DIR + 'bootstrap-datepicker/css/bootstrap-datepicker.min.css'
+//				, inputs.SRC_3RDPARTY_DIR + 'bootstrap-datepicker/css/bootstrap-datepicker.min.css'
 				, inputs.SRC_3RDPARTY_DIR + 'bootstrap-slider/css/bootstrap-slider.min.css'
 				, inputs.SRC_3RDPARTY_DIR + 'bootstrap-select/css/bootstrap-select.min.css'
+				, inputs.SRC_3RDPARTY_DIR + 'bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css'
 
 //				, extdir + ver3rd.DATATABLES_EDITOR + 'css/editor.dataTables.min.css' 
 				, inputs.EXT_DIR + ver3rd.DATATABLES_EDITOR + 'css/editor.bootstrap.min.css'

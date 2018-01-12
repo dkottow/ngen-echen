@@ -198,7 +198,27 @@
 					<label for="inputFilterMax" class="control-label">To</label>
 					<input type="text" class="form-control input-sm" id="inputFilterMax">
 				</div>
-				<div id="sliderRange">
+<!--
+					<div class="form-group">
+						<div class="input-group" id="filterMin">
+							<label for="inputFilterMin" class="control-label">From</label>
+							<input type="text" class="form-control input-sm" id="inputFilterMin">
+							<span class="input-group-addon">
+								<span class="glyphicon glyphicon-calendar"></span>
+							</span>
+						</div>						
+					</div>
+					<div class="form-group">
+						<div class="input-group" id="filterMax">
+							<label for="inputFilterMax" class="control-label">To</label>
+							<input type="text" class="form-control input-sm" id="inputFilterMax">
+							<span class="input-group-addon">
+								<span class="glyphicon glyphicon-calendar"></span>
+							</span>
+						</div>
+					</div>
+-->
+					<div id="sliderRange">
 					<input id="inputSliderRange" type="text" class="span2" value="" data-slider-min="" data-slider-max="" data-slider-step="" data-slider-value=""/>				
 				</div>
 				<div class="filter-reset">

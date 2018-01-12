@@ -970,6 +970,13 @@ Donkeylift.Field.toDate = function(dateISOString) {
 					dateISOString.split('-')[2]);
 }
 
+Donkeylift.Field.forceUTCDateString = function(dateISOString) {
+	if (dateISOString.length > 10 &&  ! dateISOString.match(/Z$/)) {
+		return dateISOString + 'Z';
+	}
+	return dateISOString;
+}
+
 Donkeylift.Field.getIdFromRef = function(val) {
 	if (_.isNumber(val)) return val;
 	//extract fk from ref such as 'Book [12]'
@@ -3406,6 +3413,7 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 	},
 
 	render: function() {
+		var me = this;
 		this.$('a[href=#filterRange]').tab('show');
 
 		var stats = this.model.get('field').get('stats');
@@ -3467,6 +3475,52 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 		}
 
 		var dateTypes = [
+			Donkeylift.Field.TYPES.date,
+			Donkeylift.Field.TYPES.timestamp
+		];
+		if (_.contains(dateTypes, this.model.get('field').get('type'))) {
+
+			var opts = {
+				format: 'YYYY-MM-DD',
+				widgetPositioning: {
+					horizontal: 'auto',
+					vertical: 'bottom'
+				}
+			}
+
+			if (this.model.get('field').get('type') == Donkeylift.Field.TYPES.timestamp) {
+				opts.format = 'YYYY-MM-DDTHH:mm:ss.SSS';
+			}
+
+			var evChangeDate = function(ev) {
+				if (ev.oldDate) {
+					$("#inputFilterMin").val(
+						Donkeylift.Field.forceUTCDateString($("#inputFilterMin").val())
+					);
+					$("#inputFilterMax").val(
+						Donkeylift.Field.forceUTCDateString($("#inputFilterMax").val())
+					);
+					me.evInputFilterChange(ev);
+				}
+			}
+
+			$('#inputFilterMin').on('dp.change', evChangeDate);
+			$('#inputFilterMax').on('dp.change', evChangeDate);
+
+			$("#inputFilterMin").datetimepicker(opts);
+			$("#inputFilterMax").datetimepicker(opts);
+/*			
+			$("#filterMin").datetimepicker(opts);
+			$("#filterMax").datetimepicker(opts);
+			$("#filterMin span").show();
+			$("#filterMax span").show();
+*/			
+		} else {
+//			$("#filterMin span").hide();
+//			$("#filterMax span").hide();
+		}
+/*
+		var dateTypes = [
 			Donkeylift.Field.TYPES.date
 		];
 		if (_.contains(dateTypes, this.model.get('field').get('type'))) {
@@ -3482,6 +3536,7 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 			$("#inputFilterMin").datepicker(opts);
 			$("#inputFilterMax").datepicker(opts);
 		}
+*/
 
 	},
 

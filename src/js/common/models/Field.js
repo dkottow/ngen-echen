@@ -266,6 +266,13 @@ Donkeylift.Field.toDate = function(dateISOString) {
 					dateISOString.split('-')[2]);
 }
 
+Donkeylift.Field.forceUTCDateString = function(dateISOString) {
+	if (dateISOString.length > 10 &&  ! dateISOString.match(/Z$/)) {
+		return dateISOString + 'Z';
+	}
+	return dateISOString;
+}
+
 Donkeylift.Field.getIdFromRef = function(val) {
 	if (_.isNumber(val)) return val;
 	//extract fk from ref such as 'Book [12]'
