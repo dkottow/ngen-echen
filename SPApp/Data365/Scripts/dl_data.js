@@ -3270,13 +3270,12 @@ Donkeylift.FilterItemsView = Backbone.View.extend({
 		}
 
 		this.$('#filterOptions').empty();
-		var fn = this.model.get('field').vname();
-		var opts = this.model.get('field').get('options');		
+		var field = this.model.get('field');
 //console.log(opts);
-		_.each(opts, function(opt) {
+		_.each(field.get('options'), function(opt) {
 			this.$('#filterOptions').append(this.template({
 				name: 'filter-option',
-				value: opt[fn]
+				value: field.toFS(opt[field.vname()])
 			}));
 		}, this);
 	},
@@ -3493,6 +3492,13 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 			}
 
 			var evChangeDate = function(ev) {
+
+				/* we need some massaging on date event handling:
+				 *    1) only trigger filter event if date changes.
+				 *    2) if input value is of type timestamp, 
+				 * 		 we force it to be UTC by making sure the datetime string ends with Z.
+				 */
+
 				if (ev.oldDate) {
 					$("#inputFilterMin").val(
 						Donkeylift.Field.forceUTCDateString($("#inputFilterMin").val())
@@ -3509,17 +3515,9 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 
 			$("#inputFilterMin").datetimepicker(opts);
 			$("#inputFilterMax").datetimepicker(opts);
-/*			
-			$("#filterMin").datetimepicker(opts);
-			$("#filterMax").datetimepicker(opts);
-			$("#filterMin span").show();
-			$("#filterMax span").show();
-*/			
-		} else {
-//			$("#filterMin span").hide();
-//			$("#filterMax span").hide();
 		}
-/*
+
+/* bootstrap-datepicker
 		var dateTypes = [
 			Donkeylift.Field.TYPES.date
 		];

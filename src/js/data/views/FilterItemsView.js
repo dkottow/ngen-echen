@@ -46,13 +46,11 @@ Donkeylift.FilterItemsView = Backbone.View.extend({
 		}
 
 		this.$('#filterOptions').empty();
-		var fn = this.model.get('field').vname();
-		var opts = this.model.get('field').get('options');		
-//console.log(opts);
-		_.each(opts, function(opt) {
+		var field = this.model.get('field');
+		_.each(field.get('options'), function(opt) {
 			this.$('#filterOptions').append(this.template({
 				name: 'filter-option',
-				value: opt[fn]
+				value: field.toFS(opt[field.vname()])
 			}));
 		}, this);
 	},

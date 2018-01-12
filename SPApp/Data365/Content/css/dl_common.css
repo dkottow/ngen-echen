@@ -293,6 +293,10 @@ ul.dt-button-collection.dropdown-menu {
 	overflow-y: auto;
 }
 
+.bootstrap-datetimepicker-widget table {
+	min-width: 16em;
+}
+
 /******* compat SP *******/
 
 #sideNavBox  {  
