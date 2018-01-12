@@ -95,6 +95,24 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 		}
 
 		var dateTypes = [
+			Donkeylift.Field.TYPES.date,
+			Donkeylift.Field.TYPES.timestamp
+		];
+		if (_.contains(dateTypes, this.model.get('field').get('type'))) {
+
+			var opts = {
+				format: 'YYYY-MM-DD',
+				widgetPositioning: {
+					horizontal: 'auto',
+					vertical: 'bottom'
+				}
+			}
+
+			$("#inputFilterMin").datetimepicker(opts);
+			$("#inputFilterMax").datetimepicker(opts);
+		}
+/*
+		var dateTypes = [
 			Donkeylift.Field.TYPES.date
 		];
 		if (_.contains(dateTypes, this.model.get('field').get('type'))) {
@@ -110,6 +128,7 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 			$("#inputFilterMin").datepicker(opts);
 			$("#inputFilterMax").datepicker(opts);
 		}
+*/
 
 	},
 
