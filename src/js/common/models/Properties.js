@@ -38,13 +38,13 @@ Donkeylift.Properties = Backbone.Collection.extend({
 		var me = this;
 		console.log("Properties.fetch...");
 		me.bbFetch({
-			success: function() {
+			success: function(result) {
 				console.log("Properties.fetch OK");
 				if (cbAfter) cbAfter();
 			},
-			error: function(collection, response, options) {
+			error: function(err) {
 				console.log("Error requesting " + me.url());		
-				console.log(response);
+				alert(err.message);
 			}
 		});
 	},
@@ -52,7 +52,6 @@ Donkeylift.Properties = Backbone.Collection.extend({
     bbFetch: function(options) {
 		//minimally adapted from backbone.js
 		options = _.extend({parse: true}, options);
-		var success = options.success;
 		var collection = this;
 
 		var url = options.url || this.url();
@@ -64,15 +63,14 @@ Donkeylift.Properties = Backbone.Collection.extend({
 
 			var method = options.reset ? 'reset' : 'set';
 			collection[method](resp, options);
-			if (success) success.call(options.context, collection, resp, options);
+			if (options.success) options.success.call(options.context, resp);
 			collection.trigger('sync', collection, resp, options);
 
 		}).catch(function(result) {
 			console.log("Error requesting " + url);
 			var err = new Error(result.errThrown + " " + result.textStatus);
 			console.log(err);
-			alert(err.message);
-			cbResult(err);
+			if (options.error) options.error.call(options.context, err);
 		});
 
 	  },	

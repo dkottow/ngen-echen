@@ -66,7 +66,7 @@ Donkeylift.Schema = Backbone.Model.extend({
 		console.log("Schema.fetch...");
 		var url = me.url({ reload : 1 });		
 		me.bbFetch({
-			success: function(model, response, options) {
+			success: function(response) {
 				me.orgJSON = JSON.parse(JSON.stringify(me.toJSON())); //copy
 				me.get('props').setKeyFuncs();
 				console.log("Schema.fetch OK");
@@ -74,9 +74,9 @@ Donkeylift.Schema = Backbone.Model.extend({
 					cbAfter();
 				});					
 			},
-			error: function(model, response, options) {
-				console.log(JSON.stringify(response));
-				alert(response.responseText);
+			error: function(err) {
+				console.log(err);
+				alert(err.message);
 			},
 			url: url
 		});
@@ -85,7 +85,6 @@ Donkeylift.Schema = Backbone.Model.extend({
     bbFetch: function(options) {
 		//minimally adapted from backbone.js
 		options = _.extend({parse: true}, options);
-		var success = options.success;
 		var model = this;
 
 		var url = options.url || this.url();
@@ -97,15 +96,14 @@ Donkeylift.Schema = Backbone.Model.extend({
 
 			var serverAttrs = options.parse ? model.parse(resp, options) : resp;
 			if (!model.set(serverAttrs, options)) return false;
-			if (success) success.call(options.context, model, resp, options);
+			if (options.success) options.success.call(options.context, resp);
 			model.trigger('sync', model, resp, options);
 
 		}).catch(function(result) {
 			console.log("Error requesting " + url);
 			var err = new Error(result.errThrown + " " + result.textStatus);
 			console.log(err);
-			alert(err.message);
-			cbResult(err);
+			if (options.error) options.error.call(options.context, err);
 		});
 
 	  },	

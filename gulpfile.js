@@ -302,9 +302,9 @@ gulp.task('build-dl-3rdparty-css', function () {
 				, inputs.SRC_3RDPARTY_DIR + ver3rd.FONT_AWESOME + 'css/font-awesome.min.css'
 				, inputs.SRC_3RDPARTY_DIR + 'vis/vis.min.css'
 				, inputs.SRC_3RDPARTY_DIR + ver3rd.DATATABLES + 'datatables.min.css'
-//				, inputs.SRC_3RDPARTY_DIR + 'bootstrap-datepicker/css/bootstrap-datepicker.min.css'
 				, inputs.SRC_3RDPARTY_DIR + 'bootstrap-slider/css/bootstrap-slider.min.css'
 				, inputs.SRC_3RDPARTY_DIR + 'bootstrap-select/css/bootstrap-select.min.css'
+				, inputs.SRC_3RDPARTY_DIR + 'bootstrap-datepicker/css/bootstrap-datepicker.min.css'
 				, inputs.SRC_3RDPARTY_DIR + 'bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css'
 
 //				, extdir + ver3rd.DATATABLES_EDITOR + 'css/editor.dataTables.min.css' 
