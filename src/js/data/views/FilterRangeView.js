@@ -132,7 +132,7 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 		if (_.contains(dateTypes, this.model.get('field').get('type'))) {
 
 			var opts = {
-				debug: true,
+				debug: false,
 				format: 'YYYY-MM-DD',
 				widgetPositioning: {
 					horizontal: 'auto',

@@ -970,6 +970,13 @@ Donkeylift.Field.toDate = function(dateISOString) {
 					dateISOString.split('-')[2]);
 }
 
+Donkeylift.Field.forceUTCDateString = function(dateISOString) {
+	if (dateISOString.length > 10 &&  ! dateISOString.match(/Z$/)) {
+		return dateISOString + 'Z';
+	}
+	return dateISOString;
+}
+
 Donkeylift.Field.getIdFromRef = function(val) {
 	if (_.isNumber(val)) return val;
 	//extract fk from ref such as 'Book [12]'
@@ -1022,13 +1029,13 @@ Donkeylift.Properties = Backbone.Collection.extend({
 		var me = this;
 		console.log("Properties.fetch...");
 		me.bbFetch({
-			success: function() {
+			success: function(result) {
 				console.log("Properties.fetch OK");
 				if (cbAfter) cbAfter();
 			},
-			error: function(collection, response, options) {
+			error: function(err) {
 				console.log("Error requesting " + me.url());		
-				console.log(response);
+				alert(err.message);
 			}
 		});
 	},
@@ -1036,7 +1043,6 @@ Donkeylift.Properties = Backbone.Collection.extend({
     bbFetch: function(options) {
 		//minimally adapted from backbone.js
 		options = _.extend({parse: true}, options);
-		var success = options.success;
 		var collection = this;
 
 		var url = options.url || this.url();
@@ -1048,15 +1054,14 @@ Donkeylift.Properties = Backbone.Collection.extend({
 
 			var method = options.reset ? 'reset' : 'set';
 			collection[method](resp, options);
-			if (success) success.call(options.context, collection, resp, options);
+			if (options.success) options.success.call(options.context, resp);
 			collection.trigger('sync', collection, resp, options);
 
 		}).catch(function(result) {
 			console.log("Error requesting " + url);
 			var err = new Error(result.errThrown + " " + result.textStatus);
 			console.log(err);
-			alert(err.message);
-			cbResult(err);
+			if (options.error) options.error.call(options.context, err);
 		});
 
 	  },	
@@ -1309,7 +1314,7 @@ Donkeylift.Schema = Backbone.Model.extend({
 		console.log("Schema.fetch...");
 		var url = me.url({ reload : 1 });		
 		me.bbFetch({
-			success: function(model, response, options) {
+			success: function(response) {
 				me.orgJSON = JSON.parse(JSON.stringify(me.toJSON())); //copy
 				me.get('props').setKeyFuncs();
 				console.log("Schema.fetch OK");
@@ -1317,9 +1322,9 @@ Donkeylift.Schema = Backbone.Model.extend({
 					cbAfter();
 				});					
 			},
-			error: function(model, response, options) {
-				console.log(JSON.stringify(response));
-				alert(response.responseText);
+			error: function(err) {
+				console.log(err);
+				alert(err.message);
 			},
 			url: url
 		});
@@ -1328,7 +1333,6 @@ Donkeylift.Schema = Backbone.Model.extend({
     bbFetch: function(options) {
 		//minimally adapted from backbone.js
 		options = _.extend({parse: true}, options);
-		var success = options.success;
 		var model = this;
 
 		var url = options.url || this.url();
@@ -1340,15 +1344,14 @@ Donkeylift.Schema = Backbone.Model.extend({
 
 			var serverAttrs = options.parse ? model.parse(resp, options) : resp;
 			if (!model.set(serverAttrs, options)) return false;
-			if (success) success.call(options.context, model, resp, options);
+			if (options.success) options.success.call(options.context, resp);
 			model.trigger('sync', model, resp, options);
 
 		}).catch(function(result) {
 			console.log("Error requesting " + url);
 			var err = new Error(result.errThrown + " " + result.textStatus);
 			console.log(err);
-			alert(err.message);
-			cbResult(err);
+			if (options.error) options.error.call(options.context, err);
 		});
 
 	  },	
@@ -3263,13 +3266,11 @@ Donkeylift.FilterItemsView = Backbone.View.extend({
 		}
 
 		this.$('#filterOptions').empty();
-		var fn = this.model.get('field').vname();
-		var opts = this.model.get('field').get('options');		
-//console.log(opts);
-		_.each(opts, function(opt) {
+		var field = this.model.get('field');
+		_.each(field.get('options'), function(opt) {
 			this.$('#filterOptions').append(this.template({
 				name: 'filter-option',
-				value: opt[fn]
+				value: field.toFS(opt[field.vname()])
 			}));
 		}, this);
 	},
@@ -3406,6 +3407,7 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 	},
 
 	render: function() {
+		var me = this;
 		this.$('a[href=#filterRange]').tab('show');
 
 		var stats = this.model.get('field').get('stats');
@@ -3467,6 +3469,52 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 		}
 
 		var dateTypes = [
+			Donkeylift.Field.TYPES.date,
+			Donkeylift.Field.TYPES.timestamp
+		];
+		if (_.contains(dateTypes, this.model.get('field').get('type'))) {
+
+			var opts = {
+				debug: false,
+				format: 'YYYY-MM-DD',
+				widgetPositioning: {
+					horizontal: 'auto',
+					vertical: 'bottom'
+				}
+			}
+
+			if (this.model.get('field').get('type') == Donkeylift.Field.TYPES.timestamp) {
+				opts.format = 'YYYY-MM-DDTHH:mm:ss.SSS';
+			}
+
+			var evChangeDate = function(ev) {
+
+				/* we need some massaging on date event handling:
+				 *    1) only trigger filter event if date changes.
+				 *    2) if input value is of type timestamp, 
+				 * 		 we force it to be UTC by making sure the datetime string ends with Z.
+				 */
+
+				if (ev.oldDate) {
+					$("#inputFilterMin").val(
+						Donkeylift.Field.forceUTCDateString($("#inputFilterMin").val())
+					);
+					$("#inputFilterMax").val(
+						Donkeylift.Field.forceUTCDateString($("#inputFilterMax").val())
+					);
+					me.evInputFilterChange(ev);
+				}
+			}
+
+			$('#inputFilterMin').on('dp.change', evChangeDate);
+			$('#inputFilterMax').on('dp.change', evChangeDate);
+
+			$("#inputFilterMin").datetimepicker(opts);
+			$("#inputFilterMax").datetimepicker(opts);
+		}
+
+/* bootstrap-datepicker
+		var dateTypes = [
 			Donkeylift.Field.TYPES.date
 		];
 		if (_.contains(dateTypes, this.model.get('field').get('type'))) {
@@ -3482,6 +3530,7 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 			$("#inputFilterMin").datepicker(opts);
 			$("#inputFilterMax").datepicker(opts);
 		}
+*/
 
 	},
 

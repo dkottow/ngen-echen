@@ -198,9 +198,11 @@
 					<label for="inputFilterMax" class="control-label">To</label>
 					<input type="text" class="form-control input-sm" id="inputFilterMax">
 				</div>
+
 				<div id="sliderRange">
 					<input id="inputSliderRange" type="text" class="span2" value="" data-slider-min="" data-slider-max="" data-slider-step="" data-slider-value=""/>				
 				</div>
+
 				<div class="filter-reset">
 					<button id="rangeReset" type="button" class="btn btn-primary">Reset</button>
 				</div>
