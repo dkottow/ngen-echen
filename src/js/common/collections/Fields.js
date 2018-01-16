@@ -20,6 +20,12 @@ Donkeylift.Fields = Backbone.Collection.extend({
 		});
 	},
 
+	setByName: function(field) {
+		this.remove(this.getByName(field.get('name')));
+		this.add(field);
+		return field;
+	},
+
 	sortByOrder: function() {
 		return this.sortBy(function(field) {
 				return field.getProp('order');

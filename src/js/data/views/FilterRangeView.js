@@ -13,30 +13,55 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 		console.log("FilterRangeView.init " + this.model.get('table'));
 	},
 
-	canSlide: function() {
-		var field = this.model.get('field');
-		if (field.get('fk')) return false;
-		
-		var slideTypes = [
-			Donkeylift.Field.TYPES.integer,
-			Donkeylift.Field.TYPES.decimal,
-			Donkeylift.Field.TYPES.float
-		];
-
-		return _.contains(slideTypes, Donkeylift.Field.typeName(field.get('type')));
-	},
-
-	loadRender: function() {
-		var me = this;
-		this.model.loadRange(function() {
-			me.render();
-		});
-	},
-
 	render: function() {
-		var me = this;
 		this.$('a[href=#filterRange]').tab('show');
 
+		this.renderMinMaxInputs();
+		this.renderSlider();
+		this.renderDateTimePicker();
+
+	},
+
+	evInputFilterChange: function(ev) {
+		var stats = this.model.get('field').get('stats');
+
+		this.sanitizeInputFilterValue(ev.target, [stats.min, stats.max]);
+
+		var filterValues = [$("#inputFilterMin").val(),
+							$("#inputFilterMax").val() ];
+
+		if (this.canSlide()) {
+			filterValues[0] = parseFloat(filterValues[0]);
+			filterValues[1] = parseFloat(filterValues[1]);
+			$('#inputSliderRange').slider('setValue', filterValues, false, false);
+		}
+
+		if (filterValues[0] != stats.min || filterValues[1] != stats.max) {
+			Donkeylift.app.filters.setFilter({
+				table: this.model.get('table'),
+				field: this.model.get('field'),
+				op: Donkeylift.Filter.OPS.BETWEEN,
+				value: filterValues
+			});
+		} else {
+			Donkeylift.app.filters.clearFilter(this.model.get('table'), 
+									this.model.get('field'));
+		}
+
+		Donkeylift.app.router.navigate("reload-table", {trigger: true});			
+		//window.location.hash = "#reload-table";
+	},
+
+	evFilterRangeResetClick: function() {
+		Donkeylift.app.filters.clearFilter(this.model.get('table'), 
+								this.model.get('field'));
+
+		Donkeylift.app.router.navigate("reload-table", {trigger: true});			
+		//window.location.hash = "#reload-table";
+		this.render();
+	},
+	
+	renderMinMaxInputs: function() {
 		var stats = this.model.get('field').get('stats');
 
 		var current = Donkeylift.app.filters.getFilter(
@@ -49,9 +74,10 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 		} else {
 			this.$("#inputFilterMin").val(stats.min);
 			this.$("#inputFilterMax").val(stats.max);
-		}
+		}		
+	},
 
-		//console.log('el ' + this.$el.html());
+	renderSlider: function() {
 
 		if (this.canSlide()) {
 
@@ -94,7 +120,11 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 		} else {
 			$('#sliderRange').hide();
 		}
+		
+	},
 
+	renderDateTimePicker: function() {
+		var me = this;
 		var dateTypes = [
 			Donkeylift.Field.TYPES.date,
 			Donkeylift.Field.TYPES.timestamp
@@ -102,6 +132,7 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 		if (_.contains(dateTypes, this.model.get('field').get('type'))) {
 
 			var opts = {
+				debug: true,
 				format: 'YYYY-MM-DD',
 				widgetPositioning: {
 					horizontal: 'auto',
@@ -156,10 +187,9 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 			$("#inputFilterMin").datepicker(opts);
 			$("#inputFilterMax").datepicker(opts);
 		}
-*/
-
+*/		
 	},
-
+	
 	sanitizeInputFilterValue: function(el, bounds) {
 
 		if (/Min$/.test(el.id)) {
@@ -175,44 +205,25 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 
 	},
 
-	evInputFilterChange: function(ev) {
-		var stats = this.model.get('field').get('stats');
+	canSlide: function() {
+		if (this.model.get('field').get('fk')) return false;
 
-		this.sanitizeInputFilterValue(ev.target, [stats.min, stats.max]);
-
-		var filterValues = [$("#inputFilterMin").val(),
-							$("#inputFilterMax").val() ];
-
-		if (this.canSlide()) {
-			filterValues[0] = parseFloat(filterValues[0]);
-			filterValues[1] = parseFloat(filterValues[1]);
-			$('#inputSliderRange').slider('setValue', filterValues, false, false);
-		}
-
-		if (filterValues[0] != stats.min || filterValues[1] != stats.max) {
-			Donkeylift.app.filters.setFilter({
-				table: this.model.get('table'),
-				field: this.model.get('field'),
-				op: Donkeylift.Filter.OPS.BETWEEN,
-				value: filterValues
-			});
-		} else {
-			Donkeylift.app.filters.clearFilter(this.model.get('table'), 
-									this.model.get('field'));
-		}
-
-		Donkeylift.app.router.navigate("reload-table", {trigger: true});			
-		//window.location.hash = "#reload-table";
+		return _.contains([
+			Donkeylift.Field.TYPES.integer,
+			Donkeylift.Field.TYPES.decimal,
+			Donkeylift.Field.TYPES.float
+		], Donkeylift.Field.typeName(
+			this.model.get('field').get('type')			
+		));
 	},
 
-	evFilterRangeResetClick: function() {
-		Donkeylift.app.filters.clearFilter(this.model.get('table'), 
-								this.model.get('field'));
-
-		Donkeylift.app.router.navigate("reload-table", {trigger: true});			
-		//window.location.hash = "#reload-table";
-		this.render();
+	loadRender: function() {
+		var me = this;
+		this.model.loadRange(function() {
+			me.render();
+		});
 	},
+	
 });
 
 
