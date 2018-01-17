@@ -51,22 +51,21 @@ Donkeylift.RelationEditView = Backbone.View.extend({
 	updateClick: function() {
 		console.log('RelationEditView.updateClick');
 		var newTable = $('#modalInputRelationTable').val();	
-		var newType = $('#modalInputRelationType').val();
 		var newField = $('#modalInputRelationField').val();
-		if (newType == 'one-to-one') newField = 'id';
-		else if (_.isEmpty(newField)) {
+
+		if (_.isEmpty(newField)) {
 			//create field as <newTable>_id
-			newField = newTable + "_id";
-			var f = this.model.get('table').get('fields').addNew();
-			f.set('name', newField);
-			f.set('type', Donkeylift.Field.TYPES.integer);
+			newField = Donkeylift.Field.create();
+			newField.set('name', newTable + "_id");
+			newField.set('type', Donkeylift.Field.TYPES.integer);
+			this.model.get('table').get('fields').setByName(newField);
+		} else {
+			newField = this.model.get('table').get('fields').getByName(newField);
 		}
 
-		newField = this.model.get('table').get('fields').getByName(newField);
 		newTable = this.schema.get('tables').getByName(newTable);
-		//console.log('new field ' + fields.getByName(newField).get('name'));
-		//console.log('new related table ' + tables.getByName(newTable).get('name'));
-		
+		var newType = $('#modalInputRelationType').val();
+
 		this.model.set({
 			'type': newType,
 			'field': newField,
