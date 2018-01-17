@@ -23,9 +23,10 @@ AppSchema.prototype.createSchema = function(name) {
 AppSchema.prototype.updateSchema = function(cbAfter) {
 	Donkeylift.app.schema.update(function() {
 		if (Donkeylift.app.table) {
-			//refresh stale reference to current table
-			Donkeylift.app.table = Donkeylift.app.schema.get('tables').getByName(
-				Donkeylift.app.table.get('name')
+			//refresh stale reference to current table and re-render
+			var tableName = Donkeylift.app.table.get('name');
+			Donkeylift.app.setTable(
+				Donkeylift.app.schema.get('tables').getByName(tableName)
 			);
 		}
 		if (cbAfter) cbAfter();

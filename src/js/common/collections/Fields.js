@@ -30,6 +30,13 @@ Donkeylift.Fields = Backbone.Collection.extend({
 		return this.sortBy(function(field) {
 				return field.getProp('order');
 		});
+	},
+
+	sortByName: function() {
+		return this.sortBy(function(field) {
+				return field.get('name');
+		});
 	}
+	
 });
 

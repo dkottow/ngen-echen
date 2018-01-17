@@ -1766,7 +1766,14 @@ Donkeylift.Fields = Backbone.Collection.extend({
 		return this.sortBy(function(field) {
 				return field.getProp('order');
 		});
+	},
+
+	sortByName: function() {
+		return this.sortBy(function(field) {
+				return field.get('name');
+		});
 	}
+	
 });
 
 
@@ -2182,7 +2189,6 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 		this.model.setType($('#modalInputFieldType').val(), $('#modalInputFieldTypeSuffix').val());
 
 		if ( ! this.model.collection) {
-			//TODO replace by setByName(field)
 			Donkeylift.app.table.get('fields').setByName(this.model);
 		}
 		Donkeylift.app.table.sanitizeFieldOrdering();
@@ -2610,13 +2616,16 @@ Donkeylift.SchemaTableView = Backbone.View.extend({
 
 	initialize: function () {
 		//console.log("TableView.init " + this.model.get('name'));
+/*		
 		this.listenTo(this.model, 'change', this.render);
-		//this.listenTo(this.model.get('fields'), 'reset', this.setFields);
+		this.listenTo(this.model.get('fields'), 'reset', this.setFields);
+		this.listenTo(this.model.get('relations'), 'reset', this.setRelations);
+
 		this.listenTo(this.model.get('fields'), 'add', this.addField);
 		this.listenTo(this.model.get('fields'), 'remove', this.removeField);
 		this.listenTo(this.model.get('relations'), 'add', this.addRelation);
 		this.listenTo(this.model.get('relations'), 'remove', this.removeRelation);
-
+*/
 		this.fieldViews = {};
 		this.relationViews = {};
 	},
@@ -2681,10 +2690,6 @@ Donkeylift.SchemaTableView = Backbone.View.extend({
 	evNewFieldClick: function() {
 		console.log('TableView.evNewFieldClick');
 		var field = Donkeylift.Field.create();
-		var order = this.model.get('fields').filter(function(f) { 
-			return f.visible(); 
-		}).length + 1;
-		field.setProp('order', order);
 		var editor = Donkeylift.app.getFieldEditor();
 		editor.model = field;
 		editor.render();
@@ -2709,7 +2714,7 @@ Donkeylift.SchemaTableView = Backbone.View.extend({
 		});
 		this.elFields().html('');
 
-		_.each(this.model.get('fields').sortByOrder(), this.addField, this);
+		_.each(this.model.get('fields').sortByName(), this.addField, this);
 	},
 
 	evNewRelationClick: function() {
@@ -2859,9 +2864,10 @@ AppSchema.prototype.createSchema = function(name) {
 AppSchema.prototype.updateSchema = function(cbAfter) {
 	Donkeylift.app.schema.update(function() {
 		if (Donkeylift.app.table) {
-			//refresh stale reference to current table
-			Donkeylift.app.table = Donkeylift.app.schema.get('tables').getByName(
-				Donkeylift.app.table.get('name')
+			//refresh stale reference to current table and re-render
+			var tableName = Donkeylift.app.table.get('name');
+			Donkeylift.app.setTable(
+				Donkeylift.app.schema.get('tables').getByName(tableName)
 			);
 		}
 		if (cbAfter) cbAfter();

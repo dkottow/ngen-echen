@@ -31,7 +31,6 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 		this.model.setType($('#modalInputFieldType').val(), $('#modalInputFieldTypeSuffix').val());
 
 		if ( ! this.model.collection) {
-			//TODO replace by setByName(field)
 			Donkeylift.app.table.get('fields').setByName(this.model);
 		}
 		Donkeylift.app.table.sanitizeFieldOrdering();

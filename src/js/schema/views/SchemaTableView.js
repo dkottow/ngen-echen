@@ -12,13 +12,6 @@ Donkeylift.SchemaTableView = Backbone.View.extend({
 
 	initialize: function () {
 		//console.log("TableView.init " + this.model.get('name'));
-		this.listenTo(this.model, 'change', this.render);
-		//this.listenTo(this.model.get('fields'), 'reset', this.setFields);
-		this.listenTo(this.model.get('fields'), 'add', this.addField);
-		this.listenTo(this.model.get('fields'), 'remove', this.removeField);
-		this.listenTo(this.model.get('relations'), 'add', this.addRelation);
-		this.listenTo(this.model.get('relations'), 'remove', this.removeRelation);
-
 		this.fieldViews = {};
 		this.relationViews = {};
 	},
@@ -83,10 +76,6 @@ Donkeylift.SchemaTableView = Backbone.View.extend({
 	evNewFieldClick: function() {
 		console.log('TableView.evNewFieldClick');
 		var field = Donkeylift.Field.create();
-		var order = this.model.get('fields').filter(function(f) { 
-			return f.visible(); 
-		}).length + 1;
-		field.setProp('order', order);
 		var editor = Donkeylift.app.getFieldEditor();
 		editor.model = field;
 		editor.render();
@@ -111,7 +100,7 @@ Donkeylift.SchemaTableView = Backbone.View.extend({
 		});
 		this.elFields().html('');
 
-		_.each(this.model.get('fields').sortByOrder(), this.addField, this);
+		_.each(this.model.get('fields').sortByName(), this.addField, this);
 	},
 
 	evNewRelationClick: function() {
