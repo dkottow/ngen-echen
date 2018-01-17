@@ -76,7 +76,20 @@ function AppBase(params) {
 AppBase.prototype.start = function(params, cbAfter) {
 	var me = this;
 
-  this.getSiteConfig(params.site, function(err, config) {
+  if (params.account && params.database) {
+    //load account & database straight away
+    me.setAccount({
+      user: params.user,
+      account: params.account,
+      id_token: params.id_token
+    }, function() {
+      me.setSchema(params.database);
+    });
+    return;
+  }
+
+    //pick up site config
+    this.getSiteConfig(params.site, function(err, config) {
 
     if (err) {
       console.log(err);
@@ -2361,6 +2374,7 @@ Donkeylift.RelationEditView = Backbone.View.extend({
 		console.log('RelationEditView.updateClick');
 		var newTable = $('#modalInputRelationTable').val();	
 		var newField = $('#modalInputRelationField').val();
+
 		if (_.isEmpty(newField)) {
 			//create field as <newTable>_id
 			newField = Donkeylift.Field.create();
@@ -2370,11 +2384,10 @@ Donkeylift.RelationEditView = Backbone.View.extend({
 		} else {
 			newField = this.model.get('table').get('fields').getByName(newField);
 		}
+
 		newTable = this.schema.get('tables').getByName(newTable);
-		//console.log('new field ' + fields.getByName(newField).get('name'));
-		//console.log('new related table ' + tables.getByName(newTable).get('name'));
 		var newType = $('#modalInputRelationType').val();
-		
+
 		this.model.set({
 			'type': newType,
 			'field': newField,
@@ -2844,17 +2857,14 @@ AppSchema.prototype.createSchema = function(name) {
 }
 
 AppSchema.prototype.updateSchema = function(cbAfter) {
-	var currentTable = Donkeylift.app.table ? Donkeylift.app.table.get('name') : undefined;
 	Donkeylift.app.schema.update(function() {
-/*
-		Donkeylift.app.resetSchema(function() {
-			if (currentTable) {
-				var table = Donkeylift.app.schema.get('tables').getByName(currentTable);
-				Donkeylift.app.setTable(table);
-			}
-			if (cbAfter) cbAfter();
-		});
-*/
+		if (Donkeylift.app.table) {
+			//refresh stale reference to current table
+			Donkeylift.app.table = Donkeylift.app.schema.get('tables').getByName(
+				Donkeylift.app.table.get('name')
+			);
+		}
+		if (cbAfter) cbAfter();
 	});
 }
 

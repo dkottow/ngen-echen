@@ -41,10 +41,18 @@ $(document).ready(function () {
                 id_token: token                
             });
 
-            Donkeylift.app.start({
+            var params = {
                 site: _spPageContextInfo.siteAbsoluteUrl,
-                user: auth.upn
-            });
+                user: auth.upn,
+            };
+            
+            var db = getParameterByName('d365_database');
+            if (db && db.indexOf('$') > 0) {
+                params.account = db.split('$')[0];
+                params.database = db.split('$')[1];
+            }
+
+            Donkeylift.app.start(params);
         }
 
         //add AAD token to links

@@ -21,17 +21,14 @@ AppSchema.prototype.createSchema = function(name) {
 }
 
 AppSchema.prototype.updateSchema = function(cbAfter) {
-	var currentTable = Donkeylift.app.table ? Donkeylift.app.table.get('name') : undefined;
 	Donkeylift.app.schema.update(function() {
-/*
-		Donkeylift.app.resetSchema(function() {
-			if (currentTable) {
-				var table = Donkeylift.app.schema.get('tables').getByName(currentTable);
-				Donkeylift.app.setTable(table);
-			}
-			if (cbAfter) cbAfter();
-		});
-*/
+		if (Donkeylift.app.table) {
+			//refresh stale reference to current table
+			Donkeylift.app.table = Donkeylift.app.schema.get('tables').getByName(
+				Donkeylift.app.table.get('name')
+			);
+		}
+		if (cbAfter) cbAfter();
 	});
 }
 

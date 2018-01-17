@@ -76,7 +76,20 @@ function AppBase(params) {
 AppBase.prototype.start = function(params, cbAfter) {
 	var me = this;
 
-  this.getSiteConfig(params.site, function(err, config) {
+  if (params.account && params.database) {
+    //load account & database straight away
+    me.setAccount({
+      user: params.user,
+      account: params.account,
+      id_token: params.id_token
+    }, function() {
+      me.setSchema(params.database);
+    });
+    return;
+  }
+
+    //pick up site config
+    this.getSiteConfig(params.site, function(err, config) {
 
     if (err) {
       console.log(err);
