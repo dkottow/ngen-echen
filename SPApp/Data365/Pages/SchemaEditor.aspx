@@ -240,7 +240,7 @@
 					<thead>
 					<tr>
 						<th></th>
-						<th>Referenced Table</th>
+						<th>Parent Table</th>
 						<th>Foreign Key</th>
 					</tr>
 					</thead>

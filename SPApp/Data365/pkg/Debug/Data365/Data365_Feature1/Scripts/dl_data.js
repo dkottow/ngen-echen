@@ -83,7 +83,7 @@ AppBase.prototype.start = function(params, cbAfter) {
       account: params.account,
       id_token: params.id_token
     }, function() {
-      me.setSchema(params.database);
+      me.setSchema(params.database, cbAfter);
     });
     return;
   }
@@ -104,10 +104,10 @@ AppBase.prototype.start = function(params, cbAfter) {
 
     }, function() {
       if (config.database != '_d365Master') {
-        me.setSchema(config.database);
+        me.setSchema(config.database, cbAfter);
 
       } else {
-        me.listSchemas(params.user);
+        me.listSchemas(params.user, cbAfter);
       }
     });      
   });
@@ -165,16 +165,8 @@ AppBase.prototype.setAccount = function(params, cbAfter) {
   $('#content').empty();
 
   if (params.reset) me.unsetSchema();
-
-  me.onAccountLoaded(cbAfter);
-
+  cbAfter();
 	$('#toggle-sidebar').hide();
-}
-
-AppBase.prototype.onAccountLoaded = function(cbAfter) {
-  //overwrite me
-  console.log('onAccountLoaded...');
-  if (cbAfter) cbAfter();
 }
 
 AppBase.prototype.toggleSidebar = function() {
@@ -5965,6 +5957,7 @@ var pegParser = (function() {
 		gotoHash: function(hash, cbAfter) {
 			var parts = hash.split('/');
 			if (parts.length == 4 && parts[0] == '#data') {
+				
 				var opts = 	{ 
 						schema: parts[1],
 						params: this.parseParams(parts[3])
@@ -6069,6 +6062,19 @@ AppData.prototype.constructor = AppData;
 
 /*** override AppBase methods ***/ 
 
+AppData.prototype.start = function(params, cbAfter) {
+	console.log("AppData.start...");
+	AppBase.prototype.start.call(this, params, function() {
+		//only data app
+		if (window.location.hash.length > 0) {
+			console.log("navigate " + window.location.hash);
+			Donkeylift.app.router.gotoHash(window.location.hash, cbAfter);
+		} else {
+			if (cbAfter) cbAfter();
+		}
+	})
+}
+
 AppData.prototype.createTableView = function(table, params) {
 	return new Donkeylift.DataTableView({
 		model: table,
@@ -6118,15 +6124,6 @@ AppData.prototype.setFilterView = function(filter, thElement) {
 	if (this.filterView) this.filterView.remove();
 	this.filterView = new Donkeylift.FilterView({ model: filter, th: thElement });
 	this.filterView.render();
-}
-
-AppData.prototype.onAccountLoaded = function(cbAfter) {
-	//only data app
-	if (window.location.hash.length > 0) {
-		console.log("navigate " + window.location.hash);
-		Donkeylift.app.router.gotoHash(window.location.hash, cbAfter);
-	}
-	else if (cbAfter) cbAfter();
 }
 
 Donkeylift.AppData = AppData;

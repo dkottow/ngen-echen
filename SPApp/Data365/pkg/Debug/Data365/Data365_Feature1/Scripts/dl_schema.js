@@ -83,7 +83,7 @@ AppBase.prototype.start = function(params, cbAfter) {
       account: params.account,
       id_token: params.id_token
     }, function() {
-      me.setSchema(params.database);
+      me.setSchema(params.database, cbAfter);
     });
     return;
   }
@@ -104,10 +104,10 @@ AppBase.prototype.start = function(params, cbAfter) {
 
     }, function() {
       if (config.database != '_d365Master') {
-        me.setSchema(config.database);
+        me.setSchema(config.database, cbAfter);
 
       } else {
-        me.listSchemas(params.user);
+        me.listSchemas(params.user, cbAfter);
       }
     });      
   });
@@ -165,16 +165,8 @@ AppBase.prototype.setAccount = function(params, cbAfter) {
   $('#content').empty();
 
   if (params.reset) me.unsetSchema();
-
-  me.onAccountLoaded(cbAfter);
-
+  cbAfter();
 	$('#toggle-sidebar').hide();
-}
-
-AppBase.prototype.onAccountLoaded = function(cbAfter) {
-  //overwrite me
-  console.log('onAccountLoaded...');
-  if (cbAfter) cbAfter();
 }
 
 AppBase.prototype.toggleSidebar = function() {
@@ -2359,7 +2351,7 @@ Donkeylift.RelationEditView = Backbone.View.extend({
 		el = $('#modalInputRelationField')
 		el.html('');
 		this.model.get('table').get('fields').each(function(field) {
-			if (field.get('type') == 'Integer' && field.get('name') != 'id') {
+			if (field.get('type') == Donkeylift.Field.TYPES.integer && field.get('name') != 'id') {
 				el.append($('<option></option>')
 					.attr('value', field.get('name'))
 					.text(field.get('name')));
@@ -2456,10 +2448,10 @@ Donkeylift.RelationView = Backbone.View.extend({
 
 	render: function() {
 		console.log("RelationView.render ");
-		var params = this.model.toJSON();
-		if (this.model.get('related')) params.related = this.model.get('related').get('name');
-		if (this.model.get('field')) params.field = this.model.get('field').get('name');
-		this.$el.html(this.template(params));
+		this.$el.html(this.template({
+			fk_table: this.model.get('related').get('name'),
+			fk_field: this.model.get('field').get('name')
+		}));
 		return this;
 	},
 

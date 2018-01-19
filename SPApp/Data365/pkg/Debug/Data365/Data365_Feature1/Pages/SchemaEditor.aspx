@@ -163,9 +163,8 @@
 			<i class="fa fa-pencil"></i>
 		</button>
 	</td>
-	<td>{{ related }}</td>
-	<td>{{ type }}</td>
-	<td>{{ name }}</td>
+	<td>{{ fk_table }}</td>
+	<td>{{ fk_field }}</td>
 </script>
 
 
@@ -241,8 +240,7 @@
 					<thead>
 					<tr>
 						<th></th>
-						<th>Referenced Table</th>
-						<th>Type</th>
+						<th>Parent Table</th>
 						<th>Foreign Key</th>
 					</tr>
 					</thead>
@@ -397,24 +395,25 @@
 	  <div class="modal-body">
 		<form>
 		  <div class="form-group">
-			<label for="modalInputRelationTable" class="control-label">Referenced Table:</label>
+			<label for="modalInputRelationTable" class="control-label">Parent Table:</label>
 			<select class="form-control" id="modalInputRelationTable">
-				<option value="Date">Date</option>
-				<option value="Timestamp">Timestamp</option>
 			</select>
 		  </div>
-		  <div class="form-group">
+<!--
+			<div class="form-group">
 			<label for="modalInputRelationType" class="control-label">Type:</label>
 			<select class="form-control" id="modalInputRelationType">
 				<option value="many-to-one">many-to-one</option>
-				<!-- <option value="one-to-one">one-to-one</option> -->
+				<option value="one-to-one">one-to-one</option>
 			</select>
 		  </div>
+		-->			
+
 		  <div class="form-group">
 			<label for="modalInputRelationField" class="control-label">Foreign Key:</label>
 			<select class="form-control" id="modalInputRelationField">
 			</select>
-			<span class="help-block">Leave empty for default.</span>
+			<span class="help-block">Leave empty and the system creates an integer field named {parent}_id for you.</table></span>
 		  </div>
 		</form>
 	  </div>
