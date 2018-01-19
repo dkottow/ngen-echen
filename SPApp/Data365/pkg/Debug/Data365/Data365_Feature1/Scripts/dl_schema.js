@@ -76,7 +76,20 @@ function AppBase(params) {
 AppBase.prototype.start = function(params, cbAfter) {
 	var me = this;
 
-  this.getSiteConfig(params.site, function(err, config) {
+  if (params.account && params.database) {
+    //load account & database straight away
+    me.setAccount({
+      user: params.user,
+      account: params.account,
+      id_token: params.id_token
+    }, function() {
+      me.setSchema(params.database);
+    });
+    return;
+  }
+
+    //pick up site config
+    this.getSiteConfig(params.site, function(err, config) {
 
     if (err) {
       console.log(err);
@@ -1743,11 +1756,24 @@ Donkeylift.Fields = Backbone.Collection.extend({
 		});
 	},
 
+	setByName: function(field) {
+		this.remove(this.getByName(field.get('name')));
+		this.add(field);
+		return field;
+	},
+
 	sortByOrder: function() {
 		return this.sortBy(function(field) {
 				return field.getProp('order');
 		});
+	},
+
+	sortByName: function() {
+		return this.sortBy(function(field) {
+				return field.get('name');
+		});
 	}
+	
 });
 
 
@@ -2163,7 +2189,7 @@ Donkeylift.FieldEditView = Backbone.View.extend({
 		this.model.setType($('#modalInputFieldType').val(), $('#modalInputFieldTypeSuffix').val());
 
 		if ( ! this.model.collection) {
-			Donkeylift.app.table.get('fields').addNew(this.model);
+			Donkeylift.app.table.get('fields').setByName(this.model);
 		}
 		Donkeylift.app.table.sanitizeFieldOrdering();
 		Donkeylift.app.updateSchema();
@@ -2353,22 +2379,21 @@ Donkeylift.RelationEditView = Backbone.View.extend({
 	updateClick: function() {
 		console.log('RelationEditView.updateClick');
 		var newTable = $('#modalInputRelationTable').val();	
-		var newType = $('#modalInputRelationType').val();
 		var newField = $('#modalInputRelationField').val();
-		if (newType == 'one-to-one') newField = 'id';
-		else if (_.isEmpty(newField)) {
+
+		if (_.isEmpty(newField)) {
 			//create field as <newTable>_id
-			newField = newTable + "_id";
-			var f = this.model.get('table').get('fields').addNew();
-			f.set('name', newField);
-			f.set('type', Donkeylift.Field.TYPES.integer);
+			newField = Donkeylift.Field.create();
+			newField.set('name', newTable + "_id");
+			newField.set('type', Donkeylift.Field.TYPES.integer);
+			this.model.get('table').get('fields').setByName(newField);
+		} else {
+			newField = this.model.get('table').get('fields').getByName(newField);
 		}
 
-		newField = this.model.get('table').get('fields').getByName(newField);
 		newTable = this.schema.get('tables').getByName(newTable);
-		//console.log('new field ' + fields.getByName(newField).get('name'));
-		//console.log('new related table ' + tables.getByName(newTable).get('name'));
-		
+		var newType = $('#modalInputRelationType').val();
+
 		this.model.set({
 			'type': newType,
 			'field': newField,
@@ -2591,13 +2616,6 @@ Donkeylift.SchemaTableView = Backbone.View.extend({
 
 	initialize: function () {
 		//console.log("TableView.init " + this.model.get('name'));
-		this.listenTo(this.model, 'change', this.render);
-		//this.listenTo(this.model.get('fields'), 'reset', this.setFields);
-		this.listenTo(this.model.get('fields'), 'add', this.addField);
-		this.listenTo(this.model.get('fields'), 'remove', this.removeField);
-		this.listenTo(this.model.get('relations'), 'add', this.addRelation);
-		this.listenTo(this.model.get('relations'), 'remove', this.removeRelation);
-
 		this.fieldViews = {};
 		this.relationViews = {};
 	},
@@ -2662,10 +2680,6 @@ Donkeylift.SchemaTableView = Backbone.View.extend({
 	evNewFieldClick: function() {
 		console.log('TableView.evNewFieldClick');
 		var field = Donkeylift.Field.create();
-		var order = this.model.get('fields').filter(function(f) { 
-			return f.visible(); 
-		}).length + 1;
-		field.setProp('order', order);
 		var editor = Donkeylift.app.getFieldEditor();
 		editor.model = field;
 		editor.render();
@@ -2690,7 +2704,7 @@ Donkeylift.SchemaTableView = Backbone.View.extend({
 		});
 		this.elFields().html('');
 
-		_.each(this.model.get('fields').sortByOrder(), this.addField, this);
+		_.each(this.model.get('fields').sortByName(), this.addField, this);
 	},
 
 	evNewRelationClick: function() {
@@ -2838,17 +2852,15 @@ AppSchema.prototype.createSchema = function(name) {
 }
 
 AppSchema.prototype.updateSchema = function(cbAfter) {
-	var currentTable = Donkeylift.app.table ? Donkeylift.app.table.get('name') : undefined;
 	Donkeylift.app.schema.update(function() {
-/*
-		Donkeylift.app.resetSchema(function() {
-			if (currentTable) {
-				var table = Donkeylift.app.schema.get('tables').getByName(currentTable);
-				Donkeylift.app.setTable(table);
-			}
-			if (cbAfter) cbAfter();
-		});
-*/
+		if (Donkeylift.app.table) {
+			//refresh stale reference to current table and re-render
+			var tableName = Donkeylift.app.table.get('name');
+			Donkeylift.app.setTable(
+				Donkeylift.app.schema.get('tables').getByName(tableName)
+			);
+		}
+		if (cbAfter) cbAfter();
 	});
 }
 

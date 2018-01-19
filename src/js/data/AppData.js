@@ -16,6 +16,19 @@ AppData.prototype.constructor = AppData;
 
 /*** override AppBase methods ***/ 
 
+AppData.prototype.start = function(params, cbAfter) {
+	console.log("AppData.start...");
+	AppBase.prototype.start.call(this, params, function() {
+		//only data app
+		if (window.location.hash.length > 0) {
+			console.log("navigate " + window.location.hash);
+			Donkeylift.app.router.gotoHash(window.location.hash, cbAfter);
+		} else {
+			if (cbAfter) cbAfter();
+		}
+	})
+}
+
 AppData.prototype.createTableView = function(table, params) {
 	return new Donkeylift.DataTableView({
 		model: table,
@@ -65,15 +78,6 @@ AppData.prototype.setFilterView = function(filter, thElement) {
 	if (this.filterView) this.filterView.remove();
 	this.filterView = new Donkeylift.FilterView({ model: filter, th: thElement });
 	this.filterView.render();
-}
-
-AppData.prototype.onAccountLoaded = function(cbAfter) {
-	//only data app
-	if (window.location.hash.length > 0) {
-		console.log("navigate " + window.location.hash);
-		Donkeylift.app.router.gotoHash(window.location.hash, cbAfter);
-	}
-	else if (cbAfter) cbAfter();
 }
 
 Donkeylift.AppData = AppData;

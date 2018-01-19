@@ -68,6 +68,7 @@
 		gotoHash: function(hash, cbAfter) {
 			var parts = hash.split('/');
 			if (parts.length == 4 && parts[0] == '#data') {
+				
 				var opts = 	{ 
 						schema: parts[1],
 						params: this.parseParams(parts[3])

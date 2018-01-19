@@ -83,7 +83,7 @@ AppBase.prototype.start = function(params, cbAfter) {
       account: params.account,
       id_token: params.id_token
     }, function() {
-      me.setSchema(params.database);
+      me.setSchema(params.database, cbAfter);
     });
     return;
   }
@@ -104,10 +104,10 @@ AppBase.prototype.start = function(params, cbAfter) {
 
     }, function() {
       if (config.database != '_d365Master') {
-        me.setSchema(config.database);
+        me.setSchema(config.database, cbAfter);
 
       } else {
-        me.listSchemas(params.user);
+        me.listSchemas(params.user, cbAfter);
       }
     });      
   });
@@ -165,16 +165,8 @@ AppBase.prototype.setAccount = function(params, cbAfter) {
   $('#content').empty();
 
   if (params.reset) me.unsetSchema();
-
-  me.onAccountLoaded(cbAfter);
-
+  cbAfter();
 	$('#toggle-sidebar').hide();
-}
-
-AppBase.prototype.onAccountLoaded = function(cbAfter) {
-  //overwrite me
-  console.log('onAccountLoaded...');
-  if (cbAfter) cbAfter();
 }
 
 AppBase.prototype.toggleSidebar = function() {

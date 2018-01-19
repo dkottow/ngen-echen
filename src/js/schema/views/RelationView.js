@@ -27,10 +27,10 @@ Donkeylift.RelationView = Backbone.View.extend({
 
 	render: function() {
 		console.log("RelationView.render ");
-		var params = this.model.toJSON();
-		if (this.model.get('related')) params.related = this.model.get('related').get('name');
-		if (this.model.get('field')) params.field = this.model.get('field').get('name');
-		this.$el.html(this.template(params));
+		this.$el.html(this.template({
+			fk_table: this.model.get('related').get('name'),
+			fk_field: this.model.get('field').get('name')
+		}));
 		return this;
 	},
 

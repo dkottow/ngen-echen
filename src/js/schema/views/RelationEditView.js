@@ -31,7 +31,7 @@ Donkeylift.RelationEditView = Backbone.View.extend({
 		el = $('#modalInputRelationField')
 		el.html('');
 		this.model.get('table').get('fields').each(function(field) {
-			if (field.get('type') == 'Integer' && field.get('name') != 'id') {
+			if (field.get('type') == Donkeylift.Field.TYPES.integer && field.get('name') != 'id') {
 				el.append($('<option></option>')
 					.attr('value', field.get('name'))
 					.text(field.get('name')));

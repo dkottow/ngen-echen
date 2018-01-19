@@ -83,6 +83,8 @@ Donkeylift.FilterRangeView = Backbone.View.extend({
 
 			$('#sliderRange').show();
 			$('#inputSliderRange').css('width', '100%');
+
+			var stats = this.model.get('field').get('stats');
 			var sliderValues = [ 
 				parseFloat(this.$("#inputFilterMin").val()),
 				parseFloat(this.$("#inputFilterMax").val())

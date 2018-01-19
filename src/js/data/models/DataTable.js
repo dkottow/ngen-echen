@@ -191,7 +191,7 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 
 				var fragment = 'data'
 							+ '/' + Donkeylift.app.schema.get('name')
-							+ '/' + Donkeylift.app.table.get('name')
+							+ '/' + me.get('name')
 							+ '/' + q;
 
 				//console.log(fragment);
