@@ -3,8 +3,8 @@ var Data365 = {
 
     config : {
         azureTenant: '46b66e86-3482-4192-842f-3472ff5fe764', //Golder
-        aadApplicationId: '7a3c34b5-2f2b-4c45-a317-242ac3f48114', //Data365
-        d365Server: "https://data365.golder.com",
+        aadApplicationId: 'fdbf5216-d507-430d-a333-b49698dc266a', //Data365
+        d365Server: "https://azd365prodwuas.azurewebsites.net",
     }
            
 };
@@ -70,6 +70,23 @@ $(document).ready(function () {
 
 
 function login(config, cbAfter) {
+    var ajaxFn = config.ajax; //config.ajax holds Donkeylift ajax impl. 
+
+    Data365.ajax = function(url, settings) {
+
+        //add AAD token to ajax request header    
+        settings = settings || {}; 
+        settings.xhrFields = { withCredentials: true };
+        return ajaxFn(url, settings);
+    }
+
+    var attrs = { 
+        upn: _spPageContextInfo.userLoginName 
+    };
+    cbAfter(null, attrs); //no auth token        
+}
+
+function login_adal(config, cbAfter) {
 
     var authContext = new AuthenticationContext({
         //instance: 'https://login.microsoftonline.com/',
@@ -128,29 +145,6 @@ function login(config, cbAfter) {
         cbAfter(null, attrs, token);        
     });
 
-}
-
-function cbAfterLogin(cbAfter) {
-    /*
-     * given the configuration of ADAL (popUp = false) cbAfter will not be called.
-     * instead the user will be redirected to another page login by ADAL.login() 
-     * and then back to ours with the token in the URL (see above)
-     * 
-     * However, if we would change to popUp = true the user does not leave our page 
-     * and the app flow would continue after login through cbAfter()
-     */ 
-    return function(err, token) {
-        console.log('cbAfterLogin...');
-        console.log('token: ' + token);
-        if (err) {  
-            console.log(err);
-            alert(err.message);
-            cbAfter(err);            
-        } else {
-            var attrs = jwt_decode(token);
-            cbAfter(null, attrs, token);
-        }
-    }
 }
 
 //stackoverflow - https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript

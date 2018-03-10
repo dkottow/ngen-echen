@@ -317,6 +317,8 @@
 
 	    </div><!-- main -->
 
+			<!-- used for appropiate CORS handling. See https://docs.microsoft.com/en-us/sharepoint/dev/spfx/web-parts/guidance/connect-to-api-secured-with-aad -->  	
+			<iframe src="https://azd365prodwuas.azurewebsites.net/" style="display:none;"></iframe>
 
     <!-- end FIXED PAGE ELEMENTS --> 
 
