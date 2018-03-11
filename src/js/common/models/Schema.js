@@ -101,7 +101,7 @@ Donkeylift.Schema = Backbone.Model.extend({
 
 		}).catch(function(result) {
 			console.log("Error requesting " + url);
-			var err = new Error(result.errThrown + " " + result.textStatus);
+			var err = new Error(result.jqXHR.responseText);
 			console.log(err);
 			if (options.error) options.error.call(options.context, err);
 		});

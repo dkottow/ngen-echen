@@ -218,7 +218,7 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 				callback(data);
 			}).catch(function(result) {
 				console.log("Error requesting " + url);
-				var err = new Error(result.errThrown + " " + result.textStatus);
+				var err = new Error(result.jqXHR.responseText);
 				console.log(err);
 				alert(err.message);
 			});
@@ -267,7 +267,7 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 
 			}).catch(function(result) {
 				console.log("Error requesting " + url);
-				var err = new Error(result.errThrown + " " + result.textStatus);
+				var err = new Error(result.jqXHR.responseText);
 				console.log(err);
 				alert(err.message);
 			});
@@ -311,7 +311,7 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 
 			}).catch(function(result) {
 				console.log("Error requesting " + url);
-				var err = new Error(result.errThrown + " " + result.textStatus);
+				var err = new Error(result.jqXHR.responseText);
 				console.log(err);
 				alert(err.message);
 			});
@@ -336,7 +336,7 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 
 		}).catch(function(result) {
 			console.log("Error requesting " + url);
-			var err = new Error(result.errThrown + " " + result.textStatus);
+			var err = new Error(result.jqXHR.responseText);
 			console.log(err);
 			alert(err.message);
 		});
@@ -364,7 +364,7 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 
 		}).catch(function(result) {
 			console.log("Error requesting " + url);
-			var err = new Error(result.errThrown + " " + result.textStatus);
+			var err = new Error(result.jqXHR.responseText);
 			console.log(err);
 			alert(err.message);
 			cbResult();
@@ -396,7 +396,7 @@ Donkeylift.DataTable = Donkeylift.Table.extend({
 
 		}).catch(function(result) {
 			console.log("Error requesting " + url);
-			var err = new Error(result.errThrown + " " + result.textStatus);
+			var err = new Error(result.jqXHR.responseText);
 			console.log(err);
 			alert(err.message);
 			cbResult(err);

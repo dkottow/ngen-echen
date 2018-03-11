@@ -13,7 +13,14 @@ function login(config, cbAfter) {
     var attrs = { 
         upn: _spPageContextInfo.userLoginName 
     };
-    cbAfter(null, attrs); //no auth token        
+
+    var lid = setInterval(function() {
+        if (Data365.env.remotePartyLoaded) {
+            clearInterval(lid);
+            cbAfter(null, attrs); //no auth token        
+        }
+    }, 100);
+
 }
 
 function login_adal(config, cbAfter) {

@@ -5,8 +5,11 @@ var Data365 = {
         azureTenant: '46b66e86-3482-4192-842f-3472ff5fe764', //Golder
         aadApplicationId: 'fdbf5216-d507-430d-a333-b49698dc266a', //Data365
         d365Server: "https://azd365prodwuas.azurewebsites.net",
-    }
-           
+    },
+
+    env: {
+        remotePartyLoaded: false //true once hidden iframe pointing to api loaded
+    },    
 };
 
 
@@ -14,7 +17,12 @@ var Data365 = {
 
 
 // This code runs when the DOM is ready and creates a context object which is needed to use the SharePoint object model
-$(document).ready(function () {
+$(document).ready(function() {
+
+    $('iframe').load(function() {
+        console.log('iframe loaded. setting remotePartyLoaded');
+        Data365.env.remotePartyLoaded = true;
+    });
 
     login({
         tenant: Data365.config.azureTenant,
@@ -55,9 +63,9 @@ $(document).ready(function () {
             Donkeylift.app.start(params);
         }
 
-        //add AAD token to links
-        if (getParameterByName('id_token')) {
-            var href = $('.d365-anchor').attr('href') + "#id_token=" + getParameterByName('id_token');
+        //add d365_database to links
+        if (getParameterByName('d365_database')) {
+            var href = $('.d365-anchor').attr('href') + "?d365_database=" + getParameterByName('d365_database');
             $('.d365-anchor').attr('href', href);
         }
 
@@ -83,7 +91,14 @@ function login(config, cbAfter) {
     var attrs = { 
         upn: _spPageContextInfo.userLoginName 
     };
-    cbAfter(null, attrs); //no auth token        
+
+    var lid = setInterval(function() {
+        if (Data365.env.remotePartyLoaded) {
+            clearInterval(lid);
+            cbAfter(null, attrs); //no auth token        
+        }
+    }, 100);
+
 }
 
 function login_adal(config, cbAfter) {

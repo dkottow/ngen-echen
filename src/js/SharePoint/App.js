@@ -2,7 +2,12 @@
 
 
 // This code runs when the DOM is ready and creates a context object which is needed to use the SharePoint object model
-$(document).ready(function () {
+$(document).ready(function() {
+
+    $('iframe').load(function() {
+        console.log('iframe loaded. setting remotePartyLoaded');
+        Data365.env.remotePartyLoaded = true;
+    });
 
     login({
         tenant: Data365.config.azureTenant,
@@ -43,9 +48,9 @@ $(document).ready(function () {
             Donkeylift.app.start(params);
         }
 
-        //add AAD token to links
-        if (getParameterByName('id_token')) {
-            var href = $('.d365-anchor').attr('href') + "#id_token=" + getParameterByName('id_token');
+        //add d365_database to links
+        if (getParameterByName('d365_database')) {
+            var href = $('.d365-anchor').attr('href') + "?d365_database=" + getParameterByName('d365_database');
             $('.d365-anchor').attr('href', href);
         }
 
