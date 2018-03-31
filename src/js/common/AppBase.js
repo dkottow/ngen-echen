@@ -88,8 +88,8 @@ AppBase.prototype.start = function(params, cbAfter) {
     return;
   }
 
-    //pick up site config
-    this.getSiteConfig(params.site, function(err, config) {
+  //else pick up site config
+  this.getSiteConfig(params.site, function(err, config) {
 
     if (err) {
       console.log(err);

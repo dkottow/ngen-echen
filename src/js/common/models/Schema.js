@@ -55,8 +55,10 @@ Donkeylift.Schema = Backbone.Model.extend({
 	url : function(params) {
 		var url = Donkeylift.app.account.url() + '/' + this.get('name');
 		if (params) {
-			url = url + '?' 
-				+ _.map(params, function(v, k) { return k + '=' + encodeURI(v) }).join('&');
+			var urlParams = _.map(params, function(v, k) { 
+				return k + '=' + encodeURI(v) 
+			}).join('&');  
+			url += '?' + urlParams; 
 		}
 		return url;
 	},
