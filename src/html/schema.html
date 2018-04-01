@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+  <head>
+        <title>DonkeyLift</title>
+		<link href="/public/css/dl_3rdparty.css" rel="stylesheet" type="text/css" />
+        <link href="/public/css/dl_common.css" rel="stylesheet" type="text/css" />
+		<style>
+		</style>
+
+		<!-- Auth0. Setting the right viewport -->
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<!-- inject:google_analytics:html -->
+<!-- endinject -->
+  </head>
+
+  <body>
+<div id="wrapper" class="container-fluid">	
+
+<!-- inject:nav:html -->
+<!-- endinject -->
+
+	<div id="main" class="row">
+
+<!-- Sidebar -->
+		<div id="sidebar" class="col-sm-3 sidebar">
+		</div>        
+
+ <!-- Dynamic Content -->
+		<div id="module" class="col-sm-13">
+    			<div id="user-info" class="row user-info"></div>
+			<div id="menu" class="row"></div>
+			<section id="content" class="row"></section>
+		</div>		
+
+	</div><!-- main -->
+
+</div><!-- id wrapper -->
+
+<!-- end FIXED PAGE ELEMENTS --> 
+
+	<div id="ajax-progress-spinner">
+		<img src="/public/images/progress-spinner.gif"></img>
+	</div>	
+
+<!-- inject:dialogs:html -->
+<!-- endinject -->
+
+<!-- inject:templates:html -->
+<!-- endinject -->
+
+	<script src="js/dl_3rdparty.js" type="text/javascript"></script>
+	<script src="js/dl_schema.js" type="text/javascript"></script>
+	<!-- Auth0 lock script -->
+	<script src="//cdn.auth0.com/js/lock-9.1.min.js"></script>
+
+	<script type="text/javascript"> 
+			$(function() { 
+				Donkeylift.app = new Donkeylift.AppSchema(); 
+				Donkeylift.app.start(); 
+			});
+	</script>
+  </body>
+</html>
+
+
+
