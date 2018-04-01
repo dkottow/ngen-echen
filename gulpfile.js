@@ -41,9 +41,9 @@ var outputs = {
 	D365_SCHEMA_JS: 'd365_schema.js', 
 	D365_API_JS: 'd365_api.js',
 
-    JS_DIR: './app/js/',
+    JS_DIR: './public/js/',
 	CONTENT_DIR: './public/',
-	PAGES_DIR: './app/'
+	PAGES_DIR: './public/'
 }
 
 var tasks = [
