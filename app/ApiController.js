@@ -74,7 +74,7 @@ Controller.prototype.initRoutes = function(options) {
 			headers : { 
 				"Authorization" : "Bearer " + token
 			} 
-		}, (err, res_api, body) => {
+		}, function(err, res_api, body) {
 			if (err) { 
 				return log.error(err); 
 			}
