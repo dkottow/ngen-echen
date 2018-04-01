@@ -59,7 +59,11 @@ $(document).ready(function() {
                 params.account = db.split('$')[0];
                 params.database = db.split('$')[1];
             }
-
+            //TODO check hash path
+/*
+getParameterByName("path", "https://golderassociates.sharepoint.com/sites/13017g/Developer%20UI/Pages/DataBrowser.aspx
+    #path=AUS/FMG_SOLOMON_WATERMONITORING/Bore_Downhole_Equipment&$select=id,Pump_Status,mod_by,mod_on,add_by,add_on,Pump_Details_ref,Motor_Details_ref,Location_ref,AssetID,PumpID,MotorID,LocCode,Installation_Date,own_by,Decommissioned_Date,Non_Operating_Reason,Metered,Intake_Depth,Description,Riser_Material,Riser_Length,Riser_Diameter,Discharge_Adapt_Size,Comment,Headworks,Motor_status,Installed_By&$orderby=id asc&$skip=0&$top=10&counts=1&")
+*/
             Donkeylift.app.start(params);
         }
 

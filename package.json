@@ -8,6 +8,7 @@
     "express": "4.x"
     , "body-parser": "*"
     , "jsonwebtoken": "*"
+    , "config": "*"
     , "dotenv": "*"
     , "validator": "*"
     , "request": "*"

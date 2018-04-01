@@ -48,6 +48,7 @@ body {
 .database-info, .user-info {
 	margin-top: 10px;
 	font-weight: bold;	
+	overflow: hidden;
 }
 
 .database-info {
@@ -61,6 +62,7 @@ body {
 
 #table-list {
 	padding-top: 10px;
+	overflow: hidden;
 } 
   
 #table-list span {

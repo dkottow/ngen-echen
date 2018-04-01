@@ -88,8 +88,8 @@ AppBase.prototype.start = function(params, cbAfter) {
     return;
   }
 
-    //pick up site config
-    this.getSiteConfig(params.site, function(err, config) {
+  //else pick up site config
+  this.getSiteConfig(params.site, function(err, config) {
 
     if (err) {
       console.log(err);
@@ -1065,7 +1065,7 @@ Donkeylift.Properties = Backbone.Collection.extend({
 
 		}).catch(function(result) {
 			console.log("Error requesting " + url);
-			var err = new Error(result.errThrown + " " + result.textStatus);
+			var err = new Error(result.jqXHR.responseText);
 			console.log(err);
 			if (options.error) options.error.call(options.context, err);
 		});
@@ -1309,8 +1309,10 @@ Donkeylift.Schema = Backbone.Model.extend({
 	url : function(params) {
 		var url = Donkeylift.app.account.url() + '/' + this.get('name');
 		if (params) {
-			url = url + '?' 
-				+ _.map(params, function(v, k) { return k + '=' + encodeURI(v) }).join('&');
+			var urlParams = _.map(params, function(v, k) { 
+				return k + '=' + encodeURI(v) 
+			}).join('&');  
+			url += '?' + urlParams; 
 		}
 		return url;
 	},
