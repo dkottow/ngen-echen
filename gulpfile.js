@@ -12,15 +12,7 @@ var insert = require('gulp-insert');
 var rename = require('gulp-rename');
 var util = require('util');
 
-process.env.AZURE_TENANT = "46b66e86-3482-4192-842f-3472ff5fe764"; //Golder
-
-//process.env.AAD_APPLICATION_ID = "7a3c34b5-2f2b-4c45-a317-242ac3f48114"; // AAD AZD365DevWUAS
-//process.env.DATA365_SERVER = "https://azd365devwuas.azurewebsites.net"; 
-
-process.env.AAD_APPLICATION_ID = "fdbf5216-d507-430d-a333-b49698dc266a"; // AAD AZD365ProdWUAS
-process.env.DATA365_SERVER = "https://azd365prodwuas.azurewebsites.net"; //vanity domain, currenty pointing to azd365devwuas.azurewebsites.net
-
-process.env.DATA365_SITEASSETS_DIR = "..";
+var config = require('config');
 
 var inputs = {
     SRC_DIR: './src/',
@@ -49,21 +41,15 @@ var outputs = {
 	D365_SCHEMA_JS: 'd365_schema.js', 
 	D365_API_JS: 'd365_api.js',
 
-/*	
-    JS_DIR: './SPSite/Scripts/',
-	CONTENT_DIR: './SPSite/Content/',
-	ASPX_DIR: './SPSite/Pages/'
-*/
-    JS_DIR: './SPApp/Data365/Scripts/',
-	CONTENT_DIR: './SPApp/Data365/Content/',
-	IMAGES_DIR: './SPApp/Data365/Images/',
-	ASPX_DIR: './SPApp/Data365/Pages/'
+    JS_DIR: './app/js/',
+	CONTENT_DIR: './public/',
+	PAGES_DIR: './app/'
 }
 
 var tasks = [
-    'build-DataBrowser-aspx',
-    'build-SchemaEditor-aspx',
-    'build-WebApi-aspx',
+    'build-data-html',
+    //'build-schema-html',
+    //'build-api-html',
 	
 	'build-d365-data-js',
     'build-d365-schema-js',
@@ -86,7 +72,7 @@ gulp.task('default', tasks, function () {
     // place code for your default task here
 });
 
-gulp.task('build-DataBrowser-aspx', function () {
+gulp.task('build-data-html', function () {
     var snippets = {
         dialogs: [
 			inputs.SRC_DIR + 'html/common/dialogs/*.html', 
@@ -98,7 +84,7 @@ gulp.task('build-DataBrowser-aspx', function () {
 		]
     };
 
-    return gulp.src([ inputs.SRC_DIR + 'aspx/DataBrowser.aspx' ])
+    return gulp.src([ inputs.SRC_DIR + 'html/data.html' ])
 
 		.pipe(inject(gulp.src(snippets.dialogs), {
 		    starttag: '<!-- inject:dialogs:{{ext}} -->',
@@ -114,9 +100,7 @@ gulp.task('build-DataBrowser-aspx', function () {
 		    }
 		}))
 
-		.pipe(replace("$DATA365_SITEASSETS_DIR", process.env.DATA365_SITEASSETS_DIR))	
-		
-		.pipe(gulp.dest(outputs.ASPX_DIR));
+		.pipe(gulp.dest(outputs.PAGES_DIR));
 });
 
 gulp.task('build-SchemaEditor-aspx', function () {
@@ -169,9 +153,9 @@ gulp.task('build-d365-data-js', function () {
 		inputs.SRC_DIR + "js/SharePoint/App.js",
         inputs.SRC_DIR + "js/SharePoint/Common.js",
 	])
-	.pipe(replace("$AZURE_TENANT", process.env.AZURE_TENANT))	
-	.pipe(replace("$AAD_APPLICATION_ID", process.env.AAD_APPLICATION_ID))	
-	.pipe(replace("$DATA365_SERVER", process.env.DATA365_SERVER))
+	.pipe(replace("$AZURE_TENANT", config.azure.tenant))	
+	.pipe(replace("$AAD_APPLICATION_ID", config.azure.aad))	
+	.pipe(replace("$DATA365_SERVER", config.api_server))
 	.pipe(replace("$DATA365_APPLICATION", "Donkeylift.AppData"))
 /*
 	.pipe(replace("$DATA365_ACCOUNT", process.env.DATA365_ACCOUNT))	
@@ -337,7 +321,7 @@ gulp.task('copy-images', function() {
 			'./src/images/*'
 		])
 
-		.pipe(gulp.dest(outputs.IMAGES_DIR));
+		.pipe(gulp.dest(outputs.CONTENT_DIR + 'img'));
 });
 
 gulp.task('copy-webapi-js', function () {
