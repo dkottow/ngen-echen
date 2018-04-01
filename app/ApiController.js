@@ -18,6 +18,7 @@ var util = require('util');
 var url = require('url');
 var express = require('express');
 var bodyParser = require('body-parser');
+var request = require('request');
 var config = require('config');
 
 //var jwt = require('azure-ad-jwt');	//AAD
@@ -65,7 +66,22 @@ Controller.prototype.initRoutes = function(options) {
 		log.debug(req.params);
 		log.debug(req.query);
 		log.debug(req.headers);
-		res.send('api get ok.');
+
+		var token = req.header('x-ms-token-aad-id-token');
+		var url = config.api_server + req.url;	
+
+		request(url, { 
+			headers : { 
+				"Authorization" : "Bearer " + token
+			} 
+		}, (err, res_api, body) => {
+			if (err) { 
+				return log.error(err); 
+			}
+			log.debug(body);
+			res.send(body);
+		});
+
 	});
 	
 }
